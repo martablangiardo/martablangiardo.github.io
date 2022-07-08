@@ -1,0 +1,1613 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>Session 1.1: Introduction to INLA and R-INLA</title>
+    <meta charset="utf-8" />
+    <script src="libs/header-attrs/header-attrs.js"></script>
+    <link href="libs/panelset/panelset.css" rel="stylesheet" />
+    <script src="libs/panelset/panelset.js"></script>
+    <!-- (Re)Defines a bunch of LaTeX commands that can then be used directly in the .Rmd file as '\command{...}' -->
+    <script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+      TeX: {
+        /* This enables color macros */
+        extensions: ["color.js"],
+        Macros: {
+          /* Probability & mathematical symbols */
+          Pr: "{\\style{font-family:inherit; font-size: 110%;}{\\text{Pr}}}",
+          exp: "{\\style{font-family:inherit; font-size: 105%;}{\\text{exp}}}",
+          log: "{\\style{font-family:inherit; font-size: 105%;}{\\text{log}}}",
+          ln: "{\\style{font-family:inherit; font-size: 105%;}{\\text{ln}}}",
+          logit: "{\\style{font-family:inherit; font-size: 100%;}{\\text{logit}}}",
+          HR: "{\\style{font-family:inherit; font-size: 105%;}{\\text{HR}}}",
+          OR: "{\\style{font-family:inherit; font-size: 105%;}{\\text{OR}}}",
+          E: "{\\style{font-family:inherit; font-size: 105%;}{\\text{E}}}",
+          Var: "{\\style{font-family:inherit; font-size: 105%;}{\\text{Var}}}",
+          Cov: "{\\style{font-family:inherit; font-size: 105%;}{\\text{Cov}}}",
+          Corr: "{\\style{font-family:inherit; font-size: 105%;}{\\text{Corr}}}",
+          DIC: "{\\style{font-family:inherit; font-size: 105%;}{\\text{DIC}}}",
+          se: "{\\style{font-family:inherit; font-size: 100%;}{\\text{se}}}",
+          sd: "{\\style{font-family:inherit; font-size: 100%;}{\\text{sd}}}",
+          kld: "{\\style{font-family:inherit; font-size: 100%;}{\\text{kld}}}",
+          /* Distributions */
+          dnorm: "{\\style{font-family:inherit;}{\\text{Normal}}}",
+          dt: "{\\style{font-family:inherit;}{\\text{t}}}",
+          ddirch: "{\\style{font-family:inherit;}{\\text{Dirichlet}}}",
+          dmulti: "{\\style{font-family:inherit;}{\\text{Multinomial}}}",
+          dbeta: "{\\style{font-family:inherit;}{\\text{Beta}}}",
+          dgamma: "{\\style{font-family:inherit;}{\\text{Gamma}}}",
+          dbern: "{\\style{font-family:inherit;}{\\text{Bernoulli}}}",
+          dbin: "{\\style{font-family:inherit;}{\\text{Binomial}}}",
+          dpois: "{\\style{font-family:inherit;}{\\text{Poisson}}}",
+          dweib: "{\\style{font-family:inherit;}{\\text{Weibull}}}",
+          dexp: "{\\style{font-family:inherit;}{\\text{Exponential}}}",
+          dlnorm: "{\\style{font-family:inherit;}{\\text{logNormal}}}",
+          dunif: "{\\style{font-family:inherit;}{\\text{Uniform}}}",
+          /* LaTeX formatting */
+          bm: ["{\\boldsymbol #1}",1],
+          /* These create macros to typeset numbers in maths with the basic font */
+          0: "{\\style{font-family:inherit; font-size: 105%;}{\\text{0}}}",
+          1: "{\\style{font-family:inherit; font-size: 105%;}{\\text{1}}}",
+          2: "{\\style{font-family:inherit; font-size: 105%;}{\\text{2}}}",
+          3: "{\\style{font-family:inherit; font-size: 105%;}{\\text{3}}}",
+          4: "{\\style{font-family:inherit; font-size: 105%;}{\\text{4}}}",
+          5: "{\\style{font-family:inherit; font-size: 105%;}{\\text{5}}}",
+          6: "{\\style{font-family:inherit; font-size: 105%;}{\\text{6}}}",
+          7: "{\\style{font-family:inherit; font-size: 105%;}{\\text{7}}}",
+          8: "{\\style{font-family:inherit; font-size: 105%;}{\\text{8}}}",
+          9: "{\\style{font-family:inherit; font-size: 105%;}{\\text{9}}}",
+          /* Health economics quantities */
+          icer: "{\\style{font-family:inherit; font-size: 100%;}{\\text{ICER}}}",
+          nb: "{\\style{font-family:inherit; font-size: 100%;}{\\text{NB}}}",
+          ol: "{\\style{font-family:inherit; font-size: 100%;}{\\text{OL}}}",
+          ceac: "{\\style{font-family:inherit; font-size: 100%;}{\\text{CEAC}}}",
+          evpi: "{\\style{font-family:inherit; font-size: 100%;}{\\text{EVPI}}}",
+          evppi: "{\\style{font-family:inherit; font-size: 100%;}{\\text{EVPPI}}}",
+          evsi: "{\\style{font-family:inherit; font-size: 100%;}{\\text{EVSI}}}"
+        }
+      }
+    });
+    </script>
+    <link rel="stylesheet" href="assets/beamer.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+
+
+
+
+class: title-slide
+
+# Session 1.1: Introduction to INLA and `R-INLA`&lt;span style="display:block; margin-top: 10px ;"&gt;&lt;/span&gt; 
+
+## 
+
+###     
+
+### VIBASS, University of Valencia 
+
+&lt;!-- Can also separate the various components of the extra argument 'params', eg as in 
+### VIBASS, University of Valencia, 20 July 2022, Spatial and Spatio-Temporal Bayesian Models with `R-INLA`
+--&gt;
+
+20 July 2022
+
+---
+
+layout: true  
+
+.my-footer[ 
+.alignleft[ 
+&amp;nbsp; &amp;copy; Marta Blangiardo | Michela Cameletti 
+]
+.aligncenter[
+Spatial and Spatio-Temporal Bayesian Models with `R-INLA` 
+]
+.alignright[
+VIBASS, 20 Jul 2022 
+]
+] 
+
+
+&lt;style&gt;
+pre {
+  overflow-x: auto;
+}
+pre code {
+  word-wrap: normal;
+  white-space: pre;
+}
+&lt;/style&gt;
+
+
+---
+
+# Learning objectives
+
+After this lecture you should be able to 
+&lt;span style="display:block; margin-top: 40px ;"&gt;&lt;/span&gt;
+- Present the class of latent Gaussian models     
+&lt;span style="display:block; margin-top: 40px ;"&gt;&lt;/span&gt;
+- Present the Laplace approximation and the INLA approach    
+&lt;span style="display:block; margin-top: 40px ;"&gt;&lt;/span&gt;
+- Use the basic functions of the `R-INLA` package     
+&lt;span style="display:block; margin-top: 40px ;"&gt;&lt;/span&gt;
+
+The topics treated in this lecture are presented in Chapter 4  of the book **Spatial and Spatio-Temporal Bayesian models with R-INLA**.
+
+---
+
+# Outline 
+
+&lt;span style="display:block; margin-top: 30px ;"&gt;&lt;/span&gt;
+
+1\. [MCMC and INLA](#mcmc)
+
+&lt;span style="display:block; margin-top: 30px ;"&gt;&lt;/span&gt;
+
+2\. [Latent Gaussian models](#LGM)
+
+&lt;span style="display:block; margin-top: 30px ;"&gt;&lt;/span&gt;
+
+3\. [The INLA approach](#INLA)
+
+&lt;span style="display:block; margin-top: 30px ;"&gt;&lt;/span&gt;
+
+4\. [`R-INLA` package](#Package)
+
+---
+
+name: mcmc
+  
+&lt;span style="display:block; margin-top: 250px ;"&gt;&lt;/span&gt;
+
+.myblue[.center[.huge[
+**MCMC and INLA**]]]
+
+---
+
+# From MCMC to INLA
+
+- MCMC methods are flexible and able to deal with virtually any type of data and model, but they  involve computationally- and time- intensive simulations to obtain the posterior distribution for the parameters. For this reason the complexity of the model and the database dimension often remain fundamental issues. 
+
+--
+
+
+- The INLA algorithm proposed by  is a .red[*deterministic*] algorithm for Bayesian inference and it represents an alternative to MCMC which is instead a simulation based algorithm.
+
+--
+
+
+- The INLA algorithm is designed for the class of .red[*latent Gaussian models*] and compared to MCMC it provides (as) accurate results in a shorter time.
+
+--
+
+
+- INLA has become very popular among statisticians and applied researchers  and in the past few years the number of papers reporting usage and extensions of the INLA method has increased considerably.
+
+&lt;span style="display:block; margin-top: -20px ;"&gt;&lt;/span&gt;
+
+&lt;center&gt;&lt;img src=./img/INLA_citations.png width='60%' title=''&gt;&lt;/center&gt;
+
+
+---
+
+# INLA website and community
+
+- The website contains source code, examples, papers and reports discussing the theory and applications of INLA.
+
+- There is also a discussion forum where users can post queries and requests of help.
+
+- Almost each year there is an INLA-related scientific meeting.
+
+&lt;center&gt;&lt;img src=./img/INLA_website.png width='50%' title=''&gt;&lt;/center&gt;
+
+
+.center[[INLA website](https://www.r-inla.org)]
+
+---
+
+name: LGM
+  
+&lt;span style="display:block; margin-top: 250px ;"&gt;&lt;/span&gt;
+
+.myblue[.center[.huge[
+**Latent Gaussian models**]]]
+
+---
+
+# Latent Gaussian models (LGMs)
+- The general problem of (parametric) inference is posited by assuming a probability model for the observed data `\(\boldsymbol y=\left(y_1,\ldots, y_n\right)\)`, as a function of some relevant parameters
+
+&lt;span style="display:block; margin-top: -10px ;"&gt;&lt;/span&gt;
+
+.myblue[$$\boldsymbol{y} \mid \boldsymbol{\theta},\boldsymbol\psi \sim p(\boldsymbol{y} \mid \boldsymbol{\theta},\boldsymbol\psi) = \prod_{i=1}^n p(y_i \mid \boldsymbol{\theta},\boldsymbol\psi)$$]
+--
+
+&lt;span style="display:block; margin-top: -10px ;"&gt;&lt;/span&gt;
+
+- Often (in fact for a surprisingly large range of models!), we can assume that the parameters are described by a .red[**Gaussian Markov Random Field** (GMRF)]
+
+
+.myblue[
+`$$\boldsymbol{\theta} \mid \boldsymbol\psi \sim \text{Normal}(\boldsymbol 0,\boldsymbol{Q^{-1}}(\boldsymbol\psi))$$`]
+
+.myblue[
+`$$\theta_i \perp\!\!\!\perp \theta_j \mid \boldsymbol\theta_{-i,j}   \Longleftrightarrow Q_{ij}(\boldsymbol\psi)=0$$`
+]
+
+&lt;span style="display:block; margin-top: -20px ;"&gt;&lt;/span&gt;
+
+where 
+- The precision matrix `\(\bm Q\)` depends on some hyperparameters `\(\bm\psi\)` .
+- The notation `\(-i,j\)` indicates all the other elements of the parameters vector, excluding elements `\(i\)` and `\(j\)`
+- The components of `\(\bm \theta\)` are supposed to be *conditionally independent* with the consequence that `\(\bm Q\)` is a sparse precision matrix.
+
+- This kind of models is often referred to as .olive[**Latent Gaussian models**].
+
+---
+
+# LGMs as a general framework
+
+- In general
+
+.myblue[
+`\begin{align*}
+\bm y \mid \bm \theta,\bm\psi  &amp;\sim  \prod_i p(y_i\mid\bm\theta,\bm\psi)\class{black}{\mbox{  (Data model)}}\\
+\bm\theta \mid \bm\psi &amp;\sim  p(\bm\theta\mid\bm\psi) = \mbox{Normal}(0,\bm Q^{-1}(\bm\psi)) \class{black}{\mbox{  (Latent Gaussian Field)}}\\
+\bm\psi &amp;\sim p(\bm\psi) \class{black}{\mbox{ (Hyperprior)}}
+\end{align*}`
+]
+
+--
+
+&lt;span style="display:block; margin-top: 30px ;"&gt;&lt;/span&gt;
+
+- The dimension of `\(\class{myblue}{\bm\theta}\)` can be very large (eg 10 `\(^2\)`-10 `\(^5\)`).
+
+&lt;span style="display:block; margin-top: 10px ;"&gt;&lt;/span&gt;
+
+- Conversely,  the dimension of `\(\class{myblue}{\bm\psi}\)` must be relatively small (less than 20 is recommended) to avoid an exponential increase in the computational costs of the model.
+
+---
+
+# LGMs as a general framework
+
+- A very general way of specifying the problem is specifying a distribution for `\(\class{myblue}{y_i}\)` characterized by a parameter  `\(\class{myblue}{\phi_i}\)` (usually the mean) defined as a function of a structured additive predictor `\(\class{myblue}{\eta_i}\)`, defined on a suitable scale, such that  `\(\class{myblue}{g(\phi_i)=\eta_i}\)` (e.g. logistic for binomial data):
+
+.myblue[
+`$$\eta_i = \beta_0 + \sum_{m=1}^M \beta_m x_{mi} + \sum_{l=1}^L f_l(z_{li})$$`
+]
+
+where
+- `\(\beta_0\)` is the intercept; 
+- `\(\bm\beta=\{\beta_1,\ldots,\beta_M\}\)` quantify the effect of the covariates `\(\bm{x}=(\bm{x_1},\ldots, \bm{x_M})\)` on the response; 
+- `\(\bm{f}=\{f_1(\cdot),\ldots,f_L(\cdot)\}\)` is a set of functions defined in terms of some covariates `\(\bm{z}=(\bm z_1,\ldots, \bm z_L)\)`
+
+and then assume 
+
+`$$\class{red}{\bm\theta=\{\beta_0,\bm \beta,\bm f \} \sim \mbox{Normal}(\bm 0,\bm Q^{-1}(\bm\psi)) = \mbox{GMRF}(\bm\psi)}$$`
+
+--
+
+- **NB**: This of course implies some form of Normally-distributed marginals for `\(\beta_0,\bm{\beta}\)` and `\(\bm{f}\)`
+
+---
+
+# LGMs as a general framework --- examples
+
+&lt;span style="display:block; margin-top: -10px ;"&gt;&lt;/span&gt;
+
+Upon varying the form of the functions `\(\class{myblue}{f_l(\cdot)}\)`, this formulation can accommodate a wide range of models (see  for a review)
+
+
+- Standard regression
+
+  - `\(\class{myblue}{f_l(\cdot) = \text{NULL}}\)`
+
+--
+
+- Hierarchical models
+
+  - `\(\class{myblue}{f_l(\cdot) \sim \mbox{Normal}(0,\sigma^2_f)}\)` (Exchangeable)    
+   `\(\class{myblue}{\sigma^2_f\mid \bm\psi \sim}\)` some common distribution
+
+--
+
+- Spatial and spatio-temporal models 
+
+  - Areal data: `\(\class{myblue}{f_1(\cdot) \sim \mbox{CAR}}\)` &amp;nbsp; (Spatially structured effects)    
+  `\(\class{myblue}{f_2(\cdot) \sim \mbox{Normal}(0,\sigma^2_{f_2})}\)` &amp;nbsp; (Unstructured residual)
+  
+  - Geostatistical data: `\(\class{myblue}{f(\cdot) \sim \mbox{Gaussian field}}\)`
+  - Temporal component: `\(\class{myblue}{f(\cdot) \sim \mbox{RW}}\)`
+
+--
+
+- Spline smoothing
+
+  - `\(\class{myblue}{f_l(\cdot) \sim \mbox{AR}(\phi,\sigma^2_\varepsilon)}\)`
+
+--
+
+- Survival models, logGaussian Cox Processes, etc.
+
+---
+
+# MCMC and LGMs
+
+- (Standard) MCMC methods can perform poorly when applied to (non-trivial) LGMs. This is due to several factors
+&lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
+
+  - The components of the latent Gaussian field `\(\class{myblue}{\bm{\theta}}\)` tend to be highly correlated, thus impacting on convergence and autocorrelation
+  &lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
+  - Especially when the number of observations is large, `\(\class{myblue}{\bm{\theta}}\)` and `\(\class{myblue}{\bm\psi}\)` also tend to be highly correlated
+  &lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
+  - Time to run can be very long
+
+
+- Blocking and overparameterisation can **alleviate**, but rarely eliminate the problem
+
+---
+
+name: INLA
+
+&lt;span style="display:block; margin-top: 250px ;"&gt;&lt;/span&gt;
+
+.myblue[.center[.huge[
+**The INLA approach**]]]
+
+
+---
+
+# Integrated Nested Laplace Approximation (INLA)
+
+- The first *ingredient* of the INLA approach is the definition of conditional probability, which holds for any pair of variables `\((x,z)\)`. 
+
+Technically, provided `\(p(z)&gt;0\)`
+
+`$$\class{myblue}{p(x\mid z) =: \frac{p(x,z)}{p(z)} \rightarrow p(x,z)=p(x\mid z)p(z)}$$`
+
+`\(\class{myblue}{p(x\mid z)}\)` can be re-written as
+
+`$$\class{myblue}{p(z) = \frac{p(x,z)}{p(x\mid z)}}$$`
+
+--
+
+- In particular, a conditional version can be obtained further considering a third variable `\(w\)` as
+
+`$$\class{myblue}{p(z\mid w) = \frac{p(x,z\mid w)}{p(x\mid z,w)}}$$`
+
+which is particularly relevant to the Bayesian case.
+
+
+---
+
+# Integrated Nested Laplace Approximation (INLA)
+
+- The second *ingredient* is .red[**Laplace approximation**]
+
+--
+
+&lt;span style="display:block; margin-top: -20px ;"&gt;&lt;/span&gt;
+
+- Main idea: approximate `\(\class{myblue}{\log f(x)}\)` using a quadratic function by means of a Taylor's series expansion around the mode `\(x^*=\arg\!\max_x \log f(x)\)`
+
+&lt;span style="display:block; margin-top: -20px ;"&gt;&lt;/span&gt;
+.myblue[
+`\begin{align*}
+\log f(x) &amp; \approx  \log f(x^*) +(x-x^*)\left.\frac{\partial \log f(x)}{\partial x}\right|_{x=x^*}+\frac{(x-x^*)^2}{2}\left.\frac{\partial^2 \log f(x)}{\partial x^2}\right|_{x=x^*}\\
+&amp; =\log f(x^*) +\frac{(x-x^*)^2}{2}\left.\frac{\partial^2 \log f(x)}{\partial x^2}\right|_{x=x^*}  \qquad\class{black}{\left(\text{since}\left.\frac{\partial \log f(x)}{\partial x}\right|_{x=x^*}=0\right)}
+\end{align*}`
+]
+
+--
+
+&lt;span style="display:block; margin-top: -20px ;"&gt;&lt;/span&gt;
+- Setting `\(\class{myblue}{{\sigma^2}^*=-1/\left.\frac{\partial^2 \log f(x)}{\partial x^2}\right|_{x=x^*}}\)` we can re-write 
+
+
+`$$\class{myblue}{\log f(x) \approx \log f(x^*) - \frac{1}{2  {\sigma^2}^*}(x-x^*)^2}$$`
+
+
+or equivalently 
+
+.small[
+`$$\class{myblue}{\int f(x)dx = \int \exp[\log f(x)]dx \approx f(x^\star) \int \exp\left[ -\frac{(x- x^*)^2}{ 2  {\sigma^2}^*}\right] dx}$$` 
+]
+
+--
+
+- Thus, under LA, `\(\class{red}{f(x)\approx \mbox{Normal}(x^*, {\sigma^2}^*)}\)`.
+
+---
+
+#Laplace approximation --- example
+
+- Consider a `\(\chi^2\)` distribution con `\(k\)` degrees of freedom: `\(\class{red}{f(x) =  \frac{x^{\frac{k}{2}-1}e^{\frac{-x}{2}}}{2^{k/2}\Gamma(k/2)}}\)`
+
+--
+
+1\. `\(\class{myblue}{l(x) = \log f(x) = \left( \frac{k}{2}-1 \right)\log x - \frac{x}{2}+\mbox{constant}}\)`
+
+--
+
+2\. `\(\class{myblue}{l'(x)  = \frac{\partial \log f(x)}{\partial x} = \left( \frac{k}{2}-1 \right)x^{-1}-\frac{1}{2}}\)`
+
+--
+
+3\. `\(\class{myblue}{l''(x) = \frac{\partial^2 \log f(x)}{\partial x^2} = -\left( \frac{k}{2}-1 \right)x^{-2}}\)`
+
+--
+
+- Then
+
+  - Solving `\(\class{myblue}{l'(x) = 0}\)` we find the mode: `\(\color{olive}{x^*=k-2}\)`
+  - Evaluating `\(\class{myblue}{-\frac{1}{l''(x)}}\)` at the mode gives `\(\color{olive}{\sigma^{2^*}=2(k-2)}\)`
+
+--
+
+- Consequently, we can approximate `\(f(x)\)` as
+`$$\class{myblue}{f(x) \approx  \mbox{Normal}(k-2,2(k-2))}$$`
+
+---
+
+# Laplace approximation --- example
+
+.panelset[
+.panel[.panel-name[Fig1]
+&lt;img src="./img/fig1-1.png" style="display: block; margin: auto;" width="50%"&gt;
+]
+.panel[.panel-name[Fig 2]
+&lt;img src="./img/fig2-1.png" style="display: block; margin: auto;" width="50%"&gt;
+]
+
+.panel[.panel-name[Fig 3]
+&lt;img src="./img/fig3-1.png" style="display: block; margin: auto;" width="50%"&gt;
+]
+
+.panel[.panel-name[Fig 4]
+&lt;img src="./img/fig4-1.png" style="display: block; margin: auto;" width="50%"&gt;
+]
+]
+
+
+---
+
+#Laplace approximation --- example
+
+
+- Consider a Gamma distribution: `\(f(x)=\frac{b^a}{\Gamma(a)}\exp\left(-bx\right)x^{a-1}\qquad x,a,b&gt;0.\)`
+
+--
+
+1\. `\(\class{myblue}{\log f(x)=(a-1)\log x -bx +\text{constant}}\)`
+
+--
+
+2\. `\(\class{myblue}{l'(x)=\frac{\partial \log f(x)}{\partial x}=\frac{a-1}{x}-b}\)`
+
+--
+
+3\. `\(\class{myblue}{l''(x)=\frac{\partial^2 \log f(x)}{\partial x^2}=-\frac{a-1}{x^2}}\)`
+
+--
+
+- Then
+
+  - Solving `\(\class{myblue}{l'(x) = 0}\)` we find the mode: `\(\color{olive}{\frac{a-1}{b}}\)`
+  - Evaluating `\(\class{myblue}{-\frac{1}{l''(x)}}\)` at the mode gives `\(\color{olive}{\frac{a-1}{b^2}}\)`
+
+--
+
+- Consequently, we can approximate `\(f(x)\)` as
+`$$\class{myblue}{Gamma(a,b) \approx  \mbox{Normal}(x^* = \frac{a-1}{b},\sigma^{2*}=\frac{a-1}{b^2})}$$`
+
+---
+
+# Laplace approximation --- example
+
+.panelset[
+.panel[.panel-name[Fig1]
+&lt;img src="./img/fig1_1-1.png" style="display: block; margin: auto;" width="50%"&gt;
+]
+.panel[.panel-name[Fig 2]
+&lt;img src="./img/fig2_1-1.png" style="display: block; margin: auto;" width="50%"&gt;
+]
+
+.panel[.panel-name[Fig 3]
+&lt;img src="./img/fig3_1-1.png" style="display: block; margin: auto;" width="50%"&gt;
+]
+]
+
+
+---
+
+# Integrated Nested Laplace Approximation (INLA)
+**Objective of Bayesian estimation**
+
+- In a Bayesian LGM, the required distributions are 
+
+`$$\class{myblue}{p(\theta_i\mid\boldsymbol{y})} \class{black}{=  \int p(\theta_i,\boldsymbol\psi\mid \boldsymbol{y}) d\boldsymbol\psi =  \int} \class{red}{p(\boldsymbol\psi\mid\boldsymbol{y})} \class{orange}{p(\theta_i \mid \boldsymbol\psi,\boldsymbol{y})}\class{black}{d\boldsymbol\psi}$$`
+`$$\class{myblue}{p(\psi_k\mid\boldsymbol{y})} \class{black}{ = \int}\class{red}{p(\boldsymbol\psi\mid\boldsymbol{y})}\class{black}{d\boldsymbol\psi_{-k}}$$`
+
+--
+
+- Thus we need to estimate: 
+
+  1\. `\(\class{red}{p(\boldsymbol\psi\mid\boldsymbol{y})}\)`, from which also all the relevant marginals `\(\class{myblue}{p(\psi_k\mid\boldsymbol{y})}\)` can be obtained; 
+
+--
+
+  2\. `\(\color{orange}{p(\theta_i \mid \boldsymbol\psi,\boldsymbol{y})}\)`, which is needed to compute the marginal posterior for the parameters
+
+---
+
+# Integrated Nested Laplace Approximation (INLA)
+
+1. can be easily estimated as
+
+`$$\class{red}{p(\boldsymbol\psi\mid\boldsymbol{y})} \class{black}{= \frac{p(\boldsymbol\theta,\boldsymbol\psi\mid\boldsymbol{y})}{p(\boldsymbol\theta\mid\boldsymbol\psi,\boldsymbol{y})}}$$`
+
+---
+
+count:false
+
+# Integrated Nested Laplace Approximation (INLA)
+
+1\. can be easily estimated as
+
+`\begin{align}
+\class{red}{p(\boldsymbol\psi\mid\boldsymbol{y})} &amp; \class{black}{= \frac{p(\boldsymbol\theta,\boldsymbol\psi\mid\boldsymbol{y})}{p(\boldsymbol\theta\mid\boldsymbol\psi,\boldsymbol{y})}}\\
+&amp; =\frac{p(\boldsymbol{y}\mid\boldsymbol\theta,\boldsymbol\psi)p(\boldsymbol\theta,\boldsymbol\psi)}{p(\boldsymbol{y})}\frac{1}{p(\boldsymbol\theta\mid\boldsymbol\psi,\boldsymbol{y})}
+\end{align}`
+
+---
+
+count:false
+
+# Integrated Nested Laplace Approximation (INLA)
+
+1\. can be easily estimated as
+
+`\begin{align}
+\class{red}{p(\boldsymbol\psi\mid\boldsymbol{y})} &amp; \class{black}{= \frac{p(\boldsymbol\theta,\boldsymbol\psi\mid\boldsymbol{y})}{p(\boldsymbol\theta\mid\boldsymbol\psi,\boldsymbol{y})}}\\
+&amp; =\frac{p(\boldsymbol{y}\mid\boldsymbol\theta,\boldsymbol\psi)p(\boldsymbol\theta,\boldsymbol\psi)}{p(\boldsymbol{y})}\frac{1}{p(\boldsymbol\theta\mid\boldsymbol\psi,\boldsymbol{y})}\\
+&amp;=\frac{p(\boldsymbol{y}\mid\boldsymbol\theta, \boldsymbol \psi)p(\boldsymbol\theta\mid\boldsymbol\psi)p(\boldsymbol\psi)}{p(\boldsymbol{y})}\frac{1}{p(\boldsymbol\theta\mid\boldsymbol\psi,\boldsymbol{y})}\
+\end{align}`
+
+---
+
+count:false
+
+# Integrated Nested Laplace Approximation (INLA)
+
+1\. can be easily estimated as
+
+`\begin{align}
+  \class{red}{p(\boldsymbol\psi\mid\boldsymbol{y})} &amp; \class{black}{= \frac{p(\boldsymbol\theta,\boldsymbol\psi\mid\boldsymbol{y})}{p(\boldsymbol\theta\mid\boldsymbol\psi,\boldsymbol{y})}}\\
+  &amp; =\frac{p(\boldsymbol{y}\mid\boldsymbol\theta,\boldsymbol\psi)p(\boldsymbol\theta,\boldsymbol\psi)}{p(\boldsymbol{y})}\frac{1}{p(\boldsymbol\theta\mid\boldsymbol\psi,\boldsymbol{y})}\\
+&amp;=\frac{p(\boldsymbol{y}\mid\boldsymbol\theta, \boldsymbol \psi)p(\boldsymbol\theta\mid\boldsymbol\psi)p(\boldsymbol\psi)}{p(\boldsymbol{y})}\frac{1}{p(\boldsymbol\theta\mid\boldsymbol\psi,\boldsymbol{y})}\\ 
+&amp; \propto \frac{p(\boldsymbol\psi)p(\boldsymbol\theta\mid\boldsymbol\psi)p(\boldsymbol{y}\mid\boldsymbol\theta,\boldsymbol y)}{p(\boldsymbol\theta\mid\boldsymbol\psi,\boldsymbol{y})}
+\end{align}`
+
+---
+
+count:false
+
+# Integrated Nested Laplace Approximation (INLA)
+
+1\. can be easily estimated as
+
+`\begin{align}
+\class{red}{p(\boldsymbol\psi\mid\boldsymbol{y})} &amp; \class{black}{= \frac{p(\boldsymbol\theta,\boldsymbol\psi\mid\boldsymbol{y})}{p(\boldsymbol\theta\mid\boldsymbol\psi,\boldsymbol{y})}}\\
+&amp; =\frac{p(\boldsymbol{y}\mid\boldsymbol\theta,\boldsymbol\psi)p(\boldsymbol\theta,\boldsymbol\psi)}{p(\boldsymbol{y})}\frac{1}{p(\boldsymbol\theta\mid\boldsymbol\psi,\boldsymbol{y})}\\
+&amp;=\frac{p(\boldsymbol{y}\mid\boldsymbol\theta, \boldsymbol \psi)p(\boldsymbol\theta\mid\boldsymbol\psi)p(\boldsymbol\psi)}{p(\boldsymbol{y})}\frac{1}{p(\boldsymbol\theta\mid\boldsymbol\psi,\boldsymbol{y})}\\ 
+&amp; \propto \frac{p(\boldsymbol\psi)p(\boldsymbol\theta\mid\boldsymbol\psi)p(\boldsymbol{y}\mid\boldsymbol\theta,\boldsymbol y)}{p(\boldsymbol\theta\mid\boldsymbol\psi,\boldsymbol{y})}\\
+&amp; \approx \left. \frac{p(\boldsymbol\psi)p(\boldsymbol\theta\mid\boldsymbol\psi)p(\boldsymbol{y}\mid\boldsymbol\theta)}{\tilde{p}(\boldsymbol\theta\mid\boldsymbol\psi,\boldsymbol{y})}\right |_{\boldsymbol\theta={\boldsymbol\theta}^*(\boldsymbol\psi)} =: \class{red}{\tilde{p}(\boldsymbol\psi\mid\boldsymbol{y})}
+\end{align}`
+
+where 
+
+- `\(\tilde{p}(\boldsymbol\theta\mid\boldsymbol\psi,\boldsymbol{y})\)` is the Laplace approximation of `\(p(\boldsymbol\theta\mid\boldsymbol\psi,\boldsymbol{y})\)` 
+- `\(\boldsymbol\theta={\boldsymbol\theta}^*(\boldsymbol\psi)\)` is its mode for a given `\(\boldsymbol \psi\)`
+
+---
+
+# Integrated Nested Laplace Approximation (INLA)
+
+2\. is slightly more complex, because in general there will be more elements in `\(\boldsymbol\theta\)` than there are in `\(\boldsymbol\psi\)` and thus this computation is more expensive.
+
+--
+
+.olive[**Gaussian Approximation**]: one easy and cheap possibility is to start from `\(\tilde{p}(\boldsymbol\theta\mid\boldsymbol\psi,\boldsymbol{y})\)` and approximate the density of `\(\class{orange}{\theta_i\mid\boldsymbol\psi,\boldsymbol{y}}\)`,  with the Gaussian marginal derived from `\(\tilde{p}(\boldsymbol\theta\mid\boldsymbol\psi,\boldsymbol{y})\)` (using GMRF theory to derive the marginal variances). While this is very fast, the approximation is generally not very good
+
+--
+
+.olive[**Full Laplace Approximation**]: alternatively, we can write `\(\boldsymbol\theta=\{\theta_i,\boldsymbol\theta_{-i}\}\)`, use the definition of conditional probability and again Laplace approximation to obtain
+
+`\begin{align*}
+\class{orange}{p(\theta_i \mid\boldsymbol\psi,\boldsymbol{y})} &amp; \class{black}{= \frac{p\left((\theta_i,\boldsymbol\theta_{-i})\mid \boldsymbol\psi,\boldsymbol{y}\right)}{p(\boldsymbol\theta_{-i}\mid\theta_i,\boldsymbol\psi,\boldsymbol{y})}}
+\end{align*}`
+
+---
+
+count:false
+
+# Integrated Nested Laplace Approximation (INLA)
+
+2\. is slightly more complex, because in general there will be more elements in `\(\boldsymbol\theta\)` than there are in `\(\boldsymbol\psi\)` and thus this computation is more expensive.
+
+.olive[**Gaussian Approximation**]: one easy and cheap possibility is to start from `\(\tilde{p}(\boldsymbol\theta\mid\boldsymbol\psi,\boldsymbol{y})\)` and approximate the density of `\(\class{orange}{\theta_i\mid\boldsymbol\psi,\boldsymbol{y}}\)`,  with the Gaussian marginal derived from `\(\tilde{p}(\boldsymbol\theta\mid\boldsymbol\psi,\boldsymbol{y})\)` (using GMRF theory to derive the marginal variances). While this is very fast, the approximation is generally not very good.
+
+.olive[**Full Laplace Approximation**]: alternatively, we can write `\(\boldsymbol\theta=\{\theta_i,\boldsymbol\theta_{-i}\}\)`, use the definition of conditional probability and again Laplace approximation to obtain
+
+`\begin{align*}
+\class{orange}{p(\theta_i \mid\boldsymbol\psi,\boldsymbol{y})} &amp; \class{black}{= \frac{p\left((\theta_i,\boldsymbol\theta_{-i})\mid \boldsymbol\psi,\boldsymbol{y}\right)}{p(\boldsymbol\theta_{-i}\mid\theta_i,\boldsymbol\psi,\boldsymbol{y})} = \frac{p\left((\theta_i,\boldsymbol\theta_{-i}), \boldsymbol\psi\mid\boldsymbol{y}\right)}{p(\boldsymbol\psi\mid \boldsymbol{y})} \frac{1}{p(\boldsymbol\theta_{-i}\mid\theta_i,\boldsymbol\psi,\boldsymbol{y})}}
+\end{align*}`
+
+---
+
+count:false
+
+# Integrated Nested Laplace Approximation (INLA)
+
+2\. is slightly more complex, because in general there will be more elements in `\(\boldsymbol\theta\)` than there are in `\(\boldsymbol\psi\)` and thus this computation is more expensive.
+
+.olive[**Gaussian Approximation**]: one easy and cheap possibility is to start from `\(\tilde{p}(\boldsymbol\theta\mid\boldsymbol\psi,\boldsymbol{y})\)` and approximate the density of `\(\class{orange}{\theta_i\mid\boldsymbol\psi,\boldsymbol{y}}\)`,  with the Gaussian marginal derived from `\(\tilde{p}(\boldsymbol\theta\mid\boldsymbol\psi,\boldsymbol{y})\)` (using GMRF theory to derive the marginal variances). While this is very fast, the approximation is generally not very good.
+
+.olive[**Full Laplace Approximation**]: alternatively, we can write `\(\boldsymbol\theta=\{\theta_i,\boldsymbol\theta_{-i}\}\)`, use the definition of conditional probability and again Laplace approximation to obtain
+
+`\begin{align*}
+\class{orange}{p(\theta_i \mid\boldsymbol\psi,\boldsymbol{y})} &amp; \class{black}{= \frac{p\left((\theta_i,\boldsymbol\theta_{-i})\mid \boldsymbol\psi,\boldsymbol{y}\right)}{p(\boldsymbol\theta_{-i}\mid\theta_i,\boldsymbol\psi,\boldsymbol{y})} = \frac{p\left((\theta_i,\boldsymbol\theta_{-i}), \boldsymbol\psi\mid\boldsymbol{y}\right)}{p(\boldsymbol\psi\mid \boldsymbol{y})} \frac{1}{p(\boldsymbol\theta_{-i}\mid\theta_i,\boldsymbol\psi,\boldsymbol{y})}}\\
+&amp; \propto \frac{p\left(\boldsymbol\theta, \boldsymbol\psi\mid\boldsymbol{y}\right)}{p(\boldsymbol\theta_{-i}\mid\theta_i,\boldsymbol\psi,\boldsymbol{y})}
+\end{align*}`
+
+---
+
+count:false
+
+# Integrated Nested Laplace Approximation (INLA)
+
+2\. is slightly more complex, because in general there will be more elements in `\(\boldsymbol\theta\)` than there are in `\(\boldsymbol\psi\)` and thus this computation is more expensive.
+
+.olive[**Gaussian Approximation**]: one easy and cheap possibility is to start from `\(\tilde{p}(\boldsymbol\theta\mid\boldsymbol\psi,\boldsymbol{y})\)` and approximate the density of `\(\class{orange}{\theta_i\mid\boldsymbol\psi,\boldsymbol{y}}\)`,  with the Gaussian marginal derived from `\(\tilde{p}(\boldsymbol\theta\mid\boldsymbol\psi,\boldsymbol{y})\)` (using GMRF theory to derive the marginal variances). While this is very fast, the approximation is generally not very good.
+
+.olive[**Full Laplace Approximation**]: alternatively, we can write `\(\boldsymbol\theta=\{\theta_i,\boldsymbol\theta_{-i}\}\)`, use the definition of conditional probability and again Laplace approximation to obtain
+
+`\begin{align*}
+\class{orange}{p(\theta_i \mid\boldsymbol\psi,\boldsymbol{y})} &amp; \class{black}{= \frac{p\left((\theta_i,\boldsymbol\theta_{-i})\mid \boldsymbol\psi,\boldsymbol{y}\right)}{p(\boldsymbol\theta_{-i}\mid\theta_i,\boldsymbol\psi,\boldsymbol{y})} = \frac{p\left((\theta_i,\boldsymbol\theta_{-i}), \boldsymbol\psi\mid\boldsymbol{y}\right)}{p(\boldsymbol\psi\mid \boldsymbol{y})} \frac{1}{p(\boldsymbol\theta_{-i}\mid\theta_i,\boldsymbol\psi,\boldsymbol{y})}}\\
+&amp; \propto \frac{p\left(\boldsymbol\theta, \boldsymbol\psi\mid\boldsymbol{y}\right)}{p(\boldsymbol\theta_{-i}\mid\theta_i,\boldsymbol\psi,\boldsymbol{y})} \propto \frac{p(\boldsymbol\psi)p(\boldsymbol\theta\mid\boldsymbol\psi)p(\boldsymbol{y}\mid\boldsymbol\theta,\boldsymbol \psi)}{p(\boldsymbol\theta_{-i}\mid\theta_i,\boldsymbol\psi,\boldsymbol{y})}
+\end{align*}`
+
+
+---
+
+count:false
+
+# Integrated Nested Laplace Approximation (INLA)
+
+2\. is slightly more complex, because in general there will be more elements in `\(\boldsymbol\theta\)` than there are in `\(\boldsymbol\psi\)` and thus this computation is more expensive.
+
+.olive[**Gaussian Approximation**]: one easy and cheap possibility is to start from `\(\tilde{p}(\boldsymbol\theta\mid\boldsymbol\psi,\boldsymbol{y})\)` and approximate the density of `\(\class{orange}{\theta_i\mid\boldsymbol\psi,\boldsymbol{y}}\)`,  with the Gaussian marginal derived from `\(\tilde{p}(\boldsymbol\theta\mid\boldsymbol\psi,\boldsymbol{y})\)` (using GMRF theory to derive the marginal variances). While this is very fast, the approximation is generally not very good.
+
+.olive[**Full Laplace Approximation**]: alternatively, we can write `\(\boldsymbol\theta=\{\theta_i,\boldsymbol\theta_{-i}\}\)`, use the definition of conditional probability and again Laplace approximation to obtain
+
+`\begin{align*}
+\class{orange}{p(\theta_i \mid\boldsymbol\psi,\boldsymbol{y})} &amp; \class{black}{= \frac{p\left((\theta_i,\boldsymbol\theta_{-i})\mid \boldsymbol\psi,\boldsymbol{y}\right)}{p(\boldsymbol\theta_{-i}\mid\theta_i,\boldsymbol\psi,\boldsymbol{y})} = \frac{p\left((\theta_i,\boldsymbol\theta_{-i}), \boldsymbol\psi\mid\boldsymbol{y}\right)}{p(\boldsymbol\psi\mid \boldsymbol{y})} \frac{1}{p(\boldsymbol\theta_{-i}\mid\theta_i,\boldsymbol\psi,\boldsymbol{y})}}\\
+&amp; \propto \frac{p\left(\boldsymbol\theta, \boldsymbol\psi\mid\boldsymbol{y}\right)}{p(\boldsymbol\theta_{-i}\mid\theta_i,\boldsymbol\psi,\boldsymbol{y})} \propto \frac{p(\boldsymbol\psi)p(\boldsymbol\theta\mid\boldsymbol\psi)p(\boldsymbol{y}\mid\boldsymbol\theta,\boldsymbol \psi)}{p(\boldsymbol\theta_{-i}\mid\theta_i,\boldsymbol\psi,\boldsymbol{y})}\\
+&amp;\approx \left. \frac{p(\boldsymbol\psi)p(\boldsymbol\theta\mid\boldsymbol\psi)p(\boldsymbol{y}\mid\boldsymbol\theta,\boldsymbol \psi)}{\tilde{p}(\boldsymbol\theta_{-i}\mid\theta_i,\boldsymbol\psi,\boldsymbol{y})}\right|_{\boldsymbol\theta_{-i}={\boldsymbol\theta}^*_{-i}(\theta_i,\boldsymbol\psi)} =: \class{orange}{\tilde{p}(\theta_i\mid\boldsymbol\psi,\boldsymbol{y})}
+\end{align*}`
+
+---
+
+# Integrated Nested Laplace Approximation (INLA)
+
+- Because `\(\left(\boldsymbol\theta_{-i}\mid\theta_i,\boldsymbol\psi,\boldsymbol{y}\right)\)` are reasonably Normal, the approximation works generally well.
+
+- However, this strategy can be computationally expensive as `\(\tilde{p}(\theta_{-i}\mid\theta_i,\boldsymbol\psi,\boldsymbol{y})\)` must be recomputed for each value of `\(\boldsymbol \theta\)` and `\(\boldsymbol \psi\)`.
+
+--
+
+&lt;span style="display:block; margin-top: 10px ;"&gt;&lt;/span&gt;
+
+- The most efficient algorithm is the .olive[Simplified Laplace Approximation]:
+    - Based on a Taylor's series expansion of the Laplace approximation `\(\class{orange}{\tilde{p}(\theta_i\mid\boldsymbol\psi,\boldsymbol{y})}\)`.
+    - This is usually corrected by including a mixing term (e.g. spline) to increase the fit to the required distribution.
+    - The accuracy of this approximation is sufficient in many applied cases and that the computing time is considerably shorter, it is the standard option.
+
+
+--
+
+- This is the algorithm implemented by default by `R-INLA`, but this choice can be modified.
+
+  - If extra precision is required, it is possible to run the full Laplace approximation --- of course at the expense of running time!
+
+---
+
+# Integrated Nested Laplace Approximation (INLA)
+
+Operationally, the INLA algorithm proceeds with the following steps:
+
+1\. Explore the joint posterior for the hyperparameters `\(\class{red}{\tilde{p}(\boldsymbol\psi\mid\boldsymbol{y})}\)` and produce a grid of  *good* integration points  `\(\color{olive}{\{\boldsymbol\psi^{(j)}\}}\)` associated with the bulk of the mass, together with a corresponding set of area weights `\(\color{olive}{\{\Delta_j\}}\)`: 
+
+
+.pull-left[
+&lt;center&gt;&lt;img src=./img/hyper_GRID.png width='70%' title=''&gt;&lt;/center&gt;
+.center[.blue[Grid strategy]]
+]
+
+
+.pull-right[
+&lt;center&gt;&lt;img src=./img/hyper_CCD.png width='70%' title=''&gt;&lt;/center&gt;
+.center[.blue[Central Composite Design strategy (CCD)]]
+]
+
+The CCD strategy is the default one in `R-INLA`: it produces a lower number of points which are however enough to capture the variability of the joint distribution (see ).
+
+---
+
+# Integrated Nested Laplace Approximation (INLA)
+
+2\. After the grid exploration:
+  - Obtain the marginal posterior `\(\class{red}{\tilde{p}(\psi_k\mid\boldsymbol{y})}\)` using an interpolation algorithm based on the values of the density  `\(\class{red}{\tilde{p}(\boldsymbol\psi\mid\boldsymbol{y})}\)` evaluated in the integration points `\(\color{olive}{\{\psi^{(j)}_k\}}\)`
+
+--
+
+  - Evaluate the conditional posteriors `\(\color{orange}{\tilde{p}(\theta_i\mid\boldsymbol\psi^{(j)},\boldsymbol{y})}\)` on a grid of selected values for `\(\theta_i\)`.
+
+--
+
+3\. Obtain the marginal posteriors `\(\color{\myblue}{\tilde{p}(\theta_i\mid\boldsymbol{y})}\)` using .olive[**numerical integration**] `\(^{[1]}\)`
+`$$\color{myblue}{\tilde{p}(\theta_i\mid\boldsymbol{y})} \approx \sum_{j} \color{red}{\tilde{p}(\boldsymbol\psi^{(j)}\mid\boldsymbol{y})}\color{orange}{\tilde{p}(\theta_i\mid\boldsymbol\psi^{(j)},\boldsymbol{y})}\color{olive}{\Delta_j}$$`
+
+.footnote[[1]: Recall from slide 20 that `\(\color{myblue}{p(\theta_i\mid\boldsymbol{y})} = \int p(\theta_i,\boldsymbol\psi\mid \boldsymbol{y}) d\boldsymbol\psi = \int \class{red}{p(\boldsymbol\psi\mid\boldsymbol{y})} \color{orange}{p(\theta_i \mid \boldsymbol\psi,\boldsymbol{y})} d\boldsymbol\psi\)`
+]
+
+---
+
+# INLA &amp;ndash; in a nutshell...
+
+.pull-left[
+.medium[
+&lt;ol style="counter-reset: my-counter 0;"&gt;
+&lt;li&gt;Select a grid of \(H\) points \(\{\bm\psi_h^*\}\) and area weights \(\{\Delta_h\}\); interpolate the density to approximate to the posterior&lt;/li&gt;
+&lt;/ol&gt;
+]
+
+&lt;span style="display:block; margin-top: 18px ;"&gt;&lt;/span&gt;
+&lt;center&gt;&lt;img src=./img/inla1-1.png width='80%' title=''&gt;&lt;/center&gt;
+]
+
+--
+
+.pull-right[
+.medium[
+&lt;ol style="counter-reset: my-counter 1;"&gt;
+&lt;li&gt; Approximates the conditional posterior of each \(\theta_j\), given \(\bm\psi, \bm{y}\) on the \(H−\)dimensional grid&lt;/li&gt;
+&lt;/ol&gt;
+]
+
+&lt;span style="display:block; margin-top: 50px ;"&gt;&lt;/span&gt;
+&lt;center&gt;&lt;img src=./img/inla2-1.png width='85%' title=''&gt;&lt;/center&gt;
+]
+
+---
+
+count: false
+# INLA &amp;ndash; in a nutshell...
+
+.pull-left[
+.medium[
+&lt;ol style="counter-reset: my-counter 2;"&gt;
+&lt;li&gt; Weight the conditional marginal posteriors by the density associated with each \(\psi_h^*\)
+&lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+]
+
+&lt;span style="display:block; margin-top: 10px ;"&gt;&lt;/span&gt;
+
+&lt;center&gt;&lt;img src=./img/inla3-1.png width='85%' title=''&gt;&lt;/center&gt;
+]
+
+--
+
+.pull-right[
+.medium[
+&lt;ol style="counter-reset: my-counter 3;"&gt;
+&lt;li&gt; (Numerically) sum over all the conditional densities to obtain the marginal posterior for \(\theta_j\)
+&lt;span style="display:block; margin-top: 50px ;"&gt;&lt;/span&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+]
+
+&lt;span style="display:block; margin-top: -10px ;"&gt;&lt;/span&gt;
+&lt;center&gt;&lt;img src=./img/inla4-1.png width='85%' title=''&gt;&lt;/center&gt;
+]
+
+---
+
+# Integrated Nested Laplace Approximation (INLA)
+
+So, it's all in the name... 
+
+&lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
+
+.large[Integrated Nested .myblue[**Laplace Approximation**]]
+
+&lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
+
+- .myblue[Because Laplace approximation is the basis to estimate the unknown distributions]
+
+---
+
+count:false
+
+# Integrated Nested Laplace Approximation (INLA)
+
+So, it's all in the name... 
+
+&lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
+
+.large[Integrated .myblue[**Nested**] Laplace Approximation]
+
+&lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
+
+- Because Laplace approximation is the basis to estimate the unknown distributions
+
+&lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
+
+- .myblue[Because the Laplace approximations are nested within one another
+
+  - Since (1.) is needed to estimate (2.)
+  
+  - NB: Consequently the estimation of (1.) might not be good enough, but it can be refined (eg using a finer grid)
+]
+
+---
+
+count:false
+
+# Integrated Nested Laplace Approximation (INLA)
+
+So, it's all in the name... 
+
+&lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
+
+.large[.myblue[**Integrated**] Nested Laplace Approximation]
+
+&lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
+
+- Because Laplace approximation is the basis to estimate the unknown distributions
+
+&lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
+
+- Because the Laplace approximations are nested within one another
+
+  - Since (1.) is needed to estimate (2.)
+  
+  - NB: Consequently the estimation of (1.) might not be good enough, but it can be refined (eg using a finer grid)
+
+&lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
+
+- .myblue[Because the required marginal posterior distributions are obtained by (numerical) integration.]
+
+---
+
+name: Package
+
+&lt;span style="display:block; margin-top: 250px ;"&gt;&lt;/span&gt;
+
+.myblue[.center[.huge[
+**The `R-INLA` package**]]]
+
+---
+
+# The `INLA` package for `R`
+
+- Good news is that all the procedures needed to perform INLA are implemented in a `R` package. This is effectively made by two components
+
+&lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
+
+--
+
+1\. The .red[`GMRFLib`] library
+
+  - A `C` library for fast and exact simulation of GMRFs
+
+--
+
+2\. The .blue[`inla`] program
+  
+  - A standalone `C` program build upon the `GMRFLib` library (it performs the relevant computation and returns the results in a standardised way)
+
+&lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
+
+--
+
+**NB**: Because the package `R-INLA` relies on a standalone `C` program (and other reasons...), it is not available directly from `CRAN`.
+
+&lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
+
+
+`R-INLA` runs natively under Linux, Windows and Mac and it is possible to do multi-threading using `OpenMP`
+
+---
+
+# The `INLA` package `R` - Installation
+
+- From `R`, installation of the stable version is performed typing 
+
+`install.packages("INLA", repos="http://www.math.ntnu.no/inla/R/stable")`
+
+&lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
+
+- Later, you can upgrade the package by typing 
+
+`library(INLA)`
+
+`inla.upgrade()`
+
+&lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
+
+- A test-version (which may contain unstable updates/new functions) can be obtained by typing 
+
+`inla.upgrade(testing=TRUE)`
+
+&lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
+
+- Type `inla.version()` to find out the installed version
+
+---
+
+# Step by step guide to using `R-INLA`
+
+1\. The first thing to do is to .red[**specify the model**]
+
+  - For example, assume we have a generic model
+.myblue[
+`\begin{align*}
+y_i &amp; \stackrel{\small{iid}}{\sim} p(y_i \mid \theta_i) \\
+\eta_i &amp; =   \beta_0 + \beta_1 x_{1i} + \beta_2 x_{2i} + f(z_i)
+\end{align*}`
+]
+
+where
+
+- `\(\color{olive}{\bm x = (\bm x_1,\bm x_2)}\)` are observed covariates 
+
+- `\(\color{olive}{\bm \beta = (\beta_0,\beta_1,\beta_2)\sim \mbox{Normal}(0,\tau_1^{-1})}\)` are unstructured (*fixed*) effects 
+
+- `\(\color{olive}{\bm z}\)` is an **index**. This can be used to include structured (*random*), spatial, spatio-temporal effect, etc.
+
+- `\(\color{olive}{f \sim \mbox{Normal}(0,\bm{Q}^{-1}_f(\tau_2))}\)` is a suitable function used to model the structured effects
+
+--
+
+&lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
+
+- As mentioned earlier, this formulation can actually be used to represent quite a wide class of models!
+
+
+---
+
+# Step by step guide to using `R-INLA`
+
+- The model is translated in `R` code using a .red[`formula`]
+
+- This is sort of standard in `R` (you would do pretty much the same for calls to functions such as `lm` or `glm`)
+
+  .olive[`formula = y `] `\(\color{olive}{\sim}\)` .olive[`1+  x1 + x2 + f(name=z, model="...",hyper=...)`]
+
+--
+
+&lt;span style="display:block; margin-top: -10px ;"&gt;&lt;/span&gt;
+
+- The .olive[`f()`] function can account for several structured nonlinear effects. We have for example:
+
+  - .olive[`iid`] specify independent random effects
+  
+  - .olive[`rw1`], .olive[`rw2`], .olive[`ar1`] are smooth effect of covariates or time effects
+  
+  - .olive[`besag`] models spatially structured effects (CAR)
+    
+  - .olive[`generic`] is a user-defined precision matrix
+    
+- Type .olive[`inla.list.models("latent")`] for the complete list and find descriptions at .olive[[https://www.r-inla.org/documentation](https://www.r-inla.org/documentation)]
+
+- Some options can be specified for the .olive[`f()`] term: for example .olive[`hyper`] is used to specify the prior on the hyperparameters (more later).
+
+--
+
+&lt;span style="display:block; margin-top: -10px ;"&gt;&lt;/span&gt;
+
+- It is possible to include in the `formula` several .olive[`f()`]  terms specifying them separately, e.g. 
+
+.olive[`formula &lt;- y`] `\(\color{olive}{\sim}\)` .olive[`x1 + x2 + f(z1,...) + f(z2,...) + f(z3,...)`]
+
+
+---
+
+# Step by step guide to using `R-INLA`
+
+2\. Call the function .olive[`inla`] to fit the model, specifying the data and options (more on this later),e.g.
+
+.olive[`m = inla(formula, family="...", data=data.frame(y,x1,x2,z))`]
+
+&lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
+--
+
+-- 
+
+- The data need to be included in a suitable .olive[`data.frame`]
+
+&lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
+--
+
+- The distribution of the data (i.e. the likelihood) is specified with the .olive[`family`] option.
+
+  - Type .olive[``inla.list.models("likelihood")`] for the complete list of likelihood function (we have .olive[`poisson, binomial, gamma, beta, gaussian`]  and many others).
+  
+&lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
+--
+
+  -  Visit .olive[[https://www.r-inla.org/documentation](https://www.r-inla.org/documentation)] for the complete description
+
+---
+
+# Step by step guide to using `R-INLA`
+
+The .olive[`control.xxx=list(...)`] statements  in the .olive[`inla`] function control various part of the INLA program:
+
+- .olive[`control.compute`]: for computing measures of fit (eg DIC)
+
+&lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
+
+- .olive[`control.predictor`]: for specifying the *Observation matrix* `\(\bm A\)` which links the latent field to the data 
+
+&lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
+
+- .olive[`control.family`]: for changing the prior distribution of the likelihood hyperparameters
+
+&lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
+
+- .olive[`control.fixed`]: for changing the prior distribution of the fixed effects
+
+&lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
+
+- .olive[`control.inla`]: for changing the strategy to use for the approximations ('gaussian', 'simplified.laplace' (default) or 'laplace') or the grid exploration strategy
+
+&lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
+
+- and many others for expert use.
+
+---
+
+# Step by step guide to using `R-INLA`
+`R` returns an object .olive[`m`] in the class `inla`, which has some methods available as for example .olive[`summary()`]  and  .olive[`plot()`].
+
+&lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
+
+
+
+.scrollable[
+
+```r
+&gt; names(m)[1:38]
+```
+
+```
+ [1] "names.fixed"                 "summary.fixed"              
+ [3] "marginals.fixed"             "summary.lincomb"            
+ [5] "marginals.lincomb"           "size.lincomb"               
+ [7] "summary.lincomb.derived"     "marginals.lincomb.derived"  
+ [9] "size.lincomb.derived"        "mlik"                       
+[11] "cpo"                         "gcpo"                       
+[13] "po"                          "waic"                       
+[15] "model.random"                "summary.random"             
+[17] "marginals.random"            "size.random"                
+[19] "summary.linear.predictor"    "marginals.linear.predictor" 
+[21] "summary.fitted.values"       "marginals.fitted.values"    
+[23] "size.linear.predictor"       "summary.hyperpar"           
+[25] "marginals.hyperpar"          "internal.summary.hyperpar"  
+[27] "internal.marginals.hyperpar" "offset.linear.predictor"    
+[29] "model.spde2.blc"             "summary.spde2.blc"          
+[31] "marginals.spde2.blc"         "size.spde2.blc"             
+[33] "model.spde3.blc"             "summary.spde3.blc"          
+[35] "marginals.spde3.blc"         "size.spde3.blc"             
+[37] "logfile"                     "misc"                       
+```
+]
+---
+
+#Toy example
+
+We consider the .olive[`iris`] dataset included in the .olive[`R`] datasets (see .olive[`?iris`]), regarding the measurements in centimeters of the variables *sepal length* and *width* and *petal length* and *width*, respectively, for 50 flowers from each of 3 species of iris. The species are Iris setosa, versicolor, and virginica. See Section 2.6 of the INLA book.
+
+
+```r
+&gt; summary(iris)
+```
+
+```
+  Sepal.Length    Sepal.Width     Petal.Length    Petal.Width   
+ Min.   :4.300   Min.   :2.000   Min.   :1.000   Min.   :0.100  
+ 1st Qu.:5.100   1st Qu.:2.800   1st Qu.:1.600   1st Qu.:0.300  
+ Median :5.800   Median :3.000   Median :4.350   Median :1.300  
+ Mean   :5.843   Mean   :3.057   Mean   :3.758   Mean   :1.199  
+ 3rd Qu.:6.400   3rd Qu.:3.300   3rd Qu.:5.100   3rd Qu.:1.800  
+ Max.   :7.900   Max.   :4.400   Max.   :6.900   Max.   :2.500  
+       Species  
+ setosa    :50  
+ versicolor:50  
+ virginica :50  
+                
+                
+                
+```
+
+We specify a simple regression model with `Petal.length` and `Petal.width` as dependent and independent variables, respectively:
+
+`\begin{align*}
+\text{ Petal.length}_i&amp;\sim \text{Normal}(\eta_i,1/\sigma^2_e)\\
+\eta_i &amp;= \beta_0 + \beta_1\text{ Petal.width}_i
+\end{align*}`
+
+---
+
+# Toy example: run INLA + summary
+&lt;span style="display:block; margin-top: -15px ;"&gt;&lt;/span&gt;
+.small[
+
+```r
+&gt; formula &lt;- Petal.Length ~  1 + Petal.Width
+&gt; output &lt;- inla(formula, family="gaussian", data=iris)
+&gt; summary(output)
+```
+
+```
+
+Call:
+   c("inla.core(formula = formula, family = family, contrasts = contrasts, 
+   ", " data = data, quantiles = quantiles, E = E, offset = offset, ", " 
+   scale = scale, weights = weights, Ntrials = Ntrials, strata = strata, 
+   ", " lp.scale = lp.scale, link.covariates = link.covariates, verbose = 
+   verbose, ", " lincomb = lincomb, selection = selection, control.compute 
+   = control.compute, ", " control.predictor = control.predictor, 
+   control.family = control.family, ", " control.inla = control.inla, 
+   control.fixed = control.fixed, ", " control.mode = control.mode, 
+   control.expert = control.expert, ", " control.hazard = control.hazard, 
+   control.lincomb = control.lincomb, ", " control.update = 
+   control.update, control.lp.scale = control.lp.scale, ", " 
+   control.pardiso = control.pardiso, only.hyperparam = only.hyperparam, 
+   ", " inla.call = inla.call, inla.arg = inla.arg, num.threads = 
+   num.threads, ", " blas.num.threads = blas.num.threads, keep = keep, 
+   working.directory = working.directory, ", " silent = silent, inla.mode 
+   = inla.mode, safe = FALSE, debug = debug, ", " .parent.frame = 
+   .parent.frame)") 
+Time used:
+    Pre = 3.8, Running = 0.296, Post = 0.0194, Total = 4.12 
+Fixed effects:
+             mean    sd 0.025quant 0.5quant 0.975quant mode kld
+(Intercept) 1.084 0.073      0.940    1.084      1.227   NA   0
+Petal.Width 2.230 0.051      2.129    2.230      2.331   NA   0
+
+Model hyperparameters:
+                                        mean    sd 0.025quant 0.5quant
+Precision for the Gaussian observations 4.43 0.512       3.50     4.41
+                                        0.975quant mode
+Precision for the Gaussian observations       5.49   NA
+
+Marginal log-Likelihood:  -119.59 
+ is computed 
+Posterior summaries for the linear predictor and the fitted values are computed
+(Posterior marginals needs also 'control.compute=list(return.marginals.predictor=TRUE)')
+```
+]
+---
+
+# Exploring the output: fixed effects
+
+
+```r
+&gt; output$summary.fixed
+```
+
+```
+                mean         sd 0.025quant 0.5quant 0.975quant mode
+(Intercept) 1.083565 0.07292054  0.9403638 1.083565   1.226767   NA
+Petal.Width 2.229935 0.05136351  2.1290668 2.229935   2.330802   NA
+                     kld
+(Intercept) 9.793724e-10
+Petal.Width 9.795414e-10
+```
+
+- For each unstructured *fixed* effect, `R-INLA` reports a set of summary statistics from the posterior distribution.
+
+--
+
+- The value of the Kullback-Leibler divergence `kld` describes the difference between the Gaussian approximation and the Simplified Laplace Approximation (SLA) to the marginal posterior densities:
+
+  - Small values indicate that the posterior distribution is well approximated by a Normal distribution  
+  - If so, the more sophisticated SLA gives a *good* error rate and therefore there is no need to use the more computationally intensive *full* Laplace approximation.
+
+---
+
+# Exploring the output: hyperparatemers
+
+
+```r
+&gt; output$summary.hyperpar
+```
+
+```
+                                            mean        sd 0.025quant 0.5quant
+Precision for the Gaussian observations 4.432668 0.5115432   3.501958 4.413411
+                                        0.975quant mode
+Precision for the Gaussian observations   5.484831   NA
+```
+
+- For each hyperparameter the summary statistics are reported to describe the posterior distribution.
+
+- **NB**: `INLA` reports results on the **precision** scale (more on this later).
+
+---
+
+# Exploring the output: effective parameters and replicates 
+
+
+- The expected number of effective parameters is basically the number of **independent** parameters included in the model: 
+
+&lt;span style="display:block; margin-top: 15px ;"&gt;&lt;/span&gt;
+
+  - In this case there are 2 actual parameters `\(\class{myblue}{\beta_0}\)` and `\(\class{myblue}{\beta_1}\)`.
+  
+  - In a hierarchical model with structured exchangeable (ie correlated)  effects (see next lecture) information is shared across parameters and the expected number is lower.
+
+&lt;span style="display:block; margin-top: 15px ;"&gt;&lt;/span&gt; 
+
+--
+
+- The number of equivalent replicates indicates the available information (in terms of sample size) per effective parameter
+
+&lt;span style="display:block; margin-top: 15px ;"&gt;&lt;/span&gt;
+
+  - Example: there are 150 data points and on average 2.011 parameters; so each is estimated using on average 150/2.011 `\(\approx\)` 74.59 data points
+  
+  - Low values (with respect to the overall sample size) are indicative of poor fit.
+  
+---
+
+# Manipulating the marginals from `R-INLA`: fixed effects
+
+.panelset[
+.panel[.panel-name[marginals1]
+.pull-left[
+
+```r
+&gt; names(output$marginals.fixed)
+```
+
+```
+[1] "(Intercept)" "Petal.Width"
+```
+
+```r
+&gt; beta1_post &lt;-output$marginals.fixed[[2]]
+&gt; marg &lt;- inla.smarginal(beta1_post)
+&gt; q &lt;-inla.qmarginal(0.05,beta1_post)
+```
+
+
+```r
+&gt; plot(marg,t="l",
++      ylab="",xlab="", 
++      main=expression(paste("p(",beta[1], "| y)")))
+&gt; polygon(c(marg$x[marg$x &lt;= q ], q),
++         c(marg$y[marg$x &lt;= q ], 0),
++         col = "slateblue1", border = 1)
+```
+]
+
+.pull-right[
+&lt;img src="./img/explore_plot_out-1.png" &gt;
+]
+]
+
+.panel[.panel-name[marginals2]
+.small[.pull-left[
+
+```r
+&gt; inla.pmarginal(q,beta1_post)
+```
+
+```
+[1] 0.05
+```
+
+```r
+&gt; d &lt;-inla.dmarginal(q,beta1_post)
+&gt; d
+```
+
+```
+[1] 1.990405
+```
+
+```r
+&gt; inla.rmarginal(4, beta1_post)
+```
+
+```
+[1] 2.283483 2.241375 2.201697 2.241272
+```
+
+]
+]
+
+.pull-right[
+&lt;img src="./img/explore_plot1_out-1.png" &gt;
+]
+]
+]
+
+---
+
+# Manipulating the marginals from `R-INLA`: hyperparameters
+
+`INLA` works with the precision by default
+
+.panelset[
+.panel[.panel-name[Precision]
+.pull-left[
+
+```r
+&gt; names(output$marginals.hyperpar)
+```
+
+```
+[1] "Precision for the Gaussian observations"
+```
+
+```r
+&gt; prec_post &lt;-output$marginals.hyperpar[[1]]
+```
+
+
+```r
+&gt; plot(inla.smarginal(prec_post),t="l",
++      ylab="",xlab="", 
++      main=expression(paste("p(",1/sigma[e]^2, "| y)")))
+```
+]
+
+.pull-right[
+&lt;img src="./img/explore_plot_hyp_out-1.png" &gt;
+]
+]
+
+.panel[.panel-name[Variance]
+.pull-left[
+
+```r
+&gt; var_post = inla.tmarginal(fun=function(x) 
++             1/x, mar=prec_post)
+&gt; inla.emarginal(fun=function(x) 1/x, 
++ marg=prec_post)
+```
+
+```
+[1] 0.228523
+```
+
+
+```r
+&gt; plot(inla.smarginal(var_post),t="l",
++      ylab="",xlab="", 
++      main=expression(paste("p(",sigma[e]^2, "| y)")))
+```
+]
+
+.pull-right[
+&lt;img src="./img/explore_plot_hyp1_out-1.png" &gt;
+]
+]
+]
+
+
+---
+
+#Summary
+
+The INLA approach is not a rival/competitor/replacement to/of MCMC, just a better option for the class of LGMs.
+
+&lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
+
+- The basic idea behind the INLA procedure is simple
+
+  - Repeatedly use Laplace approximation and take advantage of computational simplifications due to the structure of the model
+
+  - Use numerical integration to compute the required posterior marginal distributions
+
+&lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
+
+- Complications are mostly computational and occur when 
+
+  - Extending to a large number of hyperparameters
+
+  - Markedly non-Gaussian observations
+
+---
+
+# References
+
+NULL
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script src="https://platform.twitter.com/widgets.js"></script>
+<script>var slideshow = remark.create({
+"highlightStyle": "github",
+"highlightLines": true,
+"countIncrementalSlides": false,
+"ratio": "16:9"
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+// add `data-at-shortcutkeys` attribute to <body> to resolve conflicts with JAWS
+// screen reader (see PR #262)
+(function(d) {
+  let res = {};
+  d.querySelectorAll('.remark-help-content table tr').forEach(tr => {
+    const t = tr.querySelector('td:nth-child(2)').innerText;
+    tr.querySelectorAll('td:first-child .key').forEach(key => {
+      const k = key.innerText;
+      if (/^[a-z]$/.test(k)) res[k] = t;  // must be a single letter (key)
+    });
+  });
+  d.body.setAttribute('data-at-shortcutkeys', JSON.stringify(res));
+})(document);
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+// adds .remark-code-has-line-highlighted class to <pre> parent elements
+// of code chunks containing highlighted lines with class .remark-code-line-highlighted
+(function(d) {
+  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
+  const preParents = [];
+  const findPreParent = function(line, p = 0) {
+    if (p > 1) return null; // traverse up no further than grandparent
+    const el = line.parentElement;
+    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
+  };
+
+  for (let line of hlines) {
+    let pre = findPreParent(line);
+    if (pre && !preParents.includes(pre)) preParents.push(pre);
+  }
+  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
+})(document);</script>
+<style>
+.logo {
+  background-image: url("assets/MRC-Centre-Logo.png");
+  background-size: 15% 10%;
+  background-repeat: no-repeat;
+  position: absolute;
+  top:  0.25%; /* 1.135em */
+  left: 85%;
+  width: 100%;
+  height: 100%;
+  z-index: 0;
+}
+</style>
+
+<script>
+document
+  .querySelectorAll(
+    '.remark-slide-content' +
+    ':not(.title-slide)' +
+    // add additional classes to exclude here, e.g.
+    // ':not(.inverse)' +
+    ':not(.hide-logo)' +
+    ':not(.thankyou-michelle)' +
+    ':not(.thankyou-barney)'
+  )
+  .forEach(el => {
+    el.innerHTML += '<div class="logo"></div>';
+  });
+</script>
+
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>
