@@ -1,0 +1,1319 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>Session 1.2: Hierarchical Models, Priors, Prediction and Model Checking</title>
+    <meta charset="utf-8" />
+    <script src="libs/header-attrs/header-attrs.js"></script>
+    <link href="libs/panelset/panelset.css" rel="stylesheet" />
+    <script src="libs/panelset/panelset.js"></script>
+    <!-- (Re)Defines a bunch of LaTeX commands that can then be used directly in the .Rmd file as '\command{...}' -->
+    <script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+      TeX: {
+        /* This enables color macros */
+        extensions: ["color.js"],
+        Macros: {
+          /* Probability & mathematical symbols */
+          Pr: "{\\style{font-family:inherit; font-size: 110%;}{\\text{Pr}}}",
+          exp: "{\\style{font-family:inherit; font-size: 105%;}{\\text{exp}}}",
+          log: "{\\style{font-family:inherit; font-size: 105%;}{\\text{log}}}",
+          ln: "{\\style{font-family:inherit; font-size: 105%;}{\\text{ln}}}",
+          logit: "{\\style{font-family:inherit; font-size: 100%;}{\\text{logit}}}",
+          HR: "{\\style{font-family:inherit; font-size: 105%;}{\\text{HR}}}",
+          OR: "{\\style{font-family:inherit; font-size: 105%;}{\\text{OR}}}",
+          E: "{\\style{font-family:inherit; font-size: 105%;}{\\text{E}}}",
+          Var: "{\\style{font-family:inherit; font-size: 105%;}{\\text{Var}}}",
+          Cov: "{\\style{font-family:inherit; font-size: 105%;}{\\text{Cov}}}",
+          Corr: "{\\style{font-family:inherit; font-size: 105%;}{\\text{Corr}}}",
+          DIC: "{\\style{font-family:inherit; font-size: 105%;}{\\text{DIC}}}",
+          se: "{\\style{font-family:inherit; font-size: 100%;}{\\text{se}}}",
+          sd: "{\\style{font-family:inherit; font-size: 100%;}{\\text{sd}}}",
+          kld: "{\\style{font-family:inherit; font-size: 100%;}{\\text{kld}}}",
+          /* Distributions */
+          dnorm: "{\\style{font-family:inherit;}{\\text{Normal}}}",
+          dt: "{\\style{font-family:inherit;}{\\text{t}}}",
+          ddirch: "{\\style{font-family:inherit;}{\\text{Dirichlet}}}",
+          dmulti: "{\\style{font-family:inherit;}{\\text{Multinomial}}}",
+          dbeta: "{\\style{font-family:inherit;}{\\text{Beta}}}",
+          dgamma: "{\\style{font-family:inherit;}{\\text{Gamma}}}",
+          dbern: "{\\style{font-family:inherit;}{\\text{Bernoulli}}}",
+          dbin: "{\\style{font-family:inherit;}{\\text{Binomial}}}",
+          dpois: "{\\style{font-family:inherit;}{\\text{Poisson}}}",
+          dweib: "{\\style{font-family:inherit;}{\\text{Weibull}}}",
+          dexp: "{\\style{font-family:inherit;}{\\text{Exponential}}}",
+          dlnorm: "{\\style{font-family:inherit;}{\\text{logNormal}}}",
+          dunif: "{\\style{font-family:inherit;}{\\text{Uniform}}}",
+          /* LaTeX formatting */
+          bm: ["{\\boldsymbol #1}",1],
+          /* These create macros to typeset numbers in maths with the basic font */
+          0: "{\\style{font-family:inherit; font-size: 105%;}{\\text{0}}}",
+          1: "{\\style{font-family:inherit; font-size: 105%;}{\\text{1}}}",
+          2: "{\\style{font-family:inherit; font-size: 105%;}{\\text{2}}}",
+          3: "{\\style{font-family:inherit; font-size: 105%;}{\\text{3}}}",
+          4: "{\\style{font-family:inherit; font-size: 105%;}{\\text{4}}}",
+          5: "{\\style{font-family:inherit; font-size: 105%;}{\\text{5}}}",
+          6: "{\\style{font-family:inherit; font-size: 105%;}{\\text{6}}}",
+          7: "{\\style{font-family:inherit; font-size: 105%;}{\\text{7}}}",
+          8: "{\\style{font-family:inherit; font-size: 105%;}{\\text{8}}}",
+          9: "{\\style{font-family:inherit; font-size: 105%;}{\\text{9}}}",
+          /* Health economics quantities */
+          icer: "{\\style{font-family:inherit; font-size: 100%;}{\\text{ICER}}}",
+          nb: "{\\style{font-family:inherit; font-size: 100%;}{\\text{NB}}}",
+          ol: "{\\style{font-family:inherit; font-size: 100%;}{\\text{OL}}}",
+          ceac: "{\\style{font-family:inherit; font-size: 100%;}{\\text{CEAC}}}",
+          evpi: "{\\style{font-family:inherit; font-size: 100%;}{\\text{EVPI}}}",
+          evppi: "{\\style{font-family:inherit; font-size: 100%;}{\\text{EVPPI}}}",
+          evsi: "{\\style{font-family:inherit; font-size: 100%;}{\\text{EVSI}}}"
+        }
+      }
+    });
+    </script>
+    <link rel="stylesheet" href="assets/beamer.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+
+
+
+
+
+class: title-slide
+
+# Session 1.2: Hierarchical Models, Priors, Prediction and Model Checking&lt;span style="display:block; margin-top: 10px ;"&gt;&lt;/span&gt; 
+
+## 
+
+###     
+
+### VIBASS, University of Valencia 
+
+&lt;!-- Can also separate the various components of the extra argument 'params', eg as in 
+### VIBASS, University of Valencia, 20 July 2022, Spatial and Spatio-Temporal Bayesian Models with `R-INLA`
+--&gt;
+
+20 July 2022
+
+---
+
+layout: true  
+
+.my-footer[ 
+.alignleft[ 
+&amp;nbsp; &amp;copy; Marta Blangiardo | Michela Cameletti 
+]
+.aligncenter[
+Spatial and Spatio-Temporal Bayesian Models with `R-INLA` 
+]
+.alignright[
+VIBASS, 20 Jul 2022 
+]
+] 
+
+
+&lt;style&gt;
+pre {
+  overflow-x: auto;
+}
+pre code {
+  word-wrap: normal;
+  white-space: pre;
+}
+&lt;/style&gt;
+
+
+---
+
+# Learning Objectives
+
+After this session you should be able to:
+
+&lt;span style="display:block; margin-top: 10px ;"&gt;&lt;/span&gt;
+
+- Understand the different modelling assumptions for hierarchical data
+
+&lt;span style="display:block; margin-top: 10px ;"&gt;&lt;/span&gt;
+
+- Be able to specify a hierarchical model for Poisson data
+
+&lt;span style="display:block; margin-top: 10px ;"&gt;&lt;/span&gt;
+
+- Be able to perform prediction in a Bayesian approach
+
+&lt;span style="display:block; margin-top: 10px ;"&gt;&lt;/span&gt;
+
+- Distinguish and choose between several prior distributions for the precision/variance parameter 
+
+&lt;span style="display:block; margin-top: 10px ;"&gt;&lt;/span&gt;
+
+- Use the DIC/WAIC as tools for model selection.
+
+&lt;span style="display:block; margin-top: 10px ;"&gt;&lt;/span&gt;
+
+The topics treated in this lecture are covered in Chapter 5 of the book **Spatial and Spatio-Temporal Bayesian models with R-INLA**
+
+---
+
+# Outline 
+
+1\. [What are hierarchical models](#hierarchical)
+
+&lt;span style="display:block; margin-top: 30px ;"&gt;&lt;/span&gt;
+
+2\. [Different modelling assumptions](#modelling-assumptions)
+
+&lt;span style="display:block; margin-top: 30px ;"&gt;&lt;/span&gt;
+
+3\. [Parameter interpretation](#Interpretation)
+
+&lt;span style="display:block; margin-top: 30px ;"&gt;&lt;/span&gt;
+
+4\. [Hierarchical regression](#Hier-regression)
+
+&lt;span style="display:block; margin-top: 30px ;"&gt;&lt;/span&gt;
+
+5\. [Prediction](#Prediction)
+
+&lt;span style="display:block; margin-top: 30px ;"&gt;&lt;/span&gt;
+
+6\. [Choice of prior](#Prior)
+
+&lt;span style="display:block; margin-top: 30px ;"&gt;&lt;/span&gt;
+
+7\. [Model selection](#Modelselection)
+---
+
+name: hierarchical
+
+&lt;span style="display:block; margin-top: 250px ;"&gt;&lt;/span&gt;
+
+.myblue[.center[.huge[
+**What are hierarchical models**]]]
+
+
+---
+
+# What are hierarchical models?
+
+**Hierarchical model** is a very broad term that refers to wide range of
+model set-ups
+
+&lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
+ 
+- Multilevel models
+
+&lt;span style="display:block; margin-top: 10px ;"&gt;&lt;/span&gt;
+
+- Random effects models
+
+&lt;span style="display:block; margin-top: 10px ;"&gt;&lt;/span&gt;
+
+- Random coefficient models
+
+&lt;span style="display:block; margin-top: 10px ;"&gt;&lt;/span&gt;
+
+- Variance-component models
+
+&lt;span style="display:block; margin-top: 10px ;"&gt;&lt;/span&gt;
+
+- Mixed effect models
+
+&lt;span style="display:block; margin-top: 10px ;"&gt;&lt;/span&gt;
+
+.content-box-blue[**Key feature**: Hierarchical models are statistical models that provide a
+formal framework for analysis with a complexity of structure that matches the system being studied.]
+
+---
+
+# The hierarchical approach
+ 
+- Attempt to capture (model) and understand the structure of the data 
+
+&lt;span style="display:block; margin-top: 10px ;"&gt;&lt;/span&gt;
+
+--
+
+- Is flexible: 
+
+  - all sources of correlation and heterogeneity can be incorporated in a modular fashion, in particular by the introduction of unit-specific parameters
+  - can be combined with other types of models, e.g. for missing data or measurement error
+
+&lt;span style="display:block; margin-top: 10px ;"&gt;&lt;/span&gt;
+
+--
+
+- We wish to make inference on models with many parameters `\((\lambda_1,\ldots,\lambda_N)\)` measured on N units (individuals, areas, time-points, etc.) which are related or connected by the structure of the problem.
+
+&lt;span style="display:block; margin-top: 10px ;"&gt;&lt;/span&gt;
+
+--
+
+- Unit specific parameters will .red[borrow strength] from corresponding parameters associated with the other units
+
+---
+
+# Motivating example: Disease mapping
+  
+- To summarise spatial and spatio-temporal variation in disease risk
+
+- **Question**: Which areas have particularly high or low disease rates?
+
+- **Question**: Can we explain some of the variation in disease rates by
+area-level covariates?
+--
+  
+- Data are the observed `\((y_{i})\)` and expected number of cases in area `\(i\)`: `\(E_{i} = \sum_k n_{ik} r_k\)`, where `\(r_k\)` reference rate for stratum `\(k\)` (age, sex,...)
+ 
+- Rare disease and/or small areas: Poisson framework
+  
+`$$y_i \sim \text{Poisson}(\rho_i E_i)$$`
+
+&lt;span style="display:block; margin-top: -10px ;"&gt;&lt;/span&gt;
+
+where `\(\rho_i\)` is the **unknown RR** in area `\(i\)`
+
+.content-box-beamer[
+
+### Non smoothed estimates of the RR 
+`\begin{align*}
+\text{SMR}_i &amp;=\frac{y_i}{E_i}\\ 
+\hat{\hbox{Var}}(\hbox{SMR}_i) &amp;=  \frac{y_i}{E_i^2}
+\end{align*}`
+]
+  
+&lt;span style="display:block; margin-top: 10px ;"&gt;&lt;/span&gt;
+
+--
+    
+- .red[very imprecise: areas with small] `\(\class{red}{E_i}\)` .red[have high associated variance]    
+  .red[&amp;rarr; Hierarchical modelling]
+  
+- estimated independently: makes no use of risk estimates in other areas of the map
+
+---
+# Motivating example: Disease mapping
+
+*Example*: 
+
+&lt;span style="display:block; margin-top: 10px ;"&gt;&lt;/span&gt;
+
+- observed cases of lip cancer `\(y_i\)` diagnosed in Scotland in 1975-1980 at county level `\(i=1,\ldots,56\)` areas
+
+&lt;span style="display:block; margin-top: 10px ;"&gt;&lt;/span&gt;
+
+- expected number of cases `\(E_i\)` are also available using age/sex standardised reference rates and population counts:
+
+--
+  
+Assume a Poisson likelihood for the disease counts in each area:
+  
+`$$y_i\sim \text{Poisson}(\lambda_i)\qquad\qquad \lambda_i = \rho_i E_i \qquad\qquad i=1,\ldots,56$$`
+&lt;span style="display:block; margin-top: 10px ;"&gt;&lt;/span&gt;
+   
+- We have 56 parameters `\(\rho_i\)` (one for each area). What prior do we specify on `\(\rho_i\)`?    
+
+---
+
+name: modelling-assumptions
+
+&lt;span style="display:block; margin-top: 250px ;"&gt;&lt;/span&gt;
+
+.myblue[.center[.huge[
+**Modelling assumptions**]]]
+
+---
+
+
+# Different modelling assumptions
+
+.content-box-beamer[
+
+### Identical parameters
+- Assume `\(\rho_i = \rho\)` 
+
+`\(\rightsquigarrow\)` all  the  data can be pooled and the individual areas ignored.
+
+- Assume a prior `\(\rho \sim \text{Gamma}(1,1)\)`
+
+`\(\rightsquigarrow\)` conjugate prior.
+
+]
+
+--
+
+&lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
+
+- One parameter generates all the observations
+- Very easy to implement as it is conjugate (no need for INLA) and all the data are .red[pooled] to produce one estimate of the parameter of interest
+- Can be unrealistic (it does not take into account differences in the areas)
+
+---
+
+# Different modelling assumptions
+
+.content-box-beamer[
+
+### Independent parameters
+- All the `\(\rho_i\)` are unrelated, meaning that the areas are analysed independently 
+
+- Assume a prior `\(\rho_i \sim \text{Gamma}(1,1); \qquad i=1,\ldots,56\)`
+
+`\(\rightsquigarrow\)` individual estimates of `\(\rho_i\)` are likely to be highly variable (unless very large sample sizes)
+
+]
+
+--
+
+&lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
+
+- Every area is treated separately (No exchange of information between these). Estimates close to SMR `\((\rho_i \approx y_i / E_i)\)`. 
+- Again no need for INLA, conjugacy can be exploited.
+
+---
+
+# Different modelling assumptions
+
+.content-box-beamer[
+
+### Similar (exchangeable) parameters
+- All the `\(\rho_i\)` are assumed to be *similar* 
+
+`\(\rightsquigarrow\)` they come from the same distribution (are generated by the same parameters)
+
+- Assume a hierarchical prior `\(\rho_i \sim \text{Gamma}(a,b)\)`
+
+where `\(a\)` and `\(b\)` are unknown parameters and need to be estimated.
+
+]
+
+--
+
+&lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
+
+- Different levels of analysis
+- Allow the exchange of information between different levels as they are all connected to each other
+- Assign hyperprior distribution to `\(a\)` and `\(b\)`, for instance `$$a \sim \text{Exp}(1); b\sim \text{Gamma}(1,1)$$` 
+
+---
+
+# Graphical representation of lip cancer hierarchical model
+
+&lt;center&gt;&lt;img src=./img/DAG.png width='100%' title=''&gt;&lt;/center&gt;
+
+---
+
+# A more flexible hierarchical prior for the relative risks
+- A gamma random effect prior for the `\(\rho_i\)` is mathematically convenient, but might be restrictive:
+
+  - Covariate adjustment is difficult
+  
+  - Not possible to allow for spatial correlation between risks in nearby areas
+
+--
+
+  - A Normal random effect prior on the `\(\log \rho_i\)` is more flexible:
+ 
+`\begin{align*}
+y_i &amp;\sim \text{Poisson}(\lambda_i = \rho_i E_i)\\
+\eta_i &amp;= \log \rho_i = b_0 + v_i\\
+v_i &amp;\sim \text{Normal}(0, \sigma^2_v)
+\end{align*}`
+
+--
+
+- Need to specify hyperprior distributions for:
+
+- `\(\sigma^2_v\)` (between-area variance), e.g. `\(1/\sigma^2_v \sim \text{Gamma}(1,0.001)\)`
+- `\(b_0\)` (mean log relative risk), e.g. `\(b_0 \sim \text{Normal}(0,0.0001)\)` 
+&lt;span style="display:block; margin-top: -10px ;"&gt;&lt;/span&gt;
+--
+
+### Advantages of this approach:
+&lt;span style="display:block; margin-top: -20px ;"&gt;&lt;/span&gt;
+Posterior for each `\(v_i\)`
+
+- *borrows strength* from the likelihood contributions of **all** the areas, via their joint influence on the estimate of the unknown population (prior) parameter `\(\sigma^2_v\)` 
+
+&amp;rarr; *global smoothing* of the area RR 
+
+&amp;rarr; reflects our *full uncertainty* about the true values of `\(\sigma^2_v\)`
+
+.content-blue-box[
+Such models are called .red[*Hierarchical*] or .red[*Random effects*] or .red[*Multilevel*] models
+]
+
+---
+
+
+name: interpretation
+
+&lt;span style="display:block; margin-top: 250px ;"&gt;&lt;/span&gt;
+
+.myblue[.center[.huge[
+**Interpretation**]]]
+
+
+---
+
+# Parameter interpretation and useful quantities 
+  
+- `\(v_{i}\)` are the random effects. It can also be seen as the latent variable which captures the effect of unknown or unmeasured area level covariates.
+
+- If area level covariates are spatially structured we should take this into account when modelling `\(v_i\)` (we will see it later)
+
+- `\(\text{exp}(v_{i})\)` relative risk in area `\(i\)` compared to the risk for the whole study region
+
+- The variance of the random effects `\(\sigma^2_v\)` reflect the amount of extra-Poisson variation in the data
+  
+--
+
+&lt;span style="display:block; margin-top: -15px ;"&gt;&lt;/span&gt;
+
+- A useful summary of among unit variability in a Poisson hierarchical model is to rank the random effects and calculate the difference between two units at opposite extremes
+
+- Suppose we consider the `\(5^{th}\)` and `\(95^{th}\)` percentiles of the area relative risk distribution
+
+- let `\(q_{5\%} = \lambda_{5\%}\)` denote the log relative risk of outcome for the area ranked at the `\(5^{th}\)` percentile
+
+- let `\(q_{95\%} = \lambda_{95\%}\)` denote the log relative risk of outcome  for the area ranked at the `\(95^{th}\)` percentile
+
+.content-box-beamer[
+### Quantile ratio
+`$$\text{QR}_{90} = \text{exp}(q_{95\%}-q_{5\%})$$` 
+is the relative risk of outcome  between the top and bottom 5% of areas
+]
+
+---
+
+#Lip cancer dataset
+
+
+```r
+&gt; LipCancer &lt;- read.csv("scotlip.csv")
+&gt; LipCancer
+```
+
+
+
+```
+# A tibble: 6 × 11
+  CODENO       AREA PERIMETER RECORD_ID DISTRICT NAME          CODE      y    POP     E     x
+   &lt;int&gt;      &lt;dbl&gt;     &lt;dbl&gt;     &lt;int&gt;    &lt;int&gt; &lt;chr&gt;         &lt;chr&gt; &lt;int&gt;  &lt;int&gt; &lt;dbl&gt; &lt;int&gt;
+1   6126  974002000    184951         1        1 Skye-Lochalsh w6126     9  28324  1.38    16
+2   6016 1461990000    178224         2        2 Banff-Buchan  w6016    39 231337  8.66    16
+3   6121 1753090000    179177         3        3 Caithness     w6121    11  83190  3.04    10
+4   5601  898599000    128777         4        4 Berwickshire  w5601     9  51710  2.53    24
+5   6125 5109870000    580792         5        5 Ross-Cromarty w6125    15 129271  4.26    10
+6   6554  422639000    118433         6        6 Okney         w6554     8  53199  2.4     24
+```
+
+- `DISTRICT` identifies the area
+- `y` identifies the counts of cancer cases
+- `E` identifies the expected cases of cancer using the entire region under study as reference
+- `x` identifies the exposure to sun (percentage of agriculture , farming and fishery works)
+ 
+---
+
+# In `R-INLA` 
+
+We first populate the `formula` environment
+
+
+```r
+&gt; formula.inla &lt;- y ~ 1 + 
++   f(RECORD_ID,model="iid", hyper=list(prec=list(prior="loggamma",
++   	param=c(1,0.01))))
+```
+
+- The model specification is exactly the same as in GLM;
+- Anything with `f(.)` specifies a random effect; in this case `iid` represents the exchangeable structure. 
+
+Then we run the model through
+
+
+```r
+&gt; lipcancer.poisson &lt;- inla(formula.inla,family="poisson",
++                           data=LipCancer, E=E,
++                           control.predictor=list(compute=TRUE),
++                           control.compute=list(config=TRUE),
++                           control.fixed=list(mean.intercept=0,prec.intercept=0.00001))
+```
+&lt;span style="display:block; margin-top: -10px ;"&gt;&lt;/span&gt;
+Note that 
+
+- `control.fixed` allows to specify the parameters of the prior for the fixed effects (intercept)
+- `control.predictor` tells `INLA` to include the linear predictor estimation ( the parameters of the prior for the fixed effects (intercept)) useful for prediction - see later)
+- `control.compute` allows to include models election indexes, as well as to draw samples from the joint posterior
+
+---
+
+# Results for lip cancer in Scotland example
+
+- exp `\((v_i)\)` is the relative risk of lip cancer in area `\(i\)` relative to average across Scotland (see map)
+
+- `\(\sigma_v\)` is the between-area standard deviation of log relative risk of lip cancer
+
+- As in INLA we get the precision we need to convert it into variance using
+
+```r
+&gt; sigma2.v&lt;- inla.tmarginal(function(x) sqrt(1/x),
++ 			lipcancer.poisson$marginals.hyperpar[[1]])
+```
+
+And we can calculate quintiles with
+
+```r
+&gt; inla.qmarginal(seq(0,1,0.2),sigma2.v)
+```
+
+```
+[1] 0.4996176 0.6744936 0.7257159 0.7735114 0.8337035 1.1555258
+```
+
+---
+
+# Maps: comparing SMR with smoothed estimates
+
+
+
+
+.pull-left[
+###SMR
+&lt;span style="display:block; margin-top: -10px ;"&gt;&lt;/span&gt;
+
+```r
+&gt; ggplot() + geom_sf(data = out_map, 
++                    aes(fill = SMR)) + 
++                    scale_fill_viridis_c(limits = c(0,6)) + 
++   theme(axis.text.x = element_text( color = "blue", size = 2),
++         axis.text.y = element_text( color = "blue", size = 2),
++         legend.key.size = unit(0.4, 'cm'),
++         legend.text = element_text(size=6),
++         legend.title = element_text(size=6))
+```
+&lt;span style="display:block; margin-top: -10px ;"&gt;&lt;/span&gt;
+&lt;center&gt;&lt;img src=./img/ggplot1-1.png width='40%' title='SMR'&gt;&lt;/center&gt;
+]
+
+.pull-right[
+###Posterior mean
+&lt;span style="display:block; margin-top: -10px ;"&gt;&lt;/span&gt;
+
+```r
+&gt; ggplot() + geom_sf(data = out_map, 
++                    aes(fill = mean)) + 
++                   scale_fill_viridis_c(limits = c(0,6)) + 
++   theme(axis.text.x = element_text( color = "blue", size = 2),
++         axis.text.y = element_text( color = "blue", size = 2),
++         legend.key.size = unit(0.4, 'cm'),
++         legend.text = element_text(size=6),
++         legend.title = element_text(size=6))
+```
+&lt;span style="display:block; margin-top: -10px ;"&gt;&lt;/span&gt;
+&lt;center&gt;&lt;img src=./img/ggplot2-1.png width='40%' title='Posterior Mean'&gt;&lt;/center&gt;
+]
+
+---
+
+# Quantile ratios
+
+To obtain the quantile ratio we need to follow these steps:
+
+1\. Obtain the **join posterior distribution** for the model under consideration
+&lt;span style="display:block; margin-top: -10px ;"&gt;&lt;/span&gt;
+
+```r
+&gt; joint.post &lt;- inla.posterior.sample(100,lipcancer.poisson)
+&gt; names(joint.post[[1]])
+```
+
+```
+[1] "hyperpar" "latent"   "logdens" 
+```
+
+```r
+&gt; joint.post[[1]]$latent[1:3,]
+```
+
+```
+Predictor:1 Predictor:2 Predictor:3 
+  1.3416254   1.2760830   0.8166469 
+```
+&lt;span style="display:block; margin-top: -10px ;"&gt;&lt;/span&gt;
+Note that:
+- `joint.post` is a list of 100 elements and each element includes  a value from
+
+1\. the joint posterior distribution for the hyperparameters `joint.post\$hyperpar`
+
+2\. joint posterior distribution for the linear predictor `\(\bm{\eta}\)` in `joint.post\$latent` (row 1 to N) 
+
+3\. joint posterior distribution for the random effects `\(\bm{v}\)` in `joint.post\$latent` (N +1 to 2N)
+
+---
+
+# Quantile ratios
+
+2\. For each iteration rank the areas based on their `\(v_i\)` values
+
+```r
+&gt; joint.v &lt;- matrix(NA,56,100)
+&gt; for(i in 1:100){
++   joint.v[,i]&lt;- joint.post[[i]]$latent[57:112]
++ }
+```
+- Calculate `\(v_3\)` and `\(v_{53}\)` (5% and 95%) and build the ratio
+
+```r
+&gt; v5perc &lt;- apply(joint.v,2, function(x) quantile(x,0.05))
+&gt; v95perc &lt;- apply(joint.v,2, function(x) quantile(x,0.95))
+&gt; QR90&lt;- mean(exp(v95perc-v5perc))
+&gt; QR90
+```
+
+```
+[1] 10.74075
+```
+
+- The `\(QR90\)` points towards a large spatial variability. 
+
+---
+
+# SMR versus posterior mean RR for selected areas
+
+
+&lt;center&gt;&lt;img src=./img/shrinkage-1.png width='50%' title='INCLUDE TEXT HERE'&gt;&lt;/center&gt;
+
+- Comparing the SMR and the area level posterior mean from the model shows a shrinkage towards the global (national mean) 
+---
+
+# Linear combination of parameters
+
+- We have seen that `\(v_i\)` can be obtained using the random effect commands. If we want to get `\(b_0 + v_i\)` it is possible to obtain it in INLA as a linear combination using `inla.make.lincombs`
+- In practice to use it we need to type 
+
+&lt;span style="display:block; margin-top: -10px ;"&gt;&lt;/span&gt;
+
+```r
+&gt; lcs=inla.make.lincombs(RECORD_ID=diag(56),
++ 				"(Intercept)"=rep(1,56))
+```
+
+- Then we include `lcs` into the `inla` model as
+
+&lt;span style="display:block; margin-top: -20px ;"&gt;&lt;/span&gt;
+
+```r
+&gt; lipcancer.poisson &lt;- inla(formula.inla,family="poisson",lincomb=lcs,
++                           data=LipCancer, offset=log(E),
++                           control.predictor=list(compute=TRUE),
++                           control.compute=list(config=TRUE),                         
++                           control.fixed=list(mean=0,prec=0.00001, 
++                           mean.intercept=0,prec.intercept=0.00001))
+&gt; 
+&gt; #To obtain summary statistics for the combined effect (b_0 + v_i)
+&gt; lipcancer.poisson$summary.lincomb.derived[1:3,]
+```
+
+```
+     ID     mean        sd 0.025quant 0.5quant 0.975quant     mode kld
+lc01  1 1.523903 0.3561102  0.8236928 1.524278   2.221554 1.525082   0
+lc02  2 1.434887 0.1620633  1.1166099 1.434915   1.752730 1.434985   0
+lc03  3 1.096215 0.3035942  0.5005223 1.096090   1.692104 1.095862   0
+```
+
+---
+
+name: Hier-regression
+
+&lt;span style="display:block; margin-top: 250px ;"&gt;&lt;/span&gt;
+
+.myblue[.center[.huge[
+**Hierarchical Regression**]]]
+
+
+---
+
+# Regression in `INLA`
+
+It is easy to move from hierarchical models to regression models with random effects. 
+
+&lt;span style="display:block; margin-top: 10px ;"&gt;&lt;/span&gt;
+
+**Example**: In the `Seeds` dataset we are interested in the proportion of seeds that germinated on each of 21 plates arranged according to a 2 by 2 factorial layout by seed and type of root extract. The data consider the number of germinated `\(y_i\)` and the total number of seeds `\(n_i\)` on the i `\(-th\)` plate, `\(i =1,...,21\)`.
+
+--
+
+We specify a random effect logistic model 
+
+`\begin{eqnarray*}
+ y_i &amp;\sim&amp; \text{Binomial}(\pi_i , n_i)\\
+\text{logit}(\pi_i) &amp;=&amp; b_0 + \beta_1 x_{1i} + \beta_2 x_{2i} + \beta_{12} x_{1i}x_{2i} + v_i\\
+v_i &amp;\sim&amp; \text{Normal}(0, \sigma^2_v)
+\end{eqnarray*}`
+
+where `\(x_{1i}\)` , `\(x_{2i}\)` are the seed type and root extract of the i$-th$ plate, and an interaction term `\(\beta_{12} x_{1i}x_{2i}\)` is included. `\(b_0\)` , `\(\beta_1\)` , `\(\beta_2\)` , `\(\beta_{12}\)` , `\(\sigma^2_v\)` are given independent "noninformative" priors. 
+
+
+---
+
+# `R-INLA` code
+
+
+```r
+&gt; data(Seeds)
+&gt; head(Seeds)
+```
+
+```
+   r  n x1 x2 plate
+1 10 39  0  0     1
+2 23 62  0  0     2
+3 23 81  0  0     3
+4 26 51  0  0     4
+5 17 39  0  0     5
+6  5  6  0  1     6
+```
+
+```r
+&gt; formula &lt;- r~x1 + x2 + x1*x2 + f(plate, model="iid")
+&gt; model.regression &lt;- inla(formula, data=Seeds, 
++ 					family="binomial", Ntrials=n)
+```
+
+---
+
+# Output: Parameters
+
+
+```r
+&gt; model.regression$summary.fixed
+```
+
+```
+                  mean        sd 0.025quant   0.5quant 0.975quant       mode          kld
+(Intercept) -0.5573106 0.1290580 -0.8128318 -0.5566128 -0.3057575 -0.5551229 8.141460e-05
+x1           0.1432173 0.2272850 -0.3066092  0.1443640  0.5862926  0.1463687 6.017888e-05
+x2           1.3214742 0.1819023  0.9680552  1.3202582  1.6820314  1.3180323 9.645924e-05
+x1:x2       -0.7815996 0.3120993 -1.3948849 -0.7814952 -0.1691147 -0.7814959 4.969306e-05
+```
+
+```r
+&gt; head(model.regression$summary.random$plate)
+```
+
+```
+  ID          mean         sd  0.025quant      0.5quant 0.975quant          mode        kld
+1  1 -0.0103355441 0.06211783 -0.17943488 -8.454498e-04 0.04377829 -1.670834e-04 0.03280257
+2  2  0.0005949997 0.04749199 -0.07794005 -2.291544e-05 0.08598236  2.026897e-05 0.02229568
+3  3 -0.0123824254 0.06238287 -0.19682905 -1.137677e-03 0.03712337 -3.282143e-05 0.02335741
+4  4  0.0158317164 0.07312171 -0.03334043  1.441999e-03 0.24192536  3.201181e-04 0.02754597
+5  5  0.0063046878 0.05407668 -0.05320428  4.815531e-04 0.13605575  3.543913e-04 0.02878329
+6  6  0.0026606361 0.05648353 -0.07252901  3.664692e-04 0.10769889 -4.851865e-05 0.04532726
+```
+
+---
+
+name: Hier-regression
+
+&lt;span style="display:block; margin-top: 250px ;"&gt;&lt;/span&gt;
+
+.myblue[.center[.huge[
+**Prediction**]]]
+
+
+---
+
+# Predictive distribution
+
+- An important consequence of the concept of exchangeability is that we can
+derive also a predictive result on the dependent variable
+
+- Assume that `\(y^\star\)` represents a future occurrence of `\(y\)`. If `\(\bm{y}\)` and `\(y^{\star}\)` are exchangeable, we then have that:
+
+`\begin{eqnarray*}
+  p(y^{\star} \mid \bm{y}) &amp;=&amp; \frac{p(\bm{y}, y^{\star})}{p(\bm{y})} \hspace{0.5cm}\mbox{from the conditional probability}\\
+  &amp;=&amp; \frac{\int p(y^{\star}\mid \bm{\theta})p(\bm{y}\mid \bm{\theta})p(\bm{\theta})\text{d}\bm{\theta}}{p(\bm{y})} \hspace{0.5cm}\mbox{by exchangeability}\nonumber\\
+  &amp;=&amp; \frac{\int p({y}^{\star}\mid \bm{\theta})p(\bm{\theta} \mid \bm{y})p(\bm{y})\text{d}\bm\theta}{p(\bm{y})} \hspace{0.5cm}\mbox{applying Bayes' Theorem}\nonumber\\
+  &amp;=&amp; \int p(y^{\star}\mid \bm{\theta})p(\bm{\theta}\mid \bm{y})\text{d}\bm{\theta}\nonumber
+\end{eqnarray*}`
+
+- Following the INLA notation `\(\bm{\theta}\)` identifies the vector of all the parameters. 
+
+---
+
+# Predictive distribution
+
+-  The quantity `\(p(y^{\star} \mid \bm{y})\)`, known as *predictive distribution*, is only meaningful within the Bayesian approach
+
+  &amp;rarr; the posterior distribution for `\(\bm{\theta}\)` only exists if `\(\bm{\theta}\)` are random variables.
+
+&lt;center&gt;&lt;img src=./img/PredictiveDistr.jpg width='50%' title='INCLUDE TEXT HERE'&gt;&lt;/center&gt;
+
+
+- `\(y\)` and `\(y^{\star}\)` are generated by the same random process governed by the parameters `\(\bm{\theta}\)`, associated with a suitable prior distribution, `\(p(\bm{\theta})\)`. 
+- When we observe the value `\(\bm{y}\)`, the uncertainty about the parameter is updated into the posterior distribution `\(p(\bm{\theta} \mid \bm{y})\)`, which in turns is used to infer about the future realization `\(y^{\star}\)`.
+
+---
+
+# Example: Prediction of Missing data
+
+- We assume that the first observation in the Seeds dataset is missing
+
+
+
+- To predict it we simply run `INLA` with the option `control.predictor=list(link=link)` where `link` is a vector of the length equal to the number of observations with 1 only where the observation is missing
+
+
+
+```r
+&gt; link&lt;- rep(NA, length(Seeds$r))
+&gt; link[is.na(Seeds$r)]&lt;-1
+&gt; formula &lt;- r~x1 + x2 + x1*x2 + f(plate, model="iid")
+&gt; model.regression &lt;- inla(formula, data=Seeds, 
++ 					family="binomial", Ntrials=n, control.predictor=list(link=link))
+```
+
+---
+
+# Example: Prediction of Missing data
+
+- The summary statistics of the predicted values can be accessed by
+
+
+```r
+&gt; dim(model.regression$summary.fitted.values)
+```
+
+```
+[1] 21  6
+```
+
+```r
+&gt; model.regression$summary.fitted.values[1,]
+```
+
+```
+                         mean         sd 0.025quant  0.5quant 0.975quant      mode
+fitted.Predictor.01 0.3831032 0.03519607  0.3168842 0.3824702  0.4528834 0.3816362
+```
+.pull-left[
+- Note that we get a distribution for each of the 21 observations, but we need to consider only the first as this was the missing one
+- The fitted value is on the probability scale - to go back to the scale of the observations we run
+
+
+```r
+&gt; pred.values &lt;- inla.tmarginal(function(x) x*Seeds$n[1], 
++                             model.regression$marginals.fitted.values[[1]])
+```
+]
+
+.pull-right[
+&lt;img src="./img/pred_plot-1.png" &gt;
+]
+
+---
+
+name: Prior
+
+&lt;span style="display:block; margin-top: 250px ;"&gt;&lt;/span&gt;
+
+.myblue[.center[.huge[
+**Choice of prior**]]]
+
+---
+
+# How to specify priors?
+
+- In small area studies we usually work with Poisson/Binomial distribution on data - no variance parameter; the main interest is on random effect variance.
+
+&lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
+
+- A Gamma `\((\epsilon,\epsilon)\)` can be used on the precision - nice conjugacy property with the Normal distribution of the random effects - but inference could be sensitive to choice of `\(\epsilon\)` - particularly if little evidence of heterogeneity between areas is present in the data. It has also been criticised (e.g. (Gelman, 2006))
+
+&lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
+
+- A vague or weakly informative prior can be specified so that all possible values are assumed to be a priori equally likely 
+
+- Unfortunately, "non informative" prior distributions are sensitive to changes of scale 
+
+---
+
+# Changing the scale
+
+- For instance starting with a Uniform on the log standard deviation  we end up with a high density on low values for the precision  
+
+
+
+
+
+
+
+.pull-left[
+&lt;img src="./img/unnamed-chunk-3-1.png" style="display: block; margin: auto;" width="90%"&gt;
+]
+
+.pull-right[
+&lt;img src="./img/unnamed-chunk-4-1.png" style="display: block; margin: auto;" width="90%"&gt;
+]
+
+---
+
+# Remember...
+
+- `INLA` parametrises the precision and the default is
+
+`\(\log \left(1/\sigma^2\right) \sim \text{logGamma}(1,0.00005)\)`
+
+- However alternatives can be built, fror instance: 
+
+  - Uniform prior on log sigma (Jeffreys' prior)
+  -  Truncated Normal on log precision
+
+&lt;span style="display:block; margin-top: 50px ;"&gt;&lt;/span&gt;
+
+.content-box-blue[In general we need to be careful to check the level of information (weakly, strong) on the scale we are interested in (e.g. variance) and see what this corresponds on the standard deviation/precision (on which prior is usually specified).
+]
+
+---
+
+name: Modelselection
+
+&lt;span style="display:block; margin-top: 250px ;"&gt;&lt;/span&gt;
+
+.myblue[.center[.huge[
+**Model selection**]]]
+
+---
+
+# Model comparison: Methods based on the deviance
+
+- When the interest lays mainly on the prior distribution or on the functional form of some parameters the deviance of the model can be used to evaluate the goodness of fit.
+
+Given the data `\(\mathbf{y}\)` with distribution  `\(p(\mathbf{y}\mid \theta)\)`, the deviance of the model is defined as:
+`\begin{eqnarray*}
+  D(\theta) = -2 \hbox{log} p(y \mid \theta)
+\end{eqnarray*}`
+where `\(\theta\)` identifies the parameter of the likelihood
+
+--
+
+- Ex. `\(y_i \sim \hbox{Bernoulli}(\theta)\)`\\
+      `\(\rightsquigarrow p(\mathbf{y}\mid \theta) = \prod_{i=1}^n  \left( \begin{array}{c} n_i \\ y_i \end{array} \right) \theta^{y_i} (1-\theta)^{n_i-y_i}\)`
+
+`\(\displaystyle D(\theta) = -2\left[\sum_i y_i \log \theta_i + (n_i-y_i)\log(1-\theta_i)+ \log\left(\begin{array}{c}n_i\\y_i \end{array}\right)\right]\)`
+
+
+---
+
+# Mean deviance
+
+- The deviance of the model measures the variability linked to the likelihood, ie the probabilistic structure used for the observation (conditional on the parameters)
+
+- This quantity is a random variable in the Bayesian framework, so it is possible to synthesise it through several indexes (mean, median, etc.)
+
+-  Many authors suggested using posterior mean deviance `\((\overline{D}) = E_{\theta\mid y} [D(\theta)]\)` as a measure of fit
+
+**DRAWBACK:**  more complex models will fit the data better and so will have smaller `\(\overline{D}\)`
+
+- Need to have some measure of *model complexity* to trade off against `\(\overline{D}\)`
+
+---
+
+# Deviance Information Criterion - DIC, (Spiegelhalter, Best, Carlin, and Van Der Linde, 2002)
+
+- Natural way to compare models is to use criterion based on trade-off between the fit of the data to the model and the corresponding complexity of the model
+
+- Deviance Information Criterion, DIC = goodness of fit + complexity of the model
+
+--
+
+  - The fit is measure through the deviance
+
+`$$D(\theta) = -2 \hbox{log} p(y \mid \theta)$$` 
+
+--
+
+  - Complexity measured by estimate of the "effective number of parameters":
+
+  `$$p_D = \textsf{E}_{\theta\mid y}\left[D(\theta)\right] + D(\textsf{E}_{\theta\mid y}\left[\theta \right]) = \overline{D} - D(\overline{\theta})$$`
+
+--
+
+  - The DIC is then defined analogously to AIC as
+
+`$$\hbox{DIC} = D(\overline{\theta}) + 2p_D = \overline{D} + p_D$$`
+
+  - Models with smaller DIC are better supported by the data
+
+- DIC can be monitored in INLA including  `control.compute=list(dic=TRUE)` into the `inla` function.
+
+---
+
+# Scottish lip cancer example
+
+- Counts of cases of lip cancer `\(y_i\)` in 56 districts in Scotland: 
+`\(y_i \sim \text{Poisson}(\rho_i E_i)\)`
+
+- Range of models: 
+
+  1\. Pooled: `\(\log \rho_i = b_0 + \beta_1 x_i\)`
+  
+  2\. Random Effects 1: `\(\log \rho_i = b_0 + \beta_1 x_i + \theta_i\)`; Flat prior on `\(\log \sigma_v\)`
+  
+  3\. Random Effects 2: `\(\log \rho_i = b_0 + \beta_1 x_i + \theta_i\)`; Gamma prior on `\(\log\tau_v\)`
+
+
+Table: DIC elements under different models
+
+|                 |   D| D(theta)|  pD|   DIC|
+|:----------------|---:|--------:|---:|-----:|
+|Pooled           | 589|      588|   1| 590.4|
+|Random effects 1 | 270|      228| 270| 310.0|
+|Random effects 2 | 270|      230| 270| 310.0|
+
+--
+
+DIC has been criticised over the years, specifically:
+
+1\. `\(p(D)\)` is not invariant to reparameterization. For example, we would obtain a (slightly) different value if we parameterized in terms of `\(\sigma\)` or  `\(log\sigma\)`
+
+2\. It is not based on a proper predictive criterion
+
+4\. Issues when there are missing data
+
+See (Spiegelhalter, Best, Carlin, and Van der Linde, 2014) for a complete description of the criticisms.
+
+---
+
+#Watanabe AIC (WAIC, Watanabe and Opper (2010))
+
+- Considers the posterior predictive mean and variance (on the log scale)
+
+- Linked to cross-validation
+
+- Similarly to DIC:
+
+  - WAIC has a model-fit and model-complexity components
+  - Smaller WAIC indicates the preferred model
+
+--
+
+
+- Let `\(m_i\)` and `\(v_i\)` be the posterior predictive mean and variance for the $ i^{th} $ unit
+- The effective model size is 
+	`$$p_W = \sum_{i=1}^nv_i$$` 
+	&lt;span style="display:block; margin-top: 10px ;"&gt;&lt;/span&gt;
+	
+- The criteria is 
+	`$$WAIC = -2\sum_{i=1}^nm_i + 2p_W$$`
+- The WAIC is readily available in `INLA` using `control.compute=list(waic=TRUE)` 
+
+
+---
+
+# Summary
+
+- Hierarchical models allow **borrowing of strength** across units
+
+  &amp;rarr; posterior distribution of the unit-parameter borrows strength from the
+likelihood contributions for all the units, via their joint influence on
+the posterior estimates of the unknown hyper-parameters
+
+  &amp;rarr; improved efficiency
+  
+- Judgements of exchangeability need careful assessment
+  &amp;rarr; units suspected a priori to be systematically different might be
+modelled by including relevant covariates so that residual variability
+more plausibly reflects exchangeability
+
+- Subgroups of prior interest should be considered separately
+
+--
+
+Careful on the prior specification
+
+- non informative on one scale might be informative on another
+
+- always run some sensitivity analyses changing the prior and investigating how this affect the estimates of parameters of interest
+
+- DIC is a useful tool for model selection, easy to calculate in INLA
+&amp;rarr; bear in mind that they can only be used to compare models - similarly to the AIC they do not have an absolute meaning.
+
+---
+
+# References
+
+Gelman, A. (2006). "Prior distributions for variance parameters in hierarchical models (comment on article by Browne and Draper)". In: _Bayesian analysis_ 1.3, pp. 515-534.
+
+Spiegelhalter, D. J., N. G. Best, B. P. Carlin, et al. (2014). "The deviance information criterion: 12 years on". In: _Journal of the Royal Statistical Society: Series B (Statistical Methodology)_ 76.3, pp. 485-493.
+
+Spiegelhalter, D. J., N. G. Best, B. P. Carlin, et al. (2002). "Bayesian measures of model complexity and fit". In: _Journal of the Royal Statistical Society: Series B (Statistical Methodology)_ 64.4, pp. 583-639.
+
+Watanabe, S. and M. Opper (2010). "Asymptotic equivalence of Bayes cross validation and widely applicable information criterion in singular learning theory." In: _Journal of machine learning research_ 11.12.
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script src="https://platform.twitter.com/widgets.js"></script>
+<script>var slideshow = remark.create({
+"highlightStyle": "github",
+"highlightLines": true,
+"countIncrementalSlides": false,
+"ratio": "16:9"
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+// add `data-at-shortcutkeys` attribute to <body> to resolve conflicts with JAWS
+// screen reader (see PR #262)
+(function(d) {
+  let res = {};
+  d.querySelectorAll('.remark-help-content table tr').forEach(tr => {
+    const t = tr.querySelector('td:nth-child(2)').innerText;
+    tr.querySelectorAll('td:first-child .key').forEach(key => {
+      const k = key.innerText;
+      if (/^[a-z]$/.test(k)) res[k] = t;  // must be a single letter (key)
+    });
+  });
+  d.body.setAttribute('data-at-shortcutkeys', JSON.stringify(res));
+})(document);
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+// adds .remark-code-has-line-highlighted class to <pre> parent elements
+// of code chunks containing highlighted lines with class .remark-code-line-highlighted
+(function(d) {
+  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
+  const preParents = [];
+  const findPreParent = function(line, p = 0) {
+    if (p > 1) return null; // traverse up no further than grandparent
+    const el = line.parentElement;
+    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
+  };
+
+  for (let line of hlines) {
+    let pre = findPreParent(line);
+    if (pre && !preParents.includes(pre)) preParents.push(pre);
+  }
+  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
+})(document);</script>
+<style>
+.logo {
+  background-image: url("assets/MRC-Centre-Logo.png");
+  background-size: 15% 10%;
+  background-repeat: no-repeat;
+  position: absolute;
+  top:  0.25%; /* 1.135em */
+  left: 85%;
+  width: 100%;
+  height: 100%;
+  z-index: 0;
+}
+</style>
+
+<script>
+document
+  .querySelectorAll(
+    '.remark-slide-content' +
+    ':not(.title-slide)' +
+    // add additional classes to exclude here, e.g.
+    // ':not(.inverse)' +
+    ':not(.hide-logo)' +
+    ':not(.thankyou-michelle)' +
+    ':not(.thankyou-barney)'
+  )
+  .forEach(el => {
+    el.innerHTML += '<div class="logo"></div>';
+  });
+</script>
+
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>
