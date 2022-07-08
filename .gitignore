@@ -6,3 +6,7 @@ ProveMichi
 INLAbru
 VIBASS2022_TOC.docx
 */*.Rmd
+*.rdb
+*.rdx
+*.rda
+*.rds
