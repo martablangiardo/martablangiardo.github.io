@@ -11,3 +11,11 @@ The course will maintain a very practical angle, with a mixture of lectures and 
 It is recommended that people attending are familiar with [R](https://www.r-project.org/) and with the basic of the Bayesian approach.
 
 It would be beneficial if attendees could bring their laptop with the latest version of R and INLA installed.
+
+## Timetable
+### Day 1 - We 20th July 2022 - morning (3 hours)
+
+- [Session 1.1](Session1.1): Lecture on introduction to INLA and R-INLA (1 hour)
+- [Session 1.2](Session1.2): Hierarchical models, prediction, prior specification (1 hour)
+- Break
+
