@@ -1,4 +1,3 @@
-# VIBASS 2022 - Spatial and spatiotemporal models with R-INLA
 
 The course will provide a focus on how to use the Integrated Nested Laplace Approximation approach (INLA) for the analysis of spatial and spatio-temporal data.
 
@@ -13,9 +12,16 @@ It is recommended that people attending are familiar with [R](https://www.r-proj
 It would be beneficial if attendees could bring their laptop with the latest version of R and INLA installed.
 
 ## Timetable
-### Day 1 - We 20th July 2022 - morning (3 hours)
+### Day 1 - Wed 20th July 2022 - morning (3 hours)
 
 - [Session 1.1](Session1.1): Lecture on introduction to INLA and R-INLA (1 hour)
 - [Session 1.2](Session1.2): Hierarchical models, prediction, prior specification (1 hour)
 - Break
+- [Session 1.3](Session1.3): Practical session (1 hour)
 
+### Day 1 - Wed 20th July 2022 - afternoon Wed 20 (3 hours)
+
+- [Session 1.4](Session1.4): Bayesian spatial model for small area data (1 hour)
+- [Session 1.5](Session1.5): Spatio-temporal modeling for small area data (1 hour)
+- Break
+- [Session 1.6](Session1.6): Practical session (1 hour)
