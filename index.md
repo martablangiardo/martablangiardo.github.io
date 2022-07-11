@@ -5,23 +5,42 @@ We will first go through the basic of INLA for Bayesian inference and will then 
 
 Moving on to point-referenced data we will introduce the stochastic partial differential equation (SPDE) approach, used for spatial modelling on a continuous field. We will then extend this to deal with spatio-temporal data. Finally we will describe how to use R-INLA for more advanced problems in the spatio-temporal realm, for instance how to deal with misaligned data or how to model two outcomes jointly.
 
-The course will maintain a very practical angle, with a mixture of lectures and practical sessions. We will share a github repository with the material ahead of the course. For a book covering the topics of the course see [here](https://onlinelibrary.wiley.com/doi/book/10.1002/9781118950203). 
+The course will maintain a very practical angle, with a mixture of lectures and practical sessions. For a book covering the topics of the course see [here](https://onlinelibrary.wiley.com/doi/book/10.1002/9781118950203). 
 
 It is recommended that people attending are familiar with [R](https://www.r-project.org/) and with the basic of the Bayesian approach.
 
-It would be beneficial if attendees could bring their laptop with the latest version of R and INLA installed.
+It would be beneficial if attendees could bring their laptop having installed the latest R (version 4.2.1) and the following packages:
 
-## Timetable
-### Day 1 - Wed 20th July 2022 - morning (3 hours)
+- INLA (install.packages("INLA", repos="http://www.math.ntnu.no/inla/R/stable"))
 
-- [Session 1.1](Session1.1): Lecture on introduction to INLA and R-INLA (1 hour)
-- [Session 1.2](Session1.2): Hierarchical models, prediction, prior specification (1 hour)
+- sf, spdep, SpatialEpi, RColorBrewer, tmap, ggplot2, mapview, cowplot, dplyr, tidyr, viridis, patchwork, knitr, kableExtra
+
+## Timetable (with slides)
+### Day 1 - Wed 20th July 2022 - morning
+
+- [Session 1.1](Session1.1): Lecture on introduction to INLA and R-INLA
+- [Session 1.2](Session1.2): Hierarchical models, priors, prediction and model checking
 - Break
-- [Session 1.3](Session1.3): Practical session (1 hour)
+- [Practical 1](Practical1): INLA basics (1a); hierarchical models for disease mapping (1b)
 
-### Day 1 - Wed 20th July 2022 - afternoon Wed 20 (3 hours)
+### Day 1 - Wed 20th July 2022 - afternoon
 
-- [Session 1.4](Session1.4): Bayesian spatial model for small area data (1 hour)
-- [Session 1.5](Session1.5): Spatio-temporal modeling for small area data (1 hour)
+- [Session 1.4](Session1.3): Spatial models for small area data: disease mapping and ecological regression
+- [Session 1.5](Session1.4): Spatio-temporal modelling for area data
 - Break
-- [Session 1.6](Session1.6): Practical session (1 hour)
+- [Practical 2](Practical2): Spatial and spatio-temporal disease mapping and regression
+
+### Day 2 - Thur 21th July 2022 - morning
+
+- [Session 1.5](Session1.5): Models for geostatistical data and introduction to SPDE
+- [Session 1.6](Session1.6): inla.stack and inlabru
+- Break
+- [Practical 3](Practical3): INLA-SPDE for geostatistical data
+
+### Day 2 - Thur 21th July 2022 - afternoon
+
+- [Session 1.7](Session1.7): Spatio-temporal model for geostatistical data
+- [Session 1.8](Session1.8): Advanced INLA features
+- Break
+- [Practical 4](Practical4): A space-time model with inlabru
+

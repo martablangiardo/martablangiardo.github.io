@@ -162,7 +162,7 @@ The topics treated in this lecture can be found in **Section 6.4 -- 6.7** of the
 
 &lt;span style="display:block; margin-top: 30px ;"&gt;&lt;/span&gt;
 
-1\. [Introduction to spatial modeling](#introduction)
+1\. [Introduction to spatial modeling for geostatistical data (based on GF)](#introduction)
 
 &lt;span style="display:block; margin-top: 30px ;"&gt;&lt;/span&gt;
 
@@ -179,12 +179,14 @@ name: introduction
 &lt;span style="display:block; margin-top: 250px ;"&gt;&lt;/span&gt;
 
 .myblue[.center[.huge[
-**Introduction to spatial modeling**]]]
+**Introduction to spatial modeling for geostatistical data (based on GF)**]]]
 
 ---
 
 # Geostatistical data
 
+.panelset[
+.panel[.panel-name[Definition]
 - The difference between models for .red[**geostatistical**] (or point referenced) data and the spatial models
 presented in Day 1 is that here we treat space as continuous,
 not discretised (areas).
@@ -199,26 +201,29 @@ process of interest (response) is a spatial field `\(y(\bm{s}), \bm{s} \in \math
 -  Data are measured (possibly with error) at `\(n\)` spatial locations `\((\bm{s}_{1},\ldots,\bm{s}_{n})\)` and are denoted by `\(\bm{y}=\left(y(\bm{s}_1),\ldots, y(\bm{s}_n)\right)=(y_1,\ldots,y_n)\)`.
 
 &lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
+]
 
-
-
+.panel[.panel-name[Examples]
 .pull-left[
 &lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
 - Examples: 
+&lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
   - in the field of environmental science: rainfall, air pollution concentrations, radioactive emission in soil, etc.,
+  &lt;span style="display:block; margin-top: 10px ;"&gt;&lt;/span&gt;
   - in epidemiology when considering the risk of disease at different locations.
 ]
 
 .pull-right[
 &lt;img src="./img/meusezinc-1.png" &gt;
 ]
-
+]
+]
 ---
 
 # Aims
 
 &lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
-- To **reconstruct the spatial field** from a  finite set of noisy observations taken at a finite number of spatial locations.
+- To **reconstruct the spatial field** from a  finite set of **noisy** observations taken at a finite number of spatial locations.
 
 &lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
 - To use the spatial dependence to **predict values** of the spatial field
@@ -226,7 +231,7 @@ process of interest (response) is a spatial field `\(y(\bm{s}), \bm{s} \in \math
 no observations.
 
 &lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
-- The common framework to geostatistics models is that of .red[**Gaussian  fields**] (or processes) which are based on the multivariate Normal  distribution.
+- The common methodological framework to geostatisticsalmodels is that of .red[**Gaussian  fields**] (or processes) which are based on the multivariate Normal  distribution.
 
 ---
 
@@ -263,7 +268,7 @@ no observations.
 
 ---
 
-# A common model for geostatistical data
+# A common model for geostatistical (noisy) data
 
 - Usually the following (mixed-effects) model is assumed
 
@@ -272,7 +277,7 @@ no observations.
 where
 
 &lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
-- `\(\mu(\bm{s})\)` is the so-called .red[**large scale**] component, including linear or non linear covariates.
+- `\(\mu(\bm{s})\)` is the so-called .red[**large scale**] component, including linear or non linear of covariates.
 
 &lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
 - `\(\xi(\bm{s})\)` is a zero mean latent .red[**Gaussian spatial process**] commonly assumed to be stationary and isotropic with covariance function `\(Cov(\xi(\bm{s_i}),\xi(\bm{s_j}))\)` which depends only on the distance between the locations.
@@ -324,9 +329,9 @@ where:
 
 &lt;span style="display:block; margin-top: 30px ;"&gt;&lt;/span&gt;
 - This requires to compute the Cholesky factorization of the dense covariance matrix `\(\bm \Sigma\)` which is an operation of order `\(n^3\)`. This is known as **big `\(n\)` problem** (Banerjee, Carlin, and Gelfand, 2015).
+&lt;span style="display:block; margin-top: 30px ;"&gt;&lt;/span&gt;
 
-
-- The .red[**stochastic partial differential equation (SPDE) approach**] (Lindgren, Rue, and Lindström, 2011) is an alternative to the use of MCMC: it represents the continuous spatial process `\(\xi(\bm{s})\)` with Mat&amp;eacute;rn covariance function using a discretely indexed spatial random process (i.e., a GMRF),  which is characterized by a sparse precision matrix and enjoys computational benefits in terms of fast inference (the cost is typically of the order `\(n^{3/2}\)` in `\(\mathbb{R}^2\)`.
+- The .red[**stochastic partial differential equation (SPDE) approach**] (Lindgren, Rue, and Lindström, 2011) is an alternative to the use of MCMC: it represents the continuous spatial process `\(\xi(\bm{s})\)` with Mat&amp;eacute;rn covariance function using a discretely indexed spatial random process (i.e., a GMRF),  which is characterized by a sparse precision matrix and enjoys computational benefits in terms of fast inference (the cost is typically of the order `\(n^{3/2}\)` in `\(\mathbb{R}^2\)`).
 
 
 
@@ -366,6 +371,12 @@ name: spdeapproach
 .pull-right[
 &lt;center&gt;&lt;img src=./img/SPDEbook2019.png width='50%' title='INCLUDE TEXT HERE'&gt;&lt;/center&gt;
 ]
+]
+
+.panel[.panel-name[Other references]
+&lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
+- Bakka H, Rue H, Fuglstad GA, et al. **Spatial modeling with R-INLA: A review**. WIREs Comput Stat. 2018; 10:e1443. https://doi.org/10.1002/wics.1443
+&lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
 ]
 ]
 
@@ -441,7 +452,7 @@ where
   &lt;span style="display:block; margin-top: 10px ;"&gt;&lt;/span&gt;
 
 .content-box-green[
-The precision matrix  `\(\bm Q\)`, whose elements depend on `\(\tau\)` and `\(\kappa\)`, is sparse and consequently  `\(\bm \xi\)`  is a GMRF with distribution `\(\text{Normal}(\bm 0,\bm Q^{-1})\)` and it represents the approximated solution to the SPDE (in a stochastically weak sense). 
+The precision matrix  `\(\bm Q\)`, whose elements depend on `\(\tau\)` and `\(\kappa\)`, is sparse and consequently  `\(\bm \xi\)`  is a GMRF  distributed as `\(\text{Normal}(\bm 0,\bm Q^{-1})\)`: it represents the approximated solution to the SPDE (in a stochastically weak sense). 
 ]
 
 ---
@@ -522,13 +533,26 @@ We use the `SPDEtoy`  dataset , consisting in 200 simulated values for the varia
 
 
 .panel[.panel-name[Plot]
-&lt;img src="./img/spdetoydata-1.png" &gt;
+.pull-left[
+
+```r
+&gt; library(tidyverse)
+&gt; library(INLA)
+&gt; 
+&gt; SPDEtoy %&gt;% 
++   ggplot() +
++   geom_point(aes(s1,s2, col=y),size=2)   
+```
+]
+.pull-right[
+&lt;img src="./img/spdetoydataout-1.png" &gt;
+]
 ]
 ]
 
 ---
 
-# SPDE toy example
+# SPDE toy example: model for simulation
 
 - The model used for simulating the `SPDEtoy` data assumes that the distribution of the observation  `\(y_{i}\)`  is 
 
@@ -749,7 +773,7 @@ The option `offset` of the `inla.mesh.2d` function can be used to define how muc
 # Mesh optional arguments `cutoff`
 
 .panelset[
-.panel[.panel-name[mesh5]
+.panel[.panel-name[domain]
 .pull-left[
 The option `cutoff` can be used to avoid building too many small triangles around clustered data locations (the default value is equal to 0). Note that here the information about the spatial domain extent is provided through the `loc.domain`  option (i.e. a matrix of point locations).
 
@@ -757,23 +781,44 @@ The option `cutoff` can be used to avoid building too many small triangles aroun
 ```r
 &gt; domain &lt;- matrix(cbind(c(0,1,1,0.7,0),
 +                        c(0,0,0.7,1,1)), ncol=2)
-&gt; mesh5 &lt;- inla.mesh.2d(loc.domain=domain,
-+                       max.edge = c(0.04, 0.2),
-+                       cutoff = 0.015,
-*+                       offset = c(0.1, 0.4))
+*&gt; mesh5domain &lt;- inla.mesh.2d(loc.domain = domain,
++                       max.edge = c(0.04, 0.2), 
++                       offset = c(0.1, 0.4))
 ```
 
 
 ```r
 &gt; ggplot() + 
-+   gg(mesh5) +
-+   geom_point(data = data.frame(domain),
-+              aes(X1, X2)) +
++   gg(mesh5domain) +
++   geom_point(data = data.frame(domain), aes(X1, X2)) +
 +     geom_point(data = data.frame(coords),
 +              aes(s1, s2), col = "red", alpha = 0.5)
 ```
 ]
 
+.pull-right[
+&lt;img src="./img/explore_plot_out5domain-1.png" &gt;
+]
+]
+
+.panel[.panel-name[mesh5]
+.pull-left[
+
+```r
+&gt; mesh5 &lt;- inla.mesh.2d(loc.domain = domain, 
++                       max.edge = c(0.04, 0.2), 
+*+                       cutoff = 0.5,
++                       offset = c(0.1, 0.4))
+```
+
+```r
+&gt; ggplot() + 
++   gg(mesh5) +
++   geom_point(data = data.frame(domain),aes(X1, X2)) +
++     geom_point(data = data.frame(coords),
++              aes(s1, s2), col = "red", alpha = 0.5)
+```
+]
 .pull-right[
 &lt;img src="./img/explore_plot_out5-1.png" &gt;
 ]
@@ -785,8 +830,8 @@ The option `cutoff` can be used to avoid building too many small triangles aroun
 ```r
 &gt; mesh6 &lt;- inla.mesh.2d(loc.domain = domain,
 +                       max.edge = c(0.04, 0.2),
-+                       cutoff = 0.05,
-*+                       offset = c(0.1, 0.4))
+*+                       cutoff = 0.05,
++                       offset = c(0.1, 0.4))
 ```
 
 
@@ -809,33 +854,33 @@ The option `cutoff` can be used to avoid building too many small triangles aroun
 ---
 
 # Mesh: non convex hull
-.panelset[
-.panel[.panel-name[mesh7]
 .pull-left[
 A feature in `R-INLA` named `inla.nonconvex.hull`  makes it possible to compute a non convex hull to be included as boundary in the mesh construction. This can be particularly useful when the shape of the domain is of some importance.
 
 
-```r
-&gt; bnd &lt;- inla.nonconvex.hull(as.matrix(coords),
-+                            convex=0.07)
-&gt; mesh7 &lt;- inla.mesh.2d(loc = coords,
-+                       boundary = bnd,
-*+                       max.edge = c(0.04, 0.2),
-*+                       cutoff = 0.05,
-*+                       offset = c(0.1, 0.4))
-```
 
+```r
+&gt; set.seed(44)
+&gt; loc = matrix(runif(20), 10, 2)
+&gt; 
+&gt; boundary = inla.nonconvex.hull(loc,
+*+                                convex=0.2)
+&gt; meshNC &lt;- inla.mesh.2d(loc = loc,
+*+                       boundary = boundary,
++                       max.edge = c(0.04, 0.2))
+```
 
 ```r
 &gt; ggplot() + 
-+   gg(mesh7)
++   gg(meshNC)+
++   geom_point(data = data.frame(loc),
++              aes(X1, X2))
 ```
+
 ]
 
 .pull-right[
 &lt;img src="./img/explore_plot_out7-1.png" &gt;
-]
-]
 ]
 
 ---
@@ -869,7 +914,7 @@ it is possible to access the interactive Shiny app for exploring triangle mesh c
 ```
 [1] 200 548
 ```
-]
+
 No more than 3 elements in each line are non-zero:
 
 ```r
@@ -912,8 +957,8 @@ FALSE  TRUE
 
 # Model fitting
 
-- The vector of parameters is defined as  `\(\bm \theta = \{\tilde {\bm \xi}, b_0\}\)`  with  hyper-parameter vector  `\(\bm \psi=(\sigma^{2}_{e},\kappa,\tau)\)`, where `\(\kappa\)`  and `\(\tau\)` are the Mat&amp;eacute;rn covariance function parameters. 
-
+- The vector of parameters is defined as  `\(\bm \theta = \{\tilde {\bm \xi}, b_0\}\)`  with  hyper-parameter vector  `\(\bm \psi=(\sigma^{2}_{e},r,\tau)\)`, where `\(\kappa\)`  and `\(r\)` (depending on `\(\tau\)`) are the Mat&amp;eacute;rn covariance function parameters. 
+&lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
 - In `R-INLA` the default internal representation for the SPDE parameters is  `\(\log(\tau)=\theta_1\)`  and  `\(\log(\kappa)=\theta_2\)`,  with  `\(\theta_1\)`  and  `\(\theta_2\)`  being given two independent Normal prior distributions.
 
 
@@ -934,26 +979,27 @@ FALSE  TRUE
 ```r
 &gt; formula = y ~ -1 + intercept + f(spatial.field, model = spde)
 ```
-`spatial.field` is a proper index variable and `spde` is the model created previously with `inla.spde2.matern`. Note that the intercept is removed and is added as a covariate term in the list of effects.
+where `spatial.field` is a proper index variable and `spde` is the model created previously with `inla.spde2.matern`. Note that the intercept is removed and is added as a covariate term in the list of effects.
 
 ---
+
 # Model fitting
 
-3\. **Fit the model** as usual using the `inla` function
+3\. **Fit the model** as usual using the `inla` function:
 
 ```r
 &gt; output6 &lt;- inla(formula,
 +                 data = list(y = SPDEtoy$y,
 +                             intercept = rep(1,spde$n.spde),
-+                             spatial.field = 1:spde$n.spde),
-+                 control.predictor = list(A = A.est6, compute = TRUE))
+*+                             spatial.field = 1:spde$n.spde),
+*+                 control.predictor = list(A = A.est6, compute = TRUE))
 ```
 
 Note that the projector matrix is passed to `inla` through `control.predictor`. Moreover, with the option `compute = TRUE` we ask for the computation of the marginals of the linear predictor. 
 
 ---
 
-# Exploring the output
+# Exploring the output: fixed effects and hyperparameters
 
 
 ```r
@@ -979,7 +1025,7 @@ Theta2 for spatial.field                 2.002126   1.508405   2.470519
 
 ---
 
-# Exploring the output 
+# Exploring the output: spatial parameters 
 
 If we are interested in the posterior summaries of the spatial parameters  on the scale of the variance `\(\sigma^2=1/\tau\)`  and range  `\(r\)`  (instead of the internal scale regarding `\(\theta_1=\log(\tau)\)` and `\(\theta_2=\log(\kappa)\)`) we use
 
@@ -1017,8 +1063,7 @@ The posterior mean of  `\(\sigma^2\)` and the range `\(r\)`  can be obtained by 
 
 
 ```r
-&gt; inla.emarginal(function(x) x,
-+                output6.field$marginals.variance.nominal[[1]])
+&gt; inla.emarginal(function(x) x, output6.field$marginals.variance.nominal[[1]])
 ```
 
 ```
@@ -1026,15 +1071,14 @@ The posterior mean of  `\(\sigma^2\)` and the range `\(r\)`  can be obtained by 
 ```
 
 ```r
-&gt; inla.emarginal(function(x) x,
-+                output6.field$marginals.range.nominal[[1]])
+&gt; inla.emarginal(function(x) x, output6.field$marginals.range.nominal[[1]])
 ```
 
 ```
 [1] 0.393428
 ```
 
-Also the other standard INLA functions can be applied to the marginal posteriors, e:
+Also the other standard INLA functions can be applied to the marginal posteriors:
 
 ```r
 &gt; inla.zmarginal(output6.field$marginals.range.nominal[[1]])
@@ -1052,8 +1096,8 @@ Quantile  0.975 0.622605
 
 ---
 
-# PC prior
-
+# PC prior for the Mat&amp;eacute;rn model
+ 
 - Instead of `inla.spde2.matern` it is possible to use `inla.spde2.pcmatern` for creating an `inla.spde2` model object using a PC prior for the range `\(r\)` and the marginal standard deviation `\(\sigma\)` (Simpson, Rue, Riebler, Martins, and S&lt;f8&gt;rbye, 2017).
 
 
@@ -1077,11 +1121,12 @@ For example:
 
 ```r
 &gt; spde = inla.spde2.pcmatern(mesh,
-+                            prior.range=c(0.01,0.1),
-+                            prior.sigma=c(100,0.1))
++                            prior.range = c(0.01,0.1),
++                            prior.sigma = c(100,0.1))
 ```
 
 ---
+
 # References
 
 Banerjee, S., B. Carlin, and A. Gelfand (2015). _Hierarchical Modeling

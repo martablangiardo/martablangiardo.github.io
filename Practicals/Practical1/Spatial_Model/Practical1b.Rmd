@@ -1,0 +1,338 @@
+---
+title: "Practical 1b - Disease mapping study of COVID-19 mortality in England, March-July 2020"
+author: "Spatial and Spatio-Temporal Bayesian Models with `R-INLA`"
+output: 
+  html_document:
+    toc: true
+    toc_float: true
+bibliography: biblio.bib
+editor_options: 
+  chunk_output_type: console
+---
+
+\pagenumbering{gobble} 
+\pagenumbering{arabic} 
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, message=FALSE, warning=FALSE, fig.align = "center")
+```
+
+In this practical we will carry out a disease mapping study (without spatial structure) of COVID-19 mortality in England during March-July 2020, partitioned in lower tier local authorities (LTLAs) and evaluate the impact of the deprivation to explain the spatial variation. 
+
+* To start with, create a separate subdirectory to save your files created during this tutorial (e.g. setwd("~/VIBASS/Practicals/Tutorial_1b")).
+
+# 1. Install and load packages 
+
+This tutorial requires the following packages to be installed and attached: `dplyr`, `sf`, `spdep`, `SpatialEpi`, `RColorBrewer`, `ggplot2`, `tmap`, `cowplot`, `mapview`. 
+
+* To check whether a package is installed you can use the query:
+```{r echo=TRUE, eval=FALSE}
+is.element("sf", installed.packages())
+```
+
+* If FALSE is returned, then install the package function `install.packages()`, e.g.
+```{r eval = FALSE,  results="hide"}
+install.packages("sf", dep=TRUE)
+```
+
+* To install the entire suite of packages, we can use:
+```{r eval = FALSE,  results="hide"}
+#install.packages(c("dplyr","sf","spdep","SpatialEpi",,"RColorBrewer", "ggplot2", "tmap", "mapview", "cowplot"), dependencies = TRUE, repos = "http://cran.r-project.org")
+```
+
+* Then, load the needed packages:
+```{r eval = TRUE, results="hide", message=FALSE, warning=FALSE}
+library(INLA)         # Integrated Nested Laplace Approximation package
+library(dplyr)        # A package for data manipulation
+library(sf)           # Simple feature for R
+library(spdep)        # Functions and tests for evaluating spatial patterns 
+                      # and autocorrelation
+library(SpatialEpi)   # Methods and data for spatial epidemiology
+
+# Packages used for visualization 
+library(RColorBrewer) # A package providing colour palettes for shading maps 
+                      # and other plots
+library(tmap)         # A package for static and interactive maps
+library(ggplot2)      # A package that implements the grammar of graphics, which is a term used to
+                      # break up graphs into semantic components, such as geometries and layers.
+library(mapview)      # A package for interactive maps
+library(cowplot)      # Add-on to ggplot. It provides features that help us with creating
+                      # publication-quality figures
+
+```
+NOTE: if you have issues in working with `mapview` package in R Markdown, try to install it with `remotes::install_github("r-spatial/mapview")`.
+
+# 2. Visualization of spatial areal data
+
+We start by reading the shapefile of England at the LTLA level (317 areas) using the function `st_read()` of the package `sf`. Call this object as LTLA:
+```{r eval=TRUE}
+LTLA <- st_read("LTLA_shp.shp")
+
+class(LTLA)
+```
+
+The shapefile could be also imported using the function `readOGR` of the package `rgdal` (Geospatial Data Abstraction Library), such as `LTLA <- readOGR(dsn = mypath, layer = "LTLA_shp")`, where the `dsn` argument specifies the data source name and `mypath` is the path where the file is stored. 
+Then to convert `sp` object to `sf` object, we can use `st_as_sf` function, e.g. `LTLA <- st_as_sf(LTLA)`.
+
+* Now, we examine the sf object London. 
+The key metadata for the shapefiles include:
+
+1. Object Type: the class of the imported object.
+2. Coordinate Reference System (CRS): the projection of the data.
+3. Extent: the spatial extent of the shapefile (that is the geographic area that the shapefile covers). 
+
+```{r eval=FALSE}
+# Check geometry
+st_geometry_type(LTLA) 
+
+# Check what CRS this file data is in
+st_crs(LTLA) # the data are encoded using a Transverse Mercator Projection. 
+               # The Airy ellipsoid is being used (+ellps=airy) and the units are meters (+units=m)
+
+# Check the spatial extent of the shapefile (i.e. the geographic "edge" or location that is the furthest north, south east and west) 
+st_bbox(LTLA)
+
+# View all of the metadata and attributes for this shapefile object
+LTLA
+```
+
+We can create basic maps of sf objects using the `plot()` function:
+
+```{r eval=FALSE}
+# the default plot of an sf object is a multi-plot of all attributes
+
+plot(LTLA)          # plot all the attributes
+plot(LTLA$geometry) # plot only the boundaries
+```
+
+Note: A particular CRS can be referenced by its EPSG code. The EPSG is a structured dataset of CRS and
+Coordinate Transformations. It was originally compiled by the European Petroleum Survey Group (now defunct).
+
+Now, we obtain static and interactive maps of Greater London.
+
+## Static map with `ggplot2` 
+
+The package `ggplot2` implements the *grammar of graphics* [@Wilkinson_2005] in R, which is a term used to break up graphs into semantic components, such as geometries and layers.
+Spatial objects can be plotted directly with `ggplot2` using the `geom_sf()` function, without converting it into a dataframe. In particular, the `geom_sf` function adds a geometry stored in a `sf` object. 
+Plotting layers can be added with the `+` operator.
+
+```{r eval=TRUE, fig.cap =""}
+ggplot() + 
+      geom_sf(data = LTLA, color = "red", fill = "white") + 
+      ggtitle("Map of LTLAs in England") + 
+      coord_sf() +    #axis limits and CRS
+      labs(x = "Longitude", y = "Latitude", fill = "") +
+      theme_bw() +    # dark-on-light theme
+      theme(axis.title = element_text(size = 16),
+            axis.text = element_text(size = 14))
+```
+
+
+## Static map with `tmap`
+
+Like `ggplot2`, `tmap` is based on the idea of a *grammar of graphics* . This involves a separation between the input data and the aesthetics (that is, how data are visualised): data can be mapped in a range of different ways including location on the map (defined by data's geometry), color, and other visual functions. 
+The basic building block is `tm_shape()` (which defines input data, raster and vector objects), followed by one or more layer elements such as `tm_fill()` etc. (To start with, you may want to visit the page: https://cran.r-project.org/web/packages/tmap/vignettes/tmap-getstarted.html)
+
+```{r LTLA_map, eval=TRUE}
+tm_shape(LTLA) +
+          tm_fill("tomato") +
+          tm_borders(lty="dashed", col="gold") +
+          tm_style("natural", bg.color="grey90") +
+          tm_layout(title="Map of LTLAs in England")
+```
+
+NOTE: Here `tmap` style is set to "natural". Other available styles are: "white", "gray", "natural", "cobalt", "col_blind", "albatross", "beaver", "bw", "watercolor".
+
+
+## Interactive maps with `tmap`
+We previously saw a static map made with `tmap`. However, `tmap` allows to plot not only a static image but also an interactive image. Using `tmap_mode()`, we can switch between presentation (`"plot"`) and interactive (`"view"`) modes. For example:
+
+```{r eval=TRUE, message=FALSE}
+# as seen before, but with specified presentation mode
+tmap_mode("plot")
+tm_shape(LTLA) +
+            tm_fill("grey90") +
+            tm_borders(lty="solid", col="skyblue1") +
+            tm_style("albatross") +
+            tm_layout(title="Static Map of LTLAs in England")
+```
+
+```{r eval=TRUE, message=FALSE}
+# interactive mode
+tmap_mode("view")
+tm_shape(LTLA) +
+            tm_fill("grey90") +
+            tm_borders(lty="solid", col="black") +
+            tm_style("natural") +
+            tm_layout(title="Interactive Map of LTLAs in England")
+```
+
+
+## Interactive map with `mapview` (quite slow)
+We can also produce a web map visualisation as follows:
+```{r eval=FALSE}
+mapview(LTLA)
+```
+
+
+# 3. Import and explore the data
+
+The data set includes the number of COVID-19 deaths and expected counts for the 317 Local Authorities in England. In addition, it includes the value of the Index for Multiple Deprivation (IMD), which is a complex score measuring the deprivation of the area across several domains, inclusind socio-economic, crime, environment, healthcare. 
+
+1. Import the health data
+```{r eval=TRUE, echo = FALSE}
+COVID19Deaths <- read.csv("COVID19Deaths.csv", header = TRUE)
+```
+
+2. Calculate the SMRs and add them to the data frame COVID19Deaths
+```{r eval=TRUE, echo = FALSE}
+COVID19Deaths$SMR <- COVID19Deaths$O/COVID19Deaths$E
+```
+
+To produce maps we need to join the health data with the `sf` object. To do so, we take advantage of shared key variables.
+We use the library `dplyr` that has multiple join functions. `dplyr` join functions work the same on data frames and `sf` objects, the only important difference being the `geometry` list column.
+The most common type of attribute join on spatial data takes an `sf` object as the first argument and adds columns to it from a `data.frame` specified as the second argument.
+
+```{r eval=TRUE}
+names(LTLA)
+names(COVID19Deaths)
+
+England_SMR <- left_join(LTLA, COVID19Deaths, by = c("LTLA" = "LTLA"))
+```
+Note: Because the input datasets share the 'key variable' (LTLA) the join would have also worked without using the `by` argument.
+
+We can now display maps with all variables of England_SMR.
+
+* We can display number of deaths
+```{r eval=TRUE}
+plot(England_SMR["O"])
+```
+
+* Then, we can display on a map the SMRs
+```{r eval=TRUE}
+plot(England_SMR["SMR"], breaks = c(0,0.5,1,1.5,2))
+```
+
+* We can use`ggplot2` and `tmap` to create a map of the SMRs.
+
++ With `ggplot2` we can obtain a simple map as follows:
+```{r eval=TRUE}
+ggplot() + 
+  geom_sf(data = England_SMR, aes(fill = SMR), col = NA) +
+  scale_fill_viridis_c(limits = c(0,2)) + theme_bw() -> MapSMR1
+
+MapSMR1
+```
+
++ and with `tmap` as follows:
+```{r SMR_map, eval=TRUE}
+tmap_mode("plot")
+tm_shape(England_SMR) + tm_polygons("SMR",palette="RdYlGn", style="cont", n=8) +
+            tm_borders(lty="solid", col="black") +
+            tm_style("natural") +
+            tm_layout(title="Map of SMRs at LTLA level in England")
+```
+
++ We can also map the IMD as follows:
+
+```{r IMD_map, eval=TRUE}
+tmap_mode("plot")
+tm_shape(England_SMR) + tm_polygons("IMD",style="pretty", n=8, alpha=0.5) +
+            tm_borders(lty="solid", col="black") +
+            tm_style("natural") +
+            tm_layout(title="Map of IMD at LTLA level in England")
+```
+
+A useful package that can be used when mapping spatial objects is `RColorBrewer`. Once loaded, you can see a list of all the color pallets typing `display.brewer.all()`, then pick a palette you like and plot the SMRs
+```{r eval=TRUE}
+display.brewer.all()
+```
+
+Thus, the palettes from `RColorBrewer`can be used in `ggplot2`: 
+```{r eval=TRUE}
+breaks =  c(0,0.5,1,1.5,2)
+England_SMR <- mutate(England_SMR, SMR_cat = cut(SMR, breaks, include.lowest = TRUE)) # mutate() adds new variables 
+                                                             # and preserves existing ones
+
+ggplot() + geom_sf(data = England_SMR, aes(fill = SMR_cat), col = NA) +
+  theme_bw() + scale_fill_brewer(palette = "OrRd") + 
+  guides(fill=guide_legend(title="SMR"))
+
+```
+
+As we can see from the above code chunks, it is possible to store objects representing maps (i.e. MapSMR1) in R.
+
+
+# 4. Obtaining the posterior relative risks for the disease mapping (RRs)
+
+The RRs will be smoothed using the Poisson-logNormal hierarchical model. 
+
+We specify the model using a `iid` prior and then run in in `INLA`  
+```{r INLA_iid, eval=TRUE}
+ID<- seq(1,317)
+formula_iid <- O ~ f(ID, model="iid",
+                            hyper=list(prec = list(
+        prior = "pc.prec",
+        param = c(0.5 / 0.31, 0.01))))	
+mod_iid <- inla(formula=formula_iid, family="poisson", data=England_SMR, E=E, control.compute=list(dic=TRUE, waic=TRUE))
+```
+
+* To see the DIC and WAIC 
+```{r eval=TRUE}  
+mod_iid$waic$waic
+mod_iid$dic$dic
+```	
+
+# 5. Obtaining the posterior relative risks for the ecological regression (RRs)
+
+* Now let's add the IMD as a covariate in the model
+```{r INLA_reg, eval=TRUE}
+formula_reg <- O ~ IMD + f(ID, model="iid",
+                            hyper=list(prec = list(
+        prior = "pc.prec",
+        param = c(0.5 / 0.31, 0.01))))	
+mod_reg <- inla(formula=formula_reg, family="poisson", data=England_SMR, E=E, control.compute=list(dic=TRUE, waic=TRUE))
+mod_reg$waic$waic
+mod_reg$dic$dic
+```
+We can conclude that the two models are very similar in terms of fitting, so we will focus on the simpler hierarchical model in the maps.
+
+
+# 6. Map of the smoothed RRs
+
+* To map the smoothed RRs in R we extract the posterior mean of the relative risks. Note that we take the mean on the transformed marginals to get the log-RR back to the original scale:
+```{r eval=TRUE} 
+RR_COVID<-c()
+for(i in 1:317){
+  RR_COVID[i] <- inla.emarginal(function(x) exp(x), 
+        mod_iid$marginals.random$ID[[i]])
+}
+
+```	
+
+* Add it on the shapefile
+```{r eval=TRUE} 
+England_SMR$RR <- RR_COVID
+```	
+
+* Using `ggplot2`, we can produce a map of the smoothed RRs
+```{r eval=TRUE} 
+ggplot() + geom_sf(data = England_SMR, aes(fill = RR), col = NA) + theme_bw() + 
+                     scale_fill_viridis_c(limits = c(0,2)) -> MapRR1
+
+MapRR1
+```	
+
+* Now we have our maps sorted, we can arrange them side by side in the same plot using the `cowplot` package, which is a simple add-on to `ggplot`. Comment the maps.
+```{r eval=TRUE} 
+plot_grid(MapSMR1, MapRR1, ncol = 1, align = 'v', labels="AUTO", rel_widths = c(1, 1))
+```	
+
+NOTE: we can specify labels of figures as `labels = "AUTO"` or `labels = "auto"` then labels will be auto-generated in upper or lower case, respectively.
+
+
++ Exporting maps with `ggplot2` (examples)
+```{r eval=TRUE}
+## save an image - ggplot2
+ggsave("MapRR1.jpeg", plot = MapRR1) # if plot is not specified it saves the last plot.
+```

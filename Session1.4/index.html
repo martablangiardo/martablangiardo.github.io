@@ -268,8 +268,8 @@ count:false
 `\begin{align*}
 \hbox{y}_t &amp; \sim  \hbox{Poisson}(E_t \rho_t); \;\;\; t=1,...,T\\
 \log \rho_t &amp; =  b_0 + \beta t \quad \hbox{ simple linear regression}\\
-&amp; =   b_0 + \phi_t \quad \hbox{ global temporal smoothing}\\
-&amp; \phi_t \sim \hbox{Normal}(0, \sigma^2_{\phi})\\
+&amp; =   b_0 + \psi_t \quad \hbox{ global temporal smoothing}\\
+&amp; \psi_t \sim \hbox{Normal}(0, \sigma^2_{\psi})\\
 \end{align*}`
 
 
@@ -291,8 +291,8 @@ count:false
 `\begin{align*}
 \hbox{y}_t &amp; \sim  \hbox{Poisson}(E_t \rho_t); \;\;\; t=1,...,T\\
 \log \rho_t &amp; =  b_0 + \beta t \quad \hbox{ simple linear regression}\\
-&amp; =   b_0 + \phi_t \quad \hbox{ global temporal smoothing}\\
-&amp; \phi_t \sim \hbox{Normal}(0, \sigma^2_{\phi})\\
+&amp; =   b_0 + \psi_t \quad \hbox{ global temporal smoothing}\\
+&amp; \psi_t \sim \hbox{Normal}(0, \sigma^2_{\psi})\\
 &amp; =   b_0 + \gamma_t \quad \hbox{ local temporal smoothing}\\
 &amp;    \gamma_t \sim \hbox{distribution ?}\\
 \end{align*}`
@@ -315,11 +315,11 @@ count:false
 `\begin{align*}
 \hbox{y}_t &amp; \sim  \hbox{Poisson}(E_t \rho_t); \;\;\; t=1,...,T\\
 \log \rho_t &amp; =  b_0 + \beta t \quad \hbox{ simple linear regression}\\
-&amp; =   b_0 + \phi_t \quad \hbox{ global temporal smoothing}\\
-&amp; \phi_t \sim \hbox{Normal}(0, \sigma^2_{\phi})\\
+&amp; =   b_0 + \psi_t \quad \hbox{ global temporal smoothing}\\
+&amp; \psi_t \sim \hbox{Normal}(0, \sigma^2_{\psi})\\
 &amp; =   b_0 + \gamma_t \quad \hbox{ local temporal smoothing}\\
 &amp;    \gamma_t \sim \hbox{distribution ?}\\
-&amp; =   b_0 + \gamma_t + \phi_t \quad \hbox{ global and local temporal smoothing}\\
+&amp; =   b_0 + \gamma_t + \psi_t \quad \hbox{ global and local temporal smoothing}\\
 \end{align*}`
 
 ---
@@ -375,7 +375,7 @@ equivalently
 
 &lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
 
-- It only models the .red[difference of levels on consecutive time points] ($\theta_t-\theta_{t-1}=\epsilon_{t}$)
+- s the .red[difference of levels on consecutive time points] `\((\theta_t-\theta_{t-1}=\epsilon_{t})\)`
   
 .red[It is a stationary process if mean and variance independent of time `\(t\)`]
 
@@ -498,16 +498,25 @@ name: space-to-time
 
 - Disease mapping is usually carried out on aggregated data over a time period
 
+&lt;span style="display:block; margin-top: 10px ;"&gt;&lt;/span&gt;
+
 - Rather than suppressing the time dimension, it can be interesting to use models that combine the space and time dimension
 
+&lt;span style="display:block; margin-top: 10px ;"&gt;&lt;/span&gt;
+
 - The stability (or not) of the spatial pattern can aid interpretation
+
+&lt;span style="display:block; margin-top: 10px ;"&gt;&lt;/span&gt;
 
 - The specific space-time components of the model can potentially pinpoint
 unusual/emerging hazards
 
-- Data `\(\hbox{y}_{it}\)` and
-`\(\hbox{E}_{it}\)`: the observed and expected number of cases in area `\(i\)` at time `\(t\)`\\
-`\(E_{it} = \sum_k n_{itk} r_k\)`, where `\(r_k\)` reference rate for stratum (age, gender,...)
+&lt;span style="display:block; margin-top: 10px ;"&gt;&lt;/span&gt;
+
+- Data:
+
+  - `\(\hbox{y}_{it}\)` and
+  - `\(\hbox{E}_{it}\)`: the observed and expected number of cases in area `\(i\)` at time `\(t\)` calculated as `\(E_{it} = \sum_k n_{itk} r_k\)`, where `\(r_k\)` reference rate for stratum (age, gender,...)
 
 ---
 
@@ -580,7 +589,7 @@ where
 
 `\begin{align*}
 \hbox{y}_{it} &amp; \sim  \hbox{Poisson}(\hbox{E}_{it} \rho_{it}) \\
-\log\rho_{it} &amp; =  b_0 + \beta*t + u_i + v_i + \color{red}{\phi_t}\\
+\log\rho_{it} &amp; =  b_0 + \beta*t + u_i + v_i + \color{red}{\psi_t}\\
 \end{align*}`
 
 where
@@ -593,32 +602,59 @@ where
 
 - `\(\exp(\beta)\)` is the change in the RR associated with a 1-year increase in time
 
-- `\(\color{red}{\phi_t  \sim \hbox{Normal}(0, \sigma^2_{\phi})}\)` .red[temporally unstructured RE]
+- `\(\color{red}{\psi_t  \sim \hbox{Normal}(0, \sigma^2_{\psi})}\)` .red[temporally unstructured RE]
 
 
 ```r
+&gt; year2 &lt;- ohio.data$year
 &gt; formula.mod2&lt;- y ~ 1 + f(county,model="bym",
 +                   graph=Ohio.adj, constr=TRUE) + 
-+                   f(year,model="iid", constr=TRUE) + 
++                   f(year2,model="iid", constr=TRUE) + 
 +                   year
 ```
 ---
 
 # Ohio lung cancer - comparison models 1 and 2
 
-- Posterior mean and  95% CI for Model 1
 
-`$$\exp(\beta) = 1.027 \qquad (1.026-1.028)$$`
+```r
+&gt; Ohio.adj="~/Dropbox/Books/INLABook/Datasets/Ohio Lung Cancer/Ohio.graph"
+&gt; mod1&lt;- inla(data=ohio.data,formula=formula.mod1, E=E, family="poisson")
+&gt; mod2&lt;- inla(data=ohio.data,formula=formula.mod2, E=E, family="poisson")
+&gt; 
+&gt; # Posterior mean and  95% CI for Model 1
+&gt; mod1$summary.fixed
+```
 
-- Posterior mean and  95% CI for Model 2
+```
+                   mean           sd  0.025quant    0.5quant  0.975quant
+(Intercept) -0.98840916 0.1198545620 -1.22430758 -0.98839596 -0.75283818
+year         0.02618802 0.0005869893  0.02503579  0.02618792  0.02733977
+                   mode          kld
+(Intercept) -0.98835903 5.544091e-07
+year         0.02618777 3.834067e-07
+```
 
-`$$\exp(\beta) = 1.027 \qquad  (1.026-1.030)$$`
+```r
+&gt; #Posterior mean and 95% CI for Model 2
+&gt; mod2$summary.fixed
+```
 
+```
+                   mean         sd  0.025quant    0.5quant  0.975quant
+(Intercept) -1.00152385 0.22506963 -1.44547777 -1.00152150 -0.55820692
+year         0.02061841 0.01689569 -0.01286484  0.02061805  0.05404213
+                   mode          kld
+(Intercept) -1.00149655 2.444035e-09
+year         0.02061894 1.060639e-09
+```
 
---
+---
 
-&lt;center&gt;&lt;img src=./img/ohio6.jpeg width='30%' title='INCLUDE TEXT HERE'&gt;&lt;/center&gt;
+# Ohio lung cancer - comparison models 1 and 2
 
+Let's look at the temporal random effect in model 2
+&lt;img src="./img/unnamed-chunk-4-1.png" &gt;
 
 Some temporal structure which suggests that the linear term is not capturing the temporal trend well
 
@@ -632,34 +668,37 @@ trend
 
 `\begin{align*}
 \hbox{y}_{it} &amp; \sim  \hbox{Poisson}(\hbox{E}_{it} \rho_{it})\\
-\log\rho_{it} &amp; =  b_0 + u_i + v_i + \class{red}{\gamma_t}\\
+\log\rho_{it} &amp; =  b_0 + b_i + \class{red}{\gamma_t}\\
 \end{align*}`
 
+- `\(b_i = v_i + u_i\)` 
 - `\(v_i \sim \hbox{Normal}(0, \sigma^2_v)\)` spatially unstructured RE
 - `\(\mathbf{u} \sim \hbox{ICAR}(\mathbf{W}, \sigma^2_u)\)` spatially structured RE
-- `\(\class{red}{\gamma_t  \sim \hbox{RW}(1)}\)` temporally structured RE with variance parameter `\(\sigma^2_{\gamma}\)`}
-- There are 3 hyperparameters
+- `\(\class{red}{\gamma_t  \sim \hbox{RW}(1)}\)` temporally structured RE with variance parameter `\(\sigma^2_{\gamma}\)`
+- Assuming a BYM2 specification, there are 3 hyperparameters
 
-  - `\(\sigma_v^2\)`, the marginal variance of `\(v_i\)`, the unstructured spatial component
-  - `\(\sigma_u^2\)`, the conditional variance of the spatial ICAR process `\(u_i\)`
+  - `\(\tau_b\)`, the marginal precision of `\(b_i\)`
+  - `\(\psi\)`, the proportion of spatial variability explained by the spatially structured component 
   - `\(\sigma^2_\gamma\)`, the conditional variance of the RW(1) modelling the time trend
 
 
 ```r
-&gt; Ohio.adj="~/Dropbox/Books/INLABook/ShortCourse/VIBASS/Datasets/Ohio Lung Cancer/Ohio.graph"
 &gt; formula.mod3 &lt;- y ~ 1 + f(county,model="bym",
 +                   graph=Ohio.adj, constr=TRUE) + 
 +                   f(year,model="rw1", constr=TRUE) 
 ```
 
----
 
+```r
+&gt; mod3&lt;- inla(data=ohio.data,formula=formula.mod3, E=E, family="poisson")
+```
+---
 
 # Simple additive space-time structure version 2 (Model 4)
 
 `\begin{align*}
 \hbox{y}_{it} &amp; \sim  \hbox{Poisson}(\hbox{E}_{it} \rho_{it}) \\
-\log\rho_{it} &amp; =  b_0 + u_i + v_i + \class{red}{\phi_t} + \class{red}{\gamma_t}\\
+\log\rho_{it} &amp; =  b_0 + u_i + v_i + \class{red}{\psi_t} + \class{red}{\gamma_t}\\
 \end{align*}`
 
 where
@@ -667,7 +706,7 @@ where
 - `\(v_i \sim \hbox{Normal}(0, \sigma^2_v)\)` spatially unstructured RE
 - `\(\mathbf{u} \sim \hbox{ICAR}(\mathbf{W}, \sigma^2_u)\)` spatially structured RE
 - `\(\class{red}{\gamma_t  \sim \hbox{RW}(1)}\)` temporally structured RE with variance parameter `\(\sigma^2_{\gamma}\)`}
-- `\(\class{red}{\phi_t  \sim \hbox{Normal}(0, \sigma^2_{\phi})}\)` temporally unstructured RE}
+- `\(\class{red}{\psi_t  \sim \hbox{Normal}(0, \sigma^2_{\psi})}\)` temporally unstructured RE}
 
 
 ```r
@@ -676,6 +715,11 @@ where
 +                    f(year,model="rw1", constr=TRUE) +   
 +                    f(year2,model="iid", constr=TRUE)
 ```
+
+```r
+&gt; mod4&lt;- inla(data=ohio.data,formula=formula.mod4, E=E, family="poisson")
+```
+
 ---
 
 # Ohio lung cancer - comparison models 3 and 4
@@ -684,7 +728,7 @@ Posterior means of the temporal RE
 
 Model 3 = `\(\gamma_t\)` 
 
-Model 4 = `\(\phi_t + \gamma_t\)`
+Model 4 = `\(\psi_t + \gamma_t\)`
 
 &lt;center&gt;&lt;img src=./img/ohio11.jpeg width='40%' title='INCLUDE TEXT HERE'&gt;&lt;/center&gt;
 
@@ -703,31 +747,19 @@ Posterior means of the temporal RE `\(\gamma_t\)` (model 3)
 
 Posterior means of the spatial RE ( u + v ) for the 4 different models
 
-
-&lt;center&gt;&lt;img src=./img/ohio7.jpeg width='40%' title='INCLUDE TEXT HERE'&gt;&lt;/center&gt;
+&lt;img src="./img/unnamed-chunk-5-1.png" &gt;
 
 Similar patterns with the 4 models
-
----
-
-# Ohio lung cancer - space vs space-time models
-
-Posterior means of the spatial RE ( u + v )
-
-&lt;center&gt;&lt;img src=./img/ohio9.jpeg width='60%' title='INCLUDE TEXT HERE'&gt;&lt;/center&gt;
-
-Similar patterns with the 2 approaches
-
 ---
 
 # Space-time model with exchangeable interactions (Model 5)
 
 `\begin{align*}
 \hbox{y}_{it} &amp; \sim  \hbox{Poisson}(\hbox{E}_{it} \rho_{it}) \\
-\log\rho_{it} &amp; =  b_0 + \theta_i + \;\gamma_t + \phi_t + \color{blue}{\delta_{it}}\\
+\log\rho_{it} &amp; =  b_0 + \theta_i + \;\gamma_t + \psi_t + \color{blue}{\delta_{it}}\\
 \theta_i &amp; =  v_i + u_i \; \hbox{(BYM = ICAR + HET)}\\
 \gamma_t &amp; \sim  \hbox{RW(1)}\\
-\phi_t &amp; \sim  \hbox{N}(0,\sigma^2_{\phi})\\
+\psi_t &amp; \sim  \hbox{N}(0,\sigma^2_{\psi})\\
 \color{blue}{\delta_{it}} &amp; \sim  \hbox{Normal}(0, \sigma^2_{\delta})
 \end{align*}`
 
@@ -767,7 +799,7 @@ unusual temporal trends
 \log\rho_{it} &amp; =  b_0 + \xi_i + \gamma_t + \delta_{it}\\
 \xi_i &amp; =  v_i + u_i \; \hbox{(BYM = ICAR + HET)}\\
 \gamma_t &amp; \sim  \hbox{RW(1)}\\
-\phi_t &amp; \sim  N(0,\sigma^2_{\phi})\\
+\psi_t &amp; \sim  N(0,\sigma^2_{\psi})\\
 \delta_{it}  \sim &amp; \hbox{Normal}(0, \sigma^2_{\nu})
 \end{align*}`
 
@@ -809,10 +841,10 @@ name: interactions
 
 `\begin{align*}
 \hbox{y}_{it} &amp; \sim  \hbox{Poisson}(\hbox{E}_{it} \rho_{it}) \\
-\log \rho_{it} &amp; =  b_0 + v_i + u_i  + \gamma_t + \phi_t + \color{blue}{\delta_{it}}\\
+\log \rho_{it} &amp; =  b_0 + v_i + u_i  + \gamma_t + \psi_t + \color{blue}{\delta_{it}}\\
 v_i + u_i &amp; =  \; \hbox{(BYM = HET + ICAR)}\\
 \gamma_t &amp; \sim  \hbox{RW(1)}\\
-\phi_t &amp; \sim  N(0,\sigma^2_{\phi})\\
+\psi_t &amp; \sim  N(0,\sigma^2_{\psi})\\
 \end{align*}`
 
 &lt;table class="table" style="margin-left: auto; margin-right: auto;"&gt;
@@ -827,7 +859,7 @@ v_i + u_i &amp; =  \; \hbox{(BYM = HET + ICAR)}\\
 &lt;tbody&gt;
   &lt;tr&gt;
    &lt;td style="text-align:left;"&gt; I &lt;/td&gt;
-   &lt;td style="text-align:left;"&gt; \(v\) and \(\phi\) &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; \(v\) and \(\psi\) &lt;/td&gt;
    &lt;td style="text-align:left;"&gt; nT &lt;/td&gt;
   &lt;/tr&gt;
   &lt;tr&gt;
@@ -837,7 +869,7 @@ v_i + u_i &amp; =  \; \hbox{(BYM = HET + ICAR)}\\
   &lt;/tr&gt;
   &lt;tr&gt;
    &lt;td style="text-align:left;"&gt; III &lt;/td&gt;
-   &lt;td style="text-align:left;"&gt; \(u\) and \(\phi\) &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; \(u\) and \(\psi\) &lt;/td&gt;
    &lt;td style="text-align:left;"&gt; (n-1)T &lt;/td&gt;
   &lt;/tr&gt;
   &lt;tr&gt;
@@ -880,7 +912,7 @@ v_i + u_i &amp; =  \; \hbox{(BYM = HET + ICAR)}\\
 
 # Type I interaction in INLA
 
-Let's start with the Type I interaction, which assumes that the two unstructured effects `\(v_i\)` and `\(\phi_t\)` interact
+Let's start with the Type I interaction, which assumes that the two unstructured effects `\(v_i\)` and `\(\psi_t\)` interact
 
 &lt;span style="display:block; margin-top: -10px ;"&gt;&lt;/span&gt;
 
@@ -1026,7 +1058,7 @@ The `formula` environment needs to be changed to
 
 # Type III interaction in INLA
 
-- Type III combines the spatially structured main effect `\(u_i\)` and the unstructured temporal effect `\(\phi_t\)`.
+- Type III combines the spatially structured main effect `\(u_i\)` and the unstructured temporal effect `\(\psi_t\)`.
 
 - We use first create the structure matrix for the spatial component using the neighborhood graph
 
@@ -1053,7 +1085,7 @@ The `formula` environment needs to be changed to
 
 # Type III interaction in INLA
 
-- Then we create the Kronecker product `\(u\)` `\(\otimes\)` `\(\phi\)` and note from the table in slide 35 that the rank deficiency is T (11 in our case)
+- Then we create the Kronecker product `\(u\)` `\(\otimes\)` `\(\psi\)` and note from the table in slide 35 that the rank deficiency is T (11 in our case)
 
 ```r
 &gt; #Kronecker product (for RW1)
@@ -1146,13 +1178,92 @@ The `formula` environment becomes
 
 ---
 
+# Model selection
+
+It might be useful to employ indexes like DIC and WAIC to decide which model is the most appropriate for the problem at hand
+
+In this example:
+
+
+```r
+&gt; DIC &lt;- c(11570,11536,11615,11570)
+&gt; WAIC &lt;-c(11602,11569,11659,11612)
+&gt; DF$DIC&lt;- DIC
+&gt; DF$WAIC &lt;- WAIC
+&gt; 
+&gt; kable(DF, col.names = c("Interaction", "Parameters","Rank", "DIC","WAIC"),escape=F, caption = "Model fitting for the different ST models") %&gt;%
++   kable_styling(latex_options = "hold_position")
+```
+
+&lt;table class="table" style="margin-left: auto; margin-right: auto;"&gt;
+&lt;caption&gt;Model fitting for the different ST models&lt;/caption&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;"&gt; Interaction &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; Parameters &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; Rank &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; DIC &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; WAIC &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; I &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; \(v\) and \(\psi\) &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; nT &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 11570 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 11602 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; II &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; \(v\) and \(\gamma\) &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; n(T-1) for RW1, n(T-2) for RW2 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 11536 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 11569 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; III &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; \(u\) and \(\psi\) &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; (n-1)T &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 11615 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 11659 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; IV &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; \(u\) and \(\gamma\) &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; (n-1)(T-1) for RW1, (n-1)(T-2) for RW2 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 11570 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 11612 &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+
+So we conclude that the model with the interaction of order II is the most appropriate for this data.
+
+---
+
+
 # Summary
+
+&lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
 
 - Increase quality of datasets that are both spatially and temporally indexed
 
+&lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
+
 - Advanced methods to deal with this type of data
 
+&lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
+
 - Allow to interpret the stability (or not) of the spatial patterns
+
+&lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
+
+--
+
+- Model selection tools are useful to choose which interaction to use 
+
+&lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
 
 - Careful with interactions of order above I as they can take a **very long** time to run
 

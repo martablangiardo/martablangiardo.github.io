@@ -285,9 +285,8 @@ where `\(\rho_i\)` is the **unknown RR** in area `\(i\)`
 --
     
 - .red[very imprecise: areas with small] `\(\class{red}{E_i}\)` .red[have high associated variance]    
-  .red[&amp;rarr; Hierarchical modelling]
-  
-- estimated independently: makes no use of risk estimates in other areas of the map
+
+- .red[estimated independently: makes no use of risk estimates in other areas of the map]
 
 ---
 # Motivating example: Disease mapping
@@ -334,7 +333,7 @@ name: modelling-assumptions
 
 - Assume a prior `\(\rho \sim \text{Gamma}(1,1)\)`
 
-`\(\rightsquigarrow\)` conjugate prior.
+`\(\rightsquigarrow\)` conjugate prior
 
 ]
 
@@ -343,7 +342,9 @@ name: modelling-assumptions
 &lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
 
 - One parameter generates all the observations
+&lt;span style="display:block; margin-top: 10px ;"&gt;&lt;/span&gt;
 - Very easy to implement as it is conjugate (no need for INLA) and all the data are .red[pooled] to produce one estimate of the parameter of interest
+&lt;span style="display:block; margin-top: 10px ;"&gt;&lt;/span&gt;
 - Can be unrealistic (it does not take into account differences in the areas)
 
 ---
@@ -366,6 +367,7 @@ name: modelling-assumptions
 &lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
 
 - Every area is treated separately (No exchange of information between these). Estimates close to SMR `\((\rho_i \approx y_i / E_i)\)`. 
+&lt;span style="display:block; margin-top: 10px ;"&gt;&lt;/span&gt;
 - Again no need for INLA, conjugacy can be exploited.
 
 ---
@@ -579,37 +581,13 @@ And we can calculate quintiles with
 .pull-left[
 ###SMR
 &lt;span style="display:block; margin-top: -10px ;"&gt;&lt;/span&gt;
-
-```r
-&gt; ggplot() + geom_sf(data = out_map, 
-+                    aes(fill = SMR)) + 
-+                    scale_fill_viridis_c(limits = c(0,6)) + 
-+   theme(axis.text.x = element_text( color = "blue", size = 2),
-+         axis.text.y = element_text( color = "blue", size = 2),
-+         legend.key.size = unit(0.4, 'cm'),
-+         legend.text = element_text(size=6),
-+         legend.title = element_text(size=6))
-```
-&lt;span style="display:block; margin-top: -10px ;"&gt;&lt;/span&gt;
-&lt;center&gt;&lt;img src=./img/ggplot1-1.png width='40%' title='SMR'&gt;&lt;/center&gt;
+&lt;img src="./img/ggplot1-1.png" &gt;
 ]
 
 .pull-right[
 ###Posterior mean
 &lt;span style="display:block; margin-top: -10px ;"&gt;&lt;/span&gt;
-
-```r
-&gt; ggplot() + geom_sf(data = out_map, 
-+                    aes(fill = mean)) + 
-+                   scale_fill_viridis_c(limits = c(0,6)) + 
-+   theme(axis.text.x = element_text( color = "blue", size = 2),
-+         axis.text.y = element_text( color = "blue", size = 2),
-+         legend.key.size = unit(0.4, 'cm'),
-+         legend.text = element_text(size=6),
-+         legend.title = element_text(size=6))
-```
-&lt;span style="display:block; margin-top: -10px ;"&gt;&lt;/span&gt;
-&lt;center&gt;&lt;img src=./img/ggplot2-1.png width='40%' title='Posterior Mean'&gt;&lt;/center&gt;
+&lt;img src="./img/ggplot2-1.png" &gt;
 ]
 
 ---
@@ -636,7 +614,7 @@ To obtain the quantile ratio we need to follow these steps:
 
 ```
 Predictor:1 Predictor:2 Predictor:3 
-  1.3416254   1.2760830   0.8166469 
+   1.402447    1.617122    1.218793 
 ```
 &lt;span style="display:block; margin-top: -10px ;"&gt;&lt;/span&gt;
 Note that:
@@ -670,7 +648,7 @@ Note that:
 ```
 
 ```
-[1] 10.74075
+[1] 10.79859
 ```
 
 - The `\(QR90\)` points towards a large spatial variability. 
@@ -683,43 +661,6 @@ Note that:
 &lt;center&gt;&lt;img src=./img/shrinkage-1.png width='50%' title='INCLUDE TEXT HERE'&gt;&lt;/center&gt;
 
 - Comparing the SMR and the area level posterior mean from the model shows a shrinkage towards the global (national mean) 
----
-
-# Linear combination of parameters
-
-- We have seen that `\(v_i\)` can be obtained using the random effect commands. If we want to get `\(b_0 + v_i\)` it is possible to obtain it in INLA as a linear combination using `inla.make.lincombs`
-- In practice to use it we need to type 
-
-&lt;span style="display:block; margin-top: -10px ;"&gt;&lt;/span&gt;
-
-```r
-&gt; lcs=inla.make.lincombs(RECORD_ID=diag(56),
-+ 				"(Intercept)"=rep(1,56))
-```
-
-- Then we include `lcs` into the `inla` model as
-
-&lt;span style="display:block; margin-top: -20px ;"&gt;&lt;/span&gt;
-
-```r
-&gt; lipcancer.poisson &lt;- inla(formula.inla,family="poisson",lincomb=lcs,
-+                           data=LipCancer, offset=log(E),
-+                           control.predictor=list(compute=TRUE),
-+                           control.compute=list(config=TRUE),                         
-+                           control.fixed=list(mean=0,prec=0.00001, 
-+                           mean.intercept=0,prec.intercept=0.00001))
-&gt; 
-&gt; #To obtain summary statistics for the combined effect (b_0 + v_i)
-&gt; lipcancer.poisson$summary.lincomb.derived[1:3,]
-```
-
-```
-     ID     mean        sd 0.025quant 0.5quant 0.975quant     mode kld
-lc01  1 1.523903 0.3561102  0.8236928 1.524278   2.221554 1.525082   0
-lc02  2 1.434887 0.1620633  1.1166099 1.434915   1.752730 1.434985   0
-lc03  3 1.096215 0.3035942  0.5005223 1.096090   1.692104 1.095862   0
-```
-
 ---
 
 name: Hier-regression
@@ -874,7 +815,7 @@ derive also a predictive result on the dependent variable
 
 ---
 
-# Example: Prediction of Missing data
+# Example: Prediction of missing data
 
 - The summary statistics of the predicted values can be accessed by
 
@@ -963,16 +904,22 @@ name: Prior
 
 `\(\log \left(1/\sigma^2\right) \sim \text{logGamma}(1,0.00005)\)`
 
-- However alternatives can be built, fror instance: 
+- However alternatives can be built, for instance: 
 
-  - Uniform prior on log sigma (Jeffreys' prior)
-  -  Truncated Normal on log precision
+  -  Truncated Normal on log precision (`logtnormal`)
+  -  Uniform prior on the standard deviation: as it is not implemented we need to specify it through the `expression` as follows
+  
+`UN.prior = "expression:
+  log_dens = 0 - log(2) - theta / 2;
+  return(log_dens);`
+
 
 &lt;span style="display:block; margin-top: 50px ;"&gt;&lt;/span&gt;
 
 .content-box-blue[In general we need to be careful to check the level of information (weakly, strong) on the scale we are interested in (e.g. variance) and see what this corresponds on the standard deviation/precision (on which prior is usually specified).
 ]
 
+See Gómez-Rubio (2020) for more information on how to specify priors in INLA
 ---
 
 name: Modelselection
@@ -996,8 +943,7 @@ where `\(\theta\)` identifies the parameter of the likelihood
 
 --
 
-- Ex. `\(y_i \sim \hbox{Bernoulli}(\theta)\)`\\
-      `\(\rightsquigarrow p(\mathbf{y}\mid \theta) = \prod_{i=1}^n  \left( \begin{array}{c} n_i \\ y_i \end{array} \right) \theta^{y_i} (1-\theta)^{n_i-y_i}\)`
+- Ex. `\(y_i \sim \hbox{Bernoulli}(\theta) \rightsquigarrow p(\mathbf{y}\mid \theta) = \prod_{i=1}^n  \left( \begin{array}{c} n_i \\ y_i \end{array} \right) \theta^{y_i} (1-\theta)^{n_i-y_i}\)`
 
 `\(\displaystyle D(\theta) = -2\left[\sum_i y_i \log \theta_i + (n_i-y_i)\log(1-\theta_i)+ \log\left(\begin{array}{c}n_i\\y_i \end{array}\right)\right]\)`
 
@@ -1018,7 +964,7 @@ where `\(\theta\)` identifies the parameter of the likelihood
 
 ---
 
-# Deviance Information Criterion - DIC, (Spiegelhalter, Best, Carlin, and Van Der Linde, 2002)
+# Deviance Information Criterion - DIC
 
 - Natural way to compare models is to use criterion based on trade-off between the fit of the data to the model and the corresponding complexity of the model
 
@@ -1084,7 +1030,7 @@ See (Spiegelhalter, Best, Carlin, and Van der Linde, 2014) for a complete descri
 
 ---
 
-#Watanabe AIC (WAIC, Watanabe and Opper (2010))
+#Watanabe AIC - WAIC
 
 - Considers the posterior predictive mean and variance (on the log scale)
 
@@ -1144,11 +1090,9 @@ Careful on the prior specification
 
 Gelman, A. (2006). "Prior distributions for variance parameters in hierarchical models (comment on article by Browne and Draper)". In: _Bayesian analysis_ 1.3, pp. 515-534.
 
+Gómez-Rubio, V. (2020). _Bayesian inference with INLA_. CRC Press.
+
 Spiegelhalter, D. J., N. G. Best, B. P. Carlin, et al. (2014). "The deviance information criterion: 12 years on". In: _Journal of the Royal Statistical Society: Series B (Statistical Methodology)_ 76.3, pp. 485-493.
-
-Spiegelhalter, D. J., N. G. Best, B. P. Carlin, et al. (2002). "Bayesian measures of model complexity and fit". In: _Journal of the Royal Statistical Society: Series B (Statistical Methodology)_ 64.4, pp. 583-639.
-
-Watanabe, S. and M. Opper (2010). "Asymptotic equivalence of Bayes cross validation and widely applicable information criterion in singular learning theory." In: _Journal of machine learning research_ 11.12.
     </textarea>
 <style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
 <script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>

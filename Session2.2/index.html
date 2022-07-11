@@ -151,15 +151,12 @@ The topics treated in this lecture can be found in **Section 6.7 -- 6.9** of the
 
 &lt;span style="display:block; margin-top: 30px ;"&gt;&lt;/span&gt;
 
-1\. [The `inla.stack` approach](#inlastack)
+
+1\. [Model fitting and spatial prediction with the `inla.stack` approach](#inlastackspatialpred)
 
 &lt;span style="display:block; margin-top: 30px ;"&gt;&lt;/span&gt;
 
-2\. [Spatial prediction with the `inla.stack` approach](#inlastackspatialpred)
-
-&lt;span style="display:block; margin-top: 30px ;"&gt;&lt;/span&gt;
-
-3\.  [Model fitting and spatial prediction with `inlabru` approach](#inlabru)
+2\.  [Model fitting and spatial prediction with the `inlabru` package](#inlabru)
 
 ---
 
@@ -168,7 +165,7 @@ name: inlastack
 &lt;span style="display:block; margin-top: 250px ;"&gt;&lt;/span&gt;
 
 .myblue[.center[.huge[
-**The `inla.stack` approach**]]]
+**Model fitting and spatial prediction with the `inla.stack` approach**]]]
 
 ---
 
@@ -180,10 +177,10 @@ name: inlastack
 
 
 &lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
-- In the `SPDEtoy` example the **linear predictor** can be written as
-$$
-\bm\eta = \bm 1 b_0+\bm A\tilde{\bm \xi}
-$$
+- In the `SPDEtoy` example the .red[**linear predictor**] is given by 
+`$$\eta_i = b_0 +\xi_i = b_0 + \sum_{g=1}^{G}A_{ig} \tilde {\xi_g}$$`
+and can be written as
+`$$\bm\eta = \bm 1 b_0+\bm A\tilde{\bm \xi}$$`
 where the first term refers to the intercept and the second to the spatial effect. Note that each term in the linear predictor is represented as the product of a projector matrix and an effect.
 
 &lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
@@ -225,7 +222,7 @@ Note that the function `inla.stack()` will take care of eliminating any column i
 ```r
 &gt; output6 &lt;- inla(formula,
 *+                 data = inla.stack.data(stack.est),
-*+                 control.predictor = list(A = inla.stack.A(stack.est)))
+*+                 control.predictor = list(A = inla.stack.A(stack.est), compute = TRUE))
 ```
 
 
@@ -263,20 +260,12 @@ Precision for the Gaussian observations  2.532240   3.435166  2.476840
 Theta1 for i                            -3.957560  -3.632403 -3.969695
 Theta2 for i                             2.004648   2.466993  2.030469
 ```
----
-
-name: inlastackspatialpred
-  
-&lt;span style="display:block; margin-top: 250px ;"&gt;&lt;/span&gt;
-
-.myblue[.center[.huge[
-**Spatial prediction with the `inla.stack` approach**]]]
 
 ---
 
-# Spatial prediction
+# Spatial prediction with the `inla.stack()` approach
 
-- In geostatistics we are interested in predicting the spatial field at new spatial locations where we do not have data. 
+- In geostatistics we are interested in predicting the (latent) spatial field (i.e. the linear predictor) at new spatial locations where we do not have data. 
 
 &lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
 - It is possible to perform the spatial prediction jointly with the estimation by using the  `inla.stack` approach.
@@ -284,9 +273,14 @@ name: inlastackspatialpred
 &lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
 - Consider the following distribution for the response variable: 
 $$
-\bm y\sim\text{Normal}(\bm\mu=\bm 1 b_0+\bm A\tilde{\bm \xi},\sigma^2_e \bm I)
+\bm y\sim\text{Normal}(\bm\eta=\bm 1 b_0+\bm A\tilde{\bm \xi},\sigma^2_e \bm I)
 $$
-In particular, we will compute the posterior distribution of the linear predictor `\(\bm\mu\)` and perform prediction where we don't have observed data (`y=NA`).
+In particular, it is possible to obtain the posterior distribution of the linear predictor `\(\bm\eta\)` everywhere in space, especially where we don't have observed data and `y=NA`.
+
+&lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
+- With regard to spatial prediction, it is worth noting that the INLA-SPDE algorithm provides the posterior conditional distribution of `\(\bm\eta\)` for all the triangulation vertices.
+By using the SPDE approximation, it is then immediate to get a prediction for `\(\bm\eta\)` for any location in the triangulated
+domain.
 
 ---
 
@@ -327,9 +321,9 @@ For performing **jointly** the estimation and the prediction, we create a new `i
 ```r
 *&gt; stack.pred &lt;- inla.stack(data = list(y = NA),
 +          A = list(1, A.pred6),
-+          effects = list(intercept = rep(1,nrow(pred.grid)),
++          effects = list(intercept = rep(1, nrow(pred.grid)),
 +                         i = 1:spde$n.spde),
-+          tag = "pred.response") 
++          tag = "pred") 
 ```
 and then we join it to the `inla.stack` object created previously for the estimation (`stack.est`):
 
@@ -341,13 +335,13 @@ And finally, we run `INLA` again:
 
 ```r
 &gt; output6pred &lt;- inla(formula,
-+                 data = inla.stack.data(join.stack),
+*+                 data = inla.stack.data(join.stack),
 +                 control.compute = list(return.marginals.predictor=TRUE),
-+                 control.predictor = list(A = inla.stack.A(join.stack), compute = TRUE)
+*+                 control.predictor = list(A = inla.stack.A(join.stack), compute = TRUE)
 +                 )
 ```
 
-
+The option `return.marginals.predictor=TRUE` is necessary to obtain the marginals for the linear predictor. 
 ---
 
 # Retrieve the predictions
@@ -355,7 +349,7 @@ And finally, we run `INLA` again:
 To access the predictions (posterior summary stats or marginal distribution) at the target grid locations, we extract with the `inla.stack.index()` function the corresponding indexes from the full stack object using the corresponding tags:
 
 ```r
-&gt; index.pred &lt;- inla.stack.index(join.stack, tag="pred.response")$data
+&gt; index.pred &lt;- inla.stack.index(join.stack, tag="pred")$data
 &gt; length(index.pred)
 ```
 
@@ -371,9 +365,9 @@ We then extract the prediction posterior mean and sd at the first 3 grid points:
 
 ```
                           mean        sd
-fitted.APredictor.201 12.27575 0.2676821
-fitted.APredictor.202 11.95941 0.3700496
-fitted.APredictor.203 10.57918 0.4513211
+fitted.APredictor.201 12.27535 0.2676057
+fitted.APredictor.202 11.96019 0.3701493
+fitted.APredictor.203 10.57700 0.4509654
 ```
 
 In this case (identity link) `output6pred$summary.linear.predictor` would return the same output.
@@ -407,7 +401,7 @@ We can be also interested in computing the posterior probability of getting a va
 ```
 
 ```
-[1] 0.003575209
+[1] 0.003562065
 ```
 
 ]
@@ -628,8 +622,8 @@ where
 
 ```
               mean        sd
-Intercept 2.811742 0.1409726
-x         2.303388 0.2387399
+Intercept 3.200842 0.1340248
+x         1.932631 0.2306334
 ```
 ]
 .pull-right[
@@ -655,8 +649,8 @@ x         2.303388 0.2387399
 
 ```
               mean        sd
-Intercept 2.811742 0.1409726
-x         2.303388 0.2387400
+Intercept 3.200842 0.1340251
+x         1.932631 0.2306339
 ```
 ]
 
@@ -766,19 +760,19 @@ The argument `n.samples` (by default 100) specifies the number of samples to dra
 
 ```
        mean        sd    q0.025    median   q0.975      smin     smax
-1 12.285315 0.2575601 11.747671 12.279648 12.69981 11.552114 12.89830
-2 11.981657 0.3646681 11.281307 11.990296 12.71747 11.163842 12.83938
-3 10.512725 0.4413926  9.648385 10.494383 11.35012  9.248850 11.67940
-4  9.660393 0.3207797  9.081872  9.688207 10.27125  8.975843 10.51926
-5  9.550007 0.3533518  8.903465  9.508326 10.18550  8.377625 10.53363
-6 10.096259 0.3277782  9.436963 10.125662 10.76783  8.967861 10.89385
+1 12.290113 0.2511616 11.762848 12.291497 12.67553 11.627433 12.79707
+2 11.979690 0.3535714 11.341312 11.959730 12.67851 11.163842 12.79551
+3 10.526315 0.4496165  9.689704 10.538714 11.35024  9.248850 11.67940
+4  9.672356 0.3295594  9.081872  9.700957 10.31260  8.706834 10.39329
+5  9.560393 0.3586941  8.892047  9.520534 10.14950  8.377625 10.53363
+6 10.093915 0.3415124  9.304865 10.119124 10.76783  8.781015 10.90899
           cv        var
-1 0.02096488 0.06633721
-2 0.03043553 0.13298282
-3 0.04198651 0.19482747
-4 0.03320566 0.10289961
-5 0.03700016 0.12485746
-6 0.03246531 0.10743852
+1 0.02043607 0.06308214
+2 0.02951424 0.12501277
+3 0.04271357 0.20215497
+4 0.03407230 0.10860940
+5 0.03751876 0.12866148
+6 0.03383349 0.11663072
 ```
 
 Note that it is possible to predict any function of any subset of the components of the model specification.

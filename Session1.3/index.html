@@ -336,7 +336,7 @@ count: false
 # Priors for BYM2
 
 Using probability statements we can define the PC priors for the two hyperparameters as:
-
+&lt;span style="display:block; margin-top: -10px ;"&gt;&lt;/span&gt;
 .pull-left[
 .content-box-beamer[
 ### Prior on `\(\tau_b\)`
@@ -357,9 +357,13 @@ which can be interpreted as .blue[*the probability that the spatial random effec
 ]
 ]
 
-&lt;span style="display:block; margin-top: 10px ;"&gt;&lt;/span&gt;
+&lt;span style="display:block; margin-top: 5px ;"&gt;&lt;/span&gt;
 
-- In practice we need to define `\(U\)` and `\(\alpha_1, \alpha_2\)` and following (Simpson, Rue, Riebler, et al., 2017) a reasonable approach is the following:
+where `\(\lambda = \frac{-\log(\alpha_k)}{U}\)`
+
+
+
+- We need to define `\(U\)` and `\(\alpha_1, \alpha_2\)` and following Simpson, Rue, Riebler, et al. (2017):
 &lt;span style="display:block; margin-top: 10px ;"&gt;&lt;/span&gt;
 
 --
@@ -378,7 +382,7 @@ which can be interpreted as .blue[*the probability that the spatial random effec
 
 - Then 
 
-    1\. `\(U=0.5/0.31\)` translates into `\(P(sd_{\tau_b}&gt;1.62) = 0.01\)`, so we do not expect residuals larger than 1.62 
+    1\. `\(U=0.5/0.31\)` translates into `\(P(\sigma_{\tau_b}&gt;1.62) = 0.01\)`, using the rule of thumb in Simpson, Rue, Riebler, et al. (2017)
     
     2\. `\(P(\phi &lt; 0.5) = 2/3\)`
 
@@ -439,7 +443,7 @@ v_i &amp;\sim  \hbox{Normal}(0, \sigma^2_v)\\
 - Parameters of interest: 
   - residual RR `\((\hbox{resRR}_i=\exp(b_i))\)`
   - marginal variance `\((1/ \tau_b)\)`
-  - percent of total variation in the log RR due to spatial effects
+  - percent of total variation in the log RR due to spatial effects ($\phi$)
   
 ---
 
@@ -657,8 +661,7 @@ this returns a list with `Nareas` number of elements, each representing the post
   
 - Area with a decreased risk
 `\begin{align*}
-\hbox{P(resRR}_i&lt;1)&gt;0.8 &amp; \Leftrightarrow  \hbox{P(resRR}_i&gt;1)&lt;0.2\\
-&amp; \Leftrightarrow  \hbox{P}(e^{(u_i+v_i)}&gt;1)&lt;0.2\\
+\hbox{P(resRR}_i&lt;1)&gt;0.8 &amp; \Leftrightarrow  \hbox{P}(e^{(u_i+v_i)}&gt;1)&lt;0.2\\
 &amp; \Leftrightarrow  \hbox{P}(u_i+v_i&gt;0)&lt;0.2
 \end{align*}`
      
@@ -767,7 +770,7 @@ this returns a list with `Nareas` number of elements, each representing the post
 ]
 ---
 
-name: poisson-regression
+name: Poisson-regression
   
 &lt;span style="display:block; margin-top: 250px ;"&gt;&lt;/span&gt;
 
