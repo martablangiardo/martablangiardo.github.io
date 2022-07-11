@@ -32,15 +32,15 @@ It would be beneficial if attendees could bring their laptop having installed th
 
 ### Day 2 - Thur 21th July 2022 - morning
 
-- [Session 1.5](Session1.5): Models for geostatistical data and introduction to SPDE
-- [Session 1.6](Session1.6): inla.stack and inlabru
+- [Session 2.1](Session2.1): Models for geostatistical data and introduction to SPDE
+- [Session 2.2](Session2.2): inla.stack and inlabru
 - Break
 - [Practical 3](Practical3): INLA-SPDE for geostatistical data
 
 ### Day 2 - Thur 21th July 2022 - afternoon
 
-- [Session 1.7](Session1.7): Spatio-temporal model for geostatistical data
-- [Session 1.8](Session1.8): Advanced INLA features
+- [Session 2.3](Session2.3): Spatio-temporal model for geostatistical data
+- [Session 2.4](Session2.4): Advanced INLA features
 - Break
 - [Practical 4](Practical4): A space-time model with inlabru
 
