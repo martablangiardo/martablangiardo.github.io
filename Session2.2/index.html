@@ -346,7 +346,7 @@ The option `return.marginals.predictor=TRUE` is necessary to obtain the marginal
 
 # Retrieve the predictions
 
-To access the predictions (posterior summary stats or marginal distribution) at the target grid locations, we extract with the `inla.stack.index()` function the corresponding indexes from the full stack object using the corresponding tags:
+To access the predictions (posterior summary stats or marginal distribution) at the target grid locations, we extract with the `inla.stack.index()` function the corresponding indexes from the full stack object using the corresponding tag set before (`pred`):
 
 ```r
 &gt; index.pred &lt;- inla.stack.index(join.stack, tag="pred")$data
@@ -365,9 +365,9 @@ We then extract the prediction posterior mean and sd at the first 3 grid points:
 
 ```
                           mean        sd
-fitted.APredictor.201 12.27535 0.2676057
-fitted.APredictor.202 11.96019 0.3701493
-fitted.APredictor.203 10.57700 0.4509654
+fitted.APredictor.201 12.27504 0.2676398
+fitted.APredictor.202 11.96054 0.3703386
+fitted.APredictor.203 10.57605 0.4512233
 ```
 
 In this case (identity link) `output6pred$summary.linear.predictor` would return the same output.
@@ -383,7 +383,6 @@ Consider for example the first grid point and its posterior predictive distribut
 
 ```r
 &gt; distr.point1 = output6pred$marginals.fitted.values[index.pred[1]][[1]]
-&gt; # solo se control.compute = list(return.marginals.predictor=TRUE)
 &gt; distr.point1.smooth = inla.smarginal(distr.point1)
 ```
 
@@ -401,7 +400,7 @@ We can be also interested in computing the posterior probability of getting a va
 ```
 
 ```
-[1] 0.003562065
+[1] 0.003557819
 ```
 
 ]
@@ -414,9 +413,9 @@ We can be also interested in computing the posterior probability of getting a va
 
 ---
 
-# Mapping: posterior mean 
+# Mapping the linear predictor: posterior mean 
 
-We plot the posterior mean of the linear predictor at the grid level.
+We plot now the posterior mean of the linear predictor at the grid level.
 
 
 
@@ -425,11 +424,14 @@ We plot the posterior mean of the linear predictor at the grid level.
 
 ```r
 &gt; post.mean.pred = output6pred$summary.linear.predictor[index.pred,"mean"]
+&gt; 
+&gt; 
+&gt; 
 &gt; library(viridis)
 &gt; ggplot()+
 +   gg(matrix(post.mean.pred, grid.x, grid.y))+
 +   ggtitle("Posterior mean") + 
-+   coord_fixed() +
++   coord_fixed() + #x and y axis with the same length in the plot
 +   scale_fill_viridis()
 ```
 ]
@@ -440,7 +442,7 @@ We plot the posterior mean of the linear predictor at the grid level.
 
 ---
 
-# Mapping: posterior standard deviation 
+# Mapping the linear predictor: posterior standard deviation 
   
 
 We plot the posterior standard deviation of the linear predictor at the grid level.
@@ -489,7 +491,7 @@ easier as there is no more need to deal with projector matrices and stack object
 
 
  &lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt; 
-- The function `gg()` is an extension of the `ggplot()` function for generating geometries from spatial object. 
+- The function `gg()` is an extension of the `ggplot()` function for generating geometries from spatial fitted object. 
 
 
 &lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
@@ -497,39 +499,6 @@ See:
   - **Website**: https://sites.google.com/inlabru.org/inlabru
   &lt;span style="display:block; margin-top: 5px ;"&gt;&lt;/span&gt;
   - **Github**: https://github.com/inlabru-org/inlabru
-
-
----
-
-# The `inlabru` formula
-
-- Similarly to `inla` the model is specified using a `formula` which you can include both fixed effects and random effects (RE). 
-
-&lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
-- The function `f()` used with `INLA` is replaced by an arbitrary name which is assigned to the effect. For example consider a model with a linear prediction including an intercept, the linear effect of a covariate `x` and a generic RE:
-
-
-
-```r
-&gt; y ~ Intercept(1) + x + yourREnane(main = index/covariate, model = "...", ...)
-```
-
-- Note that the specification of an implicit latent intercept is deprecated, and `+ Intercept(1)` or `+1` should be used instead.
-
-- The available `model` specifications are:
-  - `iid`
-  - `linear`
-  - a spatial effect created previously using `inla.spde2.matern()`/`inla.spde2.pcmatern()`
-  - all the models accepted by the INLA `f()` function.
-
-- The linear effect model of the covariate `x` can also be expressed in the formula as
-
-```r
-&gt; cov(x, model="linear")
-```
-The difference is in the names used in the output: `x` (method 1) or `cov` (method 2).
-
-
 
 
 ---
@@ -546,7 +515,7 @@ The function for fitting the model is called `bru()`:
 &gt; bru(components = ...,
 +     formula = ...,
 +     family = ...,
-+     data = ...,
++     data = ..., #data.frame or sp spatial object
 +     options = list(...)
 +     )
 ```
@@ -556,23 +525,43 @@ where
 - `components` is a formula-like specification of the model components
 
 &lt;span style="display:block; margin-top: 10px ;"&gt;&lt;/span&gt; 
-- `formula` specifies how the `components` are combined to create the linear predictor. It is not required when the linear predictor is the sum of the terms in `components`.
+- `formula` specifies how the `components` are combined to create the linear predictor. It is not required when the linear predictor is the sum of all the terms in `components`.
 
 
  &lt;span style="display:block; margin-top: 10px ;"&gt;&lt;/span&gt; 
 - `family` (string) specifies the probability density function (PDF) of the response. All family types supported by the `INLA` package are supported by `inlabru`.
 
 &lt;span style="display:block; margin-top: 10px ;"&gt;&lt;/span&gt; 
-- `data` is a `data.frame` or a `sp` spatial object
-
-&lt;span style="display:block; margin-top: 10px ;"&gt;&lt;/span&gt; 
-- The function takes care of the construction of inla projection matrices for spatial SPDE models.
-
-&lt;span style="display:block; margin-top: 10px ;"&gt;&lt;/span&gt; 
 - When running the `bru` some options are set (for example `control.compute$dic=TRUE`): see all of them with `bru_options_default()`. With `options` we can for example specify `E` or `control.fixed`.
 
-&lt;span style="display:block; margin-top: 10px ;"&gt;&lt;/span&gt; 
-- WAIC and DIC are calculated by default and it's not necessary to use `control.compute = list(waic = TRUE, dic = TRUE)`
+---
+
+# The `inlabru` formula
+
+- Similarly to INLA a the model is specified using a `formula` which you can include both fixed effects and random effects (RE). 
+
+&lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
+- The function `f()` used with `INLA` is replaced by an **arbitrary name**    which is assigned to the effect. For example consider a model with a linear prediction including an intercept, the linear effect of a covariate `x` and a generic RE:
+
+
+
+```r
+&gt; y ~ Intercept(1) + x + yourREnane(main = index/covariate, model = "...", ...)
+```
+
+- Note that the specification of an implicit latent intercept is deprecated, and `+ Intercept(1)` or `+1` should be used instead.
+
+- The available `model` specifications are:
+  - `iid`
+  - a spatial effect created previously using `inla.spde2.matern()` or `inla.spde2.pcmatern()`
+  - all the models accepted by the INLA `f()` function.
+
+- The linear effect model of the covariate `x` can also be expressed in the formula as
+
+```r
+&gt; cov(x, model="linear")
+```
+The difference is in the name used in the output: `x` (method 1) or `cov` (method 2).
 
 ---
 
@@ -622,8 +611,8 @@ where
 
 ```
               mean        sd
-Intercept 3.200842 0.1340248
-x         1.932631 0.2306334
+Intercept 3.345697 0.1379740
+x         1.579137 0.2289666
 ```
 ]
 .pull-right[
@@ -649,8 +638,8 @@ x         1.932631 0.2306334
 
 ```
               mean        sd
-Intercept 3.200842 0.1340251
-x         1.932631 0.2306339
+Intercept 3.345697 0.1379743
+x         1.579137 0.2289671
 ```
 ]
 
@@ -705,6 +694,8 @@ attr(,"package")
 ```
 [1] "bru"   "iinla" "inla" 
 ```
+&lt;span style="display:block; margin-top: 10px ;"&gt;&lt;/span&gt; 
+- The function takes care of the construction of inla projection matrices for spatial SPDE models.
 
 
 ```r
@@ -760,19 +751,19 @@ The argument `n.samples` (by default 100) specifies the number of samples to dra
 
 ```
        mean        sd    q0.025    median   q0.975      smin     smax
-1 12.290113 0.2511616 11.762848 12.291497 12.67553 11.627433 12.79707
-2 11.979690 0.3535714 11.341312 11.959730 12.67851 11.163842 12.79551
-3 10.526315 0.4496165  9.689704 10.538714 11.35024  9.248850 11.67940
-4  9.672356 0.3295594  9.081872  9.700957 10.31260  8.706834 10.39329
-5  9.560393 0.3586941  8.892047  9.520534 10.14950  8.377625 10.53363
-6 10.093915 0.3415124  9.304865 10.119124 10.76783  8.781015 10.90899
+1 12.289502 0.2600865 11.729711 12.294270 12.69570 11.552114 12.79707
+2 11.989498 0.3567872 11.309630 11.990296 12.67851 11.163842 12.97105
+3 10.517907 0.4323665  9.742759 10.503725 11.29602  9.248850 11.64646
+4  9.654459 0.3287484  9.016594  9.667975 10.29804  8.887968 10.51926
+5  9.543578 0.3540616  8.892047  9.505425 10.14950  8.377625 10.53363
+6 10.096249 0.3418522  9.358339 10.111160 10.75225  8.781015 10.89385
           cv        var
-1 0.02043607 0.06308214
-2 0.02951424 0.12501277
-3 0.04271357 0.20215497
-4 0.03407230 0.10860940
-5 0.03751876 0.12866148
-6 0.03383349 0.11663072
+1 0.02116331 0.06764499
+2 0.02975831 0.12729712
+3 0.04110766 0.18694083
+4 0.03405145 0.10807548
+5 0.03709946 0.12535960
+6 0.03385932 0.11686289
 ```
 
 Note that it is possible to predict any function of any subset of the components of the model specification.

@@ -25,8 +25,8 @@ It would be beneficial if attendees could bring their laptop having installed th
 
 ### Day 1 - Wed 20th July 2022 - afternoon
 
-- [Session 1.4](Session1.3): Spatial models for small area data: disease mapping and ecological regression
-- [Session 1.5](Session1.4): Spatio-temporal modelling for area data
+- [Session 1.3](Session1.3): Spatial models for small area data: disease mapping and ecological regression
+- [Session 1.4](Session1.4): Spatio-temporal modelling for area data
 - Break
 - [Practical 2](Practical2): Spatial and spatio-temporal disease mapping and regression
 
