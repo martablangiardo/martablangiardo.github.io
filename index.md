@@ -24,7 +24,7 @@ It would be beneficial if attendees could bring their laptop having installed th
 - [Practical 1a](Practical1a): INLA basics 
 - [Practical 1b](Practical1b): Hierarchical models for disease mapping
 
-There is no material to download for practical 1a. Download the material for the practical 1b [here](Practical1b.zip)
+There is no material to download for practical 1a. Download the material for the practical 1b [here](Practical1b/Practical1b.zip)
 
 ### Day 1 - Wed 20th July 2022 - afternoon
 
@@ -33,7 +33,7 @@ There is no material to download for practical 1a. Download the material for the
 - Break
 - [Practical 2](Practical2): Spatial and spatio-temporal disease mapping and regression
 
-
+Download the material for the practical 2 [here](Practical2/Practical2.zip)
 
 ### Day 2 - Thur 21th July 2022 - morning
 
