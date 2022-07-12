@@ -13,7 +13,7 @@ It would be beneficial if attendees could bring their laptop having installed th
 
 - INLA (install.packages("INLA", repos="http://www.math.ntnu.no/inla/R/stable"))
 
-- sf, spdep, SpatialEpi, RColorBrewer, tmap, ggplot2, mapview, cowplot, dplyr, tidyr, viridis, patchwork, knitr, kableExtra
+- sf, spdep, SpatialEpi, RColorBrewer, tmap, ggplot2, mapview, cowplot, tidyverse, viridis, patchwork, knitr, kableExtra, inlabru, maps, spTimer, lubridate, mvtsplot, GGally, corrr, mapview
 
 ## Timetable
 ### Day 1 - Wed 20th July 2022 - morning
