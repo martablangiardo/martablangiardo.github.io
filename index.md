@@ -15,13 +15,16 @@ It would be beneficial if attendees could bring their laptop having installed th
 
 - sf, spdep, SpatialEpi, RColorBrewer, tmap, ggplot2, mapview, cowplot, dplyr, tidyr, viridis, patchwork, knitr, kableExtra
 
-## Timetable (with slides)
+## Timetable
 ### Day 1 - Wed 20th July 2022 - morning
 
 - [Session 1.1](Session1.1): Lecture on introduction to INLA and R-INLA
 - [Session 1.2](Session1.2): Hierarchical models, priors, prediction and model checking
 - Break
-- [Practical 1](Practical1): INLA basics (1a); hierarchical models for disease mapping (1b)
+- [Practical 1a](Practical1a): INLA basics 
+- [Practical 1b](Practical1b): Hierarchical models for disease mapping
+
+There is no material to download for practical 1a. Download the material for the practical 1b [here](Practical1b.zip)
 
 ### Day 1 - Wed 20th July 2022 - afternoon
 
@@ -29,6 +32,8 @@ It would be beneficial if attendees could bring their laptop having installed th
 - [Session 1.4](Session1.4): Spatio-temporal modelling for area data
 - Break
 - [Practical 2](Practical2): Spatial and spatio-temporal disease mapping and regression
+
+
 
 ### Day 2 - Thur 21th July 2022 - morning
 

@@ -365,9 +365,9 @@ We then extract the prediction posterior mean and sd at the first 3 grid points:
 
 ```
                           mean        sd
-fitted.APredictor.201 12.27504 0.2676398
-fitted.APredictor.202 11.96054 0.3703386
-fitted.APredictor.203 10.57605 0.4512233
+fitted.APredictor.201 12.27545 0.2676053
+fitted.APredictor.202 11.95982 0.3700679
+fitted.APredictor.203 10.57788 0.4510318
 ```
 
 In this case (identity link) `output6pred$summary.linear.predictor` would return the same output.
@@ -400,7 +400,7 @@ We can be also interested in computing the posterior probability of getting a va
 ```
 
 ```
-[1] 0.003557819
+[1] 0.00355769
 ```
 
 ]
@@ -423,13 +423,15 @@ We plot now the posterior mean of the linear predictor at the grid level.
 .pull-left[
 
 ```r
+&gt; library(inlabru)
 &gt; post.mean.pred = output6pred$summary.linear.predictor[index.pred,"mean"]
-&gt; 
+&gt; post.mean.df = SpatialPixelsDataFrame(SpatialPoints(pred.grid),
++                                         data = data.frame(post.mean.pred))
 &gt; 
 &gt; 
 &gt; library(viridis)
-&gt; ggplot()+
-+   gg(matrix(post.mean.pred, grid.x, grid.y))+
+&gt; ggplot() +
++   gg(post.mean.df, aes(x, y, post.mean.pred)) +
 +   ggtitle("Posterior mean") + 
 +   coord_fixed() + #x and y axis with the same length in the plot
 +   scale_fill_viridis()
@@ -453,8 +455,11 @@ We plot the posterior standard deviation of the linear predictor at the grid lev
 ```r
 &gt; post.sd.pred = output6pred$summary.linear.predictor[index.pred,"sd"]
 &gt; 
+&gt; post.sd.df = SpatialPixelsDataFrame(SpatialPoints(pred.grid),
++                                     data = data.frame(post.sd.pred))
+&gt; 
 &gt; ggplot()+
-+   gg(matrix(post.sd.pred, grid.x, grid.y))+
++   gg(post.sd.df, aes(x, y, post.sd.pred)) +
 +   ggtitle("Posterior standard deviation") + 
 +   coord_fixed() +
 +  scale_fill_viridis()
@@ -536,12 +541,12 @@ where
 
 ---
 
-# The `inlabru` formula
+# The `inlabru` model components
 
-- Similarly to INLA a the model is specified using a `formula` which you can include both fixed effects and random effects (RE). 
+- Similarly to INLA the model is defined by means of a `formula`-lime specification of the linear predictor components which include both fixed effects and random effects (RE). 
 
 &lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
-- The function `f()` used with `INLA` is replaced by an **arbitrary name**    which is assigned to the effect. For example consider a model with a linear prediction including an intercept, the linear effect of a covariate `x` and a generic RE:
+- The function `f()` used with `INLA` is replaced by an **arbitrary name** which is assigned to the effect. For example consider a model with a linear prediction including an intercept, the linear effect of a covariate `x` and a generic RE:
 
 
 
@@ -568,7 +573,7 @@ The difference is in the name used in the output: `x` (method 1) or `cov` (metho
 # The function `like()`
 
 
-The function `like()` makes it possible to specify the likelihood and other options:
+The function `like()` makes it possible to specify the likelihood and other options related to the likelihood:
 
 
 ```r
@@ -583,11 +588,11 @@ The function `like()` makes it possible to specify the likelihood and other opti
 ```
 
 where 
-- `formula` is a formula where the right hand side is a general `R` expression defining the predictor used in the model.
+- `formula` is a formula where the right hand side is a general `R` expression defining the predictor used in the model (you will use the arbitrary names adopted for specifying the model components).
 
 ---
 
-# Example with the `like()` function
+# Very simple example with simulated data
 
 
 .pull-left[
@@ -595,7 +600,9 @@ where
 ```r
 &gt; # Model component
 &gt; cmp1 = y ~ -1 + Intercept(1) + x
+&gt; 
 &gt; fit1 = bru(cmp1,
++            formula = y ~ x + Intercept, #can be omitted
 +            family = "gaussian",
 +            data = df1)
 &gt; fit1$names.fixed
@@ -611,8 +618,8 @@ where
 
 ```
               mean        sd
-Intercept 3.345697 0.1379740
-x         1.579137 0.2289666
+Intercept 3.008331 0.1314612
+x         2.001839 0.2354460
 ```
 ]
 .pull-right[
@@ -624,6 +631,7 @@ x         1.579137 0.2289666
 &gt; lik1 = like(formula = y ~ x + Intercept,
 +             family = "gaussian",
 +             data = df1)
+&gt; 
 &gt; fit1 &lt;- bru(cmp1, lik1)
 &gt; fit1$names.fixed
 ```
@@ -638,8 +646,8 @@ x         1.579137 0.2289666
 
 ```
               mean        sd
-Intercept 3.345697 0.1379743
-x         1.579137 0.2289671
+Intercept 3.008331 0.1314611
+x         2.001839 0.2354458
 ```
 ]
 
@@ -664,7 +672,7 @@ attr(,"package")
 [1] "sp"
 ```
 
-2\. We define the mesh and the `spde` object as shown before:
+2\. We define the mesh and the `spde` object as done in Section 2.1:
 
 ```r
 &gt; domain &lt;- matrix(cbind(c(0,1,1,0.7,0), c(0,0,0.7,1,1)),ncol=2)
@@ -683,10 +691,13 @@ attr(,"package")
 3\. Fit the model using `inlabru`:
 
 ```r
+&gt; # Model components
 &gt; cmp_toy &lt;- y ~ Intercept(1) + s.field(main = coordinates, model = spde) 
+&gt; # Likehood
 &gt; like_toy &lt;- like(formula = y ~ Intercept + s.field,
 +              data = SPDEtoy,
 +              family = "gaussian")
+&gt; # Run inlabru!
 &gt; fit &lt;- bru(cmp_toy, like_toy)
 &gt; class(fit)
 ```
@@ -695,8 +706,9 @@ attr(,"package")
 [1] "bru"   "iinla" "inla" 
 ```
 &lt;span style="display:block; margin-top: 10px ;"&gt;&lt;/span&gt; 
-- The function takes care of the construction of inla projection matrices for spatial SPDE models.
+- Note that the function takes care of the construction of the projection matrices requied for the spatial SPDE model.
 
+- The post-processing is exactly as with `INLA`:
 
 ```r
 &gt; fit$summary.fixed[,c("mean","sd")]
@@ -706,13 +718,13 @@ attr(,"package")
               mean        sd
 Intercept 9.501672 0.7536705
 ```
-Post-processing is exactly as with `INLA`.
+
 
 ---
 
 # Prediction with `inlabru`
 
-4\. It is suggested to transform the prediction grid into a `SpatialPixels` object (it is also possible to use the function `pixel()` that generates `SpatialPixels` covering an `inla.mesh`):
+4\. It is suggested to transform the prediction grid into a `SpatialPixels` object (it is also possible to use the function `pixel()` that generates a `SpatialPixels` object covering an `inla.mesh`):
 
 ```r
 &gt; coordinates(pred.grid) = c("x","y")
@@ -726,10 +738,11 @@ attr(,"package")
 [1] "sp"
 ```
 
-5\. For the prediction we use the `predict` function that internally calls `generate.bru()` in order to draw samples from the model. It takes a fitted  object given by `bru()` and produces predictions given a new set of values for the model covariates or the original values used for the model fit. The predictions can be based on any `R` expression that is valid given these values/covariates and the joint posterior of the estimated random effects.
+5\. For the prediction we use the `predict` function that internally calls `generate()` in order to draw samples from the fitted model. It takes a fitted  object given by `bru()` and produces predictions (100 by default) given a new set of values for the model covariates or the original values used for the model fit. We can predict any function of any subset of the components of the model.
+
 
 ```r
-&gt; pred &lt;- predict(fit, pred.grid, ~ Intercept + s.field, seed=1)
+&gt; pred &lt;- predict(fit, pred.grid, ~ Intercept + s.field, seed = 1, n.samples = 500)
 &gt; class(pred)
 ```
 
@@ -751,19 +764,19 @@ The argument `n.samples` (by default 100) specifies the number of samples to dra
 
 ```
        mean        sd    q0.025    median   q0.975      smin     smax
-1 12.289502 0.2600865 11.729711 12.294270 12.69570 11.552114 12.79707
-2 11.989498 0.3567872 11.309630 11.990296 12.67851 11.163842 12.97105
-3 10.517907 0.4323665  9.742759 10.503725 11.29602  9.248850 11.64646
-4  9.654459 0.3287484  9.016594  9.667975 10.29804  8.887968 10.51926
-5  9.543578 0.3540616  8.892047  9.505425 10.14950  8.377625 10.53363
-6 10.096249 0.3418522  9.358339 10.111160 10.75225  8.781015 10.89385
-          cv        var
-1 0.02116331 0.06764499
-2 0.02975831 0.12729712
-3 0.04110766 0.18694083
-4 0.03405145 0.10807548
-5 0.03709946 0.12535960
-6 0.03385932 0.11686289
+1 12.274661 0.2748203 11.750931 12.278165 12.79733 11.362394 13.39194
+2 11.963149 0.3874874 11.229100 11.952300 12.68887 10.722449 12.97105
+3 10.563163 0.4653250  9.664884 10.587198 11.42862  9.187471 12.28969
+4  9.651572 0.3366701  8.987241  9.631168 10.28824  8.608379 10.82990
+5  9.530041 0.3503141  8.877432  9.523253 10.16074  8.377625 10.66705
+6 10.141335 0.3693989  9.385333 10.132141 10.85414  8.838799 11.43901
+          cv       var
+1 0.02238924 0.0755262
+2 0.03239008 0.1501464
+3 0.04405167 0.2165273
+4 0.03488241 0.1133468
+5 0.03675893 0.1227200
+6 0.03642508 0.1364555
 ```
 
 Note that it is possible to predict any function of any subset of the components of the model specification.
@@ -801,6 +814,20 @@ Note that it is possible to predict any function of any subset of the components
 &lt;img src="./img/unnamed-chunk-37-1.png" &gt;
 ]
 
+
+---
+
+# References
+
+Bachl, F. E., F. Lindgren, D. L. Borchers, et al. (2019). "inlabru: an
+R package for Bayesian spatial modelling from ecological survey data".
+In: _Methods in Ecology and Evolution_ 10.6, pp. 760-766.
+
+Lindgren, F. and H. Rue (2015). "Bayesian Spatial Modelling with
+R-INLA". In: _Journal of Statistical Software_ 63.19, pp. 1&lt;80&gt;-25.
+DOI: [10.18637/jss.v063.i19](https://doi.org/10.18637%2Fjss.v063.i19).
+URL:
+[https://www.jstatsoft.org/index.php/jss/article/view/v063i19](https://www.jstatsoft.org/index.php/jss/article/view/v063i19).
 
     </textarea>
 <style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>

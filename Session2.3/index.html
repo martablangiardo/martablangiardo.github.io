@@ -133,7 +133,7 @@ At the end of this session you should be able to:
 &lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
 
 
-- use `inlabru` for implementing a space-time geostatistical model.
+- use `inlabru` for implementing a (separable) space-time geostatistical model.
 
 
 &lt;span style="display:block; margin-top: 30px ;"&gt;&lt;/span&gt;
@@ -191,17 +191,18 @@ and are observed at `\(n\)` spatial locations and at `\(T\)`  time points.
 
 # Hierarchical spatio-temporal model for PM concentration
 
-- We present a spatio-temporal model for particulate matter (PM10) concentration data measured daily (in `\(\mu g /m^3\)`) 
+- We present a spatio-temporal model for particulate matter (PM10) concentration data measured daily (in `\(\mu g /m^3\)`). 
 
 &lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
-- The data refer to Piemonte region (Italy) for the period from October 2005 to March 2006.
+- The data refer to Piemonte region (Italy) for the period from October 2005 to March 2006 (daily data).
 
 &lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
-- Main aims:
+- **Main aims**:
 &lt;span style="display:block; margin-top: 10px ;"&gt;&lt;/span&gt;
-  - predict PM concentration in the considered continuous spatial domain, where no monitoring stations are displaced.
+  - predict PM concentration in the considered continuous spatial domain, where no monitoring stations are displaced;
   &lt;span style="display:block; margin-top: 10px ;"&gt;&lt;/span&gt;
-  - evaluate the effect of some covariates (e.g. wind speed, precipitation, temperature, emissions, altitude) &lt;span style="display:block; margin-top: 10px ;"&gt;&lt;/span&gt;
+  - evaluate the effect of some covariates (e.g. wind speed, precipitation, temperature, emissions, altitude);
+  &lt;span style="display:block; margin-top: 10px ;"&gt;&lt;/span&gt;
   - compute the probability of exceeding a specific threshold (e.g. `\(50\)` `\(\mu g /m^3\)` fixed by the European Community for health protection).
 
 &lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
@@ -213,12 +214,14 @@ flexibility in modeling relevant covariates as well as correlation in space and 
 # Hierarchical spatio-temporal model for PM concentration
 
 
-- We denote by `\(y_{it}\)` the logarithm of the PM10 concentration measured at site `\(\bm s_i\)`, with `\(i=1,\ldots,n=24\)`, and day `\(t=1,\ldots,T=182\)`. 
+- We denote by `\(y_{it}\)` the logarithm of PM10 concentrations measured at site `\(\bm s_i\)`, with `\(i=1,\ldots,n=24\)`, and day `\(t=1,\ldots,T=182\)`. 
 
 &lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
-- The following distribution is assumed for the observations
+- The following distribution is assumed for the observations:
 `$$\color{blue}{y_{it}\sim \text{Normal}( \eta_{it},\sigma^2_e)}$$`
 where `\(\sigma^{2}_{e}\)` is the variance of the measurement error defined by a Gaussian white-noise process, both serially and spatially uncorrelated.
+
+--
 
 &lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
 - The linear predictor is given by
@@ -234,8 +237,10 @@ where `\(b_0\)`  is the intercept and `\(\beta_1,\ldots,\beta_M\)` are the linea
 `$$\color{blue}{\omega_{it} = a\omega_{i(t-1)}+\xi_{it}}$$`
 with `\(t=2,\ldots,T\)`, `\(|a|&lt;1\)`, `\(\omega_{i1}\sim\text{Normal}\left(0,\sigma^2/ (1-a^2)\right)\)`.
 
+--
+
 &lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
-- The term `\(\xi_{it}\)` is a zero-mean Gaussian field, assumed to be **temporally independent** and characterized by the following spatio-temporal covariance function
+- The term `\(\xi_{it}\)` is a zero-mean **Gaussian field**, assumed to be **temporally independent** and characterized by the following spatio-temporal covariance function:
 
 `$$\text{Cov}\left(\xi_{it},\xi_{ju}\right) =\left\{
 \begin{array}[c]{ccc}%
@@ -244,7 +249,7 @@ with `\(t=2,\ldots,T\)`, `\(|a|&lt;1\)`, `\(\omega_{i1}\sim\text{Normal}\left(0,
 \end{array}
 \right.$$`
 
-for `\(i\neq j\)`, where `\(\text{Cov}(\xi_i,\xi_j)\)` is given by Matern spatial covariance function.
+for `\(i\neq j\)`, where `\(\text{Cov}(\xi_i,\xi_j)\)` is given by Mat&amp;eacute;rn spatial covariance function.
 
 &lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
 - This model is characterized by a **separable spatio-temporal covariance** as it can be rewritten as the product of a purely spatial and a purely temporal covariance function (see Cameletti, Ignaccolo, and Bande (2011)).
@@ -257,10 +262,12 @@ for `\(i\neq j\)`, where `\(\text{Cov}(\xi_i,\xi_j)\)` is given by Matern spatia
 $$ \bm \xi_t \rightarrow \tilde{\bm \xi_t}\sim\text{Normal}(\bm 0,\bm Q^{-1}_S)$$
 where the precision matrix `\(\bm Q^{-1}_S\)` comes from the SPDE representation. The matrix `\(\bm Q^{-1}_S\)`  does not change in time - due to the serial independence hypothesis - and its dimension is given by the number of vertices of the domain triangulation.
 
+--
+
 &lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
 - The joint distribution of the `\(Tn\)`-dimensional GMRF `\(\bm\omega=(\bm\omega_1^\prime,\ldots,\bm\omega_T^\prime)^\prime\)` is 
 `$$\bm\omega\sim\text{Normal}(\bm 0,\bm Q^{-1})$$`
-with `\(\bm Q=\bm Q_T \otimes \bm Q_S\)` where `\(\otimes\)` denotes the Kronecker product and `\(\bm Q_T\)` is the `\(T\)`-dimensional precision matrix of the AR(1) process.
+with `\(\bm Q=\bm Q_T \otimes \bm Q_S\)`, where `\(\otimes\)` denotes the Kronecker product and `\(\bm Q_T\)` is the `\(T\)`-dimensional precision matrix of the AR(1) process.
 
 &lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
 - For the considered model the latent process is given by `\(\bm \theta=\{\bm \omega, b_0, \beta_1,\ldots, \beta_M\}\)` while the hyperparameter vector is `\(\psi=(\sigma^2_e, a, \sigma^2, r)\)`.
@@ -310,7 +317,7 @@ The data are **PM10 concentrations** in 24 monitoring stations in Piemonte regio
 ```
 
 ```r
-&gt; # select only the first 50 days
+&gt; # select only the first 50 days for reducing the computational load
 &gt; df = df[df$time &lt;= 50,]
 ```
 
@@ -333,7 +340,8 @@ attr(,"package")
 
 ```r
 &gt; ggplot()+
-+   gg(border)
++   gg(border) +
++   coord_equal()
 ```
 ]
 .pull-right[
@@ -347,7 +355,7 @@ attr(,"package")
 # PM10 data
 
 .pull-left[
-We plot PM10 concentrations measured in the 24 monitoring stations in the first 3 days of the time series.
+We plot PM10 concentrations measured in the 24 monitoring stations in the first **3 days** of the time series.
 
 
 ```r
@@ -360,6 +368,7 @@ We plot PM10 concentrations measured in the 24 monitoring stations in the first 
 +   geom_point(aes(UTMX, UTMY, color = PM10))+
 +   facet_wrap(.~ Date) +
 +   scale_color_viridis() +
++   coord_equal() +
 +   gg(border)
 ```
 ]
@@ -377,8 +386,8 @@ For the example we choose a quite rough mesh (starting from the monitoring stati
 ```r
 &gt; library(INLA)
 &gt; mesh = inla.mesh.2d(loc = cbind(df$UTMX, df$UTMY),
-+                     offset = c(20,40),
-+                     max.edge = c(30,50))
++                     offset = c(20, 40),
++                     max.edge = c(30, 50))
 ```
 
 ```r
@@ -387,7 +396,7 @@ For the example we choose a quite rough mesh (starting from the monitoring stati
 +   geom_point(data = df, aes(UTMX, UTMY)) + 
 +   gg(border)
 ```
-Given the mesh it is now possible to create the SPDE model using the `inla.spde2.matern` function:
+Given the mesh, it is now possible to create the SPDE model using the `inla.spde2.matern` function:
 
 
 ```r
@@ -429,7 +438,7 @@ and then define the model **components**
 
 
 ```r
-&gt; cmp  = ~ Intercept(1) + 
+&gt; cmp  = logPM10 ~ Intercept(1) + 
 +   SPDE(coordinates, model = spde,
 *+        group = time, control.group = list(model = "ar1")) +
 +   A + #dem(A, model = "linear") +  
@@ -472,7 +481,7 @@ TEMP       0.021393137  -0.016957290 0.059374675
 ---
 
 # Prediction at the station locations
-We are interested in predicting PM10 concentrations at the monitoring station locations. As introduced in Section 2.2 we will use the `predict` function:
+We are interested in predicting PM10 concentrations (not the log concentrations) at the monitoring station locations. As introduced in Section 2.2, we will use the `predict` function:
 
 .panelset[
 .panel[.panel-name[Compute predictions]
@@ -480,25 +489,32 @@ We are interested in predicting PM10 concentrations at the monitoring station lo
 
 
 ```r
-&gt; pred_at_station = predict(fit, df, ~ exp(Intercept + SPDE + A + TEMP))
+&gt; pred_at_station = predict(fit, df, ~ exp(Intercept + SPDE + A + TEMP), n.samples = 200)
 &gt; head(pred_at_station)
 ```
 
 ```
-        coordinates Station.ID     Date     A   WS   TEMP   HMIX PREC   EMI PM10  logPM10 time     mean        sd    q0.025   median   q0.975
-1 (469.45, 4972.85)          1 01/10/05  95.2 0.90 288.81 1294.6    0 26.05   28 3.332205    1 31.26229 11.266364 15.812596 29.02711 60.54155
-2 (423.48, 4950.69)          2 01/10/05 164.1 0.82 288.67 1139.8    0 18.74   22 3.091042    1 23.01801  8.983761 10.398527 21.53946 44.82667
-3 (490.71, 4948.86)          3 01/10/05 242.9 0.96 287.44 1404.0    0  6.28   17 2.833213    1 23.27225 10.445867  9.814527 20.99455 50.29153
-4 (437.36, 4973.34)          4 01/10/05 149.9 1.17 288.63 1042.4    0 29.35   25 3.218876    1 27.35838 10.261868 14.943499 25.47515 50.21573
-5 (426.44, 5045.66)          5 01/10/05 405.0 0.60 287.63 1038.7    0 32.19   20 2.995732    1 23.10613 13.715112  6.292715 19.32318 56.40320
-6  (394.6, 5001.18)          6 01/10/05 257.5 1.02 288.59 1048.3    0 34.24   41 3.713572    1 41.90597 17.695757 14.945648 37.48813 81.36793
-       smin      smax        cv       var
-1 15.307937  63.69723 0.3603819 126.93095
-2  5.962741  55.72509 0.3902927  80.70797
-3  6.241626  56.50117 0.4488551 109.11614
-4  7.974561  56.21978 0.3750906 105.30594
-5  5.497231  77.01164 0.5935703 188.10429
-6 13.183007 111.12108 0.4222730 313.13983
+        coordinates Station.ID     Date     A   WS   TEMP   HMIX PREC   EMI
+1 (469.45, 4972.85)          1 01/10/05  95.2 0.90 288.81 1294.6    0 26.05
+2 (423.48, 4950.69)          2 01/10/05 164.1 0.82 288.67 1139.8    0 18.74
+3 (490.71, 4948.86)          3 01/10/05 242.9 0.96 287.44 1404.0    0  6.28
+4 (437.36, 4973.34)          4 01/10/05 149.9 1.17 288.63 1042.4    0 29.35
+5 (426.44, 5045.66)          5 01/10/05 405.0 0.60 287.63 1038.7    0 32.19
+6  (394.6, 5001.18)          6 01/10/05 257.5 1.02 288.59 1048.3    0 34.24
+  PM10  logPM10 time     mean        sd    q0.025   median   q0.975      smin
+1   28 3.332205    1 30.47843 10.654627 15.371824 28.52812 55.03866 11.531874
+2   22 3.091042    1 21.83778  8.093021 10.077188 20.13336 40.60883  7.197603
+3   17 2.833213    1 22.26995  9.139357  9.430910 20.96575 45.53003  6.745942
+4   25 3.218876    1 26.70273  9.856368 12.388755 25.17459 49.47863  9.703263
+5   20 2.995732    1 20.72915 10.607990  6.943511 18.48632 46.84368  4.291996
+6   41 3.713572    1 39.63871 15.793548 16.145242 37.01607 77.21654 11.270828
+      smax        cv       var
+1 80.30652 0.3495792 113.52108
+2 58.20426 0.3705973  65.49699
+3 58.73275 0.4103897  83.52784
+4 66.88915 0.3691147  97.14798
+5 62.82900 0.5117427 112.52945
+6 96.71236 0.3984375 249.43615
 ```
 
 ]
@@ -510,6 +526,7 @@ Select randomly 6 stations
 &gt; sel = sample(1:24, 6) %&gt;% sort()
 ```
 
+and plot the observed/predicted time series: 
 
 ```r
 &gt; as.data.frame(pred_at_station) %&gt;%
@@ -531,7 +548,7 @@ Select randomly 6 stations
 
 # Prediction at the grid locations
 
-We want to predict the concentration (not the log concentration!) of PM10 in Piemonte for the first 3 days in our dataset. To do this we need the values of the altitude and temperature for every point of interest in both space (regular grid) and time.
+We want to predict the concentration (not the log concentration) of PM10 for the locations in the Piemonte grid and for the first 3 days. To do this we need the values of the altitude and temperature for every point of interest in both space (regular grid) and time.
 
 .panelset[
   .panel[.panel-name[Grid data]
@@ -580,6 +597,7 @@ Mask the grid using the Piemonte `border` created before:
 &gt; ggplot() + 
 + gg(covariate_grid, aes(fill=A)) + 
 + gg(border) +
++ coord_equal() + 
 + scale_fill_viridis()
 ```
 ]
@@ -596,6 +614,7 @@ Mask the grid using the Piemonte `border` created before:
 + gg(covariate_grid, aes(fill=TEMP)) +
 + facet_wrap(~time) +
 + gg(border) +
++ coord_equal() +
 + scale_fill_viridis()
 ```
 ]
@@ -616,31 +635,83 @@ Mask the grid using the Piemonte `border` created before:
 ```r
 &gt; pred = predict(fit, covariate_grid, 
 +                ~ exp(Intercept + SPDE + A + TEMP),
-+                seed = 2)
-&gt; range(pred$median)
++                seed = 2, n.samples = 200)
+&gt; head(pred@data)
 ```
 
 ```
-[1]  0.03139557 43.06785677
+           A time     TEMP      mean        sd     q0.025   median   q0.975
+174 1603.381    1 282.4919  83.02265  600.5297 0.18815062 8.293004 394.9235
+175 1709.620    1 281.8724 101.88146  846.7870 0.12737082 7.137347 404.2913
+176 2333.712    1 277.6419 318.08230 3430.6132 0.01444508 2.876176 667.0628
+246 1554.806    1 282.8573  72.78436  494.3988 0.21801825 8.456235 385.2443
+247 1715.673    1 281.9928  95.48083  780.1129 0.12493523 6.615723 416.2594
+248 2407.440    1 277.2219 323.05912 3395.9680 0.01144435 2.507126 741.8455
+           smin      smax        cv        var
+174 0.062904617  8265.919  7.233324   360635.9
+175 0.045550822 11788.525  8.311492   717048.1
+176 0.002758490 48142.718 10.785301 11769107.2
+246 0.092557209  6794.133  6.792652   244430.2
+247 0.048364755 10859.750  8.170361   608576.1
+248 0.002194729 47422.121 10.511909 11532599.0
 ```
-
 
 ---
 
-# And finally the daily maps!
+# And finally the daily maps for PM10 concentrations!
 
 
 ```r
 &gt; ggplot() + 
-+   gg(pred, aes(UTMX_km, UTMY_km, fill = median))  +
-+   facet_wrap(.~time) + 
-+   scale_fill_viridis() +
-+   coord_equal()+
-+   gg(border)
++   gg(pred, aes(UTMX_km, UTMY_km, fill = mean))  +
++   facet_wrap(.~ time) + 
++   scale_fill_viridis() + coord_equal() + gg(border)
 ```
 
 &lt;img src="./img/mapsgridout-1.png" &gt;
 
+---
+
+# Maps for the exceedance probability
+
+.pull-left[
+With `inlabru predict()` function, it is also very easy to compute the posterior probability of exceeding the `\(50\)` `\(\mu g /m^3\)` threshold:
+
+
+```r
+&gt; predprob = predict(fit, covariate_grid, 
++                ~ (exp(Intercept + SPDE + A + TEMP) &gt; 50),
++                seed = 2, n.samples = 500)
+&gt; ggplot() + 
++   gg(predprob, aes(UTMX_km, UTMY_km, fill = mean))  +
++   facet_wrap(.~ time) + 
++   scale_fill_viridis() + coord_equal() + gg(border)
+```
+
+&lt;img src="./img/postprobmap-1.png" &gt;
+]
+.pull-right[
+&lt;img src="./img/postprobmapout-1.png" &gt;
+]
+
+---
+
+# References
+
+Cameletti, M., R. Ignaccolo, and S. Bande (2011). "Comparing
+spatio-temporal models for particulate matter in Piemonte". In:
+_Environmetrics_ 22.8, pp. 985-996. DOI:
+[https://doi.org/10.1002/env.1139](https://doi.org/https%3A%2F%2Fdoi.org%2F10.1002%2Fenv.1139).
+
+Cameletti, M., F. Lindgren, D. Simpson, et al. (2013). "Spatio-temporal
+modeling of particulate matter concentration through the SPDE
+approach". In: _AStA Advances in Statistical Analysis_ 97.2, pp.
+109-131.
+
+Fioravanti, G., S. Martino, M. Cameletti, et al. (2021).
+"Spatio-temporal modelling of PM10 daily concentrations in Italy using
+the SPDE approach". In: _Atmospheric Environment_ 248, p. 118192. DOI:
+[https://doi.org/10.1016/j.atmosenv.2021.118192](https://doi.org/https%3A%2F%2Fdoi.org%2F10.1016%2Fj.atmosenv.2021.118192).
 
     </textarea>
 <style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
