@@ -173,7 +173,7 @@ name: mcmc
 --
 
 
-- The INLA algorithm proposed by  is a .red[*deterministic*] algorithm for Bayesian inference and it represents an alternative to MCMC which is instead a simulation based algorithm.
+- The INLA algorithm proposed by Rue, Martino, and Chopin (2009) is a .red[*deterministic*] algorithm for Bayesian inference and it represents an alternative to MCMC which is instead a simulation based algorithm.
 
 --
 
@@ -298,7 +298,7 @@ and then assume
 
 &lt;span style="display:block; margin-top: -10px ;"&gt;&lt;/span&gt;
 
-Upon varying the form of the functions `\(\class{myblue}{f_l(\cdot)}\)`, this formulation can accommodate a wide range of models (see  for a review)
+Upon varying the form of the functions `\(\class{myblue}{f_l(\cdot)}\)`, this formulation can accommodate a wide range of models (see Martins, Simpson, Lindgren, and Rue (2013) for a review)
 
 
 - Standard regression
@@ -545,7 +545,7 @@ or equivalently
 
 # Integrated Nested Laplace Approximation (INLA)
 
-1. can be easily estimated as
+1\. can be easily estimated as
 
 `$$\class{red}{p(\boldsymbol\psi\mid\boldsymbol{y})} \class{black}{= \frac{p(\boldsymbol\theta,\boldsymbol\psi\mid\boldsymbol{y})}{p(\boldsymbol\theta\mid\boldsymbol\psi,\boldsymbol{y})}}$$`
 
@@ -743,7 +743,7 @@ Operationally, the INLA algorithm proceeds with the following steps:
 .center[.blue[Central Composite Design strategy (CCD)]]
 ]
 
-The CCD strategy is the default one in `R-INLA`: it produces a lower number of points which are however enough to capture the variability of the joint distribution (see ).
+The CCD strategy is the default one in `R-INLA`: it produces a lower number of points which are however enough to capture the variability of the joint distribution (see Martins, Simpson, Lindgren, et al. (2013)).
 
 ---
 
@@ -1103,20 +1103,20 @@ The .olive[`control.xxx=list(...)`] statements  in the .olive[`inla`] function c
  [5] "marginals.lincomb"           "size.lincomb"               
  [7] "summary.lincomb.derived"     "marginals.lincomb.derived"  
  [9] "size.lincomb.derived"        "mlik"                       
-[11] "cpo"                         "gcpo"                       
-[13] "po"                          "waic"                       
-[15] "model.random"                "summary.random"             
-[17] "marginals.random"            "size.random"                
-[19] "summary.linear.predictor"    "marginals.linear.predictor" 
-[21] "summary.fitted.values"       "marginals.fitted.values"    
-[23] "size.linear.predictor"       "summary.hyperpar"           
-[25] "marginals.hyperpar"          "internal.summary.hyperpar"  
-[27] "internal.marginals.hyperpar" "offset.linear.predictor"    
-[29] "model.spde2.blc"             "summary.spde2.blc"          
-[31] "marginals.spde2.blc"         "size.spde2.blc"             
-[33] "model.spde3.blc"             "summary.spde3.blc"          
-[35] "marginals.spde3.blc"         "size.spde3.blc"             
-[37] "logfile"                     "misc"                       
+[11] "cpo"                         "po"                         
+[13] "waic"                        "model.random"               
+[15] "summary.random"              "marginals.random"           
+[17] "size.random"                 "summary.linear.predictor"   
+[19] "marginals.linear.predictor"  "summary.fitted.values"      
+[21] "marginals.fitted.values"     "size.linear.predictor"      
+[23] "summary.hyperpar"            "marginals.hyperpar"         
+[25] "internal.summary.hyperpar"   "internal.marginals.hyperpar"
+[27] "offset.linear.predictor"     "model.spde2.blc"            
+[29] "summary.spde2.blc"           "marginals.spde2.blc"        
+[31] "size.spde2.blc"              "model.spde3.blc"            
+[33] "summary.spde3.blc"           "marginals.spde3.blc"        
+[35] "size.spde3.blc"              "logfile"                    
+[37] "misc"                        "dic"                        
 ```
 ]
 ---
@@ -1169,40 +1169,24 @@ We specify a simple regression model with `Petal.length` and `Petal.width` as de
 ```
 
 Call:
-   c("inla.core(formula = formula, family = family, contrasts = contrasts, 
-   ", " data = data, quantiles = quantiles, E = E, offset = offset, ", " 
-   scale = scale, weights = weights, Ntrials = Ntrials, strata = strata, 
-   ", " lp.scale = lp.scale, link.covariates = link.covariates, verbose = 
-   verbose, ", " lincomb = lincomb, selection = selection, control.compute 
-   = control.compute, ", " control.predictor = control.predictor, 
-   control.family = control.family, ", " control.inla = control.inla, 
-   control.fixed = control.fixed, ", " control.mode = control.mode, 
-   control.expert = control.expert, ", " control.hazard = control.hazard, 
-   control.lincomb = control.lincomb, ", " control.update = 
-   control.update, control.lp.scale = control.lp.scale, ", " 
-   control.pardiso = control.pardiso, only.hyperparam = only.hyperparam, 
-   ", " inla.call = inla.call, inla.arg = inla.arg, num.threads = 
-   num.threads, ", " blas.num.threads = blas.num.threads, keep = keep, 
-   working.directory = working.directory, ", " silent = silent, inla.mode 
-   = inla.mode, safe = FALSE, debug = debug, ", " .parent.frame = 
-   .parent.frame)") 
+   "inla(formula = formula, family = \"gaussian\", data = iris)" 
 Time used:
-    Pre = 3.8, Running = 0.296, Post = 0.0194, Total = 4.12 
+    Pre = 0.281, Running = 0.0969, Post = 0.0184, Total = 0.396 
 Fixed effects:
-             mean    sd 0.025quant 0.5quant 0.975quant mode kld
-(Intercept) 1.084 0.073      0.940    1.084      1.227   NA   0
-Petal.Width 2.230 0.051      2.129    2.230      2.331   NA   0
+             mean    sd 0.025quant 0.5quant 0.975quant  mode kld
+(Intercept) 1.084 0.073      0.940    1.084      1.227 1.084   0
+Petal.Width 2.230 0.051      2.129    2.230      2.331 2.230   0
 
 Model hyperparameters:
                                         mean    sd 0.025quant 0.5quant
-Precision for the Gaussian observations 4.43 0.512       3.50     4.41
+Precision for the Gaussian observations 4.43 0.511       3.49     4.41
                                         0.975quant mode
-Precision for the Gaussian observations       5.49   NA
+Precision for the Gaussian observations       5.49 4.37
+
+Expected number of effective parameters(stdev): 2.00(0.00)
+Number of equivalent replicates : 74.85 
 
 Marginal log-Likelihood:  -119.59 
- is computed 
-Posterior summaries for the linear predictor and the fitted values are computed
-(Posterior marginals needs also 'control.compute=list(return.marginals.predictor=TRUE)')
 ```
 ]
 ---
@@ -1215,12 +1199,12 @@ Posterior summaries for the linear predictor and the fitted values are computed
 ```
 
 ```
-                mean         sd 0.025quant 0.5quant 0.975quant mode
-(Intercept) 1.083565 0.07292054  0.9403638 1.083565   1.226767   NA
-Petal.Width 2.229935 0.05136351  2.1290668 2.229935   2.330802   NA
+                mean         sd 0.025quant 0.5quant 0.975quant     mode
+(Intercept) 1.083565 0.07293226  0.9401746 1.083563   1.226833 1.083565
+Petal.Width 2.229935 0.05137177  2.1289336 2.229933   2.330849 2.229935
                      kld
-(Intercept) 9.793724e-10
-Petal.Width 9.795414e-10
+(Intercept) 1.284615e-06
+Petal.Width 1.284522e-06
 ```
 
 - For each unstructured *fixed* effect, `R-INLA` reports a set of summary statistics from the posterior distribution.
@@ -1243,9 +1227,9 @@ Petal.Width 9.795414e-10
 
 ```
                                             mean        sd 0.025quant 0.5quant
-Precision for the Gaussian observations 4.432668 0.5115432   3.501958 4.413411
-                                        0.975quant mode
-Precision for the Gaussian observations   5.484831   NA
+Precision for the Gaussian observations 4.432532 0.5109594    3.48813 4.412588
+                                        0.975quant     mode
+Precision for the Gaussian observations    5.48995 4.372888
 ```
 
 - For each hyperparameter the summary statistics are reported to describe the posterior distribution.
@@ -1332,7 +1316,7 @@ Precision for the Gaussian observations   5.484831   NA
 ```
 
 ```
-[1] 1.990405
+[1] 1.978538
 ```
 
 ```r
@@ -1340,7 +1324,7 @@ Precision for the Gaussian observations   5.484831   NA
 ```
 
 ```
-[1] 2.283483 2.241375 2.201697 2.241272
+[1] 2.186692 2.235088 2.235310 2.223369
 ```
 
 ]
@@ -1371,7 +1355,7 @@ Precision for the Gaussian observations   5.484831   NA
 ```
 
 ```r
-&gt; prec_post &lt;-output$marginals.hyperpar[[1]]
+&gt; prec_post &lt;- output$marginals.hyperpar[[1]]
 ```
 
 
@@ -1398,7 +1382,7 @@ Precision for the Gaussian observations   5.484831   NA
 ```
 
 ```
-[1] 0.228523
+[1] 0.2286685
 ```
 
 
@@ -1442,7 +1426,14 @@ The INLA approach is not a rival/competitor/replacement to/of MCMC, just a bette
 
 # References
 
-NULL
+Martins, T. G., D. Simpson, F. Lindgren, et al. (2013). "Bayesian
+computing with INLA: New features". In: _Computational Statistics &amp;
+Data Analysis_ 67, pp. 68-83.
+
+Rue, H., S. Martino, and N. Chopin (2009). "Approximate Bayesian
+inference for latent Gaussian model by using integrated nested Laplace
+approximations (with discussion)". In: _J. R. Statist. Soc. B_ 71, pp.
+319-392.
     </textarea>
 <style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
 <script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>

@@ -127,19 +127,22 @@ At the end of this session you should be able to:
 
 &lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
 
-- know the definition of spatio-temporal process in the geostatistics framework;
+- implement a joint model with multiple likelihoods by using `R-ILA`;
 
 
 &lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
 
 
-- use `inlabru` for implementing a space-time geostatistical model.
+- use the `copy` feature with `R-INLA`;
 
 
 &lt;span style="display:block; margin-top: 30px ;"&gt;&lt;/span&gt;
 
+- Implement with `inlabru` a model with two likelihoods and a shared spatial effect
 
-The topics treated in this lecture can be found in **Section 7.2** of the INLA book.  
+
+
+The topics treated in this lecture can be partially found in **Chapter 8** of the INLA book.  
 
 ---
 
@@ -147,7 +150,7 @@ The topics treated in this lecture can be found in **Section 7.2** of the INLA b
 
 &lt;span style="display:block; margin-top: 30px ;"&gt;&lt;/span&gt;
 
-1\. [Spatio-temporal processes + a space-time hierarchical model for air pollution](#stprocess)
+1\. [Joint model with multiple likelihoods](#stprocess)
 
 &lt;span style="display:block; margin-top: 30px ;"&gt;&lt;/span&gt;
 
@@ -161,7 +164,7 @@ name: stprocess
 &lt;span style="display:block; margin-top: 250px ;"&gt;&lt;/span&gt;
 
 .myblue[.center[.huge[
-**Spatio-temporal processes + a space-time hierarchical model for air pollution**]]]
+**Joint model with multiple likelihoods**]]]
 
 
 
@@ -169,217 +172,179 @@ name: stprocess
 
 # Multiple likelihoods
 
-In many situations, you need to combine data from different sources and need to be able to handle multiple likelihoods:
-
-- a different family of distribution (e.g. a subset of the data follows a Gaussian distribution
+- In many situations you need to combine data from different sources and/or differente characteristics. For example:
+&lt;span style="display:block; margin-top: 10px ;"&gt;&lt;/span&gt;
+  - a subset of the data follows a Gaussian distribution
 and the other follows a Poisson distribution)
+&lt;span style="display:block; margin-top: 10px ;"&gt;&lt;/span&gt;
+  - the data come from the same distribution but with different hyperparameters (e.g. one subset of the data comes from a Gaussian distribution with precision `\(\tau_1\)` and the other from a Gaussian with precision `\(\tau_2\)`).
 
-- the same family of distribution but with different hyperparameters (eg one subset of the data comes from a Gaussian distribution with unknown precision `\(\tau_1\)` and the other from a Gaussian with unknown precision `\(\tau_2\)`).
+&lt;span style="display:block; margin-top: 30px ;"&gt;&lt;/span&gt;
+- In this case we need to be able to handle **multiple likelihoods** when implementing the **joint model**.
+
+
+&lt;span style="display:block; margin-top: 30px ;"&gt;&lt;/span&gt;
+
+- In `R-INLA` this requires to have a particular structure for the data. For example, in the case of two likelihoods with two responses `\(\bm y_1 = (y_{11},\ldots,y_{1n})\)` and `\(\bm y_2 = (y_{21},\ldots,y_{2m})\)`, the data should be structured in a 2-columns matrix like the following:
+
+`$$\begin{bmatrix} y_{11}  &amp; NA \\ \ldots &amp; NA \\  y_{1n} &amp; NA\\ NA &amp; y_{21} \\ NA &amp; \ldots \\ NA &amp; y_{2m} \end{bmatrix}$$`
 
 ---
 
-# Example
-This example shows how to use information from two data sources to estimate the effect of a common covariate.
+# Two likelihoods model with shared covariate and different intercepts
 
-1\. We simulate `\(n=100\)` data from the Binomial distribution:
+This example shows how to use information from two data sources (Binomial and Poisson distribution) to estimate the effect of a common covariate `\(x\)` and of two different intercepts.
+
+&lt;span style="display:block; margin-top: 30px ;"&gt;&lt;/span&gt;
+
+- **Likelihood 1**: 
+`$$y_{1i} \sim Bin\left(n=1, p_i=\frac{\eta_{1i}}{1+\eta_{1i}}\right) \qquad i=1,\ldots,n$$` 
+&lt;span style="display:block; margin-top: 10px ;"&gt;&lt;/span&gt;
+where `\(\eta_{1i} = \alpha + \beta_1 x_{1i}\)`
+
+&lt;span style="display:block; margin-top: 30px ;"&gt;&lt;/span&gt;
+
+- **Likelihood 2**: 
+`$$y_{2i} \sim Poisson\left(\lambda_i=\exp(\eta_{2i})\right)\qquad i= 1,\ldots,m$$`
+&lt;span style="display:block; margin-top: 10px ;"&gt;&lt;/span&gt;
+where `\(\eta_{2i} = \gamma + \beta_1 x_{2i}\)`
+
+---
+
+# Two likelihoods model: data simulation
+
+- We simulate `\(n=100\)` data from the **Binomial** distribution:
 
 ```r
 &gt; n = 100
 &gt; x1 = runif(n)
-&gt; eta1 = 1 + x1
+&gt; eta1 = 1 + x1 #linear predictor 1
 &gt; y1 = rbinom(n, size = 1, prob = exp(eta1)/(1+exp(eta1)))
-&gt; df1 = data.frame(xx=x1, Y=y1)
+&gt; df1 = data.frame(x = x1, y = y1)
 ```
 
-2\. We simulate `\(n=100\)` data from the Poisson distribution
+- We simulate `\(m=200\)` data from the **Poisson** distribution
 
 ```r
-&gt; x2 = runif(n)
-&gt; eta2 = 1 + x2
-&gt; y2 = rpois(n, exp(eta2))
-&gt; df2 = data.frame(xx=x2, Y=y2)
+&gt; m = 200
+&gt; x2 = runif(m) 
+&gt; eta2 = 2 + x2 #linear predictor 2
+&gt; y2 = rpois(m, exp(eta2))
+&gt; df2 = data.frame(x = x2, y = y2)
 ```
 
 ---
-# Implementation with `inla`
+# Two likelihoods model: implementation with `inla`
 
-3\. Define the block matrix
+- Define the **block matrix** for the two response variables:
 
 ```r
-&gt; Y = matrix(NA, 2*n, 2)  
-&gt; Y[1:n, 1] = y1 
-&gt; Y[1:n + n, 2] = y2 
-&gt; Ntrials = c(rep(1,n), rep(NA, n)) # required only for Binomial data
+&gt; y = matrix(NA, n+m, 2)  
+&gt; y[1:n, 1] = y1  # first column
+&gt; y[(n+1):(n+m), 2] = y2  #second column
+&gt; Ntrials = c(rep(1,n), rep(NA, m)) # required only for Binomial data
 ```
 
-4\.
+- Define the **block matrix** for the two intercepts:
 
 ```r
-&gt; xx = c(x1, x2)
+&gt; intercept1 = numeric(n+m)
+&gt; intercept1[1:n] = 1
+&gt; intercept1[(n+1):(n+m)] = NA
 &gt; 
-&gt; formula = Y  ~ 1 + xx
+&gt; intercept2 = numeric(n+m)
+&gt; intercept2[1:n] = NA
+&gt; intercept2[(n+1):(n+m)] = 1
+```
+
+- With this approach every row has only a single observed value.
+- Covariates and latent effects can be indexed from 1 to `\(n+m\)`. When a covariate or effect must only affect observations in a single likelihood, the values of the indices for the other likelihood must be set to `NA`.
+---
+
+# Two likelihoods model: implementation with `inla`
+
+- Fit the model with `inla`:
+
+```r
+&gt; # Covariate vector
+&gt; x = c(x1, x2)
+&gt; 
+&gt; formula = y  ~ -1 + intercept1 + intercept2 + x #all the terms
 &gt; 
 &gt; library(INLA)
 &gt; output = inla(formula,
-+               data = list(Y = Y, xx = xx),
-+               family = c("binomial", "Poisson"),
+*+               data = list(y=y, intercept1=intercept1,
++                           intercept2=intercept2, x=x), 
+*+               family = c("binomial", "Poisson"),
 +               Ntrials = Ntrials)
 &gt; 
-&gt; output$summary.fixed
+&gt; output$summary.fixed[,c("mean","0.025quant","0.975quant")]
 ```
 
 ```
-                mean         sd 0.025quant  0.5quant 0.975quant mode
-(Intercept) 0.919213 0.09720488  0.7253829 0.9202984   1.106881   NA
-xx          1.178539 0.15761831  0.8695324 1.1781626   1.488116   NA
-                     kld
-(Intercept) 1.278915e-05
-xx          2.613936e-08
+                mean 0.025quant 0.975quant
+intercept1 1.1208594  0.6274275   1.660674
+intercept2 2.0762432  1.9877198   2.163558
+x          0.8913912  0.7576659   1.025319
 ```
 
 ---
-# Implementation with `inlabru`
 
+# Two likelihoods model: implementation with `inlabru`
+
+- Define the model components and the likelihoods:
 
 ```r
-&gt; cmp = ~ Intercept(1) + xx
+&gt; cmp = y ~ Intercept1(1) + Intercept2(1) + x
 &gt; 
 &gt; library(inlabru)
-&gt; like1 = like(formula = Y ~ Intercept + xx,
+&gt; like1 = like(formula = y ~ Intercept1 + x,
 +              family = "binomial",
 +              data = df1, 
-+              Ntrials = rep(1,nrow(df1)))
-&gt; like2 = like(formula = Y ~ Intercept + xx,
++              Ntrials = rep(1, nrow(df1)))
+&gt; 
+&gt; like2 = like(formula = y ~ Intercept2 + x,
 +              family = "Poisson",
 +              data = df2)
-&gt; 
+```
+
+- Fit the model with `inlabru`:
+
+```r
 &gt; outputbru = bru(cmp, like1, like2)
-&gt; outputbru$summary.fixed
+&gt; outputbru$summary.fixed[,c("mean","0.025quant","0.975quant")]
 ```
 
 ```
-               mean         sd 0.025quant  0.5quant 0.975quant mode
-Intercept 0.9192045 0.09721053  0.7253635 0.9202898   1.106884   NA
-xx        1.1785513 0.15762221  0.8695370 1.1781749   1.488136   NA
-                   kld
-Intercept 1.279159e-05
-xx        2.615487e-08
-```
-
-```r
-&gt; output$summary.fixed
-```
-
-```
-                mean         sd 0.025quant  0.5quant 0.975quant mode
-(Intercept) 0.919213 0.09720488  0.7253829 0.9202984   1.106881   NA
-xx          1.178539 0.15761831  0.8695324 1.1781626   1.488116   NA
-                     kld
-(Intercept) 1.278915e-05
-xx          2.613936e-08
+               mean 0.025quant 0.975quant
+Intercept1 1.120859  0.6274233   1.660678
+Intercept2 2.076243  1.9876988   2.163581
+x          0.891391  0.7576519   1.025333
 ```
 
 
 ---
-
-# Example 2
-
-
-If the covariate is different for the two families we need to change the code as follows:
-
-```r
-&gt; X1 = numeric(2*n)
-&gt; X1[1:n] = x1
-&gt; X1[(n+1):(2*n)] = NA
-&gt; X2 = numeric(2*n)
-&gt; X2[1:n] = NA
-&gt; X2[(n+1):(2*n)] = x2
-&gt; 
-&gt; formula = Y  ~ X1 + X2 
-&gt; 
-&gt; output2 = inla(formula,
-+                data = list(Y = Y, X1 = X1, X2 = X2), 
-+                family = c("binomial", "poisson"),
-+                Ntrials = Ntrials)
-&gt; 
-&gt; output2$summary.fixed
-```
-
-```
-                 mean         sd 0.025quant  0.5quant 0.975quant mode
-(Intercept) 0.9190773 0.09700791 0.72564595 0.9201586   1.106371   NA
-X1          0.8785882 0.45035113 0.04399411 0.8624033   1.811277   NA
-X2          1.1876233 0.15757121 0.87856758 1.1873152   1.496931   NA
-                     kld
-(Intercept) 3.684991e-07
-X1          1.101520e-04
-X2          5.214074e-06
-```
-
----
-
-# Example 2 with inlabru
-
-```r
-&gt; df1$x1 = df1$xx
-&gt; df2$x2 = df2$xx
-&gt; cmp = ~ Intercept(1) + x1 + x2
-&gt; 
-&gt; like1 = like(formula = Y ~ Intercept + x1,
-+              family = "binomial",
-+              data = df1, 
-+              Ntrials = rep(1,nrow(df1)))
-&gt; like2 = like(formula = Y ~ Intercept + x2,
-+              family = "Poisson",
-+              data = df2)
-&gt; 
-&gt; outputbru2 = bru(cmp, like1, like2)
-&gt; outputbru2$summary.fixed
-```
-
-```
-               mean         sd 0.025quant  0.5quant 0.975quant mode
-Intercept 0.9190688 0.09701274 0.72562846 0.9201500   1.106373   NA
-x1        0.8786000 0.45035226 0.04400488 0.8624147   1.811292   NA
-x2        1.1876354 0.15757372 0.87857461 1.1873273   1.496948   NA
-                   kld
-Intercept 3.693444e-07
-x1        1.101376e-04
-x2        5.211941e-06
-```
-
-```r
-&gt; output2$summary.fixed
-```
-
-```
-                 mean         sd 0.025quant  0.5quant 0.975quant mode
-(Intercept) 0.9190773 0.09700791 0.72564595 0.9201586   1.106371   NA
-X1          0.8785882 0.45035113 0.04399411 0.8624033   1.811277   NA
-X2          1.1876233 0.15757121 0.87856758 1.1873152   1.496931   NA
-                     kld
-(Intercept) 3.684991e-07
-X1          1.101520e-04
-X2          5.214074e-06
-```
-
-
----
-
+,
 # The `copy` feature
 
-- It is used when a latent field is needed more than once in the model formulation.
+- When we have a joint model with several likelihood, it can happen that a random effect is shared, i.e. more than one linear predictor include the same effect. 
+
+
+
 &lt;span style="display:block; margin-top: 10px ;"&gt;&lt;/span&gt;
 
--  This feature fixes a limitation in the `formula`.  Recall that the model
+-  In `R-INLA` when we have a model defined with the following formula
 
 ```r
 &gt; formula = y ~ f(idx1, model1, ...) + f(idx2, model2, ...)
 ```
-only allows ONE element from each sub-model to contribute to the linear predictor for each observation. This means that the linear predictor is connected to ONE element of the random effect `idx1` and to ONE element of the random effect `idx2`.
+it means that only one element from each sub-model contributes to the linear predictor for each observation. This means that the linear predictor is connected to only one element of the random effect `idx1` and to only one element of the random effect `idx2`.
 
 &lt;span style="display:block; margin-top: 10px ;"&gt;&lt;/span&gt;
-- This is not sufficient when we need to share the same effect and this will be estimated by using tow or more parts of the dataset. 
+- This is not sufficient when we need to share the same effect among two or more linear predictors and this will be estimated by using two or more parts of the dataset. 
+
+&lt;span style="display:block; margin-top: 10px ;"&gt;&lt;/span&gt;
+- The solution for this is the `copy` feature. Formally, it defines a copy of a generic effect `\(\theta\)` as `\(\theta^{\star}=\beta \theta + \epsilon\)`, where `\(\epsilon \sim \text {Normal}(0, b)\)`, with `\(b\)`  being a large and fixed value, and `\(\beta\)`  is a hyperparameter. By fixing `\(\beta=1\)`, it means that `\(\theta^{\star}\)`  is an exact copy of `\(\theta\)`. According to the specification of the `fixed` option (`TRUE` or `FALSE`), the hyperparameter is kept fixed or estimated.
 
 ---
 
