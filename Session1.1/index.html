@@ -332,21 +332,21 @@ Upon varying the form of the functions `\(\class{myblue}{f_l(\cdot)}\)`, this fo
 
 - Survival models, logGaussian Cox Processes, etc.
 
----
+&lt;!-- # MCMC and LGMs --&gt;
 
-# MCMC and LGMs
+&lt;!-- - (Standard) MCMC methods can perform poorly when applied to (non-trivial) LGMs. This is due to several factors --&gt;
+&lt;!-- &lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt; --&gt;
 
-- (Standard) MCMC methods can perform poorly when applied to (non-trivial) LGMs. This is due to several factors
-&lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
-
-  - The components of the latent Gaussian field `\(\class{myblue}{\bm{\theta}}\)` tend to be highly correlated, thus impacting on convergence and autocorrelation
-  &lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
-  - Especially when the number of observations is large, `\(\class{myblue}{\bm{\theta}}\)` and `\(\class{myblue}{\bm\psi}\)` also tend to be highly correlated
-  &lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
-  - Time to run can be very long
+&lt;!--   - The components of the latent Gaussian field `\(\class{myblue}{\bm{\theta}}\)` tend to be highly correlated, thus impacting on convergence and autocorrelation --&gt;
+&lt;!--   &lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt; --&gt;
+&lt;!--   - Especially when the number of observations is large, `\(\class{myblue}{\bm{\theta}}\)` and `\(\class{myblue}{\bm\psi}\)` also tend to be highly correlated --&gt;
+&lt;!--   &lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt; --&gt;
+&lt;!--   - Time to run can be very long --&gt;
 
 
-- Blocking and overparameterisation can **alleviate**, but rarely eliminate the problem
+&lt;!-- - Blocking and overparameterisation can **alleviate**, but rarely eliminate the problem --&gt;
+
+&lt;!-- --- --&gt;
 
 ---
 
@@ -455,18 +455,15 @@ or equivalently
 # Laplace approximation --- example
 
 .panelset[
-.panel[.panel-name[Fig1]
-&lt;img src="./img/fig1-1.png" style="display: block; margin: auto;" width="50%"&gt;
-]
-.panel[.panel-name[Fig 2]
+.panel[.panel-name[Fig 1]
 &lt;img src="./img/fig2-1.png" style="display: block; margin: auto;" width="50%"&gt;
 ]
 
-.panel[.panel-name[Fig 3]
+.panel[.panel-name[Fig 2]
 &lt;img src="./img/fig3-1.png" style="display: block; margin: auto;" width="50%"&gt;
 ]
 
-.panel[.panel-name[Fig 4]
+.panel[.panel-name[Fig 3]
 &lt;img src="./img/fig4-1.png" style="display: block; margin: auto;" width="50%"&gt;
 ]
 ]
@@ -547,7 +544,7 @@ or equivalently
 
 1\. can be easily estimated as
 
-`$$\class{red}{p(\boldsymbol\psi\mid\boldsymbol{y})} \class{black}{= \frac{p(\boldsymbol\theta,\boldsymbol\psi\mid\boldsymbol{y})}{p(\boldsymbol\theta\mid\boldsymbol\psi,\boldsymbol{y})}}$$`
+`$$\class{red}{p(\boldsymbol\psi\mid\boldsymbol{y})} \class{black}{= \frac{p(\boldsymbol\theta,\boldsymbol\psi\mid\boldsymbol{y})}{p(\boldsymbol\theta\mid\boldsymbol\psi,\boldsymbol{y})}} \text{ (Recall slide 14)}$$`
 
 ---
 
@@ -559,7 +556,7 @@ count:false
 
 `\begin{align}
 \class{red}{p(\boldsymbol\psi\mid\boldsymbol{y})} &amp; \class{black}{= \frac{p(\boldsymbol\theta,\boldsymbol\psi\mid\boldsymbol{y})}{p(\boldsymbol\theta\mid\boldsymbol\psi,\boldsymbol{y})}}\\
-&amp; =\frac{p(\boldsymbol{y}\mid\boldsymbol\theta,\boldsymbol\psi)p(\boldsymbol\theta,\boldsymbol\psi)}{p(\boldsymbol{y})}\frac{1}{p(\boldsymbol\theta\mid\boldsymbol\psi,\boldsymbol{y})}
+&amp; =\frac{p(\boldsymbol{y}\mid\boldsymbol\theta,\boldsymbol\psi)p(\boldsymbol\theta,\boldsymbol\psi)}{p(\boldsymbol{y})}\frac{1}{p(\boldsymbol\theta\mid\boldsymbol\psi,\boldsymbol{y})} \text{ (Bayes' theorem)}
 \end{align}`
 
 ---
@@ -573,7 +570,7 @@ count:false
 `\begin{align}
 \class{red}{p(\boldsymbol\psi\mid\boldsymbol{y})} &amp; \class{black}{= \frac{p(\boldsymbol\theta,\boldsymbol\psi\mid\boldsymbol{y})}{p(\boldsymbol\theta\mid\boldsymbol\psi,\boldsymbol{y})}}\\
 &amp; =\frac{p(\boldsymbol{y}\mid\boldsymbol\theta,\boldsymbol\psi)p(\boldsymbol\theta,\boldsymbol\psi)}{p(\boldsymbol{y})}\frac{1}{p(\boldsymbol\theta\mid\boldsymbol\psi,\boldsymbol{y})}\\
-&amp;=\frac{p(\boldsymbol{y}\mid\boldsymbol\theta, \boldsymbol \psi)p(\boldsymbol\theta\mid\boldsymbol\psi)p(\boldsymbol\psi)}{p(\boldsymbol{y})}\frac{1}{p(\boldsymbol\theta\mid\boldsymbol\psi,\boldsymbol{y})}\
+&amp;=\frac{p(\boldsymbol{y}\mid\boldsymbol\theta, \boldsymbol \psi)p(\boldsymbol\theta\mid\boldsymbol\psi)p(\boldsymbol\psi)}{p(\boldsymbol{y})}\frac{1}{p(\boldsymbol\theta\mid\boldsymbol\psi,\boldsymbol{y})} \text{ (Conditional probability)}
 \end{align}`
 
 ---
@@ -588,7 +585,7 @@ count:false
   \class{red}{p(\boldsymbol\psi\mid\boldsymbol{y})} &amp; \class{black}{= \frac{p(\boldsymbol\theta,\boldsymbol\psi\mid\boldsymbol{y})}{p(\boldsymbol\theta\mid\boldsymbol\psi,\boldsymbol{y})}}\\
   &amp; =\frac{p(\boldsymbol{y}\mid\boldsymbol\theta,\boldsymbol\psi)p(\boldsymbol\theta,\boldsymbol\psi)}{p(\boldsymbol{y})}\frac{1}{p(\boldsymbol\theta\mid\boldsymbol\psi,\boldsymbol{y})}\\
 &amp;=\frac{p(\boldsymbol{y}\mid\boldsymbol\theta, \boldsymbol \psi)p(\boldsymbol\theta\mid\boldsymbol\psi)p(\boldsymbol\psi)}{p(\boldsymbol{y})}\frac{1}{p(\boldsymbol\theta\mid\boldsymbol\psi,\boldsymbol{y})}\\ 
-&amp; \propto \frac{p(\boldsymbol\psi)p(\boldsymbol\theta\mid\boldsymbol\psi)p(\boldsymbol{y}\mid\boldsymbol\theta,\boldsymbol y)}{p(\boldsymbol\theta\mid\boldsymbol\psi,\boldsymbol{y})}
+&amp; \propto \frac{p(\boldsymbol\psi)p(\boldsymbol\theta\mid\boldsymbol\psi)p(\boldsymbol{y}\mid\boldsymbol\theta,\boldsymbol \psi)}{p(\boldsymbol\theta\mid\boldsymbol\psi,\boldsymbol{y})}
 \end{align}`
 
 ---
@@ -603,13 +600,13 @@ count:false
 \class{red}{p(\boldsymbol\psi\mid\boldsymbol{y})} &amp; \class{black}{= \frac{p(\boldsymbol\theta,\boldsymbol\psi\mid\boldsymbol{y})}{p(\boldsymbol\theta\mid\boldsymbol\psi,\boldsymbol{y})}}\\
 &amp; =\frac{p(\boldsymbol{y}\mid\boldsymbol\theta,\boldsymbol\psi)p(\boldsymbol\theta,\boldsymbol\psi)}{p(\boldsymbol{y})}\frac{1}{p(\boldsymbol\theta\mid\boldsymbol\psi,\boldsymbol{y})}\\
 &amp;=\frac{p(\boldsymbol{y}\mid\boldsymbol\theta, \boldsymbol \psi)p(\boldsymbol\theta\mid\boldsymbol\psi)p(\boldsymbol\psi)}{p(\boldsymbol{y})}\frac{1}{p(\boldsymbol\theta\mid\boldsymbol\psi,\boldsymbol{y})}\\ 
-&amp; \propto \frac{p(\boldsymbol\psi)p(\boldsymbol\theta\mid\boldsymbol\psi)p(\boldsymbol{y}\mid\boldsymbol\theta,\boldsymbol y)}{p(\boldsymbol\theta\mid\boldsymbol\psi,\boldsymbol{y})}\\
+&amp; \propto \frac{p(\boldsymbol\psi)p(\boldsymbol\theta\mid\boldsymbol\psi)p(\boldsymbol{y}\mid\boldsymbol\theta,\boldsymbol \psi)}{p(\boldsymbol\theta\mid\boldsymbol\psi,\boldsymbol{y})}\\
 &amp; \approx \left. \frac{p(\boldsymbol\psi)p(\boldsymbol\theta\mid\boldsymbol\psi)p(\boldsymbol{y}\mid\boldsymbol\theta)}{\tilde{p}(\boldsymbol\theta\mid\boldsymbol\psi,\boldsymbol{y})}\right |_{\boldsymbol\theta={\boldsymbol\theta}^*(\boldsymbol\psi)} =: \class{red}{\tilde{p}(\boldsymbol\psi\mid\boldsymbol{y})}
 \end{align}`
 
 where 
 
-- `\(\tilde{p}(\boldsymbol\theta\mid\boldsymbol\psi,\boldsymbol{y})\)` is the Laplace approximation of `\(p(\boldsymbol\theta\mid\boldsymbol\psi,\boldsymbol{y})\)` 
+- `\(\tilde{p}(\boldsymbol\theta\mid\boldsymbol\psi,\boldsymbol{y})\)` is the Gaussian approximation given by the Laplace method  of `\(p(\boldsymbol\theta\mid\boldsymbol\psi,\boldsymbol{y})\)` 
 - `\(\boldsymbol\theta={\boldsymbol\theta}^*(\boldsymbol\psi)\)` is its mode for a given `\(\boldsymbol \psi\)`
 
 ---
@@ -723,46 +720,47 @@ count:false
 
   - If extra precision is required, it is possible to run the full Laplace approximation --- of course at the expense of running time!
 
----
 
-# Integrated Nested Laplace Approximation (INLA)
+&lt;!-- # Integrated Nested Laplace Approximation (INLA) --&gt;
 
-Operationally, the INLA algorithm proceeds with the following steps:
+&lt;!-- Operationally, the INLA algorithm proceeds with the following steps: --&gt;
 
-1\. Explore the joint posterior for the hyperparameters `\(\class{red}{\tilde{p}(\boldsymbol\psi\mid\boldsymbol{y})}\)` and produce a grid of  *good* integration points  `\(\color{olive}{\{\boldsymbol\psi^{(j)}\}}\)` associated with the bulk of the mass, together with a corresponding set of area weights `\(\color{olive}{\{\Delta_j\}}\)`: 
-
-
-.pull-left[
-&lt;center&gt;&lt;img src=./img/hyper_GRID.png width='70%' title=''&gt;&lt;/center&gt;
-.center[.blue[Grid strategy]]
-]
+&lt;!-- 1\. Explore the joint posterior for the hyperparameters `\(\class{red}{\tilde{p}(\boldsymbol\psi\mid\boldsymbol{y})}\)` and produce a grid of  *good* integration points  `\(\color{olive}{\{\boldsymbol\psi^{(j)}\}}\)` associated with the bulk of the mass, together with a corresponding set of area weights `\(\color{olive}{\{\Delta_j\}}\)`:  --&gt;
 
 
-.pull-right[
-&lt;center&gt;&lt;img src=./img/hyper_CCD.png width='70%' title=''&gt;&lt;/center&gt;
-.center[.blue[Central Composite Design strategy (CCD)]]
-]
+&lt;!-- .pull-left[ --&gt;
+&lt;!-- &lt;center&gt;&lt;img src=./img/hyper_GRID.png width='70%' title=''&gt;&lt;/center&gt; --&gt;
+&lt;!-- .center[.blue[Grid strategy]] --&gt;
+&lt;!-- ] --&gt;
 
-The CCD strategy is the default one in `R-INLA`: it produces a lower number of points which are however enough to capture the variability of the joint distribution (see Martins, Simpson, Lindgren, et al. (2013)).
 
----
+&lt;!-- .pull-right[ --&gt;
+&lt;!-- &lt;center&gt;&lt;img src=./img/hyper_CCD.png width='70%' title=''&gt;&lt;/center&gt; --&gt;
+&lt;!-- .center[.blue[Central Composite Design strategy (CCD)]] --&gt;
+&lt;!-- ] --&gt;
 
-# Integrated Nested Laplace Approximation (INLA)
+&lt;!-- The CCD strategy is the default one in `R-INLA`: it produces a lower number of points which are however enough to capture the variability of the joint distribution (see Martins, Simpson, Lindgren, et al. (2013)). --&gt;
 
-2\. After the grid exploration:
-  - Obtain the marginal posterior `\(\class{red}{\tilde{p}(\psi_k\mid\boldsymbol{y})}\)` using an interpolation algorithm based on the values of the density  `\(\class{red}{\tilde{p}(\boldsymbol\psi\mid\boldsymbol{y})}\)` evaluated in the integration points `\(\color{olive}{\{\psi^{(j)}_k\}}\)`
+&lt;!-- --- --&gt;
 
---
+&lt;!-- # Integrated Nested Laplace Approximation (INLA) --&gt;
 
-  - Evaluate the conditional posteriors `\(\color{orange}{\tilde{p}(\theta_i\mid\boldsymbol\psi^{(j)},\boldsymbol{y})}\)` on a grid of selected values for `\(\theta_i\)`.
+&lt;!-- 2\. After the grid exploration: --&gt;
+&lt;!--   - Obtain the marginal posterior `\(\class{red}{\tilde{p}(\psi_k\mid\boldsymbol{y})}\)` using an interpolation algorithm based on the values of the density  `\(\class{red}{\tilde{p}(\boldsymbol\psi\mid\boldsymbol{y})}\)` evaluated in the integration points `\(\color{olive}{\{\psi^{(j)}_k\}}\)` --&gt;
 
---
+&lt;!-- -- --&gt;
 
-3\. Obtain the marginal posteriors `\(\color{\myblue}{\tilde{p}(\theta_i\mid\boldsymbol{y})}\)` using .olive[**numerical integration**] `\(^{[1]}\)`
-`$$\color{myblue}{\tilde{p}(\theta_i\mid\boldsymbol{y})} \approx \sum_{j} \color{red}{\tilde{p}(\boldsymbol\psi^{(j)}\mid\boldsymbol{y})}\color{orange}{\tilde{p}(\theta_i\mid\boldsymbol\psi^{(j)},\boldsymbol{y})}\color{olive}{\Delta_j}$$`
+&lt;!--   - Evaluate the conditional posteriors `\(\color{orange}{\tilde{p}(\theta_i\mid\boldsymbol\psi^{(j)},\boldsymbol{y})}\)` on a grid of selected values for `\(\theta_i\)`. --&gt;
 
-.footnote[[1]: Recall from slide 20 that `\(\color{myblue}{p(\theta_i\mid\boldsymbol{y})} = \int p(\theta_i,\boldsymbol\psi\mid \boldsymbol{y}) d\boldsymbol\psi = \int \class{red}{p(\boldsymbol\psi\mid\boldsymbol{y})} \color{orange}{p(\theta_i \mid \boldsymbol\psi,\boldsymbol{y})} d\boldsymbol\psi\)`
-]
+&lt;!-- -- --&gt;
+
+&lt;!-- 3\. Obtain the marginal posteriors `\(\color{\myblue}{\tilde{p}(\theta_i\mid\boldsymbol{y})}\)` using .olive[**numerical integration**] `\(^{[1]}\)` --&gt;
+&lt;!-- `$$\color{myblue}{\tilde{p}(\theta_i\mid\boldsymbol{y})} \approx \sum_{j} \color{red}{\tilde{p}(\boldsymbol\psi^{(j)}\mid\boldsymbol{y})}\color{orange}{\tilde{p}(\theta_i\mid\boldsymbol\psi^{(j)},\boldsymbol{y})}\color{olive}{\Delta_j}$$` --&gt;
+
+&lt;!-- .footnote[[1]: Recall from slide 20 that `\(\color{myblue}{p(\theta_i\mid\boldsymbol{y})} = \int p(\theta_i,\boldsymbol\psi\mid \boldsymbol{y}) d\boldsymbol\psi = \int \class{red}{p(\boldsymbol\psi\mid\boldsymbol{y})} \color{orange}{p(\theta_i \mid \boldsymbol\psi,\boldsymbol{y})} d\boldsymbol\psi\)` --&gt;
+&lt;!-- ] --&gt;
+
+&lt;!-- --- --&gt;
 
 ---
 
@@ -1171,7 +1169,7 @@ We specify a simple regression model with `Petal.length` and `Petal.width` as de
 Call:
    "inla(formula = formula, family = \"gaussian\", data = iris)" 
 Time used:
-    Pre = 0.281, Running = 0.0969, Post = 0.0184, Total = 0.396 
+    Pre = 0.263, Running = 0.0748, Post = 0.0248, Total = 0.362 
 Fixed effects:
              mean    sd 0.025quant 0.5quant 0.975quant  mode kld
 (Intercept) 1.084 0.073      0.940    1.084      1.227 1.084   0
@@ -1324,7 +1322,7 @@ Precision for the Gaussian observations    5.48995 4.372888
 ```
 
 ```
-[1] 2.186692 2.235088 2.235310 2.223369
+[1] 2.182906 2.247270 2.180414 2.199675
 ```
 
 ]
