@@ -127,7 +127,7 @@ At the end of this session you should be able to:
 
 &lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
 
-- implement a joint model with multiple likelihoods by using `R-ILA`;
+- implement a joint model with multiple likelihoods by using `R-ILA` and `inlabru`;
 
 
 &lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
@@ -150,16 +150,21 @@ The topics treated in this lecture can be partially found in **Chapter 8** of th
 
 &lt;span style="display:block; margin-top: 30px ;"&gt;&lt;/span&gt;
 
-1\. [Joint model with multiple likelihoods](#stprocess)
+1\. [Joint model with multiple likelihoods](#jointmodel)
 
 &lt;span style="display:block; margin-top: 30px ;"&gt;&lt;/span&gt;
 
-2\. [Implementation of a spatio-temporal process using `inlabru`](#stinlabru)
+2\. [The `copy` feature](#copyfeature)
+
+
+&lt;span style="display:block; margin-top: 30px ;"&gt;&lt;/span&gt;
+
+3\. [Two likelihoods model with shared spatial effect using `inlabru`](#stinlabru)
 
 
 ---
 
-name: stprocess
+name: jointmodel
   
 &lt;span style="display:block; margin-top: 250px ;"&gt;&lt;/span&gt;
 
@@ -191,7 +196,7 @@ and the other follows a Poisson distribution)
 
 ---
 
-# Two likelihoods model with shared covariate and different intercepts
+# Two likelihoods model: example
 
 This example shows how to use information from two data sources (Binomial and Poisson distribution) to estimate the effect of a common covariate `\(x\)` and of two different intercepts.
 
@@ -248,17 +253,18 @@ where `\(\eta_{2i} = \gamma + \beta_1 x_{2i}\)`
 - Define the **block matrix** for the two intercepts:
 
 ```r
-&gt; intercept1 = numeric(n+m)
+&gt; intercept1 = numeric(n+m) #empty vector
 &gt; intercept1[1:n] = 1
 &gt; intercept1[(n+1):(n+m)] = NA
 &gt; 
-&gt; intercept2 = numeric(n+m)
+&gt; intercept2 = numeric(n+m) #empty vector
 &gt; intercept2[1:n] = NA
 &gt; intercept2[(n+1):(n+m)] = 1
 ```
 
 - With this approach every row has only a single observed value.
 - Covariates and latent effects can be indexed from 1 to `\(n+m\)`. When a covariate or effect must only affect observations in a single likelihood, the values of the indices for the other likelihood must be set to `NA`.
+
 ---
 
 # Two likelihoods model: implementation with `inla`
@@ -273,8 +279,8 @@ where `\(\eta_{2i} = \gamma + \beta_1 x_{2i}\)`
 &gt; 
 &gt; library(INLA)
 &gt; output = inla(formula,
-*+               data = list(y=y, intercept1=intercept1,
-+                           intercept2=intercept2, x=x), 
+*+               data = list(y = y, intercept1 = intercept1,
++                           intercept2 = intercept2, x = x), 
 *+               family = c("binomial", "Poisson"),
 +               Ntrials = Ntrials)
 &gt; 
@@ -283,9 +289,9 @@ where `\(\eta_{2i} = \gamma + \beta_1 x_{2i}\)`
 
 ```
                 mean 0.025quant 0.975quant
-intercept1 1.1208594  0.6274275   1.660674
-intercept2 2.0762432  1.9877198   2.163558
-x          0.8913912  0.7576659   1.025319
+intercept1 0.9557212  0.4789041   1.472898
+intercept2 2.0236658  1.9330591   2.112957
+x          0.9511763  0.8114298   1.091260
 ```
 
 ---
@@ -316,22 +322,25 @@ x          0.8913912  0.7576659   1.025319
 ```
 
 ```
-               mean 0.025quant 0.975quant
-Intercept1 1.120859  0.6274233   1.660678
-Intercept2 2.076243  1.9876988   2.163581
-x          0.891391  0.7576519   1.025333
+                mean 0.025quant 0.975quant
+Intercept1 0.9557213  0.4789015   1.472903
+Intercept2 2.0236658  1.9330383   2.112979
+x          0.9511766  0.8114168   1.091274
 ```
+
+---
+
+name: copyfeature
+  
+&lt;span style="display:block; margin-top: 250px ;"&gt;&lt;/span&gt;
+
+.myblue[.center[.huge[
+**The `copy` feature**]]]
 
 
 ---
-,
+
 # The `copy` feature
-
-- When we have a joint model with several likelihood, it can happen that a random effect is shared, i.e. more than one linear predictor include the same effect. 
-
-
-
-&lt;span style="display:block; margin-top: 10px ;"&gt;&lt;/span&gt;
 
 -  In `R-INLA` when we have a model defined with the following formula
 
@@ -340,23 +349,136 @@ x          0.891391  0.7576519   1.025333
 ```
 it means that only one element from each sub-model contributes to the linear predictor for each observation. This means that the linear predictor is connected to only one element of the random effect `idx1` and to only one element of the random effect `idx2`.
 
-&lt;span style="display:block; margin-top: 10px ;"&gt;&lt;/span&gt;
-- This is not sufficient when we need to share the same effect among two or more linear predictors and this will be estimated by using two or more parts of the dataset. 
+&lt;span style="display:block; margin-top: 30px ;"&gt;&lt;/span&gt;
+- This is not sufficient when an element of a model is needed more than once for each observation or when the same effect is shared among two or more linear predictors (and will be estimated by using two or more parts of the dataset). 
 
 &lt;span style="display:block; margin-top: 10px ;"&gt;&lt;/span&gt;
-- The solution for this is the `copy` feature. Formally, it defines a copy of a generic effect `\(\theta\)` as `\(\theta^{\star}=\beta \theta + \epsilon\)`, where `\(\epsilon \sim \text {Normal}(0, b)\)`, with `\(b\)`  being a large and fixed value, and `\(\beta\)`  is a hyperparameter. By fixing `\(\beta=1\)`, it means that `\(\theta^{\star}\)`  is an exact copy of `\(\theta\)`. According to the specification of the `fixed` option (`TRUE` or `FALSE`), the hyperparameter is kept fixed or estimated.
+- The solution for this is the `copy` feature. Formally, it defines a copy of a generic effect `\(\theta\)` as `$$\theta^{\star}=\beta \theta + \epsilon$$` where `\(\epsilon \sim \text {Normal}(0, b)\)`, with `\(b\)`  being a large and fixed value ($\epsilon$ is a tiny error), and `\(\beta\)` is a hyperparameter. By fixing `\(\beta=1\)`, it means that `\(\theta^{\star}\)`  is an exact copy of `\(\theta\)`. According to the specification of the `fixed` option (`TRUE` or `FALSE`), the hyperparameter `\(\beta\)` is kept fixed or estimated.
+
+&lt;span style="display:block; margin-top: 10px ;"&gt;&lt;/span&gt;
+- Several copies of the same effect can be created and all will share the same hyperparameters. 
 
 ---
 
-# Two likelihoods and shared spatial effect
+# The `copy feature`: example
+
+The following example considers a Gaussian likelihood whose linear predictor includes two correlated random effects - `\(a\)` and `\(b\)` - coming from a bivariate Normal distribution: 
+
+&lt;span style="display:block; margin-top: 10px ;"&gt;&lt;/span&gt;
+`$$y_i \sim Normal(\eta_i,\tau^{-1}), \qquad i=1,\ldots,n$$` 
+where the linear predictor is given by
+`$$\eta_i=a_i+b_iz_i$$`
+and
+`$$(a_i,b_i)\overset{iid}\sim Normal(\bm 0, \bm Q^{-1})$$`
+The term `\(z_i\)` refers to a known covariate. 
+
+&lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
+In `R-INLA` the bivariate Gaussian model is implemented with
+`f(index, model = "iid2d", ...)`
+but this does not allow to have each `\(\eta_i\)` connected to two elements of the same (bi-variate Gaussian) model. We will use `copy`!
+
+---
+
+# The `copy feature`: data simulation
+We simulate `\(n=1000\)` values from the previous model with `\(\tau= \tau_a=\tau_b=1\)`, `\(\rho_{ab}=0.8\)`.
+
+```r
+&gt; set.seed(3)
+&gt; n = 1000
+&gt; z = rnorm(n) #covariate
+&gt; 
+&gt; Sigma = matrix(c(1, 0.8, 0.8, 1), 2, 2) # var-cov matrix
+&gt; library(mvtnorm)
+&gt; ab = rmvnorm(n, sigma = Sigma) #bivariate normal
+&gt; a = ab[, 1]
+&gt; b = ab[, 2]
+&gt; 
+&gt; eta = a + b * z #linear predictor
+&gt; y = eta + rnorm(n, sd = 1) #response variable
+```
+
+---
+
+# The `copy` feature: implementation with `inla`
+The `iid2d` model is represented internally as one vector of length `\(2n\)`. We set the indexes correspondingly and define the formula with the `copy` feature:
+
+```r
+&gt; i = 1 : n # use only the first n elements (a_1, ..., a_n)
+&gt; j = (n+1) : (2*n) # use only the last n elements (b_1, ..., b_n)
+&gt; 
+&gt; formula = y ~ -1 + f(i, model = "iid2d", n = 2*n) + f(j, z, copy = "i",fixed=TRUE) 
+```
+
+And finally run inla:
+
+```r
+&gt; result = inla(formula,
++               data = data.frame(y = y, z = z, i = i, j = j),
++               family = "gaussian")
+&gt; result$summary.hyperpar[,c("mean", "0.025quant", "0.975quant")]
+```
+
+```
+                                             mean 0.025quant 0.975quant
+Precision for the Gaussian observations 1.0757964  0.8536628  1.3287137
+Precision for i (component 1)           0.9783850  0.7767089  1.2274618
+Precision for i (component 2)           1.4771635  1.1474891  1.8748224
+Rho1:2 for i                            0.7565963  0.6793477  0.8226678
+```
+
+---
+
+# The `copy` feature: implementation with `inlabru`
+
+
+```r
+&gt; # Model components
+&gt; comp = y ~ eff(i, model = "iid2d", n = 2*n) + eff2(j, z, copy = "eff", fixed=T) 
+```
+Note that in `inlabru` when using `copy` we refer to the effect name and not to the index name.
+
+
+```r
+&gt; # Likelihood
+&gt; lik = like("gaussian",
++            formula = y ~ + eff + eff2,
++            data = data.frame(y = y, z = z, i = i, j = j))
+&gt; 
+&gt; # Run inlabru
+&gt; resultinlabru = bru(comp, lik)
+&gt; resultinlabru$summary.hyperpar[,c("mean", "0.025quant", "0.975quant")]
+```
+
+```
+                                             mean 0.025quant 0.975quant
+Precision for the Gaussian observations 1.1338876  0.7552099  1.6477099
+Precision for eff (component 1)         0.9466587  0.5844661  1.4266440
+Precision for eff (component 2)         1.5311295  1.0203687  2.2336774
+Rho1:2 for eff                          0.7430300  0.6308005  0.8315172
+```
+
+---
+
+name: stinlabru
+  
+&lt;span style="display:block; margin-top: 250px ;"&gt;&lt;/span&gt;
+
+.myblue[.center[.huge[
+**Two likelihoods model with shared spatial effect using `inlabru`**]]]
+
+
+
+---
+
+# Two likelihoods and shared spatial effect: example
 
 .panelset[
 .panel[.panel-name[Model]
 
-- We consider two sets of observations (with `\(n_1\)` and `\(n_2\)` observations):
+- We consider two sets of observations in space (with `\(n_1\)` and `\(n_2\)` locations):
 `\begin{align}
-y_{i1} &amp;\sim \text{Normal}(\beta_1 +\gamma_1 x_{i1} + \xi_{i}, \sigma^2_1)\\
-y_{i2} &amp;\sim \text{Normal}(\beta_2 +\gamma_2 x_{i2} + \xi_{i}, \sigma^2_2)\\
+y_{1i} &amp;\sim \text{Normal}(\beta_1 +\gamma_1 x_{i} + \xi_{i}, \sigma^2_1) \qquad i=1,\ldots,n\\
+y_{2i} &amp;\sim \text{Normal}(\beta_2 +\gamma_2 z_{i} + \xi_{i}, \sigma^2_2)\qquad i=1,\ldots,m\\
 \end{align}`
 
 &lt;span style="display:block; margin-top: 10px ;"&gt;&lt;/span&gt;
@@ -364,7 +486,7 @@ y_{i2} &amp;\sim \text{Normal}(\beta_2 +\gamma_2 x_{i2} + \xi_{i}, \sigma^2_2)\\
 &lt;span style="display:block; margin-top: 10px ;"&gt;&lt;/span&gt;
 - The random effect `\(\xi\)` is a  shared GF with range `\(r\)` and variance `\(\sigma^2\)`.  It enters both in the linear predictor of `\(y_1\)` and `\(y_2\)`.
 &lt;span style="display:block; margin-top: 10px ;"&gt;&lt;/span&gt;
-- For the simulation we use the following values: `\(\beta_1=3\)`, `\(\gamma_1=2\)`, `\(\sigma^2_1=0.3\)`, `\(\beta_2=10\)`, `\(\gamma_2=0.5\)`, `\(\sigma^2_2=0.2\)`, `\(r=4\)`, `\(\sigma^2=\sqrt{0.5}\)`.
+- For the simulation we use: `\(n=100\)`, `\(m=50\)`, `\(\beta_1=3\)`, `\(\gamma_1=2\)`, `\(\sigma^2_1=0.3\)`, `\(\beta_2=10\)`, `\(\gamma_2=0.5\)`, `\(\sigma^2_2=0.2\)`, `\(r=4\)`, `\(\sigma^2=\sqrt{0.5}\)`.
 ]
 
 
@@ -452,6 +574,7 @@ Stdev for field                            0.8570362  0.5722699   1.231279
 ```
 
 ---
+
 # Fixed effects
 
 
@@ -461,6 +584,7 @@ Stdev for field                            0.8570362  0.5722699   1.231279
 .pull-right[
 &lt;img src="./img/fixedeffectout2-1.png" &gt;
 ]
+
 ---
 
 # Spatial parameters
