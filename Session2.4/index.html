@@ -127,7 +127,7 @@ At the end of this session you should be able to:
 
 &lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
 
-- implement a joint model with multiple likelihoods by using `R-ILA` and `inlabru`;
+- implement a joint model with multiple likelihoods by using `R-INLA` and `inlabru`;
 
 
 &lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
@@ -162,6 +162,12 @@ The topics treated in this lecture can be partially found in **Chapter 8** of th
 3\. [Two likelihoods model with shared spatial effect using `inlabru`](#stinlabru)
 
 
+
+&lt;span style="display:block; margin-top: 30px ;"&gt;&lt;/span&gt;
+
+4\. [Conclusions](#conclusions)
+
+
 ---
 
 name: jointmodel
@@ -180,7 +186,7 @@ name: jointmodel
 - In many situations you need to combine data from different sources and/or differente characteristics. For example:
 &lt;span style="display:block; margin-top: 10px ;"&gt;&lt;/span&gt;
   - a subset of the data follows a Gaussian distribution
-and the other follows a Poisson distribution)
+and the other follows a Poisson distribution
 &lt;span style="display:block; margin-top: 10px ;"&gt;&lt;/span&gt;
   - the data come from the same distribution but with different hyperparameters (e.g. one subset of the data comes from a Gaussian distribution with precision `\(\tau_1\)` and the other from a Gaussian with precision `\(\tau_2\)`).
 
@@ -205,37 +211,45 @@ This example shows how to use information from two data sources (Binomial and Po
 - **Likelihood 1**: 
 `$$y_{1i} \sim Bin\left(n=1, p_i=\frac{\eta_{1i}}{1+\eta_{1i}}\right) \qquad i=1,\ldots,n$$` 
 &lt;span style="display:block; margin-top: 10px ;"&gt;&lt;/span&gt;
-where `\(\eta_{1i} = \alpha + \beta_1 x_{1i}\)`
+where `\(\eta_{1i} = \alpha_1 + b x_{i}\)`
 
 &lt;span style="display:block; margin-top: 30px ;"&gt;&lt;/span&gt;
 
 - **Likelihood 2**: 
 `$$y_{2i} \sim Poisson\left(\lambda_i=\exp(\eta_{2i})\right)\qquad i= 1,\ldots,m$$`
 &lt;span style="display:block; margin-top: 10px ;"&gt;&lt;/span&gt;
-where `\(\eta_{2i} = \gamma + \beta_1 x_{2i}\)`
+where `\(\eta_{2i} = \alpha_2 + b x_{i}\)`
 
 ---
 
 # Two likelihoods model: data simulation
+- The use the following values for the simulation: `\(\alpha_1=1\)`, `\(\alpha_2=2\)`, `\(b=1\)`.
+&lt;span style="display:block; margin-top: 10px ;"&gt;&lt;/span&gt;
+
+- The covariate values are simulated from an Uniform(0,1) distribution:
+
+```r
+&gt; set.seed(44)
+&gt; n = 100
+&gt; m = 200
+&gt; x = runif(n+m)
+```
+
 
 - We simulate `\(n=100\)` data from the **Binomial** distribution:
 
 ```r
-&gt; n = 100
-&gt; x1 = runif(n)
-&gt; eta1 = 1 + x1 #linear predictor 1
+&gt; eta1 = 1 + x[1:n] #linear predictor 1
 &gt; y1 = rbinom(n, size = 1, prob = exp(eta1)/(1+exp(eta1)))
-&gt; df1 = data.frame(x = x1, y = y1)
+&gt; df1 = data.frame(x = x[1:n], y = y1) #used later for inlabru
 ```
 
 - We simulate `\(m=200\)` data from the **Poisson** distribution
 
 ```r
-&gt; m = 200
-&gt; x2 = runif(m) 
-&gt; eta2 = 2 + x2 #linear predictor 2
+&gt; eta2 = 2 + x[(n+1):(n+m)] #linear predictor 2
 &gt; y2 = rpois(m, exp(eta2))
-&gt; df2 = data.frame(x = x2, y = y2)
+&gt; df2 = data.frame(x = x[(n+1):(n+m)], y = y2) #used later for inlabru
 ```
 
 ---
@@ -272,9 +286,6 @@ where `\(\eta_{2i} = \gamma + \beta_1 x_{2i}\)`
 - Fit the model with `inla`:
 
 ```r
-&gt; # Covariate vector
-&gt; x = c(x1, x2)
-&gt; 
 &gt; formula = y  ~ -1 + intercept1 + intercept2 + x #all the terms
 &gt; 
 &gt; library(INLA)
@@ -289,9 +300,9 @@ where `\(\eta_{2i} = \gamma + \beta_1 x_{2i}\)`
 
 ```
                 mean 0.025quant 0.975quant
-intercept1 0.9557212  0.4789041   1.472898
-intercept2 2.0236658  1.9330591   2.112957
-x          0.9511763  0.8114298   1.091260
+intercept1 1.5631593  0.9917147   2.208470
+intercept2 1.9944530  1.9064574   2.081208
+x          0.9853335  0.8509042   1.119944
 ```
 
 ---
@@ -323,9 +334,9 @@ x          0.9511763  0.8114298   1.091260
 
 ```
                 mean 0.025quant 0.975quant
-Intercept1 0.9557213  0.4789015   1.472903
-Intercept2 2.0236658  1.9330383   2.112979
-x          0.9511766  0.8114168   1.091274
+Intercept1 1.5631597  0.9917141   2.208476
+Intercept2 1.9944530  1.9064360   2.081231
+x          0.9853336  0.8508906   1.119958
 ```
 
 ---
@@ -353,7 +364,7 @@ it means that only one element from each sub-model contributes to the linear pre
 - This is not sufficient when an element of a model is needed more than once for each observation or when the same effect is shared among two or more linear predictors (and will be estimated by using two or more parts of the dataset). 
 
 &lt;span style="display:block; margin-top: 10px ;"&gt;&lt;/span&gt;
-- The solution for this is the `copy` feature. Formally, it defines a copy of a generic effect `\(\theta\)` as `$$\theta^{\star}=\beta \theta + \epsilon$$` where `\(\epsilon \sim \text {Normal}(0, b)\)`, with `\(b\)`  being a large and fixed value ($\epsilon$ is a tiny error), and `\(\beta\)` is a hyperparameter. By fixing `\(\beta=1\)`, it means that `\(\theta^{\star}\)`  is an exact copy of `\(\theta\)`. According to the specification of the `fixed` option (`TRUE` or `FALSE`), the hyperparameter `\(\beta\)` is kept fixed or estimated.
+- The solution for this is the `copy` feature. Formally, it defines a copy of a generic effect `\(\theta\)` as `$$\theta^{\star}=\beta \theta + \epsilon$$` where `\(\epsilon\)` is a tiny error such that `\(\epsilon \sim \text {Normal}(0, b)\)`, with `\(b\)`  being a large and fixed value, and `\(\beta\)` is a hyperparameter. By fixing `\(\beta=1\)`, it means that `\(\theta^{\star}\)`  is an exact copy of `\(\theta\)`. According to the specification of the `fixed` option (`TRUE` or `FALSE`), the hyperparameter `\(\beta\)` is kept fixed or estimated.
 
 &lt;span style="display:block; margin-top: 10px ;"&gt;&lt;/span&gt;
 - Several copies of the same effect can be created and all will share the same hyperparameters. 
@@ -362,100 +373,136 @@ it means that only one element from each sub-model contributes to the linear pre
 
 # The `copy feature`: example
 
-The following example considers a Gaussian likelihood whose linear predictor includes two correlated random effects - `\(a\)` and `\(b\)` - coming from a bivariate Normal distribution: 
+The following example is taken from Chapter 6 of Gómez-Rubio (2020). It consider two likelihoods (Gaussian and Poisson) that share a common covariate with the same coefficient `\(\alpha\)` (i.e. the common effect that will be copied). 
 
 &lt;span style="display:block; margin-top: 10px ;"&gt;&lt;/span&gt;
-`$$y_i \sim Normal(\eta_i,\tau^{-1}), \qquad i=1,\ldots,n$$` 
+- Gaussian observations:
+&lt;span style="display:block; margin-top: 10px ;"&gt;&lt;/span&gt;
+`$$y_{1i} \sim Normal(\eta_{1i},\tau^{-1}), \qquad i=1,\ldots,n$$` 
 where the linear predictor is given by
-`$$\eta_i=a_i+b_iz_i$$`
-and
-`$$(a_i,b_i)\overset{iid}\sim Normal(\bm 0, \bm Q^{-1})$$`
-The term `\(z_i\)` refers to a known covariate. 
+`$$\eta_{1i}=\alpha x_i$$`
+- Poisson observatins:
+&lt;span style="display:block; margin-top: 10px ;"&gt;&lt;/span&gt;
+`$$y_{2i} \sim Poisson(\lambda_i=\exp(\eta_{2i})), \qquad i=1,\ldots,m$$` 
+where `$$\eta_{2i}=\alpha^\star x_i=\beta\alpha x_i$$`
 
-&lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
-In `R-INLA` the bivariate Gaussian model is implemented with
-`f(index, model = "iid2d", ...)`
-but this does not allow to have each `\(\eta_i\)` connected to two elements of the same (bi-variate Gaussian) model. We will use `copy`!
+&lt;span style="display:block; margin-top: 10px ;"&gt;&lt;/span&gt;
+- The copied effect is the coefficient of covariate  `\(x\)` which appears in both the linear predictors. This coefficient is the same in the two models and we will implement an exact copy.   
+
+- To be able to use the `copy` feature, the linear will be expressed as a latent effect through the `f()` function. In this case, it will be an `iid` random effect with an index vector with all values equal to 1 (the random effect value will be a single value which is the estimate of `\(\alpha\)`). 
 
 ---
 
 # The `copy feature`: data simulation
-We simulate `\(n=1000\)` values from the previous model with `\(\tau= \tau_a=\tau_b=1\)`, `\(\rho_{ab}=0.8\)`.
+
+ We use the following values for the simulation: `\(\alpha=2\)`, `\(\tau=1\)`. Moreover, the covariate values are simulated from an Uniform(1,2) distribution.
+ 
+ &lt;span style="display:block; margin-top: 10px ;"&gt;&lt;/span&gt;
+ 
 
 ```r
 &gt; set.seed(3)
-&gt; n = 1000
-&gt; z = rnorm(n) #covariate
+&gt; n = 150
+&gt; m = 50
 &gt; 
-&gt; Sigma = matrix(c(1, 0.8, 0.8, 1), 2, 2) # var-cov matrix
-&gt; library(mvtnorm)
-&gt; ab = rmvnorm(n, sigma = Sigma) #bivariate normal
-&gt; a = ab[, 1]
-&gt; b = ab[, 2]
+&gt; # Covariate values
+&gt; x &lt;- runif(n+m, 1, 2)
 &gt; 
-&gt; eta = a + b * z #linear predictor
-&gt; y = eta + rnorm(n, sd = 1) #response variable
+&gt; # Gaussian data
+&gt; y.gaus &lt;- rnorm(n, mean = 2 * x[1:n])
+&gt; 
+&gt; #Poisson data
+&gt; y.pois &lt;- rpois(m, lambda = exp(2 * x[(n+1):(n+m)]))
 ```
+
 
 ---
 
 # The `copy` feature: implementation with `inla`
-The `iid2d` model is represented internally as one vector of length `\(2n\)`. We set the indexes correspondingly and define the formula with the `copy` feature:
+- We prepare the two-columns matrix for `inla`:
 
 ```r
-&gt; i = 1 : n # use only the first n elements (a_1, ..., a_n)
-&gt; j = (n+1) : (2*n) # use only the last n elements (b_1, ..., b_n)
-&gt; 
-&gt; formula = y ~ -1 + f(i, model = "iid2d", n = 2*n) + f(j, z, copy = "i",fixed=TRUE) 
+&gt; y &lt;- matrix(NA, ncol = 2, nrow = n+m)
+&gt; y[1:n, 1] &lt;- y.gaus
+&gt; y[(n+1):(n+m), 2] &lt;- y.pois
 ```
 
-And finally run inla:
+- We will have two `iid` random effects. The values of the covariates are introduced as weights in the latent effect inside the `f()` function. We thus need to create two indices for the Gaussian and Poisson observations:
 
 ```r
-&gt; result = inla(formula,
-+               data = data.frame(y = y, z = z, i = i, j = j),
-+               family = "gaussian")
-&gt; result$summary.hyperpar[,c("mean", "0.025quant", "0.975quant")]
+&gt; idx.gaus &lt;- c(rep(1, n), rep(NA, m)) #original random effect
+&gt; idx.pois &lt;- c(rep(NA, n), rep(1, m)) #copied random effect
 ```
 
-```
-                                             mean 0.025quant 0.975quant
-Precision for the Gaussian observations 1.0757964  0.8536628  1.3287137
-Precision for i (component 1)           0.9783850  0.7767089  1.2274618
-Precision for i (component 2)           1.4771635  1.1474891  1.8748224
-Rho1:2 for i                            0.7565963  0.6793477  0.8226678
+- Finally run `inla`:
+
+```r
+&gt; modinla &lt;- inla(y ~ -1 + f(idx.gaus, x, model = "iid") + f(idx.pois, x, copy = "idx.gaus", fixed=T),
++                 data = list(y = y, x = x),
++                 family = c("gaussian", "poisson"))
 ```
 
 ---
 
 # The `copy` feature: implementation with `inlabru`
 
+- With `inlabru` everything is easier as we don't have to use the `copy` feature. 
+
+- We define the model component including only a single iid effect (`alpha`) with weights given by `x` and index `idx`:
 
 ```r
-&gt; # Model components
-&gt; comp = y ~ eff(i, model = "iid2d", n = 2*n) + eff2(j, z, copy = "eff", fixed=T) 
+&gt; cmp = y ~ alpha(idx, x, model = "iid")
 ```
-Note that in `inlabru` when using `copy` we refer to the effect name and not to the index name.
 
+- As described before, we define the two likelihoods:
 
 ```r
-&gt; # Likelihood
-&gt; lik = like("gaussian",
-+            formula = y ~ + eff + eff2,
-+            data = data.frame(y = y, z = z, i = i, j = j))
+&gt; lik1 &lt;- like("gaussian",
++              formula = y ~ alpha,
++              data = data.frame(y = y.gaus, x = x[1:n], idx = 1))
 &gt; 
-&gt; # Run inlabru
-&gt; resultinlabru = bru(comp, lik)
-&gt; resultinlabru$summary.hyperpar[,c("mean", "0.025quant", "0.975quant")]
+&gt; lik2 &lt;- like("Poisson",
++              formula = y ~ alpha,
++              data = data.frame(y = y.pois, x = x[(n+1):(n+m)], idx = 1))
+```
+
+- And finally run the `bru()` function:
+
+```r
+&gt; modinlabru = bru(cmp, lik1, lik2)
+```
+
+---
+
+# The `copy` feature: comparison
+
+- We compare the random effect value
+
+```r
+&gt; modinla$summary.random
 ```
 
 ```
-                                             mean 0.025quant 0.975quant
-Precision for the Gaussian observations 1.1338876  0.7552099  1.6477099
-Precision for eff (component 1)         0.9466587  0.5844661  1.4266440
-Precision for eff (component 2)         1.5311295  1.0203687  2.2336774
-Rho1:2 for eff                          0.7430300  0.6308005  0.8315172
+$idx.gaus
+  ID     mean         sd 0.025quant 0.5quant 0.975quant     mode         kld
+1  1 1.993941 0.01738916   1.959571 1.994034   2.027781 1.994219 5.47604e-07
+
+$idx.pois
+  ID    mean         sd 0.025quant 0.5quant 0.975quant    mode          kld
+1  1 1.99391 0.01733539   1.959643 1.994004   2.027643 1.99419 5.385034e-07
 ```
+
+```r
+&gt; modinlabru$summary.random
+```
+
+```
+$alpha
+  ID    mean         sd 0.025quant 0.5quant 0.975quant     mode         kld
+1  1 1.99391 0.01736407   1.959588 1.994004     2.0277 1.994189 5.42504e-07
+```
+
+
 
 ---
 
@@ -482,7 +529,7 @@ y_{2i} &amp;\sim \text{Normal}(\beta_2 +\gamma_2 z_{i} + \xi_{i}, \sigma^2_2)\qq
 \end{align}`
 
 &lt;span style="display:block; margin-top: 10px ;"&gt;&lt;/span&gt;
-- Each set of data has its own intercept ($\beta_1$ and `\(\beta_2\)`) and covariate (with `\(\gamma_1\)` and `\(\gamma_2\)` as linear effect).
+- Each set of data has its own intercept - `\(\beta_1\)` and `\(\beta_2\)` - and covariate (with `\(\gamma_1\)` and `\(\gamma_2\)` as linear effect).
 &lt;span style="display:block; margin-top: 10px ;"&gt;&lt;/span&gt;
 - The random effect `\(\xi\)` is a  shared GF with range `\(r\)` and variance `\(\sigma^2\)`.  It enters both in the linear predictor of `\(y_1\)` and `\(y_2\)`.
 &lt;span style="display:block; margin-top: 10px ;"&gt;&lt;/span&gt;
@@ -604,6 +651,61 @@ Stdev for field                            0.8570362  0.5722699   1.231279
 
 &lt;img src="./img/spatialparout-1.png" &gt;
 ]
+
+
+---
+
+name: conclusions
+  
+&lt;span style="display:block; margin-top: 250px ;"&gt;&lt;/span&gt;
+
+.myblue[.center[.huge[
+**Conclusions**]]]
+
+
+---
+
+# Making the `R-INLA` work for you
+
+
+- The `R-INLA` package provide very fast computation for a large class of model. 
+&lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
+- It is very easy to use for simple problems, but for more complex problems it may happen that you have to struggle a bit.
+&lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
+- When you are solving a big problem, it is good to set the verbose=TRUE: it tells you how big the problem is; it keeps track of the optimiser steps; if something breaks, it (often) tells you where
+&lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
+- Ask for help to the INLA team through the discussion forum (https://groups.google.com/g/r-inla-discussion-group) or through e-mail (see `inla.version()` for a list of e-mails).
+
+&lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
+
+- The `inlabru` package is worth to be used when you have a spatial or spatio-temporal model: it will avoid you to work with `inla.stack` objects.
+
+---
+
+# INLA is still an active project
+
+- In April 2022 a paper has been published in ArXiv with the title **A new avenue for Bayesian inference with INLA** (by Van Niekerk, Krainski, Rustand, and Rue): https://arxiv.org/pdf/2204.06797.pdf
+ 
+ 
+ &lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
+ 
+- They propose a modern formulation of the INLA methodology based on the reformulation of the latent field by removing the linear predictors from the model. 
+
+ &lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
+- *This new framework stems from computational demands set by a certain class of models where the data is large and the model is moderate or small, termed data-rich models*.
+
+ &lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
+- For high performance computing they use the PARDISO library, which makes it possible to parallelize the sparse linear algebra operations employed at all stages of the INLA algorithm. See `inla.pardiso()` for instruction about how to obtain a free license. Note that R-INLA supports PARDISO for MacOSX and Linux only.
+---
+
+# The end
+
+.myblue[.center[.huge[
+**Thank you very much for your participation!**]]]
+
+
+&lt;center&gt;&lt;img src=./img/prisciNla.JPG width='50%' title=''&gt;&lt;/center&gt;
+
     </textarea>
 <style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
 <script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>

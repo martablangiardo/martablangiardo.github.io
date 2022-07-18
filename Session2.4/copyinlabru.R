@@ -68,52 +68,11 @@ abline(v=2)
 
 out$summary.random
 
-#############
-set.seed(4)
-n = 1000
-Sigma = matrix(c(1, 0.8, 0.8, 1), 2, 2)
-z = rnorm(n)
-library(mvtnorm)
-ab = rmvnorm(n, sigma = Sigma) # require ’mvtnorm’ package
-a = ab[, 1]
-b = ab[, 2]
-eta = 0.5 + a + b * z
-y = eta + rnorm(n, sd = 1)
-#hyper.gaussian = list(prec = list(prior = "loggamma", param = c(1, 0.2161)))
-
-i = 1:n # use only the first n elements (a_1, ..., a_n)
-j = 1:n + n # use only the last n elements (b_1, ..., b_n)
-formula = y ~ -1 + Intercept + f(i, model = "iid2d", n = 2*n) + 
-  f(j, z, copy = "i",fixed=TRUE, group='exchangeable', replicate='iid') 
-result = inla(formula, data = data.frame(y = y, z = z, i = i, j = j, Intercept = 1),
-              family = "gaussian")
-              #control.family = list(hyper = hyper.gaussian))
-summary(result)
-plot(result)
-summary(result)
 
 
-comp = y ~ Intercept(1) + eff(i, model = "iid2d", n = 2*n) + eff2(j, z, copy = "eff", fixed=T) 
-lik = like("gaussian",
-           formula = y ~ Intercept + eff + eff2,
-           data = data.frame(y = y, z = z, i = i, j = j))
-           #options = list(control.family = list(hyper = hyper.gaussian)))
-prova = bru(comp, lik)
-summary(prova)
-prova$summary.hyperpar
-result$summary.hyperpar
 
-##############
-#############
-df1 = data.frame(y = y[1:n], idx = 1:n)
-df2 = data.frame(y = y[(n+1):(2*n)], idx = 1:n)
+comp = y ~ randomslope(idx, x, model = "iid") 
 
-jcmp <- ~ Intercept(1) + fieldu(idx, model = "iid2d", n = n)
-lik1 <- like("gaussian",
-             formula = y ~ Intercept + fieldu,
-             data = df1)
-lik2 <- like("gaussian",
-             formula = y ~ Intercept2  + fieldu,
-             data = df2)
-ppp = bru(jcmp, lik1, lik2)
-summary(ppp)
+lik1 = like("gaussian",
+            formula = y ~ randomslope,
+            data = df1)

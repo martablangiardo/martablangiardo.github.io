@@ -346,7 +346,6 @@ Upon varying the form of the functions `\(\class{myblue}{f_l(\cdot)}\)`, this fo
 
 &lt;!-- - Blocking and overparameterisation can **alleviate**, but rarely eliminate the problem --&gt;
 
-&lt;!-- --- --&gt;
 
 ---
 
@@ -719,48 +718,6 @@ count:false
 - This is the algorithm implemented by default by `R-INLA`, but this choice can be modified.
 
   - If extra precision is required, it is possible to run the full Laplace approximation --- of course at the expense of running time!
-
-
-&lt;!-- # Integrated Nested Laplace Approximation (INLA) --&gt;
-
-&lt;!-- Operationally, the INLA algorithm proceeds with the following steps: --&gt;
-
-&lt;!-- 1\. Explore the joint posterior for the hyperparameters `\(\class{red}{\tilde{p}(\boldsymbol\psi\mid\boldsymbol{y})}\)` and produce a grid of  *good* integration points  `\(\color{olive}{\{\boldsymbol\psi^{(j)}\}}\)` associated with the bulk of the mass, together with a corresponding set of area weights `\(\color{olive}{\{\Delta_j\}}\)`:  --&gt;
-
-
-&lt;!-- .pull-left[ --&gt;
-&lt;!-- &lt;center&gt;&lt;img src=./img/hyper_GRID.png width='70%' title=''&gt;&lt;/center&gt; --&gt;
-&lt;!-- .center[.blue[Grid strategy]] --&gt;
-&lt;!-- ] --&gt;
-
-
-&lt;!-- .pull-right[ --&gt;
-&lt;!-- &lt;center&gt;&lt;img src=./img/hyper_CCD.png width='70%' title=''&gt;&lt;/center&gt; --&gt;
-&lt;!-- .center[.blue[Central Composite Design strategy (CCD)]] --&gt;
-&lt;!-- ] --&gt;
-
-&lt;!-- The CCD strategy is the default one in `R-INLA`: it produces a lower number of points which are however enough to capture the variability of the joint distribution (see Martins, Simpson, Lindgren, et al. (2013)). --&gt;
-
-&lt;!-- --- --&gt;
-
-&lt;!-- # Integrated Nested Laplace Approximation (INLA) --&gt;
-
-&lt;!-- 2\. After the grid exploration: --&gt;
-&lt;!--   - Obtain the marginal posterior `\(\class{red}{\tilde{p}(\psi_k\mid\boldsymbol{y})}\)` using an interpolation algorithm based on the values of the density  `\(\class{red}{\tilde{p}(\boldsymbol\psi\mid\boldsymbol{y})}\)` evaluated in the integration points `\(\color{olive}{\{\psi^{(j)}_k\}}\)` --&gt;
-
-&lt;!-- -- --&gt;
-
-&lt;!--   - Evaluate the conditional posteriors `\(\color{orange}{\tilde{p}(\theta_i\mid\boldsymbol\psi^{(j)},\boldsymbol{y})}\)` on a grid of selected values for `\(\theta_i\)`. --&gt;
-
-&lt;!-- -- --&gt;
-
-&lt;!-- 3\. Obtain the marginal posteriors `\(\color{\myblue}{\tilde{p}(\theta_i\mid\boldsymbol{y})}\)` using .olive[**numerical integration**] `\(^{[1]}\)` --&gt;
-&lt;!-- `$$\color{myblue}{\tilde{p}(\theta_i\mid\boldsymbol{y})} \approx \sum_{j} \color{red}{\tilde{p}(\boldsymbol\psi^{(j)}\mid\boldsymbol{y})}\color{orange}{\tilde{p}(\theta_i\mid\boldsymbol\psi^{(j)},\boldsymbol{y})}\color{olive}{\Delta_j}$$` --&gt;
-
-&lt;!-- .footnote[[1]: Recall from slide 20 that `\(\color{myblue}{p(\theta_i\mid\boldsymbol{y})} = \int p(\theta_i,\boldsymbol\psi\mid \boldsymbol{y}) d\boldsymbol\psi = \int \class{red}{p(\boldsymbol\psi\mid\boldsymbol{y})} \color{orange}{p(\theta_i \mid \boldsymbol\psi,\boldsymbol{y})} d\boldsymbol\psi\)` --&gt;
-&lt;!-- ] --&gt;
-
-&lt;!-- --- --&gt;
 
 ---
 
@@ -1169,7 +1126,7 @@ We specify a simple regression model with `Petal.length` and `Petal.width` as de
 Call:
    "inla(formula = formula, family = \"gaussian\", data = iris)" 
 Time used:
-    Pre = 0.263, Running = 0.0748, Post = 0.0248, Total = 0.362 
+    Pre = 0.285, Running = 0.0765, Post = 0.0279, Total = 0.39 
 Fixed effects:
              mean    sd 0.025quant 0.5quant 0.975quant  mode kld
 (Intercept) 1.084 0.073      0.940    1.084      1.227 1.084   0
@@ -1322,7 +1279,7 @@ Precision for the Gaussian observations    5.48995 4.372888
 ```
 
 ```
-[1] 2.182906 2.247270 2.180414 2.199675
+[1] 2.205708 2.240873 2.252066 2.225845
 ```
 
 ]
