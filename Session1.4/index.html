@@ -628,11 +628,11 @@ where
 
 ```
                    mean           sd  0.025quant    0.5quant  0.975quant
-(Intercept) -0.98840916 0.1198545620 -1.22430758 -0.98839596 -0.75283818
-year         0.02618802 0.0005869893  0.02503579  0.02618792  0.02733977
+(Intercept) -0.98840928 0.1198530495 -1.22430440 -0.98839609 -0.75284155
+year         0.02618802 0.0005869894  0.02503579  0.02618792  0.02733977
                    mode          kld
-(Intercept) -0.98835903 5.544091e-07
-year         0.02618777 3.834067e-07
+(Intercept) -0.98835915 5.533224e-07
+year         0.02618777 3.834065e-07
 ```
 
 ```r
@@ -1013,27 +1013,19 @@ spatial effect `\(v_i\)`.
 [5,]    0    0    0   -1    2
 ```
 
-```r
-&gt; r.def &lt;- 159
-```
-
 ---
 
 # Type II interaction: in INLA
 
 - Finally we need to impose some more constraints as the matrix have spatio-temporal interaction matrix has a rank deficiency
 
-- We define the `A.constr` matrix as that where the rows are the eigenvectors of the structure matrix of the interaction term which span the null space
+- We calculate the eigenvalues of the structure matrix of the interaction term and the extra constraints are those where the eigenvalues are zero
 
 
 ```r
-&gt; A.constr &lt;- kronecker(diag(159),matrix(1,1,11))
-&gt; A.constr &lt;- A.constr[-1,]
-&gt; dim(A.constr)
-```
-
-```
-[1]  158 1749
+&gt; eigenQ &lt;- eigen(R)
+&gt; ids &lt;- which(eigenQ$values &lt; 0.00001)
+&gt; cMat &lt;- t(eigenQ$vectors[,ids])
 ```
 
 The `formula` environment needs to be changed to
@@ -1041,9 +1033,8 @@ The `formula` environment needs to be changed to
 ```r
 &gt; formula.intII&lt;- y ~ f(ID.area,model="bym2",graph=Georgia.adj) +
 +                     f(ID.year,model="rw1") +
-+                     f(ID.area.year, model="generic0", Cmatrix=R, rankdef=r.def,
-+                  constr=TRUE,
-+                  extraconstr=list(A=A.constr, e=rep(0,159-1)))
++                     f(ID.area.year, model="generic0", Cmatrix=R, rankdef = nrow(cMat),
++                     extraconstr = list(A = cMat, e = rep(0, nrow(cMat))))
 ```
 
 ---
@@ -1107,20 +1098,17 @@ The `formula` environment needs to be changed to
 [4,]    -1
 [5,]     0
 ```
-
-```r
-&gt; r.def &lt;- 11
-```
 ---
 
 # Type III interaction in INLA
 
-- Finally we need to impose some more constraints (sum-to-zero)
+- Finally we need to impose some more constraints (on the eigenvalues equal to 0)
 
 
 ```r
-&gt; A.constr &lt;- kronecker(matrix(1,1,159),diag(11))
-&gt; A.constr &lt;- A.constr[-1,]
+&gt; eigenQ &lt;- eigen(R)
+&gt; ids &lt;- which(eigenQ$values &lt; 0.00001)
+&gt; cMat &lt;- t(eigenQ$vectors[,ids])
 ```
 
 The `formula` environment becomes
@@ -1128,9 +1116,8 @@ The `formula` environment becomes
 ```r
 &gt; formula.intIII&lt;- y ~ f(ID.area,model="bym2",graph=Georgia.adj) +
 +                     f(ID.year,model="rw1") +
-+                     f(ID.area.year, model="generic0", Cmatrix=R, rankdef=r.def,
-+                  constr=TRUE,
-+                  extraconstr=list(A=A.constr, e=rep(0,11-1)))
++                     f(ID.area.year, model="generic0", Cmatrix=R, rankdef = nrow(cMat),
++                      extraconstr = list(A = cMat, e = rep(0, nrow(cMat))))
 ```
 ---
 
@@ -1153,10 +1140,9 @@ The `formula` environment becomes
 ```r
 &gt; #Kronecker product (for RW1)
 &gt; R &lt;- kronecker(Q.xi,Q.gammaRW1)
-&gt; r.def &lt;- 159+11-1
-&gt; A1 &lt;- kronecker(diag(159),matrix(1,1,11))
-&gt; A2 &lt;- kronecker(matrix(1,1,159),diag(11))
-&gt; A.constr &lt;- rbind(A1[-1,],A2[-1,])
+&gt; eigenQ &lt;- eigen(R)
+&gt; ids &lt;- which(eigenQ$values &lt; 0.00001)
+&gt; cMat &lt;- t(eigenQ$vectors[,ids])
 ```
 
 The `formula` environment becomes
@@ -1164,9 +1150,8 @@ The `formula` environment becomes
 ```r
 &gt; formula.intIV&lt;- y ~ f(ID.area,model="bym2",graph=Georgia.adj) +
 +                     f(ID.year,model="rw1") +
-+                     f(ID.area.year, model="generic0", Cmatrix=R, rankdef=r.def,
-+                  constr=TRUE,
-+                  extraconstr=list(A=A.constr, e=rep(0,159+11-2)))
++                     f(ID.area.year, model="generic0", Cmatrix=R, rankdef = nrow(cMat),
++                     extraconstr = list(A = cMat, e = rep(0, nrow(cMat))))
 ```
 ---
 
