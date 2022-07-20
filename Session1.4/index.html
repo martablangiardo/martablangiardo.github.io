@@ -375,7 +375,7 @@ equivalently
 
 &lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
 
-- s the .red[difference of levels on consecutive time points] `\((\theta_t-\theta_{t-1}=\epsilon_{t})\)`
+- .red[difference of levels on consecutive time points] `\((\theta_t-\theta_{t-1}=\epsilon_{t})\)`
   
 .red[It is a stationary process if mean and variance independent of time `\(t\)`]
 
@@ -617,22 +617,22 @@ where
 # Ohio lung cancer - comparison models 1 and 2
 
 
+
+
 ```r
-&gt; Ohio.adj="~/Dropbox/Books/INLABook/Datasets/Ohio Lung Cancer/Ohio.graph"
 &gt; mod1&lt;- inla(data=ohio.data,formula=formula.mod1, E=E, family="poisson")
 &gt; mod2&lt;- inla(data=ohio.data,formula=formula.mod2, E=E, family="poisson")
-&gt; 
 &gt; # Posterior mean and  95% CI for Model 1
 &gt; mod1$summary.fixed
 ```
 
 ```
-                   mean           sd  0.025quant    0.5quant  0.975quant
-(Intercept) -0.98840928 0.1198530495 -1.22430440 -0.98839609 -0.75284155
-year         0.02618802 0.0005869894  0.02503579  0.02618792  0.02733977
-                   mode          kld
-(Intercept) -0.98835915 5.533224e-07
-year         0.02618777 3.834065e-07
+                   mean           sd  0.025quant    0.5quant 0.975quant mode
+(Intercept) -0.98836737 0.1197060768 -1.22370101 -0.98835058 -0.7531284   NA
+year         0.02611995 0.0005864476  0.02497007  0.02611987  0.0272703   NA
+                     kld
+(Intercept) 1.133335e-08
+year        3.810689e-07
 ```
 
 ```r
@@ -641,12 +641,12 @@ year         0.02618777 3.834065e-07
 ```
 
 ```
-                   mean         sd  0.025quant    0.5quant  0.975quant
-(Intercept) -1.00152385 0.22506963 -1.44547777 -1.00152150 -0.55820692
-year         0.02061841 0.01689569 -0.01286484  0.02061805  0.05404213
-                   mode          kld
-(Intercept) -1.00149655 2.444035e-09
-year         0.02061894 1.060639e-09
+                  mean       sd  0.025quant    0.5quant  0.975quant mode
+(Intercept) -1.0006848 0.225923 -1.44584654 -1.00067555 -0.55557570   NA
+year         0.0204429 0.016974 -0.01316612  0.02044309  0.05405086   NA
+                     kld
+(Intercept) 1.232079e-08
+year        1.433601e-08
 ```
 
 ---
@@ -654,7 +654,7 @@ year         0.02061894 1.060639e-09
 # Ohio lung cancer - comparison models 1 and 2
 
 Let's look at the temporal random effect in model 2
-&lt;img src="./img/unnamed-chunk-4-1.png" &gt;
+&lt;img src="./img/unnamed-chunk-5-1.png" &gt;
 
 Some temporal structure which suggests that the linear term is not capturing the temporal trend well
 
@@ -678,7 +678,7 @@ trend
 - Assuming a BYM2 specification, there are 3 hyperparameters
 
   - `\(\tau_b\)`, the marginal precision of `\(b_i\)`
-  - `\(\psi\)`, the proportion of spatial variability explained by the spatially structured component 
+  - `\(\phi\)`, the proportion of spatial variability explained by the spatially structured component 
   - `\(\sigma^2_\gamma\)`, the conditional variance of the RW(1) modelling the time trend
 
 
@@ -706,7 +706,7 @@ where
 - `\(v_i \sim \hbox{Normal}(0, \sigma^2_v)\)` spatially unstructured RE
 - `\(\mathbf{u} \sim \hbox{ICAR}(\mathbf{W}, \sigma^2_u)\)` spatially structured RE
 - `\(\class{red}{\gamma_t  \sim \hbox{RW}(1)}\)` temporally structured RE with variance parameter `\(\sigma^2_{\gamma}\)`}
-- `\(\class{red}{\psi_t  \sim \hbox{Normal}(0, \sigma^2_{\psi})}\)` temporally unstructured RE}
+- `\(\class{red}{\psi_t  \sim \hbox{Normal}(0, \sigma^2_{\psi})}\)` temporally unstructured RE
 
 
 ```r
@@ -747,7 +747,7 @@ Posterior means of the temporal RE `\(\gamma_t\)` (model 3)
 
 Posterior means of the spatial RE ( u + v ) for the 4 different models
 
-&lt;img src="./img/unnamed-chunk-5-1.png" &gt;
+&lt;img src="./img/unnamed-chunk-6-1.png" &gt;
 
 Similar patterns with the 4 models
 ---

@@ -464,7 +464,7 @@ name: interpretation
 
 - `\(\text{exp}(v_{i})\)` relative risk in area `\(i\)` compared to the risk for the whole study region
 
-- The variance of the random effects `\(\sigma^2_v\)` reflect the amount of extra-Poisson variation in the data
+- The variance of the random effects `\(\sigma^2_v\)` reflects the amount of extra-Poisson variation in the data
   
 --
 
@@ -544,13 +544,13 @@ Note that
 
 - `control.fixed` allows to specify the parameters of the prior for the fixed effects (intercept)
 - `control.predictor` tells `INLA` to include the linear predictor estimation ( the parameters of the prior for the fixed effects (intercept)) useful for prediction - see later)
-- `control.compute` allows to include models election indexes, as well as to draw samples from the joint posterior
+- `control.compute` allows to include model selection indexes, as well as to draw samples from the joint posterior
 
 ---
 
 # Results for lip cancer in Scotland example
 
-- exp `\((v_i)\)` is the relative risk of lip cancer in area `\(i\)` relative to average across Scotland (see map)
+- exp$(v_i)$ is the relative risk of lip cancer in area `\(i\)` relative to average across Scotland (see map)
 
 - `\(\sigma_v\)` is the between-area standard deviation of log relative risk of lip cancer
 
@@ -568,7 +568,7 @@ And we can calculate quintiles with
 ```
 
 ```
-[1] 0.4996176 0.6744936 0.7257159 0.7735114 0.8337035 1.1555258
+[1] 0.5181967 0.6758096 0.7257320 0.7724462 0.8314589 1.1387963
 ```
 
 ---
@@ -614,17 +614,17 @@ To obtain the quantile ratio we need to follow these steps:
 
 ```
 Predictor:1 Predictor:2 Predictor:3 
-   1.402447    1.617122    1.218793 
+   1.579001    1.504132    1.060556 
 ```
 &lt;span style="display:block; margin-top: -10px ;"&gt;&lt;/span&gt;
 Note that:
 - `joint.post` is a list of 100 elements and each element includes  a value from
 
-1\. the joint posterior distribution for the hyperparameters `joint.post\$hyperpar`
+1\. the joint posterior distribution for the hyperparameters `joint.post$hyperpar`
 
-2\. joint posterior distribution for the linear predictor `\(\bm{\eta}\)` in `joint.post\$latent` (row 1 to N) 
+2\. joint posterior distribution for the linear predictor `\(\bm{\eta}\)` in `joint.post$latent` (row 1 to N) 
 
-3\. joint posterior distribution for the random effects `\(\bm{v}\)` in `joint.post\$latent` (N +1 to 2N)
+3\. joint posterior distribution for the random effects `\(\bm{v}\)` in `joint.post$latent` (N +1 to 2N)
 
 ---
 
@@ -648,7 +648,7 @@ Note that:
 ```
 
 ```
-[1] 10.79859
+[1] 11.21843
 ```
 
 - The `\(QR90\)` points towards a large spatial variability. 
@@ -691,7 +691,7 @@ We specify a random effect logistic model
 v_i &amp;\sim&amp; \text{Normal}(0, \sigma^2_v)
 \end{eqnarray*}`
 
-where `\(x_{1i}\)` , `\(x_{2i}\)` are the seed type and root extract of the i$-th$ plate, and an interaction term `\(\beta_{12} x_{1i}x_{2i}\)` is included. `\(b_0\)` , `\(\beta_1\)` , `\(\beta_2\)` , `\(\beta_{12}\)` , `\(\sigma^2_v\)` are given independent "noninformative" priors. 
+where `\(x_{1i}\)` , `\(x_{2i}\)` are the seed type and root extract of the i `\(-th\)` plate, and an interaction term `\(\beta_{12} x_{1i}x_{2i}\)` is included. `\(b_0\)` , `\(\beta_1\)` , `\(\beta_2\)` , `\(\beta_{12}\)` , `\(\sigma^2_v\)` are given independent "noninformative" priors. 
 
 
 ---
@@ -731,10 +731,10 @@ where `\(x_{1i}\)` , `\(x_{2i}\)` are the seed type and root extract of the i$-t
 
 ```
                   mean        sd 0.025quant   0.5quant 0.975quant       mode          kld
-(Intercept) -0.5573106 0.1290580 -0.8128318 -0.5566128 -0.3057575 -0.5551229 8.141460e-05
-x1           0.1432173 0.2272850 -0.3066092  0.1443640  0.5862926  0.1463687 6.017888e-05
-x2           1.3214742 0.1819023  0.9680552  1.3202582  1.6820314  1.3180323 9.645924e-05
-x1:x2       -0.7815996 0.3120993 -1.3948849 -0.7814952 -0.1691147 -0.7814959 4.969306e-05
+(Intercept) -0.5576685 0.1270999 -0.8092658 -0.5568731 -0.3105787 -0.5552812 3.738429e-07
+x1           0.1451217 0.2246112 -0.2976051  0.1458743  0.5835492  0.1473265 9.047968e-07
+x2           1.3207267 0.1790347  0.9723637  1.3197223  1.6748043  1.3177522 5.328778e-07
+x1:x2       -0.7803074 0.3084258 -1.3847472 -0.7804997 -0.1747975 -0.7809117 8.842614e-07
 ```
 
 ```r
@@ -742,13 +742,13 @@ x1:x2       -0.7815996 0.3120993 -1.3948849 -0.7814952 -0.1691147 -0.7814959 4.9
 ```
 
 ```
-  ID          mean         sd  0.025quant      0.5quant 0.975quant          mode        kld
-1  1 -0.0103355441 0.06211783 -0.17943488 -8.454498e-04 0.04377829 -1.670834e-04 0.03280257
-2  2  0.0005949997 0.04749199 -0.07794005 -2.291544e-05 0.08598236  2.026897e-05 0.02229568
-3  3 -0.0123824254 0.06238287 -0.19682905 -1.137677e-03 0.03712337 -3.282143e-05 0.02335741
-4  4  0.0158317164 0.07312171 -0.03334043  1.441999e-03 0.24192536  3.201181e-04 0.02754597
-5  5  0.0063046878 0.05407668 -0.05320428  4.815531e-04 0.13605575  3.543913e-04 0.02878329
-6  6  0.0026606361 0.05648353 -0.07252901  3.664692e-04 0.10769889 -4.851865e-05 0.04532726
+  ID          mean         sd  0.025quant      0.5quant 0.975quant          mode       kld
+1  1 -0.0022232715 0.02358275 -0.05545926 -5.782123e-04 0.03441853 -3.250112e-04 0.2168396
+2  2  0.0001839876 0.02160269 -0.04153003  4.801842e-05 0.04323305 -4.289387e-05 0.1472797
+3  3 -0.0032795390 0.02426039 -0.06206391 -8.772788e-04 0.03117823 -4.662853e-04 0.2220829
+4  4  0.0040418546 0.02591558 -0.02982618  1.024312e-03 0.06798352  4.633854e-04 0.2645377
+5  5  0.0014028671 0.02256771 -0.03692147  3.641952e-04 0.05019318  9.469121e-05 0.1816008
+6  6  0.0004767578 0.02273251 -0.04104856  9.741414e-05 0.04558049 -1.134723e-04 0.1909171
 ```
 
 ---
@@ -810,7 +810,9 @@ derive also a predictive result on the dependent variable
 &gt; link[is.na(Seeds$r)]&lt;-1
 &gt; formula &lt;- r~x1 + x2 + x1*x2 + f(plate, model="iid")
 &gt; model.regression &lt;- inla(formula, data=Seeds, 
-+ 					family="binomial", Ntrials=n, control.predictor=list(link=link))
++                          family="binomial", Ntrials=n,
++                          control.predictor=list(link=link, compute=TRUE),
++                          control.compute=list(return.marginals.predictor=TRUE))
 ```
 
 ---
@@ -834,7 +836,7 @@ derive also a predictive result on the dependent variable
 
 ```
                          mean         sd 0.025quant  0.5quant 0.975quant      mode
-fitted.Predictor.01 0.3831032 0.03519607  0.3168842 0.3824702  0.4528834 0.3816362
+fitted.Predictor.01 0.3827004 0.03270233  0.3198551 0.3823125  0.4476715 0.3816144
 ```
 .pull-left[
 - Note that we get a distribution for each of the 21 observations, but we need to consider only the first as this was the missing one
@@ -1044,7 +1046,8 @@ See (Spiegelhalter, Best, Carlin, and Van der Linde, 2014) for a complete descri
 --
 
 
-- Let `\(m_i\)` and `\(v_i\)` be the posterior predictive mean and variance for the $ i^{th} $ unit
+- Let `\(m_i\)` and `\(v_i\)` be the posterior predictive mean and variance for the 
+`\(i^{th}\)` unit
 - The effective model size is 
 	`$$p_W = \sum_{i=1}^nv_i$$` 
 	&lt;span style="display:block; margin-top: 10px ;"&gt;&lt;/span&gt;

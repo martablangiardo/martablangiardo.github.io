@@ -358,9 +358,9 @@ We then extract the prediction posterior mean and sd at the first 3 grid points:
 
 ```
                    mean        sd
-APredictor.201 12.27573 0.2676557
-APredictor.202 11.95927 0.3699636
-APredictor.203 10.57941 0.4512633
+APredictor.201 12.27549 0.2677500
+APredictor.202 11.95971 0.3702108
+APredictor.203 10.57820 0.4514038
 ```
 
 In this case (identity link) `output6pred$summary.fitted.values` would return the same output.
@@ -393,7 +393,7 @@ We can be also interested in computing the posterior probability of getting a va
 ```
 
 ```
-[1] 0.003577228
+[1] 0.003579308
 ```
 
 ]
@@ -576,9 +576,9 @@ where
 - The linear effect model of the covariate `x` can also be expressed in the formula as
 
 ```r
-&gt; cov(x, model="linear")
+&gt; beta(x, model="linear")
 ```
-The difference is in the name used in the output: `x` (method 1) or `cov` (method 2).
+The difference is in the name used in the output: `x` (method 1) or `beta` (method 2).
 
 
 ---
@@ -612,17 +612,17 @@ The difference is in the name used in the output: `x` (method 1) or `cov` (metho
 
 ```
               mean        sd
-Intercept 2.929343 0.1316355
-x         2.092165 0.2345736
+Intercept 2.973281 0.1430806
+x         2.121289 0.2547919
 ```
 ]
 .pull-right[
 
 ```r
 &gt; # Model component
-&gt; cmp2 = y ~  Intercept(1) + cov(x, model="linear")
+&gt; cmp2 = y ~  Intercept(1) + beta(x, model="linear")
 &gt; # Likelihood
-&gt; lik2 = like(formula = y ~ cov + Intercept,
+&gt; lik2 = like(formula = y ~ beta + Intercept,
 +             family = "gaussian",
 +             data = df1)
 &gt; # Model fit
@@ -632,8 +632,8 @@ x         2.092165 0.2345736
 
 ```
               mean        sd
-Intercept 2.929343 0.1316354
-cov       2.092165 0.2345734
+Intercept 2.973281 0.1430807
+beta      2.121289 0.2547922
 ```
 ]
 
@@ -750,19 +750,19 @@ The argument `n.samples` (by default 100) specifies the number of samples to dra
 
 ```
        mean        sd    q0.025    median   q0.975      smin     smax
-1 12.275674 0.2760780 11.724641 12.282484 12.80222 11.362394 13.39194
-2 11.959937 0.3871687 11.216349 11.959847 12.68980 10.808989 13.21190
-3 10.570787 0.4595346  9.712486 10.578731 11.42872  9.187471 12.28969
-4  9.658574 0.3392025  9.018540  9.641246 10.30965  8.707341 11.08092
-5  9.536028 0.3507209  8.889616  9.528744 10.18288  8.377625 10.66705
-6 10.141288 0.3733778  9.384109 10.128704 10.84638  8.838799 11.43901
+1 12.277294 0.2728317 11.750931 12.290742 12.78831 11.362394 13.39194
+2 11.963010 0.3864722 11.216349 11.950500 12.68968 10.808989 13.21190
+3 10.571172 0.4508430  9.712486 10.577551 11.41365  9.221922 12.15032
+4  9.658394 0.3315335  9.003464  9.638143 10.28824  8.608379 10.62940
+5  9.533591 0.3510746  8.865138  9.527972 10.15201  8.377625 10.66705
+6 10.142434 0.3694872  9.392898 10.131154 10.85414  8.838799 11.43901
           cv        var
-1 0.02248985 0.07621907
-2 0.03237213 0.14989959
-3 0.04347213 0.21117204
-4 0.03511931 0.11505832
-5 0.03677851 0.12300518
-6 0.03681759 0.13941095
+1 0.02222246 0.07443712
+2 0.03230560 0.14936078
+3 0.04264834 0.20325938
+4 0.03432594 0.10991443
+5 0.03682501 0.12325334
+6 0.03642984 0.13652080
 ```
 
 Note that it is possible to predict any function of any subset of the components of the model specification.
