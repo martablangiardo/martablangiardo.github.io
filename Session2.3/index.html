@@ -481,7 +481,7 @@ TEMP       0.021393137  -0.016957290 0.059374675
 ---
 
 # Prediction at the station locations
-We are interested in predicting PM10 concentrations (not the log concentrations) at the monitoring station locations. As introduced in Section 2.2, we will use the `predict` function:
+We are interested in predicting PM10 concentrations (log concentrations) at the monitoring station locations. As introduced in Section 2.2, we will use the `predict` function:
 
 .panelset[
 .panel[.panel-name[Compute predictions]
@@ -489,7 +489,7 @@ We are interested in predicting PM10 concentrations (not the log concentrations)
 
 
 ```r
-&gt; pred_at_station = predict(fit, df, ~ exp(Intercept + SPDE + A + TEMP), n.samples = 200)
+&gt; pred_at_station = predict(fit, df, ~ Intercept + SPDE + A + TEMP, n.samples = 1000)
 &gt; head(pred_at_station)
 ```
 
@@ -501,29 +501,29 @@ We are interested in predicting PM10 concentrations (not the log concentrations)
 4 (437.36, 4973.34)          4 01/10/05 149.9 1.17 288.63 1042.4    0 29.35
 5 (426.44, 5045.66)          5 01/10/05 405.0 0.60 287.63 1038.7    0 32.19
 6  (394.6, 5001.18)          6 01/10/05 257.5 1.02 288.59 1048.3    0 34.24
-  PM10  logPM10 time     mean        sd    q0.025   median   q0.975      smin
-1   28 3.332205    1 30.76890 10.649580 15.378250 28.74247 59.98128 11.747074
-2   22 3.091042    1 21.83365  8.125217 10.658959 20.45647 41.53804  7.687972
-3   17 2.833213    1 21.59636  9.496731  9.269500 19.86945 40.70789  6.402697
-4   25 3.218876    1 26.04516  9.200496 12.423360 24.46402 48.01669  8.647962
-5   20 2.995732    1 20.93549 12.743514  6.820818 18.45299 49.01759  3.976179
-6   41 3.713572    1 38.13037 16.214662 17.651093 35.21339 76.66846 10.790858
-       smax        cv       var
-1  79.63765 0.3461150 113.41356
-2  54.82569 0.3721419  66.01916
-3  66.32724 0.4397375  90.18790
-4  66.23132 0.3532517  84.64913
-5  94.75699 0.6087038 162.39714
-6 119.95960 0.4252427 262.91527
+  PM10  logPM10 time     mean        sd   q0.025   median   q0.975     smin
+1   28 3.332205    1 3.368250 0.3280495 2.729238 3.373680 3.990622 2.431488
+2   22 3.091042    1 3.020728 0.3627972 2.324904 3.039675 3.712996 1.923873
+3   17 2.833213    1 3.015798 0.4024234 2.259823 3.021093 3.797079 1.891479
+4   25 3.218876    1 3.191256 0.3527783 2.513648 3.199777 3.859158 2.118994
+5   20 2.995732    1 2.888453 0.5188937 1.886307 2.875320 3.864964 1.111674
+6   41 3.713572    1 3.573681 0.4063581 2.798600 3.574389 4.352224 2.227569
+      smax         cv       var
+1 4.404395 0.09739465 0.1076165
+2 4.110860 0.12010258 0.1316218
+3 4.353181 0.13343843 0.1619446
+4 4.425424 0.11054531 0.1244525
+5 4.578471 0.17964414 0.2692507
+6 4.792494 0.11370856 0.1651269
 ```
 
 ]
 .panel[.panel-name[Plot predictions]
 .pull-left[
-Select randomly 6 stations
+Select 2 stations
 
 ```r
-&gt; sel = sample(1:24, 6) %&gt;% sort()
+&gt; sel = c(1, 7, 10, 19, 23, 24)
 ```
 
 and plot the observed/predicted time series: 
@@ -532,8 +532,8 @@ and plot the observed/predicted time series:
 &gt; as.data.frame(pred_at_station) %&gt;%
 +   dplyr::filter(Station.ID %in% sel) %&gt;% 
 +   ggplot() + 
-+   geom_line(aes(time, PM10, group = Station.ID), color = "red") +
-+   geom_line(aes(time, median, group = Station.ID)) +
++   geom_line(aes(time, logPM10, group = Station.ID), color = "red") +
++   geom_line(aes(time, mean, group = Station.ID)) +
 +   geom_ribbon(aes(time, ymin = q0.025, ymax = q0.975, group = Station.ID), alpha = 0.5) +
 +   facet_wrap(.~Station.ID)
 ```
@@ -548,7 +548,7 @@ and plot the observed/predicted time series:
 
 # Prediction at the grid locations
 
-We want to predict the concentration (not the log concentration) of PM10 for the locations in the Piemonte grid and for the first 3 days. To do this we need the values of the altitude and temperature for every point of interest in both space (regular grid) and time.
+We want to predict the concentration (log concentration) of PM10 for the locations in the Piemonte grid and for the first 3 days. To do this we need the values of the altitude and temperature for every point of interest in both space (regular grid) and time.
 
 .panelset[
   .panel[.panel-name[Grid data]
@@ -634,26 +634,26 @@ Mask the grid using the Piemonte `border` created before:
 
 ```r
 &gt; pred = predict(fit, covariate_grid, 
-+                ~ exp(Intercept + SPDE + A + TEMP),
-+                seed = 2, n.samples = 200)
++                ~ Intercept + SPDE + A + TEMP,
++                seed = 2, n.samples = 1000)
 &gt; head(pred@data)
 ```
 
 ```
-           A time     TEMP      mean        sd     q0.025   median   q0.975
-174 1603.381    1 282.4919  81.33267  598.4378 0.18277044 8.018843 340.6786
-175 1709.620    1 281.8724 100.04193  845.0733 0.12182172 7.564443 331.7433
-176 2333.712    1 277.6419 313.53546 3424.9390 0.01447067 2.876176 625.5560
-246 1554.806    1 282.8573  71.34712  492.5470 0.21583155 8.991311 312.5925
-247 1715.673    1 281.9928  93.75689  778.4123 0.12531788 7.311043 324.2251
-248 2407.440    1 277.2219 317.52075 3384.7142 0.01149871 2.507126 672.3742
-           smin      smax        cv        var
-174 0.056510441  8265.919  7.357902   358127.8
-175 0.036985794 11788.525  8.447191   714148.9
-176 0.001864465 48142.718 10.923610 11730207.5
-246 0.075084431  6794.133  6.903530   242602.5
-247 0.036983684 10859.750  8.302455   605925.7
-248 0.001503341 47422.121 10.659821 11456290.5
+           A time     TEMP      mean       sd    q0.025    median   q0.975
+174 1603.381    1 282.4919 2.0357027 1.947501 -1.681590 2.0082129 5.929694
+175 1709.620    1 281.8724 1.8641205 2.081870 -2.070967 1.8152506 6.019027
+176 2333.712    1 277.6419 0.9347172 2.806915 -4.187348 0.8589016 6.584450
+246 1554.806    1 282.8573 2.1018130 1.876302 -1.504882 2.0680705 5.872410
+247 1715.673    1 281.9928 1.8533779 2.072218 -2.100997 1.7995257 6.052461
+248 2407.440    1 277.2219 0.8104280 2.874923 -4.409344 0.7297042 6.632553
+         smin      smax        cv      var
+174 -2.993057  9.019896 0.9566725 3.792760
+175 -3.565886  9.374882 1.1168107 4.334181
+176 -6.288993 10.781925 3.0029562 7.878772
+246 -2.806517  8.823815 0.8927063 3.520508
+247 -3.549961  9.292819 1.1180762 4.294087
+248 -6.501864 10.766844 3.5474132 8.265183
 ```
 
 ---
@@ -663,7 +663,7 @@ Mask the grid using the Piemonte `border` created before:
 
 ```r
 &gt; ggplot() + 
-+   gg(pred, aes(UTMX_km, UTMY_km, fill = median))  +
++   gg(pred, aes(UTMX_km, UTMY_km, fill = mean))  +
 +   facet_wrap(.~ time) + 
 +   scale_fill_viridis() + coord_equal() + gg(border)
 ```
@@ -680,7 +680,7 @@ With `inlabru predict()` function, it is also very easy to compute the posterior
 
 ```r
 &gt; predprob = predict(fit, covariate_grid, 
-+                ~ (exp(Intercept + SPDE + A + TEMP) &gt; 50),
++                ~ (Intercept + SPDE + A + TEMP) &gt; log(50),
 +                seed = 2, n.samples = 500)
 ```
 

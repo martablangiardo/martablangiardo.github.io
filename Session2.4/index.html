@@ -484,12 +484,12 @@ where `$$\eta_{2i}=\alpha^\star x_i=\beta\alpha x_i$$`
 
 ```
 $idx.gaus
-  ID     mean         sd 0.025quant 0.5quant 0.975quant     mode         kld
-1  1 1.993941 0.01738916   1.959571 1.994034   2.027781 1.994219 5.47604e-07
+  ID     mean         sd 0.025quant 0.5quant 0.975quant     mode          kld
+1  1 1.993941 0.01738938    1.95957 1.994034   2.027782 1.994218 5.475865e-07
 
 $idx.pois
-  ID    mean         sd 0.025quant 0.5quant 0.975quant    mode          kld
-1  1 1.99391 0.01733539   1.959643 1.994004   2.027643 1.99419 5.385034e-07
+  ID    mean         sd 0.025quant 0.5quant 0.975quant     mode          kld
+1  1 1.99391 0.01733561   1.959643 1.994004   2.027643 1.994189 5.384868e-07
 ```
 
 ```r
@@ -498,8 +498,8 @@ $idx.pois
 
 ```
 $alpha
-  ID    mean         sd 0.025quant 0.5quant 0.975quant     mode         kld
-1  1 1.99391 0.01736407   1.959588 1.994004     2.0277 1.994189 5.42504e-07
+  ID    mean         sd 0.025quant 0.5quant 0.975quant     mode          kld
+1  1 1.99391 0.01736426   1.959588 1.994004   2.027701 1.994189 5.424856e-07
 ```
 
 
@@ -645,10 +645,23 @@ Stdev for field                            0.8570362  0.5722699   1.231279
 +                            "field",
 +                            what = "variance")
 ```
+
+
+```r
+&gt; range.plot &lt;- plot(spde.range) +
++   geom_vline(xintercept=4, col="blue", linetype="dotted", size=1.2)
+&gt; 
+&gt; var.plot &lt;- plot(spde.var) + 
++   geom_vline(xintercept=sqrt(0.5), col="blue", linetype="dotted", size=1.2)
+```
+
+```r
+&gt; multiplot(range.plot,var.plot)
+```
+
 ]
+
 .pull-right[
-
-
 &lt;img src="./img/spatialparout-1.png" &gt;
 ]
 
@@ -668,34 +681,51 @@ name: conclusions
 # Making the `R-INLA` work for you
 
 
-- The `R-INLA` package provide very fast computation for a large class of model. 
+- The `R-INLA` package provide very fast computation for a large class of model and a wide range of applications from environmetrics to fisheries.
+
 &lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
 - It is very easy to use for simple problems, but for more complex problems it may happen that you have to struggle a bit.
 &lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
-- When you are solving a big problem, it is good to set the verbose=TRUE: it tells you how big the problem is; it keeps track of the optimiser steps; if something breaks, it (often) tells you where
+- When you are solving a big problem, it is good to set the `verbose=TRUE`: it tells you how big the problem is; it keeps track of the optimiser steps; if something breaks, it (often) tells you where
 &lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
 - Ask for help to the INLA team through the discussion forum (https://groups.google.com/g/r-inla-discussion-group) or through e-mail (see `inla.version()` for a list of e-mails).
 
 &lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
 
+
 - The `inlabru` package is worth to be used when you have a spatial or spatio-temporal model: it will avoid you to work with `inla.stack` objects.
+
+--
+
+&lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
+- For high performance computing  the PARDISO library is recommended, which makes it possible to parallelize the sparse linear algebra operations employed at all stages of the INLA algorithm. See `inla.pardiso()` for instruction about how to obtain a free license. Note that R-INLA supports PARDISO for MacOSX and Linux only.
+
 
 ---
 
 # INLA is still an active project
 
+
+&lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
 - In April 2022 a paper has been published in ArXiv with the title **A new avenue for Bayesian inference with INLA** (by Van Niekerk, Krainski, Rustand, and Rue): https://arxiv.org/pdf/2204.06797.pdf
  
  
  &lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
  
-- They propose a modern formulation of the INLA methodology based on the reformulation of the latent field by removing the linear predictors from the model. 
+- They propose a modern formulation of the INLA methodology based on the reformulation of the latent field by removing the linear predictors from the set of model parameters. 
 
  &lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
 - *This new framework stems from computational demands set by a certain class of models where the data is large and the model is moderate or small, termed data-rich models*.
 
- &lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
-- For high performance computing they use the PARDISO library, which makes it possible to parallelize the sparse linear algebra operations employed at all stages of the INLA algorithm. See `inla.pardiso()` for instruction about how to obtain a free license. Note that R-INLA supports PARDISO for MacOSX and Linux only.
+ 
+&lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
+--
+
+- Regarding SPDE and `inlabru` the recent paper **The SPDE approach for Gaussian and non-Gaussian fields: 10 years and still running** (Lindgren, Bolin, and Rue, 2022) discusses the ongoing research regarding non stationary and anisotropic model and space-time models on the manifold.
+
+
+
+
 ---
 
 # The end
@@ -706,6 +736,16 @@ name: conclusions
 
 &lt;center&gt;&lt;img src=./img/prisciNla.JPG width='50%' title=''&gt;&lt;/center&gt;
 
+---
+
+# References
+
+Gómez-Rubio, V. (2020). _Bayesian inference with INLA_. CRC Press.
+
+Lindgren, F., D. Bolin, and H. Rue (2022). "The SPDE approach for
+Gaussian and non-Gaussian fields: 10 years and still running". In:
+_Spatial Statistics_ 50, p. 100599. DOI:
+[https://doi.org/10.1016/j.spasta.2022.100599](https://doi.org/https%3A%2F%2Fdoi.org%2F10.1016%2Fj.spasta.2022.100599).
     </textarea>
 <style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
 <script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
