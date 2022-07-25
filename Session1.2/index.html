@@ -550,7 +550,7 @@ Note that
 
 # Results for lip cancer in Scotland example
 
-- exp$(v_i)$ is the relative risk of lip cancer in area `\(i\)` relative to average across Scotland (see map)
+- `\(\text{exp}(v_i)\)` is the relative risk of lip cancer in area `\(i\)` relative to average across Scotland (see map)
 
 - `\(\sigma_v\)` is the between-area standard deviation of log relative risk of lip cancer
 
@@ -568,7 +568,7 @@ And we can calculate quintiles with
 ```
 
 ```
-[1] 0.5181967 0.6758096 0.7257320 0.7724462 0.8314589 1.1387963
+[1] 0.5182931 0.6747676 0.7256213 0.7729815 0.8333833 1.1384706
 ```
 
 ---
@@ -614,7 +614,7 @@ To obtain the quantile ratio we need to follow these steps:
 
 ```
 Predictor:1 Predictor:2 Predictor:3 
-   1.579001    1.504132    1.060556 
+   1.656924    1.743795    1.420680 
 ```
 &lt;span style="display:block; margin-top: -10px ;"&gt;&lt;/span&gt;
 Note that:
@@ -648,7 +648,7 @@ Note that:
 ```
 
 ```
-[1] 11.21843
+[1] 11.23299
 ```
 
 - The `\(QR90\)` points towards a large spatial variability. 
@@ -730,11 +730,11 @@ where `\(x_{1i}\)` , `\(x_{2i}\)` are the seed type and root extract of the i `\
 ```
 
 ```
-                  mean        sd 0.025quant   0.5quant 0.975quant       mode          kld
-(Intercept) -0.5576685 0.1270999 -0.8092658 -0.5568731 -0.3105787 -0.5552812 3.738429e-07
-x1           0.1451217 0.2246112 -0.2976051  0.1458743  0.5835492  0.1473265 9.047968e-07
-x2           1.3207267 0.1790347  0.9723637  1.3197223  1.6748043  1.3177522 5.328778e-07
-x1:x2       -0.7803074 0.3084258 -1.3847472 -0.7804997 -0.1747975 -0.7809117 8.842614e-07
+                  mean        sd 0.025quant   0.5quant 0.975quant mode          kld
+(Intercept) -0.5576685 0.1270999 -0.8092658 -0.5568731 -0.3105786   NA 3.738589e-07
+x1           0.1451216 0.2246112 -0.2976052  0.1458742  0.5835492   NA 9.048008e-07
+x2           1.3207267 0.1790347  0.9723637  1.3197223  1.6748043   NA 5.328836e-07
+x1:x2       -0.7803074 0.3084258 -1.3847473 -0.7804997 -0.1747976   NA 8.842585e-07
 ```
 
 ```r
@@ -742,13 +742,13 @@ x1:x2       -0.7803074 0.3084258 -1.3847472 -0.7804997 -0.1747975 -0.7809117 8.8
 ```
 
 ```
-  ID          mean         sd  0.025quant      0.5quant 0.975quant          mode       kld
-1  1 -0.0022232715 0.02358275 -0.05545926 -5.782123e-04 0.03441853 -3.250112e-04 0.2168396
-2  2  0.0001839876 0.02160269 -0.04153003  4.801842e-05 0.04323305 -4.289387e-05 0.1472797
-3  3 -0.0032795390 0.02426039 -0.06206391 -8.772788e-04 0.03117823 -4.662853e-04 0.2220829
-4  4  0.0040418546 0.02591558 -0.02982618  1.024312e-03 0.06798352  4.633854e-04 0.2645377
-5  5  0.0014028671 0.02256771 -0.03692147  3.641952e-04 0.05019318  9.469121e-05 0.1816008
-6  6  0.0004767578 0.02273251 -0.04104856  9.741414e-05 0.04558049 -1.134723e-04 0.1909171
+  ID          mean         sd  0.025quant      0.5quant 0.975quant mode       kld
+1  1 -0.0022232652 0.02358274 -0.05545921 -5.782112e-04 0.03441855   NA 0.2168390
+2  2  0.0001839840 0.02160269 -0.04153006  4.801689e-05 0.04323303   NA 0.1472798
+3  3 -0.0032795395 0.02426041 -0.06206393 -8.772779e-04 0.03117825   NA 0.2220840
+4  4  0.0040418455 0.02591556 -0.02982620  1.024311e-03 0.06798347   NA 0.2645366
+5  5  0.0014028632 0.02256770 -0.03692149  3.641944e-04 0.05019315   NA 0.1816004
+6  6  0.0004767574 0.02273251 -0.04104856  9.741408e-05 0.04558049   NA 0.1909171
 ```
 
 ---
@@ -835,8 +835,8 @@ derive also a predictive result on the dependent variable
 ```
 
 ```
-                         mean         sd 0.025quant  0.5quant 0.975quant      mode
-fitted.Predictor.01 0.3827004 0.03270233  0.3198551 0.3823125  0.4476715 0.3816144
+                         mean         sd 0.025quant  0.5quant 0.975quant mode
+fitted.Predictor.01 0.3827458 0.03294385  0.3194798 0.3823368  0.4482618   NA
 ```
 .pull-left[
 - Note that we get a distribution for each of the 21 observations, but we need to consider only the first as this was the missing one

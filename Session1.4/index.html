@@ -628,11 +628,11 @@ where
 
 ```
                    mean           sd  0.025quant    0.5quant 0.975quant mode
-(Intercept) -0.98836737 0.1197060768 -1.22370101 -0.98835058 -0.7531284   NA
-year         0.02611995 0.0005864476  0.02497007  0.02611987  0.0272703   NA
+(Intercept) -0.98836741 0.1197055725 -1.22369986 -0.98835063 -0.7531296   NA
+year         0.02611995 0.0005864477  0.02497007  0.02611987  0.0272703   NA
                      kld
-(Intercept) 1.133335e-08
-year        3.810689e-07
+(Intercept) 1.133182e-08
+year        3.810634e-07
 ```
 
 ```r
@@ -705,7 +705,7 @@ where
 - `\(b_0\)` overall log RR in Ohio over the 21-year period
 - `\(v_i \sim \hbox{Normal}(0, \sigma^2_v)\)` spatially unstructured RE
 - `\(\mathbf{u} \sim \hbox{ICAR}(\mathbf{W}, \sigma^2_u)\)` spatially structured RE
-- `\(\class{red}{\gamma_t  \sim \hbox{RW}(1)}\)` temporally structured RE with variance parameter `\(\sigma^2_{\gamma}\)`}
+- `\(\class{red}{\gamma_t  \sim \hbox{RW}(1)}\)` temporally structured RE with variance parameter `\(\sigma^2_{\gamma}\)`
 - `\(\class{red}{\psi_t  \sim \hbox{Normal}(0, \sigma^2_{\psi})}\)` temporally unstructured RE
 
 
@@ -922,9 +922,11 @@ Let's start with the Type I interaction, which assumes that the two unstructured
 
 ```r
 &gt; Georgia.adj &lt;- "~/LBW in Georgia/Georgia.graph"
+&gt; ID.year2 &lt;- data_INLA$ID.year
 &gt; formula.intI&lt;- y ~ + f(ID.area,model="bym2",
 +                        graph=Georgia.adj) +
 +                      f(ID.year,model="rw1") +
++                      f(ID.year2,model="iid") +
 +                      f(ID.area.year,model="iid")
 ```
 
@@ -942,7 +944,7 @@ For instance
 1 &amp; 2 \\ 3 &amp; 4
 \end{array}\right] \otimes
 \left[ \begin{array}{cc}
- 1 &amp; 2 \\ 3 &amp; 4
+ 0 &amp; 5 \\ 6 &amp; 7
  \end{array} \right] = \left[
 \begin{array}{cc}
 1 \left[\begin{array}{cc}
@@ -1033,6 +1035,7 @@ The `formula` environment needs to be changed to
 ```r
 &gt; formula.intII&lt;- y ~ f(ID.area,model="bym2",graph=Georgia.adj) +
 +                     f(ID.year,model="rw1") +
++                     f(ID.year2,model="iid") +
 +                     f(ID.area.year, model="generic0", Cmatrix=R, rankdef = nrow(cMat),
 +                     extraconstr = list(A = cMat, e = rep(0, nrow(cMat))))
 ```
@@ -1116,6 +1119,7 @@ The `formula` environment becomes
 ```r
 &gt; formula.intIII&lt;- y ~ f(ID.area,model="bym2",graph=Georgia.adj) +
 +                     f(ID.year,model="rw1") +
++                     f(ID.year2,model="iid") +
 +                     f(ID.area.year, model="generic0", Cmatrix=R, rankdef = nrow(cMat),
 +                      extraconstr = list(A = cMat, e = rep(0, nrow(cMat))))
 ```
@@ -1150,6 +1154,7 @@ The `formula` environment becomes
 ```r
 &gt; formula.intIV&lt;- y ~ f(ID.area,model="bym2",graph=Georgia.adj) +
 +                     f(ID.year,model="rw1") +
++                     f(ID.year,model="iid") +
 +                     f(ID.area.year, model="generic0", Cmatrix=R, rankdef = nrow(cMat),
 +                     extraconstr = list(A = cMat, e = rep(0, nrow(cMat))))
 ```
@@ -1168,17 +1173,6 @@ The `formula` environment becomes
 It might be useful to employ indexes like DIC and WAIC to decide which model is the most appropriate for the problem at hand
 
 In this example:
-
-
-```r
-&gt; DIC &lt;- c(11570,11536,11615,11570)
-&gt; WAIC &lt;-c(11602,11569,11659,11612)
-&gt; DF$DIC&lt;- DIC
-&gt; DF$WAIC &lt;- WAIC
-&gt; 
-&gt; kable(DF, col.names = c("Interaction", "Parameters","Rank", "DIC","WAIC"),escape=F, caption = "Model fitting for the different ST models") %&gt;%
-+   kable_styling(latex_options = "hold_position")
-```
 
 &lt;table class="table" style="margin-left: auto; margin-right: auto;"&gt;
 &lt;caption&gt;Model fitting for the different ST models&lt;/caption&gt;
