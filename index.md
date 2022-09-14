@@ -20,7 +20,9 @@ It would be beneficial if attendees could bring their laptop having installed th
 
 - [Session 1.1](Session1.1): Introduction to Bayesian thinking
 - [Session 1.2](Session1.2): Introduction to INLA and R-INLA
+
 Break
+
 - [Practical 1](Practical1): INLA basics 
 - [Session1.3](Session1.3): Introduction to Spatial data
 
@@ -33,7 +35,9 @@ There is no material to download for practical 1.
 Download the material for the practical 2a [here](Practical2a/Practical2a.zip)
 - [Practical 2b](Practical2b)
 Download the material for the practical 2b [here](Practical2b/Practical2b.zip)
+
 Break
+
 - [Session 2.2](Session2.2): Spatial models for small area data: disease mapping and ecological regression
 - [Practical 3a](Practical3)
 Download the material for the practical 3 [here](Practical3/Practical3.zip). For this practical we do section 1-3.
@@ -42,24 +46,30 @@ Download the material for the practical 3 [here](Practical3/Practical3.zip). For
 
 - [Session 3.1](Session3.1): Introduction to temporal modelling
 - [Session 3.2](Session3.2): Spatio-temporal modelling for area data
+
 Break
-- [Practical 3b](Practical3): Spatio-temporal disease mapping and regression. We contintue with section 4-5 of Practical 3
+
+- [Practical 3b](Practical3): Spatio-temporal disease mapping and regression. We continue with sections 4-5 of Practical 3
 
 ### Day 4 - Thur 29th September 2022
 
 - [Session 4.1](Session4.1): Models for geostatistical data and introduction to SPDE
 - [Session 4.2](Session4.2): inla.stack and inlabru
+
 Break
+
 - [Practical 4](Practical4): INLA-SPDE for geostatistical data
 
-Download the material for the practical 5 [here](Practical5/temperature.croatia.Rdata)
+Download the material for the practical 4 [here](Practical4/temperature.croatia.Rdata)
 
 ### Day 5 - Fri 30th September 2022
 
 - [Session 5.1](Session5.1): Spatio-temporal model for geostatistical data
 - [Practical 5](Practical5): A space-time model with inlabru
 There is no material to download for practical 5
+
 Break
+
 - Final exam
 
 
