@@ -1,0 +1,185 @@
+%%% This Beamer example was created by LianTze Lim, April 2017.
+
+%%%% This is a VERY simple and minimalistic beamer theme,
+%%%% even reminiscent of marker pens on transparencies!
+%%%% It mimics the look of the "seminar" package, which
+%%%% can only be used with plain TeX.
+%%%% There are also some comments and example to show how
+%%%% to customise various elements, e.g. the font and colours.
+
+\documentclass[12pt]{beamer}
+%% If you'd like the default font size to be even larger, use 14pt or 17pt; these are supported by Beamer.
+
+\graphicspath{{Figures/}{Figures}}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% These lines should usually go into a .sty file,
+% but I'll leave them here so that it's easier to
+% see how to customise a Beamer theme.
+% Remember, the Beamer manual is your friend!!
+% http://texdoc.net/pkg/beamer
+%
+%% So if your re-definitions have a @ somewhere, you
+%% _MUST_ put a \makeatletter before these lines and then
+%% \makeatother after them. This trick can only be done
+%% in the preamble! BUT if you're doing these re-definitions
+%% in a .sty file (so that you \usepackage it later), you
+%% don't need the \makeatletter and \makeatother.
+\makeatletter
+
+%% Set the left and right margins
+\setbeamersize{text margin left=1em,text margin right=1em}
+
+%% FONTS
+\setbeamerfont{title}{series=\bfseries,size=\LARGE}
+\setbeamerfont{subtitle}{series=\bfseries,size=\Large}
+\setbeamerfont{frametitle}{series=\bfseries,size=\small}
+\setbeamerfont{block title}{series=\bfseries,size=\normalsize}
+\setbeamerfont{footline}{size=\small}
+
+%% COLOURS
+%% If you'd like everything to have the same colour
+\usebeamercolor{structure}
+\setbeamercolor{normal text}{fg=structure.fg}
+
+%% Add a line after the frametitle
+\addtobeamertemplate{frametitle}{}{\vspace*{-1ex}\rule{\textwidth}{1pt}}
+
+%% Use circular discs as itemized list markers;
+%% there's an existing option in Beamer for it so I'll use it
+\setbeamertemplate{itemize items}[circle]
+
+%% Remove default navigation symbols (We'll add the ones we need in the footline
+\setbeamertemplate{navigation symbols}{}
+
+
+%% And before the footline... actually we'd like to re-define
+%% the footline
+\setbeamertemplate{footline}{%
+   %% Beamer headlines and footlines are always full-paperwidth, so if you want the horizontal line to
+   %% not span it entirely you'll need to do a bit of arithmetic
+   \centering
+   \begin{minipage}{\dimexpr\paperwidth-\beamer@leftmargin-\beamer@rightmargin\relax}
+   \centering
+   \rule{\linewidth}{1pt}\vskip2pt
+   \usebeamerfont{footline}%
+   \usebeamercolor{footline}%
+   %% The frame number smack in the middle
+   \hfill\insertframenumber/\inserttotalframenumber
+   \hfill%
+   %% ONLY the navigation symbols we want at the far right.
+   %% We use an \llap so that it takes up zero width, and doesn't throw the page number off-centre!
+   \llap{\insertframenavigationsymbol\insertbackfindforwardnavigationsymbol}\par
+   \end{minipage}\vskip2pt
+}
+
+\setbeamercolor{block title alerted}{fg=white,bg=brown}
+
+\makeatother
+%%%% END STYLE CUSTOMISATION %%%%%%%%%%%%
+
+\usepackage[english]{babel}
+\usepackage[latin1]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{graphicx}
+
+\usepackage{subcaption}
+
+\usepackage{times}
+
+\usepackage{graphics}
+%\usepackage[draft]{graphics}
+
+\usepackage{xspace}
+\usepackage{amsmath}
+\usepackage{bm}
+\usepackage{pgfpages}
+\usepackage{fancybox}
+\usepackage{threeparttable}
+\usepackage{bbding}
+\usepackage{verbatim}
+\usepackage{booktabs}
+
+\usepackage{natbib}
+\bibpunct{(}{)}{;}{a}{}{,}
+
+\newcommand{\pkg}[1]{{\normalfont\fontseries{b}\selectfont #1}}
+\let\proglang=\textsf
+\let\code=\texttt
+
+\newcommand{\btheta}{ \mbox{\boldmath $\theta$}}
+\newcommand{\bbeta}{ \mbox{\boldmath $\beta$}}
+\newcommand{\balpha}{ \mbox{\boldmath $\alpha$}}
+\newcommand{\by}{ \mbox{\bf y}}
+\newcommand{\bY}{ \mbox{\bf Y}}
+\newcommand{\bX}{ \mbox{\bf X}}
+\newcommand{\bH}{ \mbox{\bf H}}
+\newcommand{\bI}{ \mbox{\bf I}}
+
+
+\title{Global measures of spatial autocorrelation}
+\subtitle{}
+\author{Bayesian modelling for spatial and spatio-temporal data}
+\institute{MSc in Epidemiology}
+\date{Week 6}
+
+
+\begin{document}
+
+\begin{frame}[t]
+  \titlepage
+\end{frame}
+
+\begin{frame}
+\frametitle{Measuring spatial autocorrelation}
+\begin{itemize}\setlength\itemsep{\fill}
+%\item A number of approaches have been suggested for measuring spatial autocorrelation.
+\item Global measures of spatial autocorrelation share a common structure: calculate the similarity of values at locations $i$ and $j$, then weight the similarity by the proximity of locations $i$ and $j$.
+\item Null hypothesis: spatial randomness (independent observations).
+\item Form of global measure of spatial autocorrelation:
+$$T= c \frac{\sum_{i=1}^N \sum_{j=1}^N w_{ij} \times \hbox{similarity}_{ij}}{\sum_{i=1}^N \sum_{j=1}^N w_{ij}}$$
+\end{itemize}
+\footnotesize{
+\begin{itemize}\setlength\itemsep{\fill}
+\item $c$ constant
+\item $N$ number of areas
+\item $w_{ij}$ weights reflecting the proximity between areas $i$ and $j$
+\item $\hbox{similarity}_{ij}$ measure of similarity between data values in areas $i$ and $j$
+\end{itemize}
+}
+\end{frame}
+
+\begin{frame}
+\frametitle{Global Moran's I test for spatial autocorrelation}
+\begin{itemize}\setlength\itemsep{\fill}
+\item Moran's I test can be applied to the data directly, or to the residuals from a regression model (as shown in tutorial 6.1).
+\item Let $\{Z_{i}: i,\dots,N\}$ represent spatially referenced data (or residuals) for $N$ spatial locations.
+\item The global Moran's I statistic is:\\
+$$ I  = \frac{N \sum_{i=1}^N \sum_{j=1}^N w_{ij}(Z_i - \overline{Z})(Z_j - \overline{Z})}
+{\left(\sum_i\sum_j w_{ij}\right)\sum_{i=1}^N (Z_i - \overline{Z})^2} $$
+\vspace{5pt}
+where $\overline{Z}=(1/N)\sum_i^N Z_i$ is the spatial mean and $w_{ij}$ are the spatial weights
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Global Moran's I interpretation}
+$I$ tell us if most pairs of neighbouring areas have the same sign regarding their deviation from the mean.
+\begin{itemize}\setlength\itemsep{\fill}
+    \item If there is no spatial dependence, $I$ will be close to 0 (i.e. spatial pattern is random)
+    \item If $I > 0$ and significant, then areas close together (as defined by $w_{ij}$) will tend to have similar values (i.e. clustering of like value)
+    \item If $I < 0$ and significant, clustering of dissimilar (i.e. alternating) values
+    \item ``Significance'' will be done using Monte Carlo (MC) approach (i.e. the data are repeatedly randomly assigned to different areas, and the statistic calculated under each permutation, yielding a comparison distribution)
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{References}
+\begin{itemize}\setlength\itemsep{\fill}
+\item Haining R., Guangquan L. (2020), Modelling Spatial and Spatial-Temporal Data. A Bayesian Approach, CRC Press, Section 6.2.4.2
+\item Waller L. A., Gotway C.A. (2004), Applied Spatial Statistics for Public Health Data. John Wiley \& Sons,  Section 7.4
+\end{itemize}
+\end{frame}
+
+
+\end{document} 

@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="" xml:lang="">
   <head>
-    <title>Session 1.3: Spatial models for small area data: disease mapping and ecological regression</title>
+    <title>Session 1.3: Types of Spatial Data</title>
     <meta charset="utf-8" />
     <script src="libs/header-attrs/header-attrs.js"></script>
     <link href="libs/panelset/panelset.css" rel="stylesheet" />
@@ -76,21 +76,22 @@
 
 
 
+
 class: title-slide
 
-# Session 1.3: Spatial models for small area data: disease mapping and ecological regression&lt;span style="display:block; margin-top: 10px ;"&gt;&lt;/span&gt; 
+# Session 1.3: Types of Spatial Data&lt;span style="display:block; margin-top: 10px ;"&gt;&lt;/span&gt; 
 
 ## 
 
 ###     
 
-### VIBASS, University of Valencia 
+### Spatial and Spatio-Temporal Bayesian Models with `R-INLA`, University of São Paulo 
 
 &lt;!-- Can also separate the various components of the extra argument 'params', eg as in 
-### VIBASS, University of Valencia, 20 July 2022, Spatial and Spatio-Temporal Bayesian Models with `R-INLA`
+### Spatial and Spatio-Temporal Bayesian Models with `R-INLA`, University of São Paulo, 26 September 2022, Spatial and Spatio-Temporal Bayesian Models with `R-INLA`
 --&gt;
 
-20 July 2022
+26 September 2022
 
 ---
 
@@ -98,36 +99,27 @@ layout: true
 
 .my-footer[ 
 .alignleft[ 
-&amp;nbsp; &amp;copy; Marta Blangiardo | Michela Cameletti 
+&amp;nbsp; &amp;copy; Marta Blangiardo | Monica Pirani
 ]
 .aligncenter[
 Spatial and Spatio-Temporal Bayesian Models with `R-INLA` 
 ]
 .alignright[
-VIBASS, 20 Jul 2022 
+Spatial and Spatio-Temporal Bayesian Models with `R-INLA`, 26 Sep 2022 
 ]
 ] 
 
 
+&lt;style&gt;
+pre {
+  overflow-x: auto;
+}
+pre code {
+  word-wrap: normal;
+  white-space: pre;
+}
+&lt;/style&gt;
 
----
-
-# Learning Objectives
-
-After this session you should be able to:
-   
-- Explain the main ideas underlying the use of Bayesian methods for producing spatially smoothed estimates of disease risk in small areas
- 
-- Describe different priors for spatial random effects 
- 
-- Explore aetiological hypothesis between a health outcome and exposure based on disease mapping
- 
-- Describe Poisson regression with spatial random effects for continuous and categorical covariates;
-
-- Use `R-INLA` to produce maps of smoothed estimates of disease risk, carry out spatial smoothing of disease risk and specify ecological regression models 
-
-
-The topics treated in this lecture are covered in Chapter 5-6 of the book **Spatial and Spatio-Temporal Bayesian models with R-INLA**
 
 ---
 
@@ -135,827 +127,300 @@ The topics treated in this lecture are covered in Chapter 5-6 of the book **Spat
 
 &lt;span style="display:block; margin-top: 30px ;"&gt;&lt;/span&gt;
 
-1\. [Spatial Structure](#spatial-structure)
+1\. [What are the different types of spatial data](#spatialData)
 
 &lt;span style="display:block; margin-top: 30px ;"&gt;&lt;/span&gt;
 
-2\. [Example: suicides in London](#Example)
-
-&lt;span style="display:block; margin-top: 30px ;"&gt;&lt;/span&gt;
-
-3\. [Ecological regression with spatial random effects](#Poisson-regression)
+2\. [Spatial data in R](#SpatialR)
 
 ---
 
-
-# Smoothed estimates of the RR (non spatial)
-
-- Poisson-logNormal model based on the assumption that the observations in the data set are identically distributed and independent
-
-&lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
-
-- However, data that occur close together in space (or time) are likely to be correlated    
-  .red[&amp;rarr; Dependence between observations is a more realistic assumption]
-
-&lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
-
-- Ignoring this dependence can lead to biased and inefficient inference    
-  .red[&amp;rarr; Smooth in space] prior distribution for the random effects should allow for spatial correlation
-
----
-
-name: spatial-structure
+name: spatialData
   
 &lt;span style="display:block; margin-top: 250px ;"&gt;&lt;/span&gt;
 
 .myblue[.center[.huge[
-**Spatial structure**]]]
+**What are the different types of spatial data**]]]
 
 ---
 
-# Intrinsic CAR model (Besag, York, and Mollie, 1991)
 
-- Specify the distribution of each random effect as if we knew the values of the spatial random effects in .red[neighbouring areas]
+# Terminology
 
-&lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
+- The data are seen as being a realization of a stochastic process, that is, of a set of random numbers each of which is associated with a spatial location.
+  - A spatial process in `\(d\)` dimensions is denoted as:
 
-- We have a conditional specification since we are conditioning on knowing the neighbours
-
-&lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
-
-- Rule for determining the neighbours of each area: most common based on common boundary
-
-&lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
-
-- Use of conditional autoregressive distributions
-
-.panelset[
-.panel[.panel-name[General definition]
-
-`$$\mathbf{u} \sim \hbox{ICAR}(\mathbf{W},\sigma^2_u)$$`
-
-with
-
-&lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt; 
-- `\(\mathbf{W}\)` matrix defining the neighbours (weights)
-- `\(\sigma^2_u\)` conditional variance parameter of `\(\mathbf{U}\)`
-
-`$$u_i \mid u_{j \;\; j\ne i} \sim \hbox{Normal}\left(\frac{\sum_{j} W_{ij} u_j}{\sum_{j} W_{ij}}, \frac{\sigma^2_u}{\sum_{j}  W_{ij}}\right)$$`
-]
-
-.panel[.panel-name[Common definition]
-
-`$$\mathbf{u} \sim \hbox{ICAR}(\mathbf{W},\sigma^2_u)$$`
-
-Let `\(\partial_i =\)` set of areas adjacent to `\(i\)`, `\(w_{ij}\)`  = 1 for `\(j \in \partial_i\)`, 0 otherwise
-`$$u_i \mid u_{j \;\; j\ne i} \sim \hbox{Normal}\left(\frac{\sum_{j \in \partial_i} u_j}{n_i}, \frac{\sigma^2_u}{n_i}\right)$$`
-
-&lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
-
-- `\(u_i\)` is smoothed towards mean risk in a set of neighbouring areas
-- Conditional variance inversely proportional to the number of neighbours (so more neighbours, less variability)
-
-]
-
-.panel[.panel-name[Remarks]
-- ICAR model is improper: the overall mean of the `\(\bm{u}\)` is not defined. So an additional constraints needs to be imposed:
-.red[**sum-to-zero constraint**:]  `\(\sum_i u_i  = 0\)`
-
-&lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;  
-
-- The parameter `\(\sigma^2_u\)` represents the .red[**conditional**] variance of the random effects (and not the marginal one) and its magnitude determines the amount of spatial variation
-
-&lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
-
-- No closed-form expression available for the .red[**marginal**] between-area variance of the spatial effects 
-  &amp;rarr; estimate marginal spatial variance empirically
-`$$s^2_{\text{u.marginal}} = \sum_i (u_i - \overline{u})^2 / (N-1)$$`
-]
-]
-
----
-
-#Combining ICAR with unstructured random effects
-- ICAR model makes a strong spatial assumption; it cannot take a limiting form that allows non-spatial variability
-
-- Besag, York and Mollie (BYM) recommended combining the ICAR prior and the standard normal prior to allow for both     
-  - spatially unstructured latent covariates `\(\bm{v}\)` modelled as iid
-  &amp;rarr; global smoothing
-  - spatially correlated latent covariates `\(\bm{u}\)` modelled as ICAR
-  &amp;rarr; local smoothing
-  
-.panelset[
-.panel[.panel-name[BYM]
-`\begin{align*}
-y_i &amp;\sim \text{Poisson}(\lambda_i = \rho_i E_i)\\
-\eta_i &amp;= \log \rho_i = b_0 + v_i + u_i\\
-v_i &amp;\sim \text{Normal}(0, \sigma^2_v)\\
-\mathbf{u} &amp;\sim \hbox{ICAR}(\mathbf{W},\sigma^2_u)
-\end{align*}`
-
-- Need to specify hyperprior distributions for:
-
-- `\(\sigma^2_v\)` (between-area unstructured marginal variance), e.g. `\(1/\sigma^2_v \sim \text{Gamma}(1,0.001)\)`
-- `\(\sigma^2_u\)` (between-area spatial conditional variance), e.g. `\(1/\sigma^2_u \sim \text{Gamma}(1,0.001)\)`
-- `\(b_0\)` (mean log relative risk), e.g. `\(b_0 \sim \text{Normal}(0,0.0001)\)` 
-]
-
-.panel[.panel-name[BYM2]
-
-`\begin{align*}
-y_i &amp;\sim \text{Poisson}(\lambda_i = \rho_i E_i)\\
-\eta_i &amp;= \log \rho_i = b_0 + b_i\\
-\boldsymbol{b} &amp;= \frac{1}{\sqrt{\tau_b}}(\sqrt{1-\phi}\boldsymbol{v}_{*} + \sqrt{\phi}\boldsymbol{u}_{*})
-\end{align*}`
-
-where `\(\boldsymbol{v}_{*}\)` and `\(\boldsymbol{u}_{*}\)` are standardised versions of `\(\bm{u}\)` and `\(\bm{v}\)`. 
-
-- Need to specify hyperprior distributions for:
-
-- `\(\phi\)` which is the weight of the spatially structured residual
-- `\(\tau_b\)` which is the marginal variance of the random effect 
-]
-]
-
----
-
-# Priors for BYM2
-    
-Under the BYM2 specification the hyperparameters `\(\tau_b\)` and `\(\phi\)` are modelled using .red[**Penalised Complexity** (PC) priors] (Simpson, Rue, Riebler, Martins, and S&lt;f8&gt;rbye, 2017)
-
-- Regularise inference while not forcing too strong information
-
-- Penalise departure from a "base" model (eg parameter = some fixed value)
-
-- Prior tends to favour the base model &amp;rarr; need fairly strong evidence to move away from it
-
-- Distance between the **base** model `\(\color{red}g(\xi)\)` and an **alternative**, more complex model `\(\color{blue}f(\xi)\)` is measured by
-  
-.blue[
-`$$d(f,g) = \sqrt{2\kld(f,g)} \qquad {\style{font-family:inherit; font-size: 105%; color: black;}{\text{with}}} \qquad \kld(f,g) = \int f(\xi)\log\left(\frac{f(\xi)}{g(\xi)}\right)d\xi$$`
-]
-
---
-
-- Penalisation done at a constant rate 
-
-.blue[   
-`$$p(d)=\lambda\exp(-\lambda d)\sim \dexp(\lambda) \qquad {\color{black}\Rightarrow} \qquad p(\xi)=\lambda e^{-\lambda d(\xi)}\left\lvert \frac{\partial d(\xi)}{\partial \xi} \right\rvert$$`
-]
-
-- PC prior defined using probability statements on the model parameters (in the appropriate scale) to determine the value of `\(\lambda\)` using "reasonable" information
-
----
-
-# Priors for BYM2
-
-Using probability statements we can define the PC priors for the two hyperparameters as:
-
-.pull-left[
-.content-box-beamer[
-### Prior on `\(\tau_b\)`
-
-`$$P((1/\sqrt{\tau_b})&gt;U) = \alpha_1$$`
-
-which can be interpreted as .blue[*the probability that the standard deviation of the random effect is larger than U is equal to*] `\(\class{blue}{\alpha_1}\)`
-]
-]
-
-.pull-right[
-.content-box-beamer[
-### Prior on `\(\phi\)`
-
-`$$P(\phi &lt; U) = \alpha_2$$`
-
-which can be interpreted as .blue[*the probability that the spatial random effect explains less than U of the total variability is equal to*] `\(\class{blue}{\alpha_2}\)`
-]
-]
-
----
-count: false
-# Priors for BYM2
-
-Using probability statements we can define the PC priors for the two hyperparameters as:
-&lt;span style="display:block; margin-top: -10px ;"&gt;&lt;/span&gt;
-.pull-left[
-.content-box-beamer[
-### Prior on `\(\tau_b\)`
-
-`$$P((1/\sqrt{\tau_b})&gt;U) = \alpha_1$$`
-
-which can be interpreted as .blue[*the probability that the standard deviation of the random effect is larger than U is equal to*] `\(\class{blue}{\alpha_1}\)`
-]
-]
-
-.pull-right[
-.content-box-beamer[
-### Prior on `\(\phi\)`
-
-`$$P(\phi &lt; U) = \alpha_2$$`
-
-which can be interpreted as .blue[*the probability that the spatial random effect explains less than U of the total variability is equal to*] `\(\class{blue}{\alpha_2}\)`
-]
-]
-
-&lt;span style="display:block; margin-top: 5px ;"&gt;&lt;/span&gt;
-
-where `\(\lambda = \frac{-\log(\alpha_k)}{U}\)`
-
-
-
-- We need to define `\(U\)` and `\(\alpha_1, \alpha_2\)` and following Simpson, Rue, Riebler, et al. (2017):
-&lt;span style="display:block; margin-top: 10px ;"&gt;&lt;/span&gt;
-
---
-
-  - A marginal sd not too large;
-
---
-
-  - `\(\alpha_1=0.01\)` (we want to allow for a small probability)
-
---
-
-  - `\(\alpha_2=2/3\)` (we expect a higher probability that the variability to be explained by the spatial random effect is lower than 50%)
-
---
-
-- Then 
-
-    1\. g Assuming `\(U=0.5/0.31\)` translates into `\(P(\sigma_{\tau_b}&gt;1.62) = 0.01\)`, using the rule of thumb in Simpson, Rue, Riebler, et al. (2017)
-    
-    2\. `\(P(\phi &lt; 0.5) = 2/3\)`
-
----
-
-# Poisson model with BYM random effects 
-
-- Choice of the adjacency matrix (neighbours): 2 areas are neighbours if they share a common border
-
-  &amp;rarr; Adjacency matrix implemented in INLA     
-
-- An area cannot be specified as its own neighbour
-
-- Adjacency matrix must be symmetric
-
---
-
-- `\(\text{RR}_i = \exp(b_0 + b_i)\)`: RR in area `\(i\)` relative to the age/sex structure (used to estimate the `\(E_i\)`)
-
-- `\(\hbox{residual RR}_i = \exp(b_i)\)`: residual RR in area `\(i\)` relative to the region average after adjusting for the overall risk
-
---
-
-- `\(\sigma^2_b\)` reflects the marginal variability of the REs 
-
-- `\(\phi\)` represent the weight of the spatial structure
-
----
-
-name: Example
-  
-&lt;span style="display:block; margin-top: 250px ;"&gt;&lt;/span&gt;
-
-.myblue[.center[.huge[
-**Example: Suicides in London**]]]
-
----
-
-# Suicides in Greater London, M+F, 1989-1993, Boroughs
-
-- 32 boroughs in Greater London
-
-- Interest: mapping the RR in each borough
-
-- Methods with no spatial structure: SMR, non spatial smoothing
-
-- Spatial smoothing using the BYM model
-
-`\begin{align*}
-y_i &amp; \sim  \hbox{Poisson}(\rho_i E_i)\\
-\log \rho_i  &amp; =  b_0 + b_i\\
-v_i &amp;\sim  \hbox{Normal}(0, \sigma^2_v)\\
-\bm{u} &amp; \sim  \hbox{ICAR}(\mathbf{W}, \sigma^2_u)
-\end{align*}`
-
-- Data: `\(\bm{y}\)` and `\(\bm{E}\)`
-- Priors: `\(\sigma^2_v\)`, `\(\sigma^2_u\)`, `\(b_0\)`
-- Parameters of interest: 
-  - residual RR `\((\hbox{resRR}_i=\exp(b_i))\)`
-  - marginal variance `\((1/ \tau_b)\)`
-  - percent of total variation in the log RR due to spatial effects `\((\phi)\)`
-  
----
-
-# Adjacency matrix in INLA
-    
-- It is possible to produces a graph from a shapefile
-
-&lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
-
-- Upload the shapefile using `sf` package
-
-
-```r
-&gt; library(sf)
-&gt; london.gen &lt;- read_sf("LDNSuicides.shp")
-&gt; london.gen$ID &lt;- seq(1,32)
-```
-
-
-
---
-
-- Use `poly2nb` and `nb2INLA` from the `spdep` package to transform the shapefile into adjacency matrix
-
-
-```r
-&gt; library(spdep)
-&gt; nb2INLA("LDN.graph",poly2nb(london.gen))
-&gt; LDN.adj &lt;- paste(getwd(),"/LDN.graph",sep="")
-```
-  
---
-
-- Now `LDN.graph` has been saved in the working directory and can be called when specifying the BYM model (see later)
-
----
-
-# Spatial distributions for area level data in INLA
-
-We introduce here the specification of the `ICAR` and `BYM2` models in `INLA`, which are done through `f()`:
-
-.panelset[
-.panel[.panel-name[ICAR in `INLA`]
-
-```r
-&gt; formula.ICAR &lt;- y ~ f(ID, model="besag", graph=LDN.adj)	
-```
-             
-&lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
-
-- `ID` is the area identifier
-
-&lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
-
-- `graph=LDN.adj` identifies the adjacency structure constructed as seen before
-
-&lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
-
-- `model=besag` specifies the intrinsic conditional autoregressive structure as described before
-
-On the example:
-
-
-```r
-&gt; formula &lt;- y ~ 1 + f(ID, model="besag",graph=LDN.adj, 
-+                     hyper=list(
-+                       prec=list(
-+                         prior="loggamma",param=c(1,0.0005))))
-```
-]
-
-.panel[.panel-name[BYM2 in `INLA`]
-
-```r
-&gt; formula.BYM2 &lt;- y ~ f(ID, model="bym2", graph=LDN.adj)	
-```
-
-&lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
-
-- `ID` is the area identifier
-
-&lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
-
-- `graph=LDN.adj` identifies the adjacency structure constructed as seen before
-
-&lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
-
-- `model=BYM2` specifies the combination of the intrinsic conditional autoregressive structure and unstructured random effect as described before
-
-On the example:
-
-
-```r
-&gt; formula &lt;- y ~ 1 + f(ID, model="bym2",graph="LDN.graph", 
-+         hyper=list(prec = list(
-+         prior = "pc.prec",
-+         param = c(0.5 / 0.31, 0.01)),
-+         phi = list(
-+         prior = "pc",
-+         param = c(0.5, 2 / 3))))
-```
-]
-]
-
----
-
-# Running the model in `INLA`
-
-
-To run the model in INLA
-
-```r
-&gt; mod.suicides &lt;- inla(formula,family="poisson",
-+                        data=data.suicides,E=E,
-+                        control.compute=list(dic=TRUE, waic=TRUE))
-```
-
-`R-INLA` estimates the parameters `\(\bm \theta = \{b_0, \bm{b}, \bm{u}\}\)` and the hyper-parameters  `\(\bm\psi=\{\tau_{b}, \phi\}\)`.
-
----
-
-# How to get information from random effects
- 
-- The random effect are obtained through 
-
-
-```r
-&gt; mod.suicides$summary.random$ID
-```
-
-
-```
-  ID        mean         sd  0.025quant    0.5quant  0.975quant mode
-1  1 -0.08510952 0.10811939 -0.30285486 -0.08316692  0.12163309   NA
-2  2 -0.17474998 0.08540538 -0.34589778 -0.17353272 -0.01046816   NA
-3  3 -0.21992750 0.09665180 -0.41408349 -0.21840193 -0.03443054   NA
-4  4  0.12065015 0.08247743 -0.04244836  0.12103829  0.28157238   NA
-5  5 -0.14179292 0.08401198 -0.30909735 -0.14098882  0.02097276   NA
-6  6  0.40357593 0.08256304  0.23961732  0.40423764  0.56386951   NA
-           kld
-1 3.915693e-08
-2 6.780423e-08
-3 1.341278e-08
-4 1.655222e-07
-5 1.134656e-07
-6 1.343781e-07
-```
-
-which is a matrix formed by `\(2n\)` rows: 
-
-  - `\(1:n\)` rows include information on the area specific residuals `\(b_i\)`
-  - `\(n+1:2n\)` rows are the spatially structured residual `\(u_i\)`
-
----
-
-# How to get information from random effects
- 
-- All these parameters are on the logarithmic scale; to transform the **marginal** back to the natural scale:
-.pull-left[
-
-```r
-&gt; b &lt;- mod.suicides$marginals.random$ID[1:Nareas]
-```
-this returns a list with `Nareas` number of elements, each representing the posterior marginal of `\(b_i\)` for that area
-]
-
-.pull-right[
-&lt;img src="./img/fig2.1-1.png" style="display: block; margin: auto;" width="50%"&gt;
-]
-
---
-&lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
-
-- Then we can get the posterior mean and 95% credible intervals:
-
-.pull-left[
-
-```r
-&gt; zeta &lt;- lapply(b,function(x) inla.emarginal(exp,x))
-&gt; zeta_CI &lt;- lapply(b,function(x) 
-+ inla.qmarginal(c(0.025,0.975),
-+     inla.tmarginal(exp,x)))
-```
-]
-
-.pull-right[
-
-
-&lt;span style="display:block; margin-top: -150px ;"&gt;&lt;/span&gt;
-
-&lt;center&gt;&lt;img src=./img/trans1-plot-1.png width='50%' title=''&gt;&lt;/center&gt;
-]
-
----
-
-# Identification of spatial patterns
- 
-- What is the sensitivity vs specificity of smoothed RR?
-  - Ability to detect true patterns (sensitivity)
-  - Ability to discard false patterns (specificity)
-
-&lt;span style="display:block; margin-top: 10px ;"&gt;&lt;/span&gt;
-
-- Detection of increased/decreased RR 
-
-  &amp;rarr; Posterior probabilities that the residual RR is above/below 1 (Richardson, Thomson, Best, and Elliott, 2004)
-
-&lt;span style="display:block; margin-top: 10px ;"&gt;&lt;/span&gt;
-
-- Area with an increased risk
-`\begin{align*}
-\hbox{P(resRR}_i&gt;1)&gt;0.8 &amp; \Leftrightarrow \hbox{P}(e^{(u_i+v_i)}&gt;1)&gt;0.8\\
-&amp; \Leftrightarrow  \hbox{P}(u_i+v_i&gt;0)&gt;0.8
-\end{align*}`
-  
-- Area with a decreased risk
-`\begin{align*}
-\hbox{P(resRR}_i&lt;1)&gt;0.8 &amp; \Leftrightarrow  \hbox{P}(e^{(u_i+v_i)}&gt;1)&lt;0.2\\
-&amp; \Leftrightarrow  \hbox{P}(u_i+v_i&gt;0)&lt;0.2
-\end{align*}`
-     
----
-    
-# Posterior probability in INLA
-     
-- Remember the parametrisation `\(\zeta = \exp{(b_i)}\)`
-      
-- We can visualize `\(p(\zeta_i&gt;1\mid \bm y)=p(b_i&gt;0\mid \bm y)\)` using the built-in function `inla.pmarginal`:
-
-```r
-&gt; a &lt;- 0
-&gt; prob.b &lt;- lapply(b, function(x) {1 - inla.pmarginal(a, x)})
-```
-
---
-
-- Create an object with all the info to map
-
-```r
-&gt; RR_BYM &lt;- tibble(zeta=unlist(zeta),prob=unlist(prob.b), ID=seq(1,32))
-&gt; out_map &lt;- left_join(london.gen,datasuicides, by="ID") %&gt;% left_join(., RR_BYM, by="ID")
-&gt; out_map$pp_breaks &lt;- cut(out_map$prob, 
-+                            breaks = c(0, c(0.2, 0.8), 
-+                                       1), include.lowest = T)
-```
-
----
-
-#...and then create some maps
-
-.pull-left[
-### Map of posterior mean of `\(b_i\)`
-
-```r
-&gt; ggplot() + geom_sf(data = out_map, 
-+                    aes(fill = zeta)) + 
-+             scale_fill_viridis_c()
-```
-
-&lt;img src="./img/map-post-mean-1.png" &gt;
-]
-
-.pull-right[
-### Map of posterior probability of `\(b_i&gt;0\)`
-
-```r
-&gt; ggplot() + geom_sf(data = out_map, 
-+            aes(fill = pp_breaks)) + 
-+   scale_fill_manual(values = c("blue","orange","red"))
-```
-
-&lt;img src="./img/map-post-p-1.png" &gt;
-]
-
----
-
-# Output from different models
-
-.panelset[
-.panel[.panel-name[Comparing maps]     
-.pull-left[
-- **SMR** non smoothed RR
-                 
-- **HET** non spatially smoothed residual RR: `\(\exp(v)\)`
-                   
-- **CAR** spatially smoothed residual RR: `\(\exp(u)\)`
-                   
-- **BYM** spatially and non spatially smoothed residual RR: `\(\exp(b)=\exp(u+v)\)`
-]
-.pull-right[
-&lt;center&gt;&lt;img src=./img/Lungmales_4maps.jpg width='90%' title=''&gt;&lt;/center&gt;
-]
-]
-
-.panel[.panel-name[Shrinkage]
-.pull-left[  
-&lt;center&gt;&lt;img src=./img/Lungmales_shrinkage.jpg width='90%' title=''&gt;&lt;/center&gt;
-]
-
-.pull-right[
-- Shrinkage towards the mean due to the **borrowing of strength**
-]
-]
-
-.panel[.panel-name[Interpretation]
-
-- Smoothed relative risks are more stable (precise than observed)
-
-&amp;rarr; geographical patterns of risk are easier to detect using smoothed maps
-
-&lt;span style="display:block; margin-top: 10px ;"&gt;&lt;/span&gt;
-
-- Smoothed relative risks have higher specificity:
-  - Possible "false positive" values shrunk towards mean
-  - But in danger of over-smoothing (false negatives)
-
-&lt;span style="display:block; margin-top: 10px ;"&gt;&lt;/span&gt;
-
-- Visual impact of maps can be very dependent on the choice of colours and cut-points used to shade each region
-
-&amp;rarr; Care must be taken not to over-interpret any patterns identified
-
-]
-]
----
-
-name: Poisson-regression
-  
-&lt;span style="display:block; margin-top: 250px ;"&gt;&lt;/span&gt;
-
-.myblue[.center[.huge[
-**Ecological regression with spatial random effects**]]]
-
----
-# Disease Mapping vs Ecological Regression
-       
-## Disease mapping studies
-       
-- Focus is on description
-- Level of inference is at the aggregate (small area) level
-       
-      
-## Ecological correlation studies
-       
-- Focus is on **explanation**
-  
-  - Used for investigating specific exposure-disease hypotheses at small-area scale
-
-  - Poisson regression can be used to model relationship between any area-level exposure measure and incidence/prevalence of disease
-
-  - Such area-level exposure measures include average annual pollution level, proportion of population who smoke, proportion of population living with x km of a landfill site, etc.
- 
----
-
-# Poisson regression with random effects
-
-Straightforward extension of disease mapping model:
-
-.content-box-beamer[
-### Ecological regression with BYM structure
-  
-`\begin{align*}
-\hbox{y}_i &amp; \sim  \hbox{Poisson}(E_i \rho_i); \;\;\; i=1,...,N\\
-\log \rho_i &amp; =  b_0 + \class{red}{\beta_1 x_i} + u_i + v_i\\
-\text{residual RR}_i &amp;= \exp(b_i) = \exp(u_i + v_i)\\
-\boldsymbol{b} &amp;= \frac{1}{\sqrt{\tau_b}}(\sqrt{1-\phi}\boldsymbol{v}_{*} + \sqrt{\phi} \boldsymbol{u}_{*})\\ 
-v_i &amp;\sim \text{Normal}(0, \sigma^2_v) \;\;\; \mathbf{u} \sim \hbox{ICAR}(\mathbf{W},\sigma^2_u)
-\end{align*}`
-]
-
-&lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
+$$  \{Z(\bm{s}): \bm{s} \in \mathcal{D} \subset \mathbb{R}^d\}$$ 
 
 where
- 
-- `\(O_i\)` and `\(E_i\)`: Observed and expected nb of cases in each area `\(i\)`
-- `\(\lambda_i\)`: unknown RR
-- `\(x\)`  area-level covariate of interest
-- `\(\beta_1\)`: parameter associated with the covariate
-- `\(\bm v_{*}\)`: standardised version of unstructured random effects, i.i.d.
-- `\(\bm u_{*}\)`: standardised version of random effects with spatial structure, conditional distribution
+- `\(Z\)` is the attribute we observe (e.g. temperature, number of sudden infant deaths etc.)
+&lt;span style="display:block; margin-top: 10px ;"&gt;&lt;/span&gt;
+- `\(\bm{s}\)` is the location where `\(Z\)` is observed (e.g. coordinates such as latitude and longitude)
+&lt;span style="display:block; margin-top: 10px ;"&gt;&lt;/span&gt;
+- `\(\mathcal{D}\)` is the domain, and it is called the **index set** = possible locations
 
-
----
-  
-# Interpretation of the parameters
-
-- `\(\exp(\beta_1)\)` is the change in risk associated with a unit
-   change in exposure `\(x\)`
-   
-&lt;span style="display:block; margin-top: 30px ;"&gt;&lt;/span&gt;
-   
-- `\(b_i\)` is the  random effect in area `\(i\)`
-
-&lt;span style="display:block; margin-top: 30px ;"&gt;&lt;/span&gt;
-
-- `\(\exp(b_i)\)` is the residual or adjusted relative risk of disease
-   in area `\(i\)` .blue[after accounting for the effects of measured covariates and the
-   overall mean risk]
-
-&lt;span style="display:block; margin-top: 30px ;"&gt;&lt;/span&gt;
-
-- The variance of the random effects reflects the amount of overdispersion
-   in the data (total residual variance = Poisson variance + random effects variance)
- 
----
-# Poisson regression with random effects - INLA code
-
-- Continuous covariate
-
-```r
-&gt; formula.ecoreg.inla &lt;- y ~ 1 + x +
-+         f(id,model="bym", graph=graph,                 
-+           hyper=list(prec.spatial=list(
-+                 prior="loggamma",param=c(0.01,0.01))))
-```
-
-  - Categorical covariate
-
-```r
-&gt; formula.ecoreg.inla &lt;- y ~ 1 + cut(x,breaks=c(0,7,10,24),
-+                            include.lowest=TRUE) +
-+                            f(id,model="bym", graph=graph,   
-+                              hyper=list(prec.spatial=list(
-+                              prior="loggamma",param=c(0.01,0.01))))
-```
+&lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
+- Symbols are as follows: `\(\{\}\)` a set (a collection of elements); `\(\in\)` element of or belongs to; `\(\subset\)` subset of; `\(\mathbb{R}\)` real numbers set
 
 ---
 
-# Comparison between DM and ecological regression
+# Type of spatial data
 
-&lt;span style="display:block; margin-top: -40px ;"&gt;&lt;/span&gt;
+Cressie and Wikle (2015) distinguishes three types of spatial data, based on the nature of the spatial domain `\(\mathcal{D}\)`:
 
-&lt;center&gt;&lt;img src=./img/LipCancer.png width='50%' title=''&gt;&lt;/center&gt;
+&lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
 
-&lt;span style="display:block; margin-top: -40px ;"&gt;&lt;/span&gt;
+- .red[Areal data (also known as lattice data)]: `\(\mathcal{D}\)` is fixed (of regular or irregular shape) and partitioned into a finite number of areal units (e.g. census tract, pixels) with well-defined boundaries. 
 
-- Less extreme values when covariates are included
+&lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
 
-&amp;rarr; part of the spatial variability is explained by the covariates
+- .red[Geostatistical (or point-referenced) data]: `\(\mathcal{D}\)` is a continuous fixed set. By continuous we mean that `\(Z(\bm{s})\)` can be observed everywhere within `\(\mathcal{D}\)`. By fixed we mean that the points in `\(\mathcal{D}\)` are non-stochastic. 
+
+&lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
+
+.red[Point pattern data]: `\(\mathcal{D}\)` is itself random. Its index set gives the locations of random **events** that are the spatial point pattern. 
+
 ---
-# Poisson regression with random effects
 
-.content-box-beamer[
+# Example of areal data [1]
 
-### Extension to several variables
-
-`\begin{align*}
-\hbox{y}_i &amp; \sim  \hbox{Poisson}(E_i \rho_i); \;\;\; i=1,...,N\\
-\log \rho_i &amp; =  b_0 + \beta_1 x_{1i} +\beta_2 x_{2i} + b_i\\
-&amp; ...
-\end{align*}`
+Lattice data can be either irregularly aligned or gridded, and occur in the form of aggregated observation over areas.
+&lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
+.pull-left[&lt;center&gt;&lt;img src=./img/poverty_US.jpg width='65%' title=''&gt;&lt;/center&gt;
+.center[Percentage of people in poverty by County: 2015-2019. Source: American Community Survey 2015-2019, 5-Year Data Release.]
 ]
 
-&lt;span style="display:block; margin-top: 10px ;"&gt;&lt;/span&gt;
+.pull-right[
+- This figure is an example of a **choropleth map**, which uses shades of color (or grey scale) to classify the values of the variable that we are mapping into classes.
+&lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
+- From the choropleth map we know which areas are adjacent which other areas. The relationship between areal units is characterized in terms of .red[adjacency].
+&lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
+- The *sites* `\(\boldsymbol{s} \in \mathcal{D}\)` in this case are actually the polygons themselves. %which can be denoted not by `\(\boldsymbol{s}_i\)` but by `\(B_i, i = 1,\dots, N\)` to avoid confusion between points `\(\boldsymbol{s}_i\)` and regions `\(B_i\)`.
+]
 
-- `\(\exp(\beta_1)\)` is the relative risk of disease/death associated with a unit
-   increase in exposure `\(x_1\)`, after adjustment for `\(x_2\)`
-   
-&lt;span style="display:block; margin-top: 10px ;"&gt;&lt;/span&gt;
-
-- `\(\exp(\beta_2)\)` is the relative risk of disease/death associated with a unit
-   increase in exposure `\(x_2\)`, after adjustment for `\(x_1\)`
-
-&lt;span style="display:block; margin-top: 10px ;"&gt;&lt;/span&gt;
-
-- `\(\exp(b_i)\)` is the residual or adjusted relative risk of disease/death
-   in area `\(i\)` after accounting for the effects of measured covariates and the overall mean risk
- 
 ---
-     
- # Summary
+
+# Example of areal data [2]
+
+&lt;center&gt;&lt;img src=./img/Italy_Covid_March2020.jpg width='38%' title=''&gt;&lt;/center&gt;
+
+.center[Map of the percent excess mortality for the 107 Italian provinces during the first wave of Covid-19 pandemic. Epidemiological week 18-24 March, 2020; males.]
+
+---
+
+# Example of regular lattice data [3]
+
+&lt;center&gt;&lt;img src=./img/Getis-Ord.jpg width='40%' title=''&gt;&lt;/center&gt;
+
+.center[Regular lattice: Getis-Ord remote sensing example data (from package `spdep`).]
+
+
+---
+
+# Example of geostatistical data [1]
+
+&lt;center&gt;&lt;img src=./img/Wind_Temp_StationsUS.jpg width='45%' title=''&gt;&lt;/center&gt;
+
+.center[Map of wind and temperature stations in US (2019).]
+
+&lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
+
+The data are gathered at a discrete set of points in an region of interest `\((\mathcal{D})\)`, with the aim of understanding
+the behaviour of an unobserved, spatially continuous phenomenon that exists throughout that region and could, in principle, be observed at any point in `\(\mathcal{D}\)`.
+
+---
+
+# Example of geostatistical data [2]
+.center[Average air temperature in degree Celsius (March-November 2018)]
+.pull-left[
+&lt;center&gt;&lt;img src=./img/Rplot_Temp_Dry2018.jpeg width='80%' title=''&gt;&lt;/center&gt;
+
+.center[Observed]
+]
+
+.pull-right[
+&lt;center&gt;&lt;img src=./img/Rplot_Temp_Pred_Dry2018.jpeg width='57%' title=''&gt;&lt;/center&gt;
+
+.center[Predicted]
+]
+
+
+&lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
+
+We can reconstruct a surface from the finite set of observations taken at a finite number of spatial locations.
+
+---
+
+# Examples of point pattern data [1]
+
+&lt;center&gt;&lt;img src=./img/colera.jpg width='40%' title=''&gt;&lt;/center&gt;
+.center[John Snow's map of the 1854 London cholera outbreak]
+&lt;span style="display:block; margin-top: 10px ;"&gt;&lt;/span&gt;
+- In 1854, cholera hit the city of London. No one knew where the disease started. So, British physician John Snow started mapping the outbreak.
+- It wasn’t just the disease. But he also mapped out roads, property boundaries, and water lines.
+- When he added these features to a map, something interesting happened. He noticed that cholera cases were only along one water line. This was a breakthrough that connected geography to public health safety.
+- The question of primary interest is whether, and if so where and when, statistically unusual local concentrations of cases occur.
+
+---
+
+# Examples of point pattern data [2]
+
+&lt;center&gt;&lt;img src=./img/Earthquakes_Italy.jpg width='38%' title=''&gt;&lt;/center&gt;
+
+.center[Location of earthquakes in Italy 1900-2017 (moment magnitude scale).]
+&lt;span style="display:block; margin-top: 10px ;"&gt;&lt;/span&gt;
+Other examples in which points are the location of an .red[event] of interest:
+- Location of crimes
+- Location of trees
+- Location of earthquakes
+
+---
+
+# Data we will work with
+In this course, we will work with:
+&lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
+
+- Areal or lattice data
+&lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
+
+- Geostatistical or spatial-referenced data
+
+---
+
+name: spatialR
   
-- Hierarchical models allow "borrowing of strength" across units
- 
-  - posterior distribution of `\(\rho_i\)` for each unit borrows
-   strength from the likelihood contributions for
-   **all** the units, via their joint influence on the posterior
-   estimates of the unknown hyper-parameters
- 
-&lt;span style="display:block; margin-top: 10px ;"&gt;&lt;/span&gt;
- 
-- Judgements of exchangeability need careful assessment
- 
-  - units suspected a priori to be systematically different might be modelled by including relevant covariates so that residual variability more plausibly reflects exchangeability
-  - subgroups of prior interest should be considered separately
+&lt;span style="display:block; margin-top: 250px ;"&gt;&lt;/span&gt;
 
-&lt;span style="display:block; margin-top: 10px ;"&gt;&lt;/span&gt;
-
-- Mapping geographical variations in disease risk is an important epidemiological technique for
-   suggesting aetiological hypotheses
-
-&lt;span style="display:block; margin-top: 10px ;"&gt;&lt;/span&gt;
-
-- When combined with data on geographical variations in exposure, disease mapping techniques can be used to investigate and quantify **ecological** associations between disease risk and potential exposures
+.myblue[.center[.huge[
+**Spatial Data in R**]]]
 
 ---
+
+
+# Spatial data in R: Vectors
+
+The are two fundamental distinctions: spatial .red[vector] data and .red[raster].
+
+- .red[Vector] represents the world using .red[points], .red[lines] and .red[polygons] or combinations of those, where:
+&lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
+- *Point*, is a single point location, such as a geocoded address or a temperature sensor or the location of a bus stop;
+&lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
+- *Line*, is a set of ordered points, connected by straight line segments such as route travel or connections between locations;
+&lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
+- *Polygon*, is an area, marked by one or more enclosing lines such as local authority districts or census tracts.
+
+---
+
+Simple features, `sf` package  support 17 geometry types. Of these, 7 are used in the vast majority of geographic research:
+
+&lt;center&gt;&lt;img src=./img/Features_supported_by_sf.jpg width='40%' title=''&gt;&lt;/center&gt;
+
+Core geometry types supported by the R package sf. Source: Lovelace, Nowosad, and Muenchow (2019), Section 2.2.
+
+---
+
+# Spatial data in R: Rasters
+
+- .red[Raster]: divides the surface into cells (also called pixels) of constant size. Each cell has a value associated with it, which might be numeric or categorical. 
+
+&lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
+
+  - Raster maps usually represent continuous phenomena such as elevation, temperature, population density.
+&lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
+
+  - Raster data are the basis of images used in web-mapping and have been a source of data since the origins of aerial photography and satellite-based remote sensing devices.
+
+---
+
+Examples of continuous and categorical raster data. 
+
+&lt;center&gt;&lt;img src=./img/Raster_data.jpg width='70%' title=''&gt;&lt;/center&gt;
+
+.center[Source: Lovelace, Nowosad, and Muenchow (2019), Section 2.3.]
+
+---
+
+# Some useful R packages 
+
+-   `sf`, which is a recently developed package for spatial vector data (points, lines, polygons etc.) and combines the functionality of three previous packages `sp`, `rgeos` and `rgdal`. It refers to a formal standard that describes how objects in the real world can be represented in computers, with emphasis on the spatial geometry of these objects
+&lt;span style="display:block; margin-top: 10px ;"&gt;&lt;/span&gt;
+- `sp`, which precedes `sf`, and with the `rgdal` and `rgeos` package, it creates a powerful tool to works with spatial data. Many R packages still depends on the `sp` package
+&lt;span style="display:block; margin-top: 10px ;"&gt;&lt;/span&gt;
+- `spdep`, which includes functions and tests for evaluating spatial patterns and autocorrelation
+&lt;span style="display:block; margin-top: 10px ;"&gt;&lt;/span&gt;
+- `tidyverse`, which is a coherent system of packages for data manipulation, exploration and visualization
+&lt;span style="display:block; margin-top: 10px ;"&gt;&lt;/span&gt;
+- `ggplot2`, `tmap` and `mapview` for visualization and maps
+&lt;span style="display:block; margin-top: 10px ;"&gt;&lt;/span&gt;
+- `SpatialEpi`, which provides methods for spatial epidemiology
+
+---
+
+# Some useful R packages 
+
+Many spatial R packages still depends on the `sp`, thus it is important to know how to convert `sp` to and from `sf` objects
+
+
+```r
+&gt; library(spData); library(sf); library(tidyverse)
+&gt; 
+&gt; # world is a sf object containing a world map data
+&gt; # from Natural Earth with a few variables from World Bank
+&gt; world &lt;- st_read(system.file("shapes/world.gpkg", package="spData"))
+&gt; plot(world["pop"])                # plot world population
+&gt; 
+&gt; world_sp &lt;- as(world, "Spatial")  # from sf to sp object
+&gt; class(world_sp)                   # "SpatialPolygonsDataFrame"
+&gt; 
+&gt; world_sf &lt;- st_as_sf(world_sp)    # from sp to sf object
+&gt; class(world_sf)                   # "sf"  "data.frame"
+```
+
+&lt;center&gt;&lt;img src=./img/World_pop.jpeg width='30%' title=''&gt;&lt;/center&gt;
+
+---
+
+# Some useful R packages 
+
+`sf` works well with the `tidyverse` collection of R packages.
+
+For example, functions can be combined using the pipe operator `\(\%&gt;\%\)` given that both packages are loaded
+
+
+```r
+&gt; # Select and plot information for a single attribute
+&gt; world %&gt;% select(lifeExp) %&gt;% plot()
+```
+
+&lt;center&gt;&lt;img src=./img/LifeExp.jpeg width='50%' title=''&gt;&lt;/center&gt;
+
+---
+
+# Some useful R packages 
+
+`sf` object includes spatial metadata like the coordinate reference
+system (CRS), which are stored in a list column.
+
+We can extract and plot only the geometry with the function `st_geometry()`
+
+
+```r
+&gt; # Extract geometry
+&gt; worlg_geo &lt;- st_geometry(world)
+&gt; # Extract and plot out only the geometries
+&gt; world %&gt;% st_geometry() %&gt;% plot()
+```
+
+&lt;center&gt;&lt;img src=./img/World_geom.jpeg width='50%' title=''&gt;&lt;/center&gt;
+
+---
+
 
 # References
 
-Besag, J., J. York, and A. Mollie (1991). "Bayesian Image Restoration,
-with two Applications in Spatial Statistics". In: _Annals of the
-Institute of Statistical Mathematics_ 43, pp. 1-59.
+Cressie, N. and C. K. Wikle (2015). _Statistics for spatio-temporal data_. John Wiley &amp; Sons.
 
-Richardson, S., A. Thomson, N. Best, et al. (2004). "Interpreting
-posterior relative risk estimates in disease-mapping studies". In:
-_Environmental Health Perspectives_ 112.9, pp. 1016-1025.
-
-Simpson, D., H. Rue, A. Riebler, et al. (2017). "Penalising Model
-Component Complexity: A Principled, Practical Approach to Constructing
-Priors". In: _Statistical Science_ 32.1, pp. 1 - 28. DOI:
-[10.1214/16-STS576](https://doi.org/10.1214%2F16-STS576). URL:
-[https://doi.org/10.1214/16-STS576](https://doi.org/10.1214/16-STS576).
+Lovelace, R., J. Nowosad, and J. Muenchow (2019). _Geocomputation with R_. The online version of the book is at http://geocompr.robinlovelace.net/. CRC Press.
     </textarea>
 <style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
 <script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>

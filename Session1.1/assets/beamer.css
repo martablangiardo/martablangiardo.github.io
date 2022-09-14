@@ -620,7 +620,7 @@ table.dataTable.hover tbody tr:hover, table.dataTable.display tbody tr:hover {
   margin: 0 0 15px;
   overflow: hidden;
   padding: 10px 20px 10px 20px;
-  width: 100%;
+  width: 90%;
 }
 /*
  * Define a content box similar to the 'block' in 'Beamer/Boadilla'

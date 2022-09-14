@@ -1,0 +1,887 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>Session 2.3: spatio-temporal model for geostatistical data</title>
+    <meta charset="utf-8" />
+    <script src="libs/header-attrs/header-attrs.js"></script>
+    <link href="libs/panelset/panelset.css" rel="stylesheet" />
+    <script src="libs/panelset/panelset.js"></script>
+    <!-- (Re)Defines a bunch of LaTeX commands that can then be used directly in the .Rmd file as '\command{...}' -->
+    <script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+      TeX: {
+        /* This enables color macros */
+        extensions: ["color.js"],
+        Macros: {
+          /* Probability & mathematical symbols */
+          Pr: "{\\style{font-family:inherit; font-size: 110%;}{\\text{Pr}}}",
+          exp: "{\\style{font-family:inherit; font-size: 105%;}{\\text{exp}}}",
+          log: "{\\style{font-family:inherit; font-size: 105%;}{\\text{log}}}",
+          ln: "{\\style{font-family:inherit; font-size: 105%;}{\\text{ln}}}",
+          logit: "{\\style{font-family:inherit; font-size: 100%;}{\\text{logit}}}",
+          HR: "{\\style{font-family:inherit; font-size: 105%;}{\\text{HR}}}",
+          OR: "{\\style{font-family:inherit; font-size: 105%;}{\\text{OR}}}",
+          E: "{\\style{font-family:inherit; font-size: 105%;}{\\text{E}}}",
+          Var: "{\\style{font-family:inherit; font-size: 105%;}{\\text{Var}}}",
+          Cov: "{\\style{font-family:inherit; font-size: 105%;}{\\text{Cov}}}",
+          Corr: "{\\style{font-family:inherit; font-size: 105%;}{\\text{Corr}}}",
+          DIC: "{\\style{font-family:inherit; font-size: 105%;}{\\text{DIC}}}",
+          se: "{\\style{font-family:inherit; font-size: 100%;}{\\text{se}}}",
+          sd: "{\\style{font-family:inherit; font-size: 100%;}{\\text{sd}}}",
+          kld: "{\\style{font-family:inherit; font-size: 100%;}{\\text{kld}}}",
+          /* Distributions */
+          dnorm: "{\\style{font-family:inherit;}{\\text{Normal}}}",
+          dt: "{\\style{font-family:inherit;}{\\text{t}}}",
+          ddirch: "{\\style{font-family:inherit;}{\\text{Dirichlet}}}",
+          dmulti: "{\\style{font-family:inherit;}{\\text{Multinomial}}}",
+          dbeta: "{\\style{font-family:inherit;}{\\text{Beta}}}",
+          dgamma: "{\\style{font-family:inherit;}{\\text{Gamma}}}",
+          dbern: "{\\style{font-family:inherit;}{\\text{Bernoulli}}}",
+          dbin: "{\\style{font-family:inherit;}{\\text{Binomial}}}",
+          dpois: "{\\style{font-family:inherit;}{\\text{Poisson}}}",
+          dweib: "{\\style{font-family:inherit;}{\\text{Weibull}}}",
+          dexp: "{\\style{font-family:inherit;}{\\text{Exponential}}}",
+          dlnorm: "{\\style{font-family:inherit;}{\\text{logNormal}}}",
+          dunif: "{\\style{font-family:inherit;}{\\text{Uniform}}}",
+          /* LaTeX formatting */
+          bm: ["{\\boldsymbol #1}",1],
+          /* These create macros to typeset numbers in maths with the basic font */
+          0: "{\\style{font-family:inherit; font-size: 105%;}{\\text{0}}}",
+          1: "{\\style{font-family:inherit; font-size: 105%;}{\\text{1}}}",
+          2: "{\\style{font-family:inherit; font-size: 105%;}{\\text{2}}}",
+          3: "{\\style{font-family:inherit; font-size: 105%;}{\\text{3}}}",
+          4: "{\\style{font-family:inherit; font-size: 105%;}{\\text{4}}}",
+          5: "{\\style{font-family:inherit; font-size: 105%;}{\\text{5}}}",
+          6: "{\\style{font-family:inherit; font-size: 105%;}{\\text{6}}}",
+          7: "{\\style{font-family:inherit; font-size: 105%;}{\\text{7}}}",
+          8: "{\\style{font-family:inherit; font-size: 105%;}{\\text{8}}}",
+          9: "{\\style{font-family:inherit; font-size: 105%;}{\\text{9}}}",
+          /* Health economics quantities */
+          icer: "{\\style{font-family:inherit; font-size: 100%;}{\\text{ICER}}}",
+          nb: "{\\style{font-family:inherit; font-size: 100%;}{\\text{NB}}}",
+          ol: "{\\style{font-family:inherit; font-size: 100%;}{\\text{OL}}}",
+          ceac: "{\\style{font-family:inherit; font-size: 100%;}{\\text{CEAC}}}",
+          evpi: "{\\style{font-family:inherit; font-size: 100%;}{\\text{EVPI}}}",
+          evppi: "{\\style{font-family:inherit; font-size: 100%;}{\\text{EVPPI}}}",
+          evsi: "{\\style{font-family:inherit; font-size: 100%;}{\\text{EVSI}}}"
+        }
+      }
+    });
+    </script>
+    <link rel="stylesheet" href="assets/beamer.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+
+
+
+
+class: title-slide
+
+# Session 2.3: spatio-temporal model for geostatistical data&lt;span style="display:block; margin-top: 10px ;"&gt;&lt;/span&gt; 
+
+## 
+
+###     
+
+### VIBASS, University of Valencia 
+
+&lt;!-- Can also separate the various components of the extra argument 'params', eg as in 
+### VIBASS, University of Valencia, 21 July 2022, Spatial and Spatio-Temporal Bayesian Models with `R-INLA`
+--&gt;
+
+21 July 2022
+
+
+
+---
+
+layout: true  
+
+.my-footer[ 
+.alignleft[ 
+&amp;nbsp; &amp;copy; Marta Blangiardo | Michela Cameletti 
+]
+.aligncenter[
+Spatial and Spatio-Temporal Bayesian Models with `R-INLA` 
+]
+.alignright[
+VIBASS, 21 Jul 2022 
+]
+] 
+
+
+
+&lt;style type="text/css"&gt;
+.scrollable {
+  height: 80%;
+  overflow-y: auto;
+} 
+&lt;/style&gt;
+
+---
+
+# Learning Objectives
+
+At the end of this session you should be able to:
+
+&lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
+
+- know the definition of spatio-temporal process in the geostatistics framework;
+
+
+&lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
+
+
+- use `inlabru` for implementing a (separable) space-time geostatistical model.
+
+
+&lt;span style="display:block; margin-top: 30px ;"&gt;&lt;/span&gt;
+
+
+The topics treated in this lecture can be found in **Section 7.2** of the INLA book.  
+
+---
+
+# Outline 
+
+&lt;span style="display:block; margin-top: 30px ;"&gt;&lt;/span&gt;
+
+1\. [Spatio-temporal processes + a space-time hierarchical model for air pollution](#stprocess)
+
+&lt;span style="display:block; margin-top: 30px ;"&gt;&lt;/span&gt;
+
+2\. [Implementation of a spatio-temporal process using `inlabru`](#stinlabru)
+
+
+---
+
+name: stprocess
+  
+&lt;span style="display:block; margin-top: 250px ;"&gt;&lt;/span&gt;
+
+.myblue[.center[.huge[
+**Spatio-temporal processes + a space-time hierarchical model for air pollution**]]]
+
+
+
+---
+
+# Spatio-temporal processes
+
+-  The concept of spatial process can be extended to the spatio-temporal case including a time dimension. The data are then defined by a process 
+`\(\{y(s,t), (s,t) \in \mathcal D \subset \mathbb{R}^{2}\times \mathbb{R}\}\)`
+and are observed at `\(n\)` spatial locations and at `\(T\)`  time points. 
+
+--
+
+&lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
+- When spatio-temporal geostatistical data are considered, we need to define a valid .red[**spatio-temporal covariance function**] given by 
+`$$\mbox{Cov}\left(y(\bm s_i,t), y(\bm s_j,u)\right)=\mathcal {C}(y_{it},y_{ju})$$`
+--
+&lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
+
+- If we assume .red[**stationarity in space and time**], the space-time covariance function can be written as a function of the spatial Euclidean distance `\(\Delta_{ij}=||\bm s_{i}-\bm s_{j}||\)` and of the temporal lag `\(\Lambda_{tu}=|t-u|\)` so that `\(\mbox{Cov}\left(y_{it}, y_{ju}\right)=\mathcal C(\Delta_{ij},\Lambda_{tu})\)`.
+
+--
+&lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
+-  If we assume .red[**separability**] the stationary space-time covariance function is decomposed into the product (or the sum) of a purely spatial and a purely temporal term: `$$\mbox{Cov}\left(y_{it}, y_{ju}\right)=\mathcal{C}_1(\Delta_{ij})\mathcal{C}_2(\Lambda_{tu})$$`
+
+---
+
+# Hierarchical spatio-temporal model for PM concentration
+
+- We present a spatio-temporal model for particulate matter (PM10) concentration data measured daily (in `\(\mu g /m^3\)`). 
+
+&lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
+- The data refer to Piemonte region (Italy) for the period from October 2005 to March 2006 (daily data).
+
+&lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
+- **Main aims**:
+&lt;span style="display:block; margin-top: 10px ;"&gt;&lt;/span&gt;
+  - predict PM concentration in the considered continuous spatial domain, where no monitoring stations are displaced;
+  &lt;span style="display:block; margin-top: 10px ;"&gt;&lt;/span&gt;
+  - evaluate the effect of some covariates (e.g. wind speed, precipitation, temperature, emissions, altitude);
+  &lt;span style="display:block; margin-top: 10px ;"&gt;&lt;/span&gt;
+  - compute the probability of exceeding a specific threshold (e.g. `\(50\)` `\(\mu g /m^3\)` fixed by the European Community for health protection).
+
+&lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
+-  The spatio-temporal model we specify here is widely adopted in the air quality literature thanks to its 
+flexibility in modeling relevant covariates as well as correlation in space and time (see Cameletti, Lindgren, Simpson, and Rue (2013); Fioravanti, Martino, Cameletti, and Cattani (2021)).
+
+---
+
+# Hierarchical spatio-temporal model for PM concentration
+
+
+- We denote by `\(y_{it}\)` the logarithm of PM10 concentrations measured at site `\(\bm s_i\)`, with `\(i=1,\ldots,n=24\)`, and day `\(t=1,\ldots,T=182\)`. 
+
+&lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
+- The following distribution is assumed for the observations:
+`$$\color{blue}{y_{it}\sim \text{Normal}( \eta_{it},\sigma^2_e)}$$`
+where `\(\sigma^{2}_{e}\)` is the variance of the measurement error defined by a Gaussian white-noise process, both serially and spatially uncorrelated.
+
+--
+
+&lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
+- The linear predictor is given by
+`$$\color{blue}{\eta_{it} = b_0+ \sum_{m=1}^M \beta_m x_{mi} + \omega_{it}}$$`
+where `\(b_0\)`  is the intercept and `\(\beta_1,\ldots,\beta_M\)` are the linear effects related to meteorological and orographical covariates `\(\bm x_1,\ldots, \bm x_M\)`. 
+
+---
+
+# Hierarchical spatio-temporal model for PM concentration
+
+- The term `\(\omega_{it}\)` refers to the **latent spatio-temporal process** (i.e. the true unobserved level of pollution) which changes in time with first order autoregressive dynamics and spatially correlated innovations:
+
+`$$\color{blue}{\omega_{it} = a\omega_{i(t-1)}+\xi_{it}}$$`
+with `\(t=2,\ldots,T\)`, `\(|a|&lt;1\)`, `\(\omega_{i1}\sim\text{Normal}\left(0,\sigma^2/ (1-a^2)\right)\)`.
+
+--
+
+&lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
+- The term `\(\xi_{it}\)` is a zero-mean **Gaussian field**, assumed to be **temporally independent** and characterized by the following spatio-temporal covariance function:
+
+`$$\text{Cov}\left(\xi_{it},\xi_{ju}\right) =\left\{
+\begin{array}[c]{ccc}%
+0 &amp;  &amp;  \text{if} \qquad t\neq u\\
+\text{Cov}(\xi_i,\xi_j) &amp;&amp; \text{if} \qquad t=u
+\end{array}
+\right.$$`
+
+for `\(i\neq j\)`, where `\(\text{Cov}(\xi_i,\xi_j)\)` is given by Mat&amp;eacute;rn spatial covariance function.
+
+&lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
+- This model is characterized by a **separable spatio-temporal covariance** as it can be rewritten as the product of a purely spatial and a purely temporal covariance function (see Cameletti, Ignaccolo, and Bande (2011)).
+
+---
+
+# Hierarchical spatio-temporal model for PM concentration
+
+- For each time point `\(\bm \xi_t \sim \text{Normal}(\bm 0, \bm\Sigma)\)` and through the SPDE approach 
+$$ \bm \xi_t \rightarrow \tilde{\bm \xi_t}\sim\text{Normal}(\bm 0,\bm Q^{-1}_S)$$
+where the precision matrix `\(\bm Q^{-1}_S\)` comes from the SPDE representation. The matrix `\(\bm Q^{-1}_S\)`  does not change in time - due to the serial independence hypothesis - and its dimension is given by the number of vertices of the domain triangulation.
+
+--
+
+&lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
+- The joint distribution of the `\(Tn\)`-dimensional GMRF `\(\bm\omega=(\bm\omega_1^\prime,\ldots,\bm\omega_T^\prime)^\prime\)` is 
+`$$\bm\omega\sim\text{Normal}(\bm 0,\bm Q^{-1})$$`
+with `\(\bm Q=\bm Q_T \otimes \bm Q_S\)`, where `\(\otimes\)` denotes the Kronecker product and `\(\bm Q_T\)` is the `\(T\)`-dimensional precision matrix of the AR(1) process.
+
+&lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
+- For the considered model the latent process is given by `\(\bm \theta=\{\bm \omega, b_0, \beta_1,\ldots, \beta_M\}\)` while the hyperparameter vector is `\(\psi=(\sigma^2_e, a, \sigma^2, r)\)`.
+
+---
+
+name: stinlabru
+  
+&lt;span style="display:block; margin-top: 250px ;"&gt;&lt;/span&gt;
+
+.myblue[.center[.huge[
+**Implementation of a spatio-temporal process using `inlabru`**]]]
+
+
+---
+
+# Piemonte data
+
+The data are **PM10 concentrations** in 24 monitoring stations in Piemonte region in Italy for a period of 182 days from 2005-10-01 to 2006-03-31.
+
+.panelset[
+.panel[.panel-name[Data]
+
+
+
+```r
+&gt; df = readRDS("./data/Piemonte_Data.rds")
+&gt; class(df)
+```
+
+```
+[1] "data.frame"
+```
+
+```r
+&gt; head(df)
+```
+
+```
+  Station.ID     Date     A   UTMX    UTMY   WS   TEMP   HMIX PREC   EMI PM10  logPM10 time
+1          1 01/10/05  95.2 469.45 4972.85 0.90 288.81 1294.6    0 26.05   28 3.332205    1
+2          2 01/10/05 164.1 423.48 4950.69 0.82 288.67 1139.8    0 18.74   22 3.091042    1
+3          3 01/10/05 242.9 490.71 4948.86 0.96 287.44 1404.0    0  6.28   17 2.833213    1
+4          4 01/10/05 149.9 437.36 4973.34 1.17 288.63 1042.4    0 29.35   25 3.218876    1
+5          5 01/10/05 405.0 426.44 5045.66 0.60 287.63 1038.7    0 32.19   20 2.995732    1
+6          6 01/10/05 257.5 394.60 5001.18 1.02 288.59 1048.3    0 34.24   41 3.713572    1
+```
+
+```r
+&gt; # select only the first 50 days for reducing the computational load
+&gt; df = df[df$time &lt;= 50,]
+```
+
+]
+.panel[.panel-name[Boundary]
+.pull-left[
+
+```r
+&gt; library(tidyverse)
+&gt; library(inlabru)
+&gt; border = readRDS("./data/Piemonte_Border.rds")
+&gt; class(border)
+```
+
+```
+[1] "SpatialPolygons"
+attr(,"package")
+[1] "sp"
+```
+
+```r
+&gt; ggplot()+
++   gg(border) +
++   coord_equal()
+```
+]
+.pull-right[
+&lt;img src="./img/bordermap-1.png" &gt;
+]
+]
+]
+
+---
+
+# PM10 data
+
+.pull-left[
+We plot PM10 concentrations measured in the 24 monitoring stations in the first **3 days** of the time series.
+
+
+```r
+&gt; library(tidyverse)
+&gt; library(viridis)
+&gt; 
+&gt; df %&gt;% 
++   filter(time&lt;=3) %&gt;%
++   ggplot() + 
++   geom_point(aes(UTMX, UTMY, color = PM10), size = 2)+
++   facet_wrap(.~ Date, ncol = 2, nrow = 2) +
++   scale_color_viridis() +
++   coord_equal() +
++   gg(border)
+```
+]
+.pull-right[
+&lt;img src="./img/mapPM10_3days_out-1.png" &gt;
+]
+
+---
+
+# Create the mesh and the SPDE model
+For the example we choose a quite rough mesh (starting from the monitoring stations):
+
+.pull-left[
+
+```r
+&gt; library(INLA)
+&gt; mesh = inla.mesh.2d(loc = cbind(df$UTMX, df$UTMY),
++                     offset = c(20, 40),
++                     max.edge = c(30, 50))
+```
+
+```r
+&gt; ggplot() +
++   gg(mesh) +
++   geom_point(data = df, aes(UTMX, UTMY)) + 
++   gg(border)
+```
+Given the mesh, it is now possible to create the SPDE model using the `inla.spde2.matern` function:
+
+
+```r
+&gt; spde = inla.spde2.matern(mesh = mesh) 
+&gt; spde$n.spde #n. of mesh vertices
+```
+
+```
+[1] 136
+```
+
+
+]
+.pull-right[
+&lt;img src="./img/mesh-1.png" &gt;
+]
+
+---
+
+# Define the model components using `inlabru`
+
+We run here the model using `inlabru`. If you are interested in the alternative version based on the `inla.stack` approach, see Section 7.2 of the INLA book. 
+&lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
+
+We first transform the `df` data frame into a **spatial object** (`SpatialPointsDataFrame`)
+
+```r
+&gt; coordinates(df) = c("UTMX","UTMY")
+&gt; class(df)
+```
+
+```
+[1] "SpatialPointsDataFrame"
+attr(,"package")
+[1] "sp"
+```
+
+and then define the model **components**
+
+
+```r
+&gt; cmp  = logPM10 ~ Intercept(1) + 
++   SPDE(coordinates, model = spde,
+*+        group = time, control.group = list(model = "ar1")) +
++   A + #dem(A, model = "linear") +  
++   TEMP #temp(TEMP, model = "linear")
+```
+
+Using the options `group` and `control.group` we specify that at each time point the spatial locations are linked by the `spde` model object, while across time the process evolves according to an AR(1) dynamics.
+
+---
+
+# Fit the space-time model using `inlabru`
+
+We then define the **likelihood**
+
+```r
+&gt; lik = like(formula = logPM10 ~ Intercept + SPDE + A + TEMP,
++            family = "gaussian",
++            data = df)
+```
+
+and finally run the model with `bru`
+
+```r
+&gt; fit = bru(cmp, lik)
+```
+
+
+
+```r
+&gt; fit$summary.fixed[,c("mean","0.025quant","0.975quant")]
+```
+
+```
+                  mean    0.025quant  0.975quant
+Intercept -2.330542652 -13.198261436 8.647721743
+A         -0.001330801  -0.003800033 0.001135421
+TEMP       0.021393137  -0.016957290 0.059374675
+```
+
+---
+
+# Prediction at the station locations
+We are interested in predicting PM10 concentrations (log concentrations) at the monitoring station locations. As introduced in Section 2.2, we will use the `predict` function:
+
+.panelset[
+.panel[.panel-name[Compute predictions]
+&lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
+
+
+```r
+&gt; pred_at_station = predict(fit, df, ~ Intercept + SPDE + A + TEMP, n.samples = 1000)
+&gt; head(pred_at_station)
+```
+
+```
+        coordinates Station.ID     Date     A   WS   TEMP   HMIX PREC   EMI
+1 (469.45, 4972.85)          1 01/10/05  95.2 0.90 288.81 1294.6    0 26.05
+2 (423.48, 4950.69)          2 01/10/05 164.1 0.82 288.67 1139.8    0 18.74
+3 (490.71, 4948.86)          3 01/10/05 242.9 0.96 287.44 1404.0    0  6.28
+4 (437.36, 4973.34)          4 01/10/05 149.9 1.17 288.63 1042.4    0 29.35
+5 (426.44, 5045.66)          5 01/10/05 405.0 0.60 287.63 1038.7    0 32.19
+6  (394.6, 5001.18)          6 01/10/05 257.5 1.02 288.59 1048.3    0 34.24
+  PM10  logPM10 time     mean        sd   q0.025   median   q0.975     smin
+1   28 3.332205    1 3.368250 0.3280495 2.729238 3.373680 3.990622 2.431488
+2   22 3.091042    1 3.020728 0.3627972 2.324904 3.039675 3.712996 1.923873
+3   17 2.833213    1 3.015798 0.4024234 2.259823 3.021093 3.797079 1.891479
+4   25 3.218876    1 3.191256 0.3527783 2.513648 3.199777 3.859158 2.118994
+5   20 2.995732    1 2.888453 0.5188937 1.886307 2.875320 3.864964 1.111674
+6   41 3.713572    1 3.573681 0.4063581 2.798600 3.574389 4.352224 2.227569
+      smax         cv       var
+1 4.404395 0.09739465 0.1076165
+2 4.110860 0.12010258 0.1316218
+3 4.353181 0.13343843 0.1619446
+4 4.425424 0.11054531 0.1244525
+5 4.578471 0.17964414 0.2692507
+6 4.792494 0.11370856 0.1651269
+```
+
+]
+.panel[.panel-name[Plot predictions]
+.pull-left[
+Select 2 stations
+
+```r
+&gt; sel = c(1, 7, 10, 19, 23, 24)
+```
+
+and plot the observed/predicted time series: 
+
+```r
+&gt; as.data.frame(pred_at_station) %&gt;%
++   dplyr::filter(Station.ID %in% sel) %&gt;% 
++   ggplot() + 
++   geom_line(aes(time, logPM10, group = Station.ID), color = "red") +
++   geom_line(aes(time, mean, group = Station.ID)) +
++   geom_ribbon(aes(time, ymin = q0.025, ymax = q0.975, group = Station.ID), alpha = 0.5) +
++   facet_wrap(.~Station.ID)
+```
+]
+.pull-right[
+&lt;img src="./img/predstationsout-1.png" &gt;
+]
+]
+]
+
+---
+
+# Prediction at the grid locations
+
+We want to predict the concentration (log concentration) of PM10 for the locations in the Piemonte grid and for the first 3 days. To do this we need the values of the altitude and temperature for every point of interest in both space (regular grid) and time.
+
+.panelset[
+  .panel[.panel-name[Grid data]
+
+```r
+&gt; covariate_grid = readRDS("./data/covariate_grid.rds")
+&gt; class(covariate_grid)
+```
+
+```
+[1] "SpatialPixelsDataFrame"
+attr(,"package")
+[1] "sp"
+```
+
+```r
+&gt; head(covariate_grid@data)
+```
+
+```
+         A time     TEMP
+1 1775.106    1 280.4226
+2 1775.106    1 280.4540
+3 1884.536    1 279.7775
+4 2270.879    1 277.3138
+5 2027.098    1 278.9060
+6 1926.721    1 279.5709
+```
+
+Mask the grid using the Piemonte `border` created before:
+
+```r
+&gt; covariate_grid = covariate_grid[!is.na(sp::over(covariate_grid, border)),]
+&gt; dim(covariate_grid@data)
+```
+
+```
+[1] 4761    3
+```
+]
+
+.panel[.panel-name[Altitude]
+.pull-left[
+
+```r
+&gt; ggplot() + 
++ gg(covariate_grid, aes(fill=A)) + 
++ gg(border) +
++ coord_equal() + 
++ scale_fill_viridis()
+```
+]
+.pull-right[
+&lt;img src="./img/mapAgridout-1.png" &gt;
+]
+]
+
+.panel[.panel-name[Temperature]
+.pull-left[
+
+```r
+&gt; ggplot() + 
++ gg(covariate_grid, aes(fill=TEMP)) +
++ facet_wrap(~ time) +
++ gg(border) +
++ coord_equal() +
++ scale_fill_viridis()
+```
+]
+.pull-right[
+&lt;img src="./img/mapTempgridout-1.png" &gt;
+]
+]
+]
+
+---
+
+# Prediction at the grid locations
+
+- We sample from the fitted model in order to inspect the PM10 field. As described in Section 2.2, the function `predict` is used for sampling from the posterior predictive distributions and computing posterior summary statistics. In this case we use the space-time grid (`covariate_grid`) introduced before. 
+
+
+
+```r
+&gt; pred = predict(fit, covariate_grid, 
++                ~ Intercept + SPDE + A + TEMP,
++                seed = 2, n.samples = 1000)
+&gt; head(pred@data)
+```
+
+```
+           A time     TEMP      mean       sd    q0.025    median   q0.975
+174 1603.381    1 282.4919 2.0357027 1.947501 -1.681590 2.0082129 5.929694
+175 1709.620    1 281.8724 1.8641205 2.081870 -2.070967 1.8152506 6.019027
+176 2333.712    1 277.6419 0.9347172 2.806915 -4.187348 0.8589016 6.584450
+246 1554.806    1 282.8573 2.1018130 1.876302 -1.504882 2.0680705 5.872410
+247 1715.673    1 281.9928 1.8533779 2.072218 -2.100997 1.7995257 6.052461
+248 2407.440    1 277.2219 0.8104280 2.874923 -4.409344 0.7297042 6.632553
+         smin      smax        cv      var
+174 -2.993057  9.019896 0.9566725 3.792760
+175 -3.565886  9.374882 1.1168107 4.334181
+176 -6.288993 10.781925 3.0029562 7.878772
+246 -2.806517  8.823815 0.8927063 3.520508
+247 -3.549961  9.292819 1.1180762 4.294087
+248 -6.501864 10.766844 3.5474132 8.265183
+```
+
+---
+
+# And finally the daily maps for PM10 (median) concentrations!
+
+
+```r
+&gt; ggplot() + 
++   gg(pred, aes(UTMX_km, UTMY_km, fill = mean))  +
++   facet_wrap(.~ time) + 
++   scale_fill_viridis() + coord_equal() + gg(border)
+```
+
+&lt;img src="./img/mapsgridout-1.png" &gt;
+
+---
+
+# Maps for the exceedance probability
+
+.pull-left[
+With `inlabru predict()` function, it is also very easy to compute the posterior probability of exceeding the `\(50\)` `\(\mu g /m^3\)` threshold:
+
+
+```r
+&gt; predprob = predict(fit, covariate_grid, 
++                ~ (Intercept + SPDE + A + TEMP) &gt; log(50),
++                seed = 2, n.samples = 500)
+```
+
+```r
+&gt; ggplot() + 
++   gg(predprob, aes(UTMX_km, UTMY_km, fill = mean))  +
++   facet_wrap(.~ time, ncol = 2, nrow = 2) + 
++   scale_fill_viridis() + coord_equal() + gg(border)
+```
+]
+.pull-right[
+&lt;img src="./img/postprobmapout-1.png" &gt;
+]
+
+---
+
+# References
+
+Cameletti, M., R. Ignaccolo, and S. Bande (2011). "Comparing
+spatio-temporal models for particulate matter in Piemonte". In:
+_Environmetrics_ 22.8, pp. 985-996. DOI:
+[https://doi.org/10.1002/env.1139](https://doi.org/https%3A%2F%2Fdoi.org%2F10.1002%2Fenv.1139).
+
+Cameletti, M., F. Lindgren, D. Simpson, et al. (2013). "Spatio-temporal
+modeling of particulate matter concentration through the SPDE
+approach". In: _AStA Advances in Statistical Analysis_ 97.2, pp.
+109-131.
+
+Fioravanti, G., S. Martino, M. Cameletti, et al. (2021).
+"Spatio-temporal modelling of PM10 daily concentrations in Italy using
+the SPDE approach". In: _Atmospheric Environment_ 248, p. 118192. DOI:
+[https://doi.org/10.1016/j.atmosenv.2021.118192](https://doi.org/https%3A%2F%2Fdoi.org%2F10.1016%2Fj.atmosenv.2021.118192).
+
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script src="https://platform.twitter.com/widgets.js"></script>
+<script>var slideshow = remark.create({
+"navigation": {
+"scroll": false
+},
+"highlightStyle": "github",
+"highlightLines": true,
+"countIncrementalSlides": false,
+"ratio": "16:9"
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+// add `data-at-shortcutkeys` attribute to <body> to resolve conflicts with JAWS
+// screen reader (see PR #262)
+(function(d) {
+  let res = {};
+  d.querySelectorAll('.remark-help-content table tr').forEach(tr => {
+    const t = tr.querySelector('td:nth-child(2)').innerText;
+    tr.querySelectorAll('td:first-child .key').forEach(key => {
+      const k = key.innerText;
+      if (/^[a-z]$/.test(k)) res[k] = t;  // must be a single letter (key)
+    });
+  });
+  d.body.setAttribute('data-at-shortcutkeys', JSON.stringify(res));
+})(document);
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+// adds .remark-code-has-line-highlighted class to <pre> parent elements
+// of code chunks containing highlighted lines with class .remark-code-line-highlighted
+(function(d) {
+  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
+  const preParents = [];
+  const findPreParent = function(line, p = 0) {
+    if (p > 1) return null; // traverse up no further than grandparent
+    const el = line.parentElement;
+    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
+  };
+
+  for (let line of hlines) {
+    let pre = findPreParent(line);
+    if (pre && !preParents.includes(pre)) preParents.push(pre);
+  }
+  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
+})(document);</script>
+<style>
+.logo {
+  background-image: url("assets/MRC-Centre-Logo.png");
+  background-size: 15% 10%;
+  background-repeat: no-repeat;
+  position: absolute;
+  top:  0.25%; /* 1.135em */
+  left: 85%;
+  width: 100%;
+  height: 100%;
+  z-index: 0;
+}
+</style>
+
+<script>
+document
+  .querySelectorAll(
+    '.remark-slide-content' +
+    ':not(.title-slide)' +
+    // add additional classes to exclude here, e.g.
+    // ':not(.inverse)' +
+    ':not(.hide-logo)' +
+    ':not(.thankyou-michelle)' +
+    ':not(.thankyou-barney)'
+  )
+  .forEach(el => {
+    el.innerHTML += '<div class="logo"></div>';
+  });
+</script>
+
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>
