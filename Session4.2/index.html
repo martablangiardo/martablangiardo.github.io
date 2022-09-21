@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="" xml:lang="">
   <head>
-    <title>Session 2.2: inla.stack and inlabru</title>
+    <title>Session 4.2: inla.stack and inlabru</title>
     <meta charset="utf-8" />
     <script src="libs/header-attrs/header-attrs.js"></script>
     <link href="libs/panelset/panelset.css" rel="stylesheet" />
@@ -78,19 +78,19 @@
 
 class: title-slide
 
-# Session 2.2: `inla.stack` and `inlabru`&lt;span style="display:block; margin-top: 10px ;"&gt;&lt;/span&gt; 
+# Session 4.2: `inla.stack` and `inlabru`&lt;span style="display:block; margin-top: 10px ;"&gt;&lt;/span&gt; 
 
 ## 
 
 ###     
 
-### VIBASS, University of Valencia 
+### Spatial and Spatio-Temporal Bayesian Models with `R-INLA`, University of São Paulo 
 
 &lt;!-- Can also separate the various components of the extra argument 'params', eg as in 
-### VIBASS, University of Valencia, 21 July 2022, Spatial and Spatio-Temporal Bayesian Models with `R-INLA`
+### Spatial and Spatio-Temporal Bayesian Models with `R-INLA`, University of São Paulo, 29 September 2022, Spatial and Spatio-Temporal Bayesian Models with `R-INLA`
 --&gt;
 
-21 July 2022
+29 September 2022
 
 ---
 
@@ -98,13 +98,13 @@ layout: true
 
 .my-footer[ 
 .alignleft[ 
-&amp;nbsp; &amp;copy; Marta Blangiardo | Michela Cameletti 
+&amp;nbsp; &amp;copy; Marta Blangiardo | Monica Pirani 
 ]
 .aligncenter[
 Spatial and Spatio-Temporal Bayesian Models with `R-INLA` 
 ]
 .alignright[
-VIBASS, 21 Jul 2022 
+Spatial and Spatio-Temporal Bayesian Models with `R-INLA`, 29 Sep 2022 
 ]
 ] 
 
@@ -240,7 +240,7 @@ The output is exactly equal to the one presented in Section 2.1. The same poster
 
 ```
               mean 0.025quant 0.975quant
-intercept 9.499583   7.883433   11.00359
+intercept 9.505379   8.041105   10.86208
 ```
 
 
@@ -250,9 +250,9 @@ intercept 9.499583   7.883433   11.00359
 
 ```
                                              mean 0.025quant 0.975quant
-Precision for the Gaussian observations  2.561461   1.857745   3.435166
-Theta1 for spatial.field                -3.954332  -4.259786  -3.632403
-Theta2 for spatial.field                 1.997811   1.493527   2.466993
+Precision for the Gaussian observations  2.860432   2.045075   3.867535
+Theta1 for spatial.field                -4.029614  -4.323940  -3.716477
+Theta2 for spatial.field                 2.087758   1.605681   2.534946
 ```
 
 ---
@@ -299,7 +299,7 @@ It is necessary to define a new projector matrix:
 ```
 
 ```
-[1] 400 548
+[1] 400 549
 ```
 ]
 .pull-right[
@@ -329,7 +329,7 @@ And finally, we run `INLA` again:
 ```r
 &gt; output6pred &lt;- inla(formula,
 *+                 data = inla.stack.data(join.stack),
-+                 control.compute = list(return.marginals.predictor=TRUE),
++                 control.compute = list(return.marginals=TRUE),
 *+                 control.predictor = list(A = inla.stack.A(join.stack), compute = TRUE)
 +                 )
 ```
@@ -358,9 +358,9 @@ We then extract the prediction posterior mean and sd at the first 3 grid points:
 
 ```
                    mean        sd
-APredictor.201 12.27549 0.2677500
-APredictor.202 11.95971 0.3702108
-APredictor.203 10.57820 0.4514038
+APredictor.201 12.24746 0.2611298
+APredictor.202 12.06138 0.4239807
+APredictor.203 10.58629 0.4333241
 ```
 
 In this case (identity link) `output6pred$summary.fitted.values` would return the same output.
@@ -393,7 +393,7 @@ We can be also interested in computing the posterior probability of getting a va
 ```
 
 ```
-[1] 0.003579308
+[1] 0.002157059
 ```
 
 ]
@@ -470,7 +470,7 @@ name: inlabru
 &lt;span style="display:block; margin-top: 250px ;"&gt;&lt;/span&gt;
 
 .myblue[.center[.huge[
-**Model fitting and spatial prediction with `inla.bru`**]]]
+**Model fitting and spatial prediction with `inlabru`**]]]
 
 ---
 
@@ -612,8 +612,8 @@ The difference is in the name used in the output: `x` (method 1) or `beta` (meth
 
 ```
               mean        sd
-Intercept 2.973281 0.1430806
-x         2.121289 0.2547919
+Intercept 2.903588 0.1396076
+x         1.928730 0.2536232
 ```
 ]
 .pull-right[
@@ -632,8 +632,8 @@ x         2.121289 0.2547919
 
 ```
               mean        sd
-Intercept 2.973281 0.1430807
-beta      2.121289 0.2547922
+Intercept 2.903588 0.1396076
+beta      1.928730 0.2536232
 ```
 ]
 
@@ -658,7 +658,7 @@ attr(,"package")
 [1] "sp"
 ```
 
-2\. We define the mesh and the `spde` object as done in Section 2.1:
+2\. We define the mesh and the `spde` object as done in Lecture 4.1:
 
 ```r
 &gt; domain &lt;- matrix(cbind(c(0,1,1,0.7,0), c(0,0,0.7,1,1)),ncol=2)
@@ -702,7 +702,7 @@ attr(,"package")
 
 ```
               mean        sd
-Intercept 9.501672 0.7536705
+Intercept 9.507882 0.6833965
 ```
 
 
@@ -724,7 +724,7 @@ attr(,"package")
 [1] "sp"
 ```
 
-5\. For the prediction we use the `predict` function that internally calls `generate()` in order to draw samples from the fitted model. It takes a fitted  object given by `bru()` and produces predictions (100 by default) given a new set of values for the model covariates or the original values used for the model fit. We can predict any function of any subset of the components of the model.
+5\. For the prediction we use the `predict` function that internally calls `generate()` in order to draw samples from the fitted model. It takes a fitted  object given by `bru()` and produces predictions (100 by default) given a new set of values for the model covariates or the original values used for the model fit. 
 
 
 ```r
@@ -750,19 +750,19 @@ The argument `n.samples` (by default 100) specifies the number of samples to dra
 
 ```
        mean        sd    q0.025    median   q0.975      smin     smax
-1 12.277294 0.2728317 11.750931 12.290742 12.78831 11.362394 13.39194
-2 11.963010 0.3864722 11.216349 11.950500 12.68968 10.808989 13.21190
-3 10.571172 0.4508430  9.712486 10.577551 11.41365  9.221922 12.15032
-4  9.658394 0.3315335  9.003464  9.638143 10.28824  8.608379 10.62940
-5  9.533591 0.3510746  8.865138  9.527972 10.15201  8.377625 10.66705
-6 10.142434 0.3694872  9.392898 10.131154 10.85414  8.838799 11.43901
+1 12.240176 0.2654447 11.730881 12.234493 12.79419 11.558092 13.01762
+2 12.059057 0.4088444 11.319155 12.055598 12.92104 10.833721 13.52903
+3 10.556931 0.4230253  9.785362 10.568902 11.32133  9.029392 12.16952
+4  9.505962 0.3029436  8.917529  9.494116 10.11430  8.711334 10.30435
+5  9.512059 0.3047513  8.950011  9.506243 10.11148  8.536000 10.56451
+6 10.254195 0.3309043  9.623914 10.247885 10.86162  8.775430 11.33845
           cv        var
-1 0.02222246 0.07443712
-2 0.03230560 0.14936078
-3 0.04264834 0.20325938
-4 0.03432594 0.10991443
-5 0.03682501 0.12325334
-6 0.03642984 0.13652080
+1 0.02168634 0.07046086
+2 0.03390351 0.16715372
+3 0.04007085 0.17895037
+4 0.03186881 0.09177485
+5 0.03203841 0.09287334
+6 0.03227014 0.10949766
 ```
 
 Note that it is possible to predict any function of any subset of the components of the model specification.
@@ -810,9 +810,8 @@ R package for Bayesian spatial modelling from ecological survey data".
 In: _Methods in Ecology and Evolution_ 10.6, pp. 760-766.
 
 Lindgren, F. and H. Rue (2015). "Bayesian Spatial Modelling with
-R-INLA". In: _Journal of Statistical Software_ 63.19, pp. 1&lt;80&gt;-25.
-DOI: [10.18637/jss.v063.i19](https://doi.org/10.18637%2Fjss.v063.i19).
-URL:
+R-INLA". In: _Journal of Statistical Software_ 63.19, pp. 1�-25. DOI:
+[10.18637/jss.v063.i19](https://doi.org/10.18637%2Fjss.v063.i19). URL:
 [https://www.jstatsoft.org/index.php/jss/article/view/v063i19](https://www.jstatsoft.org/index.php/jss/article/view/v063i19).
 
     </textarea>

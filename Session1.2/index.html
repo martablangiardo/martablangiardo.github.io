@@ -1058,20 +1058,20 @@ The .olive[`control.xxx=list(...)`] statements  in the .olive[`inla`] function c
  [5] "marginals.lincomb"           "size.lincomb"               
  [7] "summary.lincomb.derived"     "marginals.lincomb.derived"  
  [9] "size.lincomb.derived"        "mlik"                       
-[11] "cpo"                         "po"                         
-[13] "waic"                        "model.random"               
-[15] "summary.random"              "marginals.random"           
-[17] "size.random"                 "summary.linear.predictor"   
-[19] "marginals.linear.predictor"  "summary.fitted.values"      
-[21] "marginals.fitted.values"     "size.linear.predictor"      
-[23] "summary.hyperpar"            "marginals.hyperpar"         
-[25] "internal.summary.hyperpar"   "internal.marginals.hyperpar"
-[27] "offset.linear.predictor"     "model.spde2.blc"            
-[29] "summary.spde2.blc"           "marginals.spde2.blc"        
-[31] "size.spde2.blc"              "model.spde3.blc"            
-[33] "summary.spde3.blc"           "marginals.spde3.blc"        
-[35] "size.spde3.blc"              "logfile"                    
-[37] "misc"                        "dic"                        
+[11] "cpo"                         "gcpo"                       
+[13] "po"                          "waic"                       
+[15] "model.random"                "summary.random"             
+[17] "marginals.random"            "size.random"                
+[19] "summary.linear.predictor"    "marginals.linear.predictor" 
+[21] "summary.fitted.values"       "marginals.fitted.values"    
+[23] "size.linear.predictor"       "summary.hyperpar"           
+[25] "marginals.hyperpar"          "internal.summary.hyperpar"  
+[27] "internal.marginals.hyperpar" "offset.linear.predictor"    
+[29] "model.spde2.blc"             "summary.spde2.blc"          
+[31] "marginals.spde2.blc"         "size.spde2.blc"             
+[33] "model.spde3.blc"             "summary.spde3.blc"          
+[35] "marginals.spde3.blc"         "size.spde3.blc"             
+[37] "logfile"                     "misc"                       
 ```
 ]
 ---
@@ -1130,11 +1130,11 @@ We specify a simple regression model with `Petal.length` and `Petal.width` as de
 
 ```
                 mean         sd 0.025quant 0.5quant 0.975quant     mode
-(Intercept) 1.083565 0.07293226  0.9401746 1.083563   1.226833 1.083565
-Petal.Width 2.229935 0.05137177  2.1289336 2.229933   2.330849 2.229935
+(Intercept) 1.083565 0.07292054  0.9403638 1.083565   1.226767 1.083565
+Petal.Width 2.229935 0.05136352  2.1290668 2.229935   2.330802 2.229935
                      kld
-(Intercept) 1.284615e-06
-Petal.Width 1.284522e-06
+(Intercept) 9.794035e-10
+Petal.Width 9.793728e-10
 ```
 
 - For each unstructured *fixed* effect, `R-INLA` reports a set of summary statistics from the posterior distribution.
@@ -1157,40 +1157,16 @@ Petal.Width 1.284522e-06
 
 ```
                                             mean        sd 0.025quant 0.5quant
-Precision for the Gaussian observations 4.432532 0.5109594    3.48813 4.412588
+Precision for the Gaussian observations 4.432668 0.5115437   3.501958  4.41341
                                         0.975quant     mode
-Precision for the Gaussian observations    5.48995 4.372888
+Precision for the Gaussian observations   5.484831 4.373231
 ```
 
 - For each hyperparameter the summary statistics are reported to describe the posterior distribution.
 
 - **NB**: `INLA` reports results on the **precision** scale (more on this later).
 
----
 
-# Exploring the output: effective parameters and replicates 
-
-
-- The expected number of effective parameters is basically the number of **independent** parameters included in the model: 
-
-&lt;span style="display:block; margin-top: 15px ;"&gt;&lt;/span&gt;
-
-  - In this case there are 2 actual parameters `\(\class{myblue}{\beta_0}\)` and `\(\class{myblue}{\beta_1}\)`.
-  
-  - In a hierarchical model with structured exchangeable (ie correlated)  effects (see next lecture) information is shared across parameters and the expected number is lower.
-
-&lt;span style="display:block; margin-top: 15px ;"&gt;&lt;/span&gt; 
-
---
-
-- The number of equivalent replicates indicates the available information (in terms of sample size) per effective parameter
-
-&lt;span style="display:block; margin-top: 15px ;"&gt;&lt;/span&gt;
-
-  - Example: there are 150 data points and on average 2.011 parameters; so each is estimated using on average 150/2.011 `\(\approx\)` 74.59 data points
-  
-  - Low values (with respect to the overall sample size) are indicative of poor fit.
-  
 ---
 
 # Manipulating the marginals from `R-INLA`: fixed effects
@@ -1246,7 +1222,7 @@ Precision for the Gaussian observations    5.48995 4.372888
 ```
 
 ```
-[1] 1.978538
+[1] 1.990404
 ```
 
 ```r
@@ -1254,7 +1230,7 @@ Precision for the Gaussian observations    5.48995 4.372888
 ```
 
 ```
-[1] 2.191996 2.164812 2.259094 2.291844
+[1] 2.254273 2.256581 2.151424 2.256309
 ```
 
 ]
@@ -1285,7 +1261,7 @@ Precision for the Gaussian observations    5.48995 4.372888
 ```
 
 ```r
-&gt; prec_post &lt;- output$marginals.hyperpar[[1]]
+&gt; prec_post &lt;-output$marginals.hyperpar[[1]]
 ```
 
 
@@ -1312,7 +1288,7 @@ Precision for the Gaussian observations    5.48995 4.372888
 ```
 
 ```
-[1] 0.2286685
+[1] 0.228523
 ```
 
 
