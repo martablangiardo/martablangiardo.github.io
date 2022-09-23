@@ -3,9 +3,9 @@
   <head>
     <title>Session 1.3: Types of Spatial Data</title>
     <meta charset="utf-8" />
-    <script src="libs/header-attrs/header-attrs.js"></script>
-    <link href="libs/panelset/panelset.css" rel="stylesheet" />
-    <script src="libs/panelset/panelset.js"></script>
+    <script src="index_files/header-attrs/header-attrs.js"></script>
+    <link href="index_files/panelset/panelset.css" rel="stylesheet" />
+    <script src="index_files/panelset/panelset.js"></script>
     <!-- (Re)Defines a bunch of LaTeX commands that can then be used directly in the .Rmd file as '\command{...}' -->
     <script type="text/x-mathjax-config">
     MathJax.Hub.Config({
@@ -72,6 +72,13 @@
   </head>
   <body>
     <textarea id="source">
+class: center, middle, title-slide
+
+.title[
+# Session 1.3: Types of Spatial Data
+]
+
+---
 
 
 
@@ -140,7 +147,7 @@ name: spatialData
 &lt;span style="display:block; margin-top: 250px ;"&gt;&lt;/span&gt;
 
 .myblue[.center[.huge[
-**What are the different types of spatial data**]]]
+**What are the different types of spatial data?**]]]
 
 ---
 
@@ -178,7 +185,7 @@ Cressie and Wikle (2015) distinguishes three types of spatial data, based on the
 
 &lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
 
-.red[Point pattern data]: `\(\mathcal{D}\)` is itself random. Its index set gives the locations of random **events** that are the spatial point pattern. 
+- .red[Point pattern data]: `\(\mathcal{D}\)` is itself random. Its index set gives the locations of random **events** that are the spatial point pattern. 
 
 ---
 
@@ -195,7 +202,7 @@ Lattice data can be either irregularly aligned or gridded, and occur in the form
 &lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
 - From the choropleth map we know which areas are adjacent which other areas. The relationship between areal units is characterized in terms of .red[adjacency].
 &lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
-- The *sites* `\(\boldsymbol{s} \in \mathcal{D}\)` in this case are actually the polygons themselves. %which can be denoted not by `\(\boldsymbol{s}_i\)` but by `\(B_i, i = 1,\dots, N\)` to avoid confusion between points `\(\boldsymbol{s}_i\)` and regions `\(B_i\)`.
+- The *sites* `\(\boldsymbol{s} \in \mathcal{D}\)` in this case are actually the polygons themselves. 
 ]
 
 ---
@@ -526,36 +533,6 @@ if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
   }
   preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
 })(document);</script>
-<style>
-.logo {
-  background-image: url("assets/MRC-Centre-Logo.png");
-  background-size: 15% 10%;
-  background-repeat: no-repeat;
-  position: absolute;
-  top:  0.25%; /* 1.135em */
-  left: 85%;
-  width: 100%;
-  height: 100%;
-  z-index: 0;
-}
-</style>
-
-<script>
-document
-  .querySelectorAll(
-    '.remark-slide-content' +
-    ':not(.title-slide)' +
-    // add additional classes to exclude here, e.g.
-    // ':not(.inverse)' +
-    ':not(.hide-logo)' +
-    ':not(.thankyou-michelle)' +
-    ':not(.thankyou-barney)'
-  )
-  .forEach(el => {
-    el.innerHTML += '<div class="logo"></div>';
-  });
-</script>
-
 
 <script>
 slideshow._releaseMath = function(el) {
