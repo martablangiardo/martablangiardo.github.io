@@ -3,9 +3,9 @@
   <head>
     <title>Session 1.3: Types of Spatial Data</title>
     <meta charset="utf-8" />
-    <script src="index_files/header-attrs/header-attrs.js"></script>
-    <link href="index_files/panelset/panelset.css" rel="stylesheet" />
-    <script src="index_files/panelset/panelset.js"></script>
+    <script src="libs/header-attrs/header-attrs.js"></script>
+    <link href="libs/panelset/panelset.css" rel="stylesheet" />
+    <script src="libs/panelset/panelset.js"></script>
     <!-- (Re)Defines a bunch of LaTeX commands that can then be used directly in the .Rmd file as '\command{...}' -->
     <script type="text/x-mathjax-config">
     MathJax.Hub.Config({
@@ -72,13 +72,6 @@
   </head>
   <body>
     <textarea id="source">
-class: center, middle, title-slide
-
-.title[
-# Session 1.3: Types of Spatial Data
-]
-
----
 
 
 
@@ -157,7 +150,7 @@ name: spatialData
 - The data are seen as being a realization of a stochastic process, that is, of a set of random numbers each of which is associated with a spatial location.
   - A spatial process in `\(d\)` dimensions is denoted as:
 
-$$  \{Z(\bm{s}): \bm{s} \in \mathcal{D} \subset \mathbb{R}^d\}$$ 
+`$$\{Z(\bm{s}): \bm{s} \in \mathcal{D} \subset \mathbb{R}^d \}$$` 
 
 where
 - `\(Z\)` is the attribute we observe (e.g. temperature, number of sudden infant deaths etc.)
@@ -533,6 +526,36 @@ if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
   }
   preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
 })(document);</script>
+<style>
+.logo {
+  background-image: url("assets/MRC-Centre-Logo.png");
+  background-size: 15% 10%;
+  background-repeat: no-repeat;
+  position: absolute;
+  top:  0.25%; /* 1.135em */
+  left: 85%;
+  width: 100%;
+  height: 100%;
+  z-index: 0;
+}
+</style>
+
+<script>
+document
+  .querySelectorAll(
+    '.remark-slide-content' +
+    ':not(.title-slide)' +
+    // add additional classes to exclude here, e.g.
+    // ':not(.inverse)' +
+    ':not(.hide-logo)' +
+    ':not(.thankyou-michelle)' +
+    ':not(.thankyou-barney)'
+  )
+  .forEach(el => {
+    el.innerHTML += '<div class="logo"></div>';
+  });
+</script>
+
 
 <script>
 slideshow._releaseMath = function(el) {
