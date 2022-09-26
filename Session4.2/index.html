@@ -230,7 +230,7 @@ Note that the function `inla.stack()` will take care of eliminating any column i
 
 # Exploring the output
 
-The output is exactly equal to the one presented in Section 2.1. The same posterior summary statistics can be computed also when the `inla.stack` approach is adopted. 
+The output is exactly equal to the one presented in Section 4.1. The same posterior summary statistics can be computed also when the `inla.stack` approach is adopted. 
 
 
 
@@ -240,7 +240,7 @@ The output is exactly equal to the one presented in Section 2.1. The same poster
 
 ```
               mean 0.025quant 0.975quant
-intercept 9.505379   8.041105   10.86208
+intercept 9.505136   8.056254   10.85442
 ```
 
 
@@ -250,9 +250,9 @@ intercept 9.505379   8.041105   10.86208
 
 ```
                                              mean 0.025quant 0.975quant
-Precision for the Gaussian observations  2.860432   2.045075   3.867535
-Theta1 for spatial.field                -4.029614  -4.323940  -3.716477
-Theta2 for spatial.field                 2.087758   1.605681   2.534946
+Precision for the Gaussian observations  2.877425   2.016438   3.954292
+Theta1 for spatial.field                -4.038427  -4.351693  -3.715364
+Theta2 for spatial.field                 2.104859   1.655382   2.538630
 ```
 
 ---
@@ -329,7 +329,8 @@ And finally, we run `INLA` again:
 ```r
 &gt; output6pred &lt;- inla(formula,
 *+                 data = inla.stack.data(join.stack),
-+                 control.compute = list(return.marginals=TRUE),
++                 control.compute = list(return.marginals=TRUE,
++                                        return.marginals.predictor=TRUE),
 *+                 control.predictor = list(A = inla.stack.A(join.stack), compute = TRUE)
 +                 )
 ```
@@ -358,9 +359,9 @@ We then extract the prediction posterior mean and sd at the first 3 grid points:
 
 ```
                    mean        sd
-APredictor.201 12.24746 0.2611298
-APredictor.202 12.06138 0.4239807
-APredictor.203 10.58629 0.4333241
+APredictor.201 12.24727 0.2609043
+APredictor.202 12.06216 0.4241736
+APredictor.203 10.58545 0.4333507
 ```
 
 In this case (identity link) `output6pred$summary.fitted.values` would return the same output.
@@ -393,7 +394,7 @@ We can be also interested in computing the posterior probability of getting a va
 ```
 
 ```
-[1] 0.002157059
+[1] 0.002117688
 ```
 
 ]
@@ -612,8 +613,8 @@ The difference is in the name used in the output: `x` (method 1) or `beta` (meth
 
 ```
               mean        sd
-Intercept 2.903588 0.1396076
-x         1.928730 0.2536232
+Intercept 3.087772 0.1420333
+x         1.657266 0.2394693
 ```
 ]
 .pull-right[
@@ -632,8 +633,8 @@ x         1.928730 0.2536232
 
 ```
               mean        sd
-Intercept 2.903588 0.1396076
-beta      1.928730 0.2536232
+Intercept 3.087771 0.1420333
+beta      1.657266 0.2394693
 ```
 ]
 
@@ -702,7 +703,7 @@ attr(,"package")
 
 ```
               mean        sd
-Intercept 9.507882 0.6833965
+Intercept 9.505791 0.6862972
 ```
 
 
@@ -749,20 +750,20 @@ The argument `n.samples` (by default 100) specifies the number of samples to dra
 ```
 
 ```
-       mean        sd    q0.025    median   q0.975      smin     smax
-1 12.240176 0.2654447 11.730881 12.234493 12.79419 11.558092 13.01762
-2 12.059057 0.4088444 11.319155 12.055598 12.92104 10.833721 13.52903
-3 10.556931 0.4230253  9.785362 10.568902 11.32133  9.029392 12.16952
-4  9.505962 0.3029436  8.917529  9.494116 10.11430  8.711334 10.30435
-5  9.512059 0.3047513  8.950011  9.506243 10.11148  8.536000 10.56451
-6 10.254195 0.3309043  9.623914 10.247885 10.86162  8.775430 11.33845
-          cv        var
-1 0.02168634 0.07046086
-2 0.03390351 0.16715372
-3 0.04007085 0.17895037
-4 0.03186881 0.09177485
-5 0.03203841 0.09287334
-6 0.03227014 0.10949766
+       mean        sd    q0.025      q0.5   q0.975    median mean.mc_std_err
+1 12.240160 0.2668991 11.713002 12.230989 12.81185 12.230989      0.01193609
+2 12.053240 0.4098115 11.297952 12.058383 12.85653 12.058383      0.01832733
+3 10.562368 0.4225269  9.786545 10.570022 11.36868 10.570022      0.01889598
+4  9.510371 0.3049403  8.921902  9.495889 10.09044  9.495889      0.01363735
+5  9.514464 0.3020450  8.949142  9.515708 10.10517  9.515708      0.01350786
+6 10.254276 0.3328632  9.599244 10.243278 10.86263 10.243278      0.01488610
+  sd.mc_std_err
+1   0.007969371
+2   0.013441170
+3   0.014872706
+4   0.009088889
+5   0.009921144
+6   0.012310802
 ```
 
 Note that it is possible to predict any function of any subset of the components of the model specification.
