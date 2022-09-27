@@ -194,7 +194,7 @@ model temporal dependence of data or of parameters:
 # Spatial patterns
 
 1\. Data
-  - Disease counts `\(y_{ik}\)` in area `\(i\)` and stratum `\(k\)`, aggregated over a time period, `\(i=1,\ldots,N\)`, `\(k=1,\ldots,K\)`
+  - Disease counts `\(y_{i}\)` in area `\(i\)` and stratum `\(k\)`, aggregated over a time period, `\(i=1,\ldots,N\)`, `\(k=1,\ldots,K\)`
   &lt;span style="display:block; margin-top: 10px ;"&gt;&lt;/span&gt;
   - Population counts `\(n_{ik}\)` in area `\(i\)` and stratum `\(k\)`, aggregated over a time period
   &lt;span style="display:block; margin-top: 10px ;"&gt;&lt;/span&gt;
@@ -204,7 +204,7 @@ model temporal dependence of data or of parameters:
 2\. Spatial smoothing using BYM model
 
 `\begin{align*}
-\hbox{y}_i &amp; \sim  \hbox{Poisson}(E_i \rho_i); \;\;\; i=1,...,N\\
+y_i &amp; \sim  \hbox{Poisson}(E_i \rho_i); \;\;\; i=1,...,N\\
 \log \rho_i &amp; =  b_0 + v_i + u_i\\
 v_i &amp;\sim  \hbox{Normal}(0, \sigma^2_v)\\
 {\bm u} &amp; \sim   \hbox{ICAR}({\bm W}, \sigma_u^2) \rightarrow  u_i | u_{j, \;\; j\ne i}  \sim  \hbox{Normal}\left(\frac{\sum_{j} w_{ij} u_j}{\sum_{j} w_{ij}}, \sigma^2_u/n_i\right)
@@ -226,7 +226,7 @@ with `\(w_{ij}=1\)` if areas `\(i\)` and `\(j\)` are neighbours, 0 otherwise
 2\. Temporal trends
 
 `\begin{align*}
-\hbox{y}_t &amp; \sim  \hbox{Poisson}(E_t \rho_t); \;\;\; t=1,...,T\\
+y_t &amp; \sim  \hbox{Poisson}(E_t \rho_t); \;\;\; t=1,...,T\\
 \log \rho_t &amp; =  ???
 \end{align*}`
 
@@ -246,7 +246,7 @@ count:false
 2\. Temporal trends
 
 `\begin{align*}
-\hbox{y}_t &amp; \sim  \hbox{Poisson}(E_t \rho_t); \;\;\; t=1,...,T\\
+y_t &amp; \sim  \hbox{Poisson}(E_t \rho_t); \;\;\; t=1,...,T\\
 \log \rho_t &amp; =  b_0 + \beta t \quad \hbox{ simple linear regression}\\
 \end{align*}`
 
@@ -266,7 +266,7 @@ count:false
 2\. Temporal trends
 
 `\begin{align*}
-\hbox{y}_t &amp; \sim  \hbox{Poisson}(E_t \rho_t); \;\;\; t=1,...,T\\
+y_t &amp; \sim  \hbox{Poisson}(E_t \rho_t); \;\;\; t=1,...,T\\
 \log \rho_t &amp; =  b_0 + \beta t \quad \hbox{ simple linear regression}\\
 &amp; =   b_0 + \psi_t \quad \hbox{ global temporal smoothing}\\
 &amp; \psi_t \sim \hbox{Normal}(0, \sigma^2_{\psi})\\
@@ -289,7 +289,7 @@ count:false
 2\. Temporal trends
 
 `\begin{align*}
-\hbox{y}_t &amp; \sim  \hbox{Poisson}(E_t \rho_t); \;\;\; t=1,...,T\\
+y_t &amp; \sim  \hbox{Poisson}(E_t \rho_t); \;\;\; t=1,...,T\\
 \log \rho_t &amp; =  b_0 + \beta t \quad \hbox{ simple linear regression}\\
 &amp; =   b_0 + \psi_t \quad \hbox{ global temporal smoothing}\\
 &amp; \psi_t \sim \hbox{Normal}(0, \sigma^2_{\psi})\\
@@ -313,7 +313,7 @@ count:false
 2\. Temporal trends
 
 `\begin{align*}
-\hbox{y}_t &amp; \sim  \hbox{Poisson}(E_t \rho_t); \;\;\; t=1,...,T\\
+y_t &amp; \sim  \hbox{Poisson}(E_t \rho_t); \;\;\; t=1,...,T\\
 \log \rho_t &amp; =  b_0 + \beta t \quad \hbox{ simple linear regression}\\
 &amp; =   b_0 + \psi_t \quad \hbox{ global temporal smoothing}\\
 &amp; \psi_t \sim \hbox{Normal}(0, \sigma^2_{\psi})\\
@@ -327,7 +327,7 @@ count:false
 # Conditional distributions for a RW(1) 
 
 - Recalling from the previous lecture, the conditional distribution `\(p(\gamma_t |\bm \gamma_{-t})\)`, where
-`\(\bm \gamma_{-t}\)` represent the  vector of `\(\gamma\)`s with
+`\(\bm \gamma_{-t}\)` represent the  vector of `\(\{\gamma_1,...,\gamma_T\}\)`s with
 `\(\gamma_t\)` removed, can be derived.
 
 - **RW1**: The conditional distribution of `\(\gamma_t\)` involves
@@ -353,7 +353,7 @@ N(\gamma_{t-1},\sigma^2_{\epsilon})
 
 # Conditional distributions for a RW(2) 
 
-- A different parametrisation can be specified similarly to the spatial ICAR, so that 
+- A similar parametrisation can be specified as the spatial ICAR, so that 
 
 `\begin{align*}
 t=1 &amp; \qquad\qquad\gamma_{t+1},\gamma_{t+2}  \qquad\qquad\qquad \text{weights}= 2, -1 \\ 
@@ -379,7 +379,7 @@ p(\gamma_t |
 
 # Ohio Lung cancer data
 - Data on lung cancer in 88 counties of Ohio, 1968-1988
-- Annual rates by gender and race
+- Annual rates adjusted by gender and race
 
 &lt;img src="./img/ohio_data-1.png" &gt;
 ---
@@ -429,7 +429,7 @@ unusual/emerging hazards
 
 - Data:
 
-  - `\(\hbox{y}_{it}\)` and
+  - `\(y_{it}\)` and
   - `\(\hbox{E}_{it}\)`: the observed and expected number of cases in area `\(i\)` at time `\(t\)` calculated as `\(E_{it} = \sum_k n_{itk} r_k\)`, where `\(r_k\)` reference rate for stratum (age, gender,...)
 
 ---
@@ -478,7 +478,7 @@ Log SMR time trends in each county
 # Simple linear spatio-temporal model (Model 1)
 
 `\begin{align*}
-\hbox{y}_{it} &amp; \sim  \hbox{Poisson}(\hbox{E}_{it} \rho_{it}) \\
+y_{it} &amp; \sim  \hbox{Poisson}(\hbox{E}_{it} \rho_{it}) \\
 \log\rho_{it} &amp; =  b_0 + \beta*t + u_i + v_i\\
 \end{align*}`
 where
@@ -494,7 +494,7 @@ where
 
 ```r
 &gt; formula.mod1 &lt;- y ~ 1 + f(county,model="bym",
-+                    graph=Ohio.adj, constr=TRUE) + year
++                    graph=Ohio.adj) + year
 ```
 
 ---
@@ -502,7 +502,7 @@ where
 # Log-linear temporal model with unstructured temporal RE (Model 2)
 
 `\begin{align*}
-\hbox{y}_{it} &amp; \sim  \hbox{Poisson}(\hbox{E}_{it} \rho_{it}) \\
+y_{it} &amp; \sim  \hbox{Poisson}(\hbox{E}_{it} \rho_{it}) \\
 \log\rho_{it} &amp; =  b_0 + \beta*t + u_i + v_i + \color{red}{\psi_t}\\
 \end{align*}`
 
@@ -522,8 +522,8 @@ where
 ```r
 &gt; year2 &lt;- ohio.data$year
 &gt; formula.mod2&lt;- y ~ 1 + f(county,model="bym",
-+                   graph=Ohio.adj, constr=TRUE) + 
-+                   f(year2,model="iid", constr=TRUE) + 
++                   graph=Ohio.adj) + 
++                   f(year2,model="iid") + 
 +                   year
 ```
 ---
@@ -542,11 +542,11 @@ where
 
 ```
                    mean           sd  0.025quant    0.5quant 0.975quant
-(Intercept) -0.98836690 0.1196600394 -1.22359898 -0.98835045 -0.7532275
-year         0.02611995 0.0005864475  0.02497007  0.02611987  0.0272703
+(Intercept) -0.98836727 0.1196637252 -1.22360598 -0.98835084 -0.7532211
+year         0.02611995 0.0005864478  0.02497007  0.02611987  0.0272703
                    mode          kld
-(Intercept) -0.98831751 1.121006e-08
-year         0.02611971 3.810652e-07
+(Intercept) -0.98831792 1.120422e-08
+year         0.02611971 3.810708e-07
 ```
 
 ```r
@@ -555,12 +555,12 @@ year         0.02611971 3.810652e-07
 ```
 
 ```
-                   mean         sd  0.025quant    0.5quant  0.975quant
-(Intercept) -1.00067058 0.22449772 -1.44275478 -1.00066290 -0.55862979
-year         0.02044299 0.01686104 -0.01289646  0.02044315  0.05378153
+                   mean         sd  0.025quant   0.5quant  0.975quant
+(Intercept) -1.00067522 0.24776794 -1.48889878 -1.0006681 -0.51249167
+year         0.02044293 0.01695747 -0.01309592  0.0204431  0.05398088
                    mode          kld
-(Intercept) -1.00064747 1.036291e-08
-year         0.02044345 8.837703e-09
+(Intercept) -1.00065351 1.113514e-08
+year         0.02044343 8.753625e-09
 ```
 
 ---
@@ -581,7 +581,7 @@ by the superimposition of a BYM spatial model and a structured time
 trend
 
 `\begin{align*}
-\hbox{y}_{it} &amp; \sim  \hbox{Poisson}(\hbox{E}_{it} \rho_{it})\\
+y_{it} &amp; \sim  \hbox{Poisson}(\hbox{E}_{it} \rho_{it})\\
 \log\rho_{it} &amp; =  b_0 + b_i + \class{red}{\gamma_t}\\
 \end{align*}`
 
@@ -598,8 +598,8 @@ trend
 
 ```r
 &gt; formula.mod3 &lt;- y ~ 1 + f(county,model="bym",
-+                   graph=Ohio.adj, constr=TRUE) + 
-+                   f(year,model="rw1", constr=TRUE) 
++                   graph=Ohio.adj) + 
++                   f(year,model="rw1") 
 ```
 
 
@@ -611,7 +611,7 @@ trend
 # Simple additive space-time structure version 2 (Model 4)
 
 `\begin{align*}
-\hbox{y}_{it} &amp; \sim  \hbox{Poisson}(\hbox{E}_{it} \rho_{it}) \\
+y_{it} &amp; \sim  \hbox{Poisson}(\hbox{E}_{it} \rho_{it}) \\
 \log\rho_{it} &amp; =  b_0 + u_i + v_i + \class{red}{\psi_t} + \class{red}{\gamma_t}\\
 \end{align*}`
 
@@ -625,9 +625,9 @@ where
 
 ```r
 &gt; formula.mod4 &lt;- y ~ 1 + f(county,model="bym",
-+                    graph=Ohio.adj, constr=TRUE) + 
-+                    f(year,model="rw1", constr=TRUE) +   
-+                    f(year2,model="iid", constr=TRUE)
++                    graph=Ohio.adj) + 
++                    f(year,model="rw1") +   
++                    f(year2,model="iid")
 ```
 
 ```r
@@ -659,7 +659,7 @@ Posterior means of the temporal RE `\(\gamma_t\)` (model 3)
 
 # Ohio lung cancer - spatial patterns (all models)
 
-Posterior means of the spatial RE ( u + v ) for the 4 different models
+Posterior means of the spatial random effects for the 4 different models
 
 &lt;img src="./img/unnamed-chunk-6-1.png" &gt;
 
@@ -669,12 +669,12 @@ Similar patterns with the 4 models
 # Space-time model with exchangeable interactions (Model 5)
 
 `\begin{align*}
-\hbox{y}_{it} &amp; \sim  \hbox{Poisson}(\hbox{E}_{it} \rho_{it}) \\
-\log\rho_{it} &amp; =  b_0 + \theta_i + \;\gamma_t + \psi_t + \color{blue}{\delta_{it}}\\
-\theta_i &amp; =  v_i + u_i \; \hbox{(BYM = ICAR + HET)}\\
+y_{it} &amp; \sim  \hbox{Poisson}(\hbox{E}_{it} \rho_{it}) \\
+\log\rho_{it} &amp; =  b_0 + b_i + \;\gamma_t + \psi_t + \color{blue}{\delta_{it}}\\
+b_i &amp; =  v_i + u_i\\
 \gamma_t &amp; \sim  \hbox{RW(1)}\\
 \psi_t &amp; \sim  \hbox{N}(0,\sigma^2_{\psi})\\
-\color{blue}{\delta_{it}} &amp; \sim  \hbox{Normal}(0, \sigma^2_{\delta})
+\color{blue}{\delta_{it}} &amp; \color{blue}{\sim  \hbox{Normal}(0, \sigma^2_{\delta})}
 \end{align*}`
 
 The simple additive model 4 can be extended by including **space-time interactions parameters**, `\(\delta_{it}\)`, modelled as
@@ -710,11 +710,11 @@ unusual temporal trends
 - We need to specify an index for the interaction, i.e. for each combination of area/time  
 
 `\begin{align*}
-\log\rho_{it} &amp; =  b_0 + \xi_i + \gamma_t + \delta_{it}\\
-\xi_i &amp; =  v_i + u_i \; \hbox{(BYM = ICAR + HET)}\\
+\log\rho_{it} &amp; =  b_0 + b_i + \gamma_t + \psi_t + \delta_{it}\\
+b_i &amp; =  v_i + u_i\\
 \gamma_t &amp; \sim  \hbox{RW(1)}\\
 \psi_t &amp; \sim  N(0,\sigma^2_{\psi})\\
-\delta_{it}  \sim &amp; \hbox{Normal}(0, \sigma^2_{\nu})
+\delta_{it}  \sim &amp; \hbox{Normal}(0, \sigma^2_{\delta})
 \end{align*}`
 
 
@@ -754,9 +754,9 @@ name: interactions
 # Different types of interactions (Knorr-Held, 2000)
 
 `\begin{align*}
-\hbox{y}_{it} &amp; \sim  \hbox{Poisson}(\hbox{E}_{it} \rho_{it}) \\
-\log \rho_{it} &amp; =  b_0 + v_i + u_i  + \gamma_t + \psi_t + \color{blue}{\delta_{it}}\\
-v_i + u_i &amp; =  \; \hbox{(BYM = HET + ICAR)}\\
+y_{it} &amp; \sim  \hbox{Poisson}(\hbox{E}_{it} \rho_{it}) \\
+\log \rho_{it} &amp; =  b_0 + b_i  + \gamma_t + \psi_t + \color{blue}{\delta_{it}}\\
+b_i &amp; = v_i + u_i\\
 \gamma_t &amp; \sim  \hbox{RW(1)}\\
 \psi_t &amp; \sim  N(0,\sigma^2_{\psi})\\
 \end{align*}`
@@ -835,7 +835,7 @@ Let's start with the Type I interaction, which assumes that the two unstructured
 
 
 ```r
-&gt; Georgia.adj &lt;- "~/LBW in Georgia/Georgia.graph"
+&gt; Georgia.adj &lt;- "Georgia.graph"
 &gt; ID.year2 &lt;- data_INLA$ID.year
 &gt; formula.intI&lt;- y ~ + f(ID.area,model="bym2",
 +                        graph=Georgia.adj) +
@@ -844,7 +844,7 @@ Let's start with the Type I interaction, which assumes that the two unstructured
 +                      f(ID.area.year,model="iid")
 ```
 
-&lt;center&gt;&lt;img src=./img/INLA_ST1_mod-1.png width='45%' title='INCLUDE TEXT HERE'&gt;&lt;/center&gt;
+&lt;center&gt;&lt;img src=./img/INLA_ST1_mod-1.png width='40%' title='INCLUDE TEXT HERE'&gt;&lt;/center&gt;
 
 
 ---
@@ -917,23 +917,49 @@ spatial effect `\(v_i\)`.
 ```r
 &gt; #Kronecker product (for RW1)
 &gt; R &lt;- kronecker(diag(159),Q.gammaRW1)
-&gt; R[1:5,1:5]
+&gt; R[1:15,1:15]
 ```
 
 ```
-     [,1] [,2] [,3] [,4] [,5]
-[1,]    1   -1    0    0    0
-[2,]   -1    2   -1    0    0
-[3,]    0   -1    2   -1    0
-[4,]    0    0   -1    2   -1
-[5,]    0    0    0   -1    2
+      [,1] [,2] [,3] [,4] [,5] [,6] [,7] [,8] [,9] [,10] [,11] [,12] [,13]
+ [1,]    1   -1    0    0    0    0    0    0    0     0     0     0     0
+ [2,]   -1    2   -1    0    0    0    0    0    0     0     0     0     0
+ [3,]    0   -1    2   -1    0    0    0    0    0     0     0     0     0
+ [4,]    0    0   -1    2   -1    0    0    0    0     0     0     0     0
+ [5,]    0    0    0   -1    2   -1    0    0    0     0     0     0     0
+ [6,]    0    0    0    0   -1    2   -1    0    0     0     0     0     0
+ [7,]    0    0    0    0    0   -1    2   -1    0     0     0     0     0
+ [8,]    0    0    0    0    0    0   -1    2   -1     0     0     0     0
+ [9,]    0    0    0    0    0    0    0   -1    2    -1     0     0     0
+[10,]    0    0    0    0    0    0    0    0   -1     2    -1     0     0
+[11,]    0    0    0    0    0    0    0    0    0    -1     1     0     0
+[12,]    0    0    0    0    0    0    0    0    0     0     0     1    -1
+[13,]    0    0    0    0    0    0    0    0    0     0     0    -1     2
+[14,]    0    0    0    0    0    0    0    0    0     0     0     0    -1
+[15,]    0    0    0    0    0    0    0    0    0     0     0     0     0
+      [,14] [,15]
+ [1,]     0     0
+ [2,]     0     0
+ [3,]     0     0
+ [4,]     0     0
+ [5,]     0     0
+ [6,]     0     0
+ [7,]     0     0
+ [8,]     0     0
+ [9,]     0     0
+[10,]     0     0
+[11,]     0     0
+[12,]     0     0
+[13,]    -1     0
+[14,]     2    -1
+[15,]    -1     2
 ```
 
 ---
 
 # Type II interaction: in INLA
 
-- Finally we need to impose some more constraints as the matrix have spatio-temporal interaction matrix has a rank deficiency
+- Finally we need to impose some more constraints as the spatio-temporal interaction matrix has a rank deficiency
 
 - We calculate the eigenvalues of the structure matrix of the interaction term and the extra constraints are those where the eigenvalues are zero
 
@@ -968,7 +994,7 @@ The `formula` environment needs to be changed to
 
 - Type III combines the spatially structured main effect `\(u_i\)` and the unstructured temporal effect `\(\psi_t\)`.
 
-- We use first create the structure matrix for the spatial component using the neighborhood graph
+- We first create the structure matrix for the spatial component using the neighborhood graph
 
 ```r
 &gt; g &lt;- inla.read.graph(Georgia.adj)
@@ -977,16 +1003,11 @@ The `formula` environment needs to be changed to
 +   Q.xi[i,i]=g$nnbs[[i]]
 +   Q.xi[i,g$nbs[[i]]]=-1
 + }
-&gt; Q.xi[1:5,1:5]
+&gt; Q.xi[1,1:20]
 ```
 
 ```
-     [,1] [,2] [,3] [,4] [,5]
-[1,]    2   -1    0    0    0
-[2,]   -1    4    0    0    0
-[3,]    0    0    5   -1    0
-[4,]    0    0   -1    4   -1
-[5,]    0    0    0   -1    4
+ [1]  2 -1  0  0  0  0  0  0  0  0 -1  0  0  0  0  0  0  0  0  0
 ```
 
 ---
