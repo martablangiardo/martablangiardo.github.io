@@ -475,7 +475,7 @@ The variance is `\(var(Z_{t})=var\Big(\sum_{j=1}^{t}W_{j}\Big)=\sum_{j=1}^{t}  \
 - The parameterization of the RW1 model in `R-INLA` is `\(Z_{t}|Z_{t-1}\sim N(Z_{t-1}, \sigma^2_{Z})\)`, and it is implemented through the specification `rw1`.
 
 
-- The parameterization of the RW1 model in `R-INLA` is `\(Z_{t}, Z_{t-2}\sim N(2Z_{t-1}-Z_{t-2}, \sigma^2_{Z})\)`, and it is implemented through the specification `rw2`.
+- The parameterization of the RW2 model in `R-INLA` is `\(Z_{t}|Z_{t-1}, Z_{t-2}\sim N(2Z_{t-1}-Z_{t-2}, \sigma^2_{Z})\)`, and it is implemented through the specification `rw2`.
 
 
 ---

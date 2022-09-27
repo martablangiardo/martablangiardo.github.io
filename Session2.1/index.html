@@ -331,17 +331,17 @@ with
 - age will almost need controlling for since different disease risks in different areas may reflect differences in age population
 &lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
 - Direct standardisation: apply the disease rate in the population of interest (e.g. UK) to a standard population e.g. European standard population
--  external comparison: if the reference population is not the population of the study of interest. For example, to calculate the expected numbers in London, risks in England could be used.
+-  External comparison: if the reference population is not the population of the study of interest. For example, to calculate the expected numbers in London, risks in England could be used.
 ---
 
 # Expected numbers of cases - calculation
 
 &lt;center&gt;&lt;img src=./img/Expected.png width='60%' title='Lung cancer incidence in males, all ages, using the rates in England and Wales as reference, for the period 1985-2009'&gt;&lt;/center&gt;
 
-`$$\hbox{SIR}_A=\frac{118}{126.38}=0.93 \rightarrow$$` 
-Fewer incident cases of lung cancer for males in ward A than expected in EW after adjusting for differences in age.
+`$$\hbox{SIR}_A=\frac{118}{126.38}=0.93$$` 
+- Fewer incident cases of lung cancer for males in ward A than expected in EW after adjusting for differences in age.
 &lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
-In R we can perform indirect standardization using the package `SpatialEpi` (we will see it in the Practical).
+- In R we can perform indirect standardization using the package `SpatialEpi` (we will see it in the Practical).
 
 ---
 
@@ -490,7 +490,8 @@ name: interpretation
 ---
 
 # Parameter interpretation and useful quantities 
-  
+- `\(\rho_i\)` is the log-relative risk for the area i compared to the average area with the same structure in the Expected values.
+
 - `\(v_{i}\)` are the random effects. It can also be seen as the latent variable which captures the effect of unknown or unmeasured area level covariates.
 
 - If area level covariates are spatially structured we should take this into account when modelling `\(v_i\)` (we will see it later)
@@ -507,9 +508,9 @@ name: interpretation
 
 - Suppose we consider the `\(5^{th}\)` and `\(95^{th}\)` percentiles of the area relative risk distribution
 
-- let `\(q_{5\%} = \lambda_{5\%}\)` denote the log relative risk of outcome for the area ranked at the `\(5^{th}\)` percentile
+- let `\(q_{5\%} = \rho_{5\%}\)` denote the log relative risk of outcome for the area ranked at the `\(5^{th}\)` percentile
 
-- let `\(q_{95\%} = \lambda_{95\%}\)` denote the log relative risk of outcome  for the area ranked at the `\(95^{th}\)` percentile
+- let `\(q_{95\%} = \rho_{95\%}\)` denote the log relative risk of outcome  for the area ranked at the `\(95^{th}\)` percentile
 
 .content-box-beamer[
 ### Quantile ratio
@@ -587,21 +588,21 @@ Note that
 
 - `\(\sigma_v\)` is the between-area standard deviation of log relative risk of lip cancer
 
-- As in INLA we get the precision we need to convert it into variance using
+- As in INLA we get the precision we need to convert it into standard deviaiton using
 
 ```r
-&gt; sigma2.v&lt;- inla.tmarginal(function(x) sqrt(1/x),
+&gt; sigma.v&lt;- inla.tmarginal(function(x) sqrt(1/x),
 + 			lipcancer.poisson$marginals.hyperpar[[1]])
 ```
 
 And we can calculate quintiles with
 
 ```r
-&gt; inla.qmarginal(seq(0,1,0.2),sigma2.v)
+&gt; inla.qmarginal(seq(0,1,0.2),sigma.v)
 ```
 
 ```
-[1] 0.5185021 0.6752559 0.7256128 0.7729646 0.8334388 1.1385662
+[1] 0.5184260 0.6745696 0.7255678 0.7745260 0.8347659 1.1376314
 ```
 
 ---
@@ -647,7 +648,7 @@ To obtain the quantile ratio we need to follow these steps:
 
 ```
 Predictor:1 Predictor:2 Predictor:3 
-   1.662177    1.250731    1.309383 
+  0.8309731   0.9167561   1.0396160 
 ```
 &lt;span style="display:block; margin-top: -10px ;"&gt;&lt;/span&gt;
 Note that:
@@ -681,7 +682,7 @@ Note that:
 ```
 
 ```
-[1] 10.49323
+[1] 10.72202
 ```
 
 - The `\(QR90\)` points towards a large spatial variability. 
@@ -764,10 +765,10 @@ where `\(x_{1i}\)` , `\(x_{2i}\)` are the seed type and root extract of the i `\
 
 ```
                   mean        sd 0.025quant   0.5quant 0.975quant       mode          kld
-(Intercept) -0.5576687 0.1270990 -0.8092640 -0.5568732 -0.3105808 -0.5552814 3.738674e-07
-x1           0.1451228 0.2246100 -0.2976003  0.1458749  0.5835492  0.1473262 9.049758e-07
-x2           1.3207264 0.1790331  0.9723663  1.3197220  1.6748005  1.3177520 5.328334e-07
-x1:x2       -0.7803078 0.3084241 -1.3847444 -0.7805000 -0.1748016 -0.7809118 8.840644e-07
+(Intercept) -0.5576686 0.1270991 -0.8092639 -0.5568732 -0.3105804 -0.5552815 3.739103e-07
+x1           0.1451229 0.2246101 -0.2975998  0.1458748  0.5835501  0.1473258 9.050863e-07
+x2           1.3207268 0.1790332  0.9723670  1.3197223  1.6748016  1.3177520 5.327068e-07
+x1:x2       -0.7803090 0.3084242 -1.3847462 -0.7805010 -0.1748030 -0.7809125 8.839009e-07
 ```
 
 ```r
@@ -776,12 +777,12 @@ x1:x2       -0.7803078 0.3084241 -1.3847444 -0.7805000 -0.1748016 -0.7809118 8.8
 
 ```
   ID          mean         sd  0.025quant      0.5quant 0.975quant          mode       kld
-1  1 -0.0022221229 0.02357588 -0.05544158 -5.780561e-04 0.03441539 -3.247659e-04 0.2167860
-2  2  0.0001839175 0.02159768 -0.04152285  4.801781e-05 0.04322491 -4.284610e-05 0.1472387
-3  3 -0.0032779989 0.02425306 -0.06204182 -8.771023e-04 0.03117624 -4.661547e-04 0.2220429
-4  4  0.0040398101 0.02590670 -0.02982474  1.024144e-03 0.06795555  4.635023e-04 0.2645106
-5  5  0.0014021960 0.02256185 -0.03691699  3.641255e-04 0.05018001  9.461053e-05 0.1815532
-6  6  0.0004765113 0.02272650 -0.04104168  9.742638e-05 0.04557048 -1.133497e-04 0.1908667
+1  1 -0.0022222100 0.02357646 -0.05544281 -5.780687e-04 0.03441563 -3.247895e-04 0.2167979
+2  2  0.0001839261 0.02159809 -0.04152334  4.801709e-05 0.04322551 -4.285707e-05 0.1472458
+3  3 -0.0032781315 0.02425370 -0.06204349 -8.771178e-04 0.03117635 -4.661711e-04 0.2220545
+4  4  0.0040399676 0.02590743 -0.02982485  1.024159e-03 0.06795752  4.635029e-04 0.2645202
+5  5  0.0014022416 0.02256231 -0.03691732  3.641289e-04 0.05018090  9.461399e-05 0.1815613
+6  6  0.0004765308 0.02272700 -0.04104216  9.742449e-05 0.04557119 -1.133622e-04 0.1908765
 ```
 
 ---
@@ -946,7 +947,7 @@ name: Prior
   
 `UN.prior = "expression:
   log_dens = 0 - log(2) - theta / 2;
-  return(log_dens);`
+  return(log_dens);"`
 
 
 &lt;span style="display:block; margin-top: 50px ;"&gt;&lt;/span&gt;
@@ -970,9 +971,9 @@ name: Modelselection
 
 - When the interest lays mainly on the prior distribution or on the functional form of some parameters the deviance of the model can be used to evaluate the goodness of fit.
 
-Given the data `\(\mathbf{y}\)` with distribution  `\(p(\mathbf{y}\mid \theta)\)`, the deviance of the model is defined as:
+Given the data `\(\bm{y}\)` with distribution  `\(p(\bm{y}\mid \theta)\)`, the deviance of the model is defined as:
 `\begin{eqnarray*}
-  D(\theta) = -2 \hbox{log} p(y \mid \theta)
+  D(\theta) = -2 \hbox{log} p(\bm{y} \mid \theta)
 \end{eqnarray*}`
 where `\(\theta\)` identifies the parameter of the likelihood
 
@@ -1009,19 +1010,19 @@ where `\(\theta\)` identifies the parameter of the likelihood
 
   - The fit is measure through the deviance
 
-`$$D(\theta) = -2 \hbox{log} p(y \mid \theta)$$` 
+`$$D(\theta) = -2 \hbox{log} p(\bm{y} \mid \theta)$$` 
 
 --
 
   - Complexity measured by estimate of the "effective number of parameters":
 
-  `$$p_D = \textsf{E}_{\theta\mid y}\left[D(\theta)\right] + D(\textsf{E}_{\theta\mid y}\left[\theta \right]) = \overline{D} - D(\overline{\theta})$$`
+  `$$p_D = \textsf{E}_{\theta\mid y}\left[D(\theta)\right] + D(\textsf{E}_{\theta\mid y}\left[\theta \right])$$`
 
 --
 
   - The DIC is then defined analogously to AIC as
 
-`$$\hbox{DIC} = D(\overline{\theta}) + 2p_D = \overline{D} + p_D$$`
+`$$\hbox{DIC} = D(\textsf{E}_{\theta\mid y}\left[\theta \right]) + 2p_D$$`
 
   - Models with smaller DIC are better supported by the data
 
@@ -1038,24 +1039,24 @@ where `\(\theta\)` identifies the parameter of the likelihood
 
   1\. Pooled: `\(\log \rho_i = b_0 + \beta_1 x_i\)`
   
-  2\. Random Effects 1: `\(\log \rho_i = b_0 + \beta_1 x_i + \theta_i\)`; Flat prior on `\(\log \sigma_v\)`
+  2\. Random Effects 1: `\(\log \rho_i = b_0 + \beta_1 x_i + v_i\)`; Flat prior on `\(\log \sigma_v\)`
   
-  3\. Random Effects 2: `\(\log \rho_i = b_0 + \beta_1 x_i + \theta_i\)`; Gamma prior on `\(\log\tau_v\)`
+  3\. Random Effects 2: `\(\log \rho_i = b_0 + \beta_1 x_i + v_i\)`; Gamma prior on `\(\log\tau_v\)`
 
 
 Table: DIC elements under different models
 
-|                 |   D| D(theta)|  pD|   DIC|
-|:----------------|---:|--------:|---:|-----:|
-|Pooled           | 589|      588|   1| 590.4|
-|Random effects 1 | 270|      228| 270| 310.0|
-|Random effects 2 | 270|      230| 270| 310.0|
+|                 |   D| D(theta)| pD| DIC|
+|:----------------|---:|--------:|--:|---:|
+|Pooled           | 589|      588|  1| 590|
+|Random effects 1 | 270|      228| 41| 310|
+|Random effects 2 | 270|      230| 40| 310|
 
 --
 
 DIC has been criticised over the years, specifically:
 
-1\. `\(p(D)\)` is not invariant to reparameterization. For example, we would obtain a (slightly) different value if we parameterized in terms of `\(\sigma\)` or  `\(log\sigma\)`
+1\. `\(p_D\)` is not invariant to reparameterization. For example, we would obtain a (slightly) different value if we parameterized in terms of `\(\sigma\)` or  `\(log\sigma\)`
 
 2\. It is not based on a proper predictive criterion
 
