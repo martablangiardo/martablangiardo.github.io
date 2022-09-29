@@ -240,7 +240,7 @@ The output is exactly equal to the one presented in Section 4.1. The same poster
 
 ```
               mean 0.025quant 0.975quant
-intercept 9.505136   8.056254   10.85442
+intercept 9.504649   8.032413   10.86847
 ```
 
 
@@ -250,9 +250,9 @@ intercept 9.505136   8.056254   10.85442
 
 ```
                                              mean 0.025quant 0.975quant
-Precision for the Gaussian observations  2.877425   2.016438   3.954292
-Theta1 for spatial.field                -4.038427  -4.351693  -3.715364
-Theta2 for spatial.field                 2.104859   1.655382   2.538630
+Precision for the Gaussian observations  2.853382   2.027582   3.879383
+Theta1 for spatial.field                -4.027635  -4.319787  -3.716326
+Theta2 for spatial.field                 2.082435   1.597990   2.531253
 ```
 
 ---
@@ -359,9 +359,9 @@ We then extract the prediction posterior mean and sd at the first 3 grid points:
 
 ```
                    mean        sd
-APredictor.201 12.24727 0.2609043
-APredictor.202 12.06216 0.4241736
-APredictor.203 10.58545 0.4333507
+APredictor.201 12.24722 0.2609015
+APredictor.202 12.06216 0.4241943
+APredictor.203 10.58542 0.4333720
 ```
 
 In this case (identity link) `output6pred$summary.fitted.values` would return the same output.
@@ -394,7 +394,7 @@ We can be also interested in computing the posterior probability of getting a va
 ```
 
 ```
-[1] 0.002117688
+[1] 0.002116014
 ```
 
 ]
@@ -481,8 +481,8 @@ name: inlabru
 
 &lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt; 
 
-- `inlabru` is a wrapper around `INLA` taylored towards spatial data. It makes fitting spatial models with INLA
-easier as there is no more need to deal with projector matrices and stack objects. It also extends the class of models that can be fitted, including also distance sampling. 
+- `inlabru` is a wrapper around `INLA` tailored towards spatial data. It makes fitting spatial models with INLA
+easier as there is no more need to deal with projector matrices and stack objects. It also extends the class of models that can be fitted. 
 
 &lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt; 
 
@@ -613,8 +613,8 @@ The difference is in the name used in the output: `x` (method 1) or `beta` (meth
 
 ```
               mean        sd
-Intercept 3.087772 0.1420333
-x         1.657266 0.2394693
+Intercept 3.154427 0.1251910
+x         1.677757 0.2250018
 ```
 ]
 .pull-right[
@@ -633,8 +633,8 @@ x         1.657266 0.2394693
 
 ```
               mean        sd
-Intercept 3.087771 0.1420333
-beta      1.657266 0.2394693
+Intercept 3.154427 0.1251910
+beta      1.677757 0.2250018
 ```
 ]
 
@@ -703,7 +703,7 @@ attr(,"package")
 
 ```
               mean        sd
-Intercept 9.505791 0.6862972
+Intercept 9.506126 0.6855602
 ```
 
 
@@ -751,19 +751,19 @@ The argument `n.samples` (by default 100) specifies the number of samples to dra
 
 ```
        mean        sd    q0.025      q0.5   q0.975    median mean.mc_std_err
-1 12.240160 0.2668991 11.713002 12.230989 12.81185 12.230989      0.01193609
-2 12.053240 0.4098115 11.297952 12.058383 12.85653 12.058383      0.01832733
-3 10.562368 0.4225269  9.786545 10.570022 11.36868 10.570022      0.01889598
-4  9.510371 0.3049403  8.921902  9.495889 10.09044  9.495889      0.01363735
-5  9.514464 0.3020450  8.949142  9.515708 10.10517  9.515708      0.01350786
-6 10.254276 0.3328632  9.599244 10.243278 10.86263 10.243278      0.01488610
+1 12.239408 0.2688680 11.710934 12.236283 12.81067 12.236283      0.01202414
+2 12.055825 0.4087471 11.291659 12.064425 12.86257 12.064425      0.01827973
+3 10.560534 0.4233880  9.760810 10.560449 11.40428 10.560449      0.01893449
+4  9.507930 0.3165921  8.882076  9.488077 10.12360  9.488077      0.01415843
+5  9.513974 0.3047775  8.944521  9.506418 10.10405  9.506418      0.01363006
+6 10.254879 0.3337293  9.601126 10.241806 10.86287 10.241806      0.01492483
   sd.mc_std_err
-1   0.007969371
-2   0.013441170
-3   0.014872706
-4   0.009088889
-5   0.009921144
-6   0.012310802
+1   0.007945295
+2   0.013703305
+3   0.014680900
+4   0.009811157
+5   0.010277959
+6   0.012471945
 ```
 
 Note that it is possible to predict any function of any subset of the components of the model specification.
