@@ -29,7 +29,8 @@ The html version of the slides and the practical material will be posted here be
 Break
 
 - [Practical 1](Practical1): Conditional/joint probability and Bayes theorem 
-Solutions of practical 1 are [here](Practical1/Solutions.html)
+
+Solutions of practical 1 are [here](Practical1/solutions.html)
 
 ### Day 2 - Mon 23th Jan 2023
 
@@ -38,8 +39,9 @@ Solutions of practical 1 are [here](Practical1/Solutions.html)
 
 Break
 
-- [Practical 2](Practical2)
-Solutions of practical 2 are [here](Practical2/Solutions.html)
+- [Practical 2](Practical2): Conjugacy, prediction and Monte Carlo simulation
+
+Solutions of practical 2 are [here](Practical2/solutions.html)
 
 
 
