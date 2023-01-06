@@ -1,0 +1,988 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>Session 4.2: inla.stack and inlabru</title>
+    <meta charset="utf-8" />
+    <script src="libs/header-attrs/header-attrs.js"></script>
+    <link href="libs/panelset/panelset.css" rel="stylesheet" />
+    <script src="libs/panelset/panelset.js"></script>
+    <!-- (Re)Defines a bunch of LaTeX commands that can then be used directly in the .Rmd file as '\command{...}' -->
+    <script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+      TeX: {
+        /* This enables color macros */
+        extensions: ["color.js"],
+        Macros: {
+          /* Probability & mathematical symbols */
+          Pr: "{\\style{font-family:inherit; font-size: 110%;}{\\text{Pr}}}",
+          exp: "{\\style{font-family:inherit; font-size: 105%;}{\\text{exp}}}",
+          log: "{\\style{font-family:inherit; font-size: 105%;}{\\text{log}}}",
+          ln: "{\\style{font-family:inherit; font-size: 105%;}{\\text{ln}}}",
+          logit: "{\\style{font-family:inherit; font-size: 100%;}{\\text{logit}}}",
+          HR: "{\\style{font-family:inherit; font-size: 105%;}{\\text{HR}}}",
+          OR: "{\\style{font-family:inherit; font-size: 105%;}{\\text{OR}}}",
+          E: "{\\style{font-family:inherit; font-size: 105%;}{\\text{E}}}",
+          Var: "{\\style{font-family:inherit; font-size: 105%;}{\\text{Var}}}",
+          Cov: "{\\style{font-family:inherit; font-size: 105%;}{\\text{Cov}}}",
+          Corr: "{\\style{font-family:inherit; font-size: 105%;}{\\text{Corr}}}",
+          DIC: "{\\style{font-family:inherit; font-size: 105%;}{\\text{DIC}}}",
+          se: "{\\style{font-family:inherit; font-size: 100%;}{\\text{se}}}",
+          sd: "{\\style{font-family:inherit; font-size: 100%;}{\\text{sd}}}",
+          kld: "{\\style{font-family:inherit; font-size: 100%;}{\\text{kld}}}",
+          /* Distributions */
+          dnorm: "{\\style{font-family:inherit;}{\\text{Normal}}}",
+          dt: "{\\style{font-family:inherit;}{\\text{t}}}",
+          ddirch: "{\\style{font-family:inherit;}{\\text{Dirichlet}}}",
+          dmulti: "{\\style{font-family:inherit;}{\\text{Multinomial}}}",
+          dbeta: "{\\style{font-family:inherit;}{\\text{Beta}}}",
+          dgamma: "{\\style{font-family:inherit;}{\\text{Gamma}}}",
+          dbern: "{\\style{font-family:inherit;}{\\text{Bernoulli}}}",
+          dbin: "{\\style{font-family:inherit;}{\\text{Binomial}}}",
+          dpois: "{\\style{font-family:inherit;}{\\text{Poisson}}}",
+          dweib: "{\\style{font-family:inherit;}{\\text{Weibull}}}",
+          dexp: "{\\style{font-family:inherit;}{\\text{Exponential}}}",
+          dlnorm: "{\\style{font-family:inherit;}{\\text{logNormal}}}",
+          dunif: "{\\style{font-family:inherit;}{\\text{Uniform}}}",
+          /* LaTeX formatting */
+          bm: ["{\\boldsymbol #1}",1],
+          /* These create macros to typeset numbers in maths with the basic font */
+          0: "{\\style{font-family:inherit; font-size: 105%;}{\\text{0}}}",
+          1: "{\\style{font-family:inherit; font-size: 105%;}{\\text{1}}}",
+          2: "{\\style{font-family:inherit; font-size: 105%;}{\\text{2}}}",
+          3: "{\\style{font-family:inherit; font-size: 105%;}{\\text{3}}}",
+          4: "{\\style{font-family:inherit; font-size: 105%;}{\\text{4}}}",
+          5: "{\\style{font-family:inherit; font-size: 105%;}{\\text{5}}}",
+          6: "{\\style{font-family:inherit; font-size: 105%;}{\\text{6}}}",
+          7: "{\\style{font-family:inherit; font-size: 105%;}{\\text{7}}}",
+          8: "{\\style{font-family:inherit; font-size: 105%;}{\\text{8}}}",
+          9: "{\\style{font-family:inherit; font-size: 105%;}{\\text{9}}}",
+          /* Health economics quantities */
+          icer: "{\\style{font-family:inherit; font-size: 100%;}{\\text{ICER}}}",
+          nb: "{\\style{font-family:inherit; font-size: 100%;}{\\text{NB}}}",
+          ol: "{\\style{font-family:inherit; font-size: 100%;}{\\text{OL}}}",
+          ceac: "{\\style{font-family:inherit; font-size: 100%;}{\\text{CEAC}}}",
+          evpi: "{\\style{font-family:inherit; font-size: 100%;}{\\text{EVPI}}}",
+          evppi: "{\\style{font-family:inherit; font-size: 100%;}{\\text{EVPPI}}}",
+          evsi: "{\\style{font-family:inherit; font-size: 100%;}{\\text{EVSI}}}"
+        }
+      }
+    });
+    </script>
+    <link rel="stylesheet" href="assets/beamer.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+
+
+
+
+class: title-slide
+
+# Session 4.2: `inla.stack` and `inlabru`&lt;span style="display:block; margin-top: 10px ;"&gt;&lt;/span&gt; 
+
+## 
+
+###     
+
+### Spatial and Spatio-Temporal Bayesian Models with `R-INLA`, University of São Paulo 
+
+&lt;!-- Can also separate the various components of the extra argument 'params', eg as in 
+### Spatial and Spatio-Temporal Bayesian Models with `R-INLA`, University of São Paulo, 29 September 2022, Spatial and Spatio-Temporal Bayesian Models with `R-INLA`
+--&gt;
+
+29 September 2022
+
+---
+
+layout: true  
+
+.my-footer[ 
+.alignleft[ 
+&amp;nbsp; &amp;copy; Marta Blangiardo | Monica Pirani 
+]
+.aligncenter[
+Spatial and Spatio-Temporal Bayesian Models with `R-INLA` 
+]
+.alignright[
+Spatial and Spatio-Temporal Bayesian Models with `R-INLA`, 29 Sep 2022 
+]
+] 
+
+
+
+&lt;style type="text/css"&gt;
+.scrollable {
+  height: 80%;
+  overflow-y: auto;
+} 
+&lt;/style&gt;
+
+
+---
+
+# Learning Objectives
+
+At the end of this session you should be able to:
+
+&lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
+
+- use `R-INLA` to implement a spatial geostatistical model with the  `inla.stack` approach;
+
+
+&lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
+
+
+- use `inlabru` to implement a spatial geostatistical model;
+
+&lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
+
+
+- perform spatial prediction and mapping.
+
+
+&lt;span style="display:block; margin-top: 30px ;"&gt;&lt;/span&gt;
+
+
+The topics treated in this lecture can be found in **Section 6.7 -- 6.9** of the INLA book.  
+
+---
+
+# Outline 
+
+&lt;span style="display:block; margin-top: 30px ;"&gt;&lt;/span&gt;
+
+
+1\. [Model fitting and spatial prediction with the `inla.stack` approach](#inlastackspatialpred)
+
+&lt;span style="display:block; margin-top: 30px ;"&gt;&lt;/span&gt;
+
+2\.  [Model fitting and spatial prediction with the `inlabru` package](#inlabru)
+
+---
+
+name: inlastack
+  
+&lt;span style="display:block; margin-top: 250px ;"&gt;&lt;/span&gt;
+
+.myblue[.center[.huge[
+**Model fitting and spatial prediction with the `inla.stack` approach**]]]
+
+---
+
+
+# The `inla.stack()` function 
+
+- A function named `inla.stack()` has been introduced in `R-INLA` for an optimal and easy management of the SPDE objects (data, covariates, indices and projector matrices) and for the construction of the linear predictor (Lindgren and Rue, 2015).
+
+
+
+&lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
+- In the `SPDEtoy` example the .red[**linear predictor**] is given by 
+`$$\eta_i = b_0 +\xi_i = b_0 + \sum_{g=1}^{G}A_{ig} \tilde {\xi_g}$$`
+and can be written as
+`$$\bm\eta = \bm 1 b_0+\bm A\tilde{\bm \xi}$$`
+where the first term refers to the intercept and the second to the spatial effect. Note that each term in the linear predictor is represented as the product of a projector matrix and an effect.
+
+&lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
+- The main arguments of the `inla.stack()` function are:
+  - `data`: a vector list with the data
+  - `A`: a list of projector matrices 
+  - `effects`: the list of effects
+  - `tag` (optional): a label for the data stack
+  
+  
+---
+
+
+# The `inla.stack()` function for model fitting with the `SPDEtoy` data
+
+
+1\. Define the `inla.stack` object for model fitting:
+
+```r
+&gt; stack.est &lt;- inla.stack(
++   data = list(y = SPDEtoy$y),
++   A = list(1, A.est6),
++   effects = list(intercept = rep(1,nrow(SPDEtoy)),
++                  spatial.field = 1:spde$n.spde),
++   tag="est") 
+```
+  
+Note that the function `inla.stack()` will take care of eliminating any column in the projector matrix which is full of zeros. 
+
+2\. Define the `formula` by specifying an explicit intercept:
+
+```r
+&gt; formula = y ~ -1 + intercept + f(spatial.field, model = spde)
+```
+
+3\. Run `inla`! The function `inla.stack.data()` and `inla.stack.A()` are used for extracting the data and the projector matrix from the `stack.est` object:
+
+
+```r
+&gt; output6 &lt;- inla(formula,
+*+                 data = inla.stack.data(stack.est),
+*+                 control.predictor = list(A = inla.stack.A(stack.est), compute = TRUE))
+```
+
+
+---
+
+# Exploring the output
+
+The output is exactly equal to the one presented in Section 4.1. The same posterior summary statistics can be computed also when the `inla.stack` approach is adopted. 
+
+
+
+```r
+&gt; output6$summary.fixed[,c("mean","0.025quant","0.975quant")]
+```
+
+```
+              mean 0.025quant 0.975quant
+intercept 9.504649   8.032413   10.86847
+```
+
+
+```r
+&gt; output6$summary.hyperpar[,c("mean","0.025quant","0.975quant")]
+```
+
+```
+                                             mean 0.025quant 0.975quant
+Precision for the Gaussian observations  2.853382   2.027582   3.879383
+Theta1 for spatial.field                -4.027635  -4.319787  -3.716326
+Theta2 for spatial.field                 2.082435   1.597990   2.531253
+```
+
+---
+
+# Spatial prediction with the `inla.stack()` approach
+
+- In geostatistics we are interested in predicting the (latent) spatial field (i.e. the linear predictor) at new spatial locations where we do not have data. 
+
+&lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
+- It is possible to perform the spatial prediction jointly with the estimation by using the  `inla.stack` approach.
+
+&lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
+- Consider the response variable distribution
+$$
+\bm y\sim\text{Normal}(\bm\eta=\bm 1 b_0+\bm A\tilde{\bm \xi},\sigma^2_e \bm I)
+$$
+we are interested in the posterior distribution of the linear predictor `\(\bm\eta\)` everywhere in space, especially where we don't have observed data and `y=NA`.
+
+&lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
+- With regard to spatial prediction, it is worth noting that the INLA-SPDE algorithm provides the posterior conditional distribution of `\(\bm\eta\)` for all the triangulation vertices.
+By using the SPDE approximation, it is then immediate to get a prediction for `\(\bm\eta\)` for any location in the triangulated domain (i.e. the posterior predictive distribution).
+
+---
+
+# Grid for spatial prediction
+
+
+.pull-left[
+Consider the following regular grid of points:
+
+```r
+&gt; grid.x = 20
+&gt; grid.y = 20
+&gt; pred.grid &lt;- expand.grid(x = seq(0, 1, length.out = grid.x),
++                          y = seq(0, 1, length.out = grid.y))
+```
+
+It is necessary to define a new projector matrix:
+
+```r
+&gt; A.pred6 &lt;- inla.spde.make.A(mesh = mesh6,
++                             loc = as.matrix(pred.grid))
+&gt; dim(A.pred6)
+```
+
+```
+[1] 400 549
+```
+]
+.pull-right[
+&lt;img src="./img/predgrid-1.png" &gt;
+]
+
+---
+
+# Model fitting jointly with spatial prediction
+For performing **jointly** the estimation and the prediction, we create a new `inla.stack` object:
+
+```r
+*&gt; stack.pred &lt;- inla.stack(data = list(y = NA),
++          A = list(1, A.pred6),
++          effects = list(intercept = rep(1, nrow(pred.grid)),
++                         spatial.field = 1:spde$n.spde),
++          tag = "pred") 
+```
+and then we join it to the `inla.stack` object created previously for the estimation (`stack.est`):
+
+```r
+&gt; join.stack &lt;- inla.stack(stack.est, stack.pred) #full stack object
+```
+
+And finally, we run `INLA` again:
+
+```r
+&gt; output6pred &lt;- inla(formula,
+*+                 data = inla.stack.data(join.stack),
++                 control.compute = list(return.marginals=TRUE,
++                                        return.marginals.predictor=TRUE),
+*+                 control.predictor = list(A = inla.stack.A(join.stack), compute = TRUE)
++                 )
+```
+
+The option `return.marginals.predictor=TRUE` is necessary to obtain the marginals for the linear predictor. 
+---
+
+# Retrieve the predictions
+
+To access the predictions (posterior summary stats or marginal distribution) at the target grid locations, we extract with the `inla.stack.index()` function the corresponding indexes from the full stack object using the corresponding tag set before (`pred`):
+
+```r
+&gt; index.pred &lt;- inla.stack.index(join.stack, tag = "pred")$data
+&gt; length(index.pred)
+```
+
+```
+[1] 400
+```
+
+We then extract the prediction posterior mean and sd at the first 3 grid points:
+
+```r
+&gt; output6pred$summary.linear.predictor[index.pred[1:3],c("mean","sd")]
+```
+
+```
+                   mean        sd
+APredictor.201 12.24722 0.2609015
+APredictor.202 12.06216 0.4241943
+APredictor.203 10.58542 0.4333720
+```
+
+In this case (identity link) `output6pred$summary.fitted.values` would return the same output.
+
+---
+
+# Manipulate the posterior predictive distribution 
+
+As described in Day 1, it is possible to manipulate marginal distributions. 
+
+.pull-left[
+Consider for example the first grid point and its posterior predictive distribution:
+
+```r
+&gt; distr.point1 = output6pred$marginals.linear.predictor[index.pred[1]][[1]]
+&gt; distr.point1.smooth = inla.smarginal(distr.point1)
+```
+
+
+
+```r
+&gt; ggplot(data.frame(distr.point1.smooth)) + 
++   geom_line(aes(x,y))
+```
+
+We can be also interested in computing the posterior probability of getting a value bigger than 13:
+
+```r
+&gt; 1 - inla.pmarginal(13, distr.point1)
+```
+
+```
+[1] 0.002116014
+```
+
+]
+
+
+.pull-right[
+&lt;img src="./img/postpredgrid1-1.png" &gt;
+]
+
+
+---
+
+# Mapping the linear predictor: posterior mean 
+
+We plot now the posterior mean of the linear predictor at the grid level.
+
+
+
+
+.pull-left[
+
+```r
+&gt; library(inlabru)
+&gt; post.mean.pred = output6pred$summary.linear.predictor[index.pred,"mean"]
+&gt; post.mean.df = SpatialPixelsDataFrame(SpatialPoints(pred.grid),
++                                       data = data.frame(post.mean.pred))
+&gt; 
+&gt; 
+&gt; library(viridis)
+&gt; ggplot() +
++   gg(post.mean.df, aes(x, y, post.mean.pred)) +
++   ggtitle("Posterior mean") + 
++   coord_fixed() + #x and y axis with the same length in the plot
++   scale_fill_viridis()
+```
+]
+
+.pull-right[
+&lt;img src="./img/mapmeanout-1.png" &gt;
+]
+
+---
+
+# Mapping the linear predictor: posterior standard deviation 
+  
+
+We plot the posterior standard deviation of the linear predictor at the grid level.
+
+
+.pull-left[
+
+```r
+&gt; post.sd.pred = output6pred$summary.linear.predictor[index.pred,"sd"]
+&gt; 
+&gt; post.sd.df = SpatialPixelsDataFrame(SpatialPoints(pred.grid),
++                                     data = data.frame(post.sd.pred))
+&gt; 
+&gt; ggplot()+
++   gg(post.sd.df, aes(x, y, post.sd.pred)) +
++   ggtitle("Posterior standard deviation") + 
++   coord_fixed() +
++  scale_fill_viridis()
+```
+]
+
+.pull-right[
+&lt;img src="./img/mapsdout-1.png" &gt;
+]
+
+---
+
+name: inlabru
+  
+&lt;span style="display:block; margin-top: 250px ;"&gt;&lt;/span&gt;
+
+.myblue[.center[.huge[
+**Model fitting and spatial prediction with `inlabru`**]]]
+
+---
+
+# inlabru
+
+- `inlabru` is an `R` package for Bayesian spatial modelling, originally developed for ecological applications (Bachl, Lindgren, Borchers, and Illian, 2019) and the implementation of Log Gaussian Cox processes. 
+
+&lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt; 
+
+- `inlabru` is a wrapper around `INLA` tailored towards spatial data. It makes fitting spatial models with INLA
+easier as there is no more need to deal with projector matrices and stack objects. It also extends the class of models that can be fitted. 
+
+&lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt; 
+
+- The `inlabru` package works with spatial objects from the `sp` package (e.g. `SpatialPointsDataFrame`, `SpatialGridDataFrame`, `SpatialPixelsDataFrame`): https://cran.r-project.org/web/packages/sp/index.html
+
+
+ &lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt; 
+- The function `gg()` is an extension of the `ggplot()` function for generating geometries from spatial fitted object. 
+
+
+&lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
+See: 
+  - **Website**: https://sites.google.com/inlabru.org/inlabru
+  &lt;span style="display:block; margin-top: 5px ;"&gt;&lt;/span&gt;
+  - **Github**: https://github.com/inlabru-org/inlabru
+
+
+---
+
+# Model fitting with `inlabru`
+
+
+The function for fitting the model is called `bru()`:
+
+
+```r
+&gt; library(inlabru)
+&gt; 
+&gt; bru(components = ...,
++     ..., 
++     options = list(...)
++     )
+```
+
+where
+ &lt;span style="display:block; margin-top: 10px ;"&gt;&lt;/span&gt; 
+- `components` is a formula-like specification of the model components
+
+&lt;span style="display:block; margin-top: 10px ;"&gt;&lt;/span&gt; 
+- `...` requires the specification of the likelihood and of the data. This will be done using the function `like`.
+
+&lt;span style="display:block; margin-top: 10px ;"&gt;&lt;/span&gt; 
+- When running the `bru` some options are set (for example `control.compute$dic=TRUE`): see all of them with `bru_options_default()`. With `options` we can for example specify the `inla` `control.fixed` and `control.compute` options.
+
+---
+
+# The function `like()`
+
+
+The function `like()` makes it possible to specify the likelihood and other options related to the likelihood:
+
+
+```r
+&gt; like(
++   formula = . ~ .,
++   family = "gaussian",
++   data = NULL,
++   E = NULL,
++   Ntrials = NULL,
++   control.family = NULL,
++   ...)
+```
+
+where 
+
+- `formula` specifies how the `components` are combined to create the linear predictor (you will use the arbitrary names adopted for specifying the model components). It is not required when the linear predictor is the sum of all the terms in `components`.
+
+
+ &lt;span style="display:block; margin-top: 10px ;"&gt;&lt;/span&gt; 
+- `family` (string) specifies the probability density function (PDF) of the response. All family types supported by the `INLA` package are supported by `inlabru`.
+
+
+---
+
+# The `inlabru` model components
+
+- The function `f()` used with `INLA` is replaced by an **arbitrary name** which is assigned to the effect. For example consider a model with a linear prediction including an intercept, the linear effect of a covariate `x` and a generic random effect:
+
+
+
+```r
+&gt; y ~ Intercept(1) + x + yourREnane(main = index/covariate, model = "...", ...)
+```
+ &lt;span style="display:block; margin-top: 10px ;"&gt;&lt;/span&gt; 
+- Note that the specification of an implicit latent intercept is deprecated, and `+ Intercept(1)` or `+1` should be used instead.
+ &lt;span style="display:block; margin-top: 10px ;"&gt;&lt;/span&gt; 
+- The available `model` specifications are:
+  - `iid`
+  - a spatial effect created previously using `inla.spde2.matern()` or `inla.spde2.pcmatern()`
+  - all the models accepted by the INLA `f()` function.
+
+- The linear effect model of the covariate `x` can also be expressed in the formula as
+
+```r
+&gt; beta(x, model="linear")
+```
+The difference is in the name used in the output: `x` (method 1) or `beta` (method 2).
+
+
+---
+
+# Very simple example with simulated data
+
+
+.pull-left[
+
+```r
+&gt; # Data simulation
+&gt; n1 &lt;- 200
+&gt; x1 &lt;- runif(n1)
+&gt; y1 &lt;- rnorm(n1, mean = 3 + 2 * x1 )
+&gt; df1 &lt;- data.frame(y = y1, x = x1)
+&gt; 
+&gt; library(inlabru)
+&gt; # Model component
+&gt; cmp1 = y ~  Intercept(1) + x
+&gt; 
+&gt; # Likelihood
+&gt; lik1 = like(formula = y ~ x + Intercept,
++             #formula = y ~ ., 
++             family = "gaussian",
++             data = df1)
+&gt; 
+&gt; # Model fit
+&gt; fit1 &lt;- bru(cmp1, lik1)
+&gt; fit1$summary.fixed[,c("mean","sd")]
+```
+
+```
+              mean        sd
+Intercept 3.154427 0.1251910
+x         1.677757 0.2250018
+```
+]
+.pull-right[
+
+```r
+&gt; # Model component
+&gt; cmp2 = y ~  Intercept(1) + beta(x, model="linear")
+&gt; # Likelihood
+&gt; lik2 = like(formula = y ~ beta + Intercept,
++             family = "gaussian",
++             data = df1)
+&gt; # Model fit
+&gt; fit2 &lt;- bru(cmp2, lik2)
+&gt; fit2$summary.fixed[,c("mean","sd")]
+```
+
+```
+              mean        sd
+Intercept 3.154427 0.1251910
+beta      1.677757 0.2250018
+```
+]
+
+
+
+---
+
+# `SPDEtoy` example with `inlabru`
+
+
+
+1\. We first trasform the SPDEtoy dataframe into a `SpatialPointsDataFrame`:
+
+```r
+&gt; coordinates(SPDEtoy) = c("s1","s2")
+&gt; class(SPDEtoy)
+```
+
+```
+[1] "SpatialPointsDataFrame"
+attr(,"package")
+[1] "sp"
+```
+
+2\. We define the mesh and the `spde` object as done in Lecture 4.1:
+
+```r
+&gt; domain &lt;- matrix(cbind(c(0,1,1,0.7,0), c(0,0,0.7,1,1)),ncol=2)
+&gt; 
+&gt; mesh6 &lt;- inla.mesh.2d(loc.domain = domain,
++                       max.edge = c(0.04, 0.2),
++                       cutoff = 0.05,
++                       offset = c(0.1, 0.4))
+&gt; 
+&gt; spde = inla.spde2.matern(mesh = mesh6)
+```
+
+---
+
+# `SPDEtoy` example with `inlabru`
+3\. Fit the model using `inlabru`:
+
+```r
+&gt; # Model components
+&gt; cmp_toy &lt;- y ~ Intercept(1) + s.field(main = coordinates, model = spde) 
+&gt; # Likehood
+&gt; like_toy &lt;- like(formula = y ~ Intercept + s.field,
++              data = SPDEtoy,
++              family = "gaussian")
+&gt; # Run inlabru!
+&gt; fit &lt;- bru(cmp_toy, like_toy)
+&gt; class(fit)
+```
+
+```
+[1] "bru"   "iinla" "inla" 
+```
+&lt;span style="display:block; margin-top: 10px ;"&gt;&lt;/span&gt; 
+- Note that the function takes care of the construction of the projection matrices requied for the spatial SPDE model.
+
+- The post-processing is exactly as with `INLA`:
+
+```r
+&gt; fit$summary.fixed[,c("mean","sd")]
+```
+
+```
+              mean        sd
+Intercept 9.506126 0.6855602
+```
+
+
+---
+
+# Prediction with `inlabru`
+
+4\. It is suggested to transform the prediction grid into a `SpatialPixels` object (it is also possible to use the function `pixel()` that generates a `SpatialPixels` object covering an `inla.mesh`):
+
+```r
+&gt; coordinates(pred.grid) = c("x","y")
+&gt; gridded(pred.grid) = TRUE
+&gt; class(pred.grid)
+```
+
+```
+[1] "SpatialPixels"
+attr(,"package")
+[1] "sp"
+```
+
+5\. For the prediction we use the `predict` function that internally calls `generate()` in order to draw samples from the fitted model. It takes a fitted  object given by `bru()` and produces predictions (100 by default) given a new set of values for the model covariates or the original values used for the model fit. 
+
+
+```r
+&gt; pred &lt;- predict(fit, pred.grid, ~ Intercept + s.field, seed = 1, n.samples = 500)
+&gt; class(pred)
+```
+
+```
+[1] "SpatialPixelsDataFrame"
+attr(,"package")
+[1] "sp"
+```
+
+---
+
+# Output from the `predict` function 
+The argument `n.samples` (by default 100) specifies the number of samples to draw in order to calculate the posterior statistics.
+
+
+```r
+&gt; head(pred@data)
+```
+
+```
+       mean        sd    q0.025      q0.5   q0.975    median mean.mc_std_err
+1 12.239408 0.2688680 11.710934 12.236283 12.81067 12.236283      0.01202414
+2 12.055825 0.4087471 11.291659 12.064425 12.86257 12.064425      0.01827973
+3 10.560534 0.4233880  9.760810 10.560449 11.40428 10.560449      0.01893449
+4  9.507930 0.3165921  8.882076  9.488077 10.12360  9.488077      0.01415843
+5  9.513974 0.3047775  8.944521  9.506418 10.10405  9.506418      0.01363006
+6 10.254879 0.3337293  9.601126 10.241806 10.86287 10.241806      0.01492483
+  sd.mc_std_err
+1   0.007945295
+2   0.013703305
+3   0.014680900
+4   0.009811157
+5   0.010277959
+6   0.012471945
+```
+
+Note that it is possible to predict any function of any subset of the components of the model specification.
+---
+
+# Mapping using `gg`: posterior mean 
+.pull-left[
+
+```r
+&gt; ggplot() + 
++   gg(pred, aes(x, y, fill = mean)) +
++   ggtitle("Posterior mean") + 
++   coord_fixed() +
++   scale_fill_viridis()
+```
+]
+.pull-right[
+&lt;img src="./img/unnamed-chunk-35-1.png" &gt;
+]
+
+---
+
+# Mapping using `gg`: posterior standard deviation 
+.pull-left[
+
+```r
+&gt; ggplot() + 
++   gg(pred, aes(x, y, fill = sd)) +
++   ggtitle("Posterior standard deviation") + 
++   coord_fixed() +
++   scale_fill_viridis()
+```
+]
+.pull-right[
+&lt;img src="./img/unnamed-chunk-36-1.png" &gt;
+]
+
+
+---
+
+# References
+
+Bachl, F. E., F. Lindgren, D. L. Borchers, et al. (2019). "inlabru: an
+R package for Bayesian spatial modelling from ecological survey data".
+In: _Methods in Ecology and Evolution_ 10.6, pp. 760-766.
+
+Lindgren, F. and H. Rue (2015). "Bayesian Spatial Modelling with
+R-INLA". In: _Journal of Statistical Software_ 63.19, pp. 1�-25. DOI:
+[10.18637/jss.v063.i19](https://doi.org/10.18637%2Fjss.v063.i19). URL:
+[https://www.jstatsoft.org/index.php/jss/article/view/v063i19](https://www.jstatsoft.org/index.php/jss/article/view/v063i19).
+
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script src="https://platform.twitter.com/widgets.js"></script>
+<script>var slideshow = remark.create({
+"navigation": {
+"scroll": false
+},
+"highlightStyle": "github",
+"highlightLines": true,
+"countIncrementalSlides": false,
+"ratio": "16:9"
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+// add `data-at-shortcutkeys` attribute to <body> to resolve conflicts with JAWS
+// screen reader (see PR #262)
+(function(d) {
+  let res = {};
+  d.querySelectorAll('.remark-help-content table tr').forEach(tr => {
+    const t = tr.querySelector('td:nth-child(2)').innerText;
+    tr.querySelectorAll('td:first-child .key').forEach(key => {
+      const k = key.innerText;
+      if (/^[a-z]$/.test(k)) res[k] = t;  // must be a single letter (key)
+    });
+  });
+  d.body.setAttribute('data-at-shortcutkeys', JSON.stringify(res));
+})(document);
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+// adds .remark-code-has-line-highlighted class to <pre> parent elements
+// of code chunks containing highlighted lines with class .remark-code-line-highlighted
+(function(d) {
+  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
+  const preParents = [];
+  const findPreParent = function(line, p = 0) {
+    if (p > 1) return null; // traverse up no further than grandparent
+    const el = line.parentElement;
+    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
+  };
+
+  for (let line of hlines) {
+    let pre = findPreParent(line);
+    if (pre && !preParents.includes(pre)) preParents.push(pre);
+  }
+  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
+})(document);</script>
+<style>
+.logo {
+  background-image: url("assets/MRC-Centre-Logo.png");
+  background-size: 15% 10%;
+  background-repeat: no-repeat;
+  position: absolute;
+  top:  0.25%; /* 1.135em */
+  left: 85%;
+  width: 100%;
+  height: 100%;
+  z-index: 0;
+}
+</style>
+
+<script>
+document
+  .querySelectorAll(
+    '.remark-slide-content' +
+    ':not(.title-slide)' +
+    // add additional classes to exclude here, e.g.
+    // ':not(.inverse)' +
+    ':not(.hide-logo)' +
+    ':not(.thankyou-michelle)' +
+    ':not(.thankyou-barney)'
+  )
+  .forEach(el => {
+    el.innerHTML += '<div class="logo"></div>';
+  });
+</script>
+
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>

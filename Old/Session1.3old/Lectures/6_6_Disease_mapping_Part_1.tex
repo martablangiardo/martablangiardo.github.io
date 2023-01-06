@@ -1,0 +1,362 @@
+%%% This Beamer example was created by LianTze Lim, April 2017.
+
+%%%% This is a VERY simple and minimalistic beamer theme,
+%%%% even reminiscent of marker pens on transparencies!
+%%%% It mimics the look of the "seminar" package, which
+%%%% can only be used with plain TeX.
+%%%% There are also some comments and example to show how
+%%%% to customise various elements, e.g. the font and colours.
+
+\documentclass[12pt]{beamer}
+%% If you'd like the default font size to be even larger, use 14pt or 17pt; these are supported by Beamer.
+
+\graphicspath{{Figures/}{Figures}}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% These lines should usually go into a .sty file,
+% but I'll leave them here so that it's easier to
+% see how to customise a Beamer theme.
+% Remember, the Beamer manual is your friend!!
+% http://texdoc.net/pkg/beamer
+%
+%% So if your re-definitions have a @ somewhere, you
+%% _MUST_ put a \makeatletter before these lines and then
+%% \makeatother after them. This trick can only be done
+%% in the preamble! BUT if you're doing these re-definitions
+%% in a .sty file (so that you \usepackage it later), you
+%% don't need the \makeatletter and \makeatother.
+\makeatletter
+
+%% Set the left and right margins
+\setbeamersize{text margin left=1em,text margin right=1em}
+
+%% FONTS
+\setbeamerfont{title}{series=\bfseries,size=\LARGE}
+\setbeamerfont{subtitle}{series=\bfseries,size=\Large}
+\setbeamerfont{frametitle}{series=\bfseries,size=\small}
+\setbeamerfont{block title}{series=\bfseries,size=\normalsize}
+\setbeamerfont{footline}{size=\small}
+
+%% COLOURS
+%% If you'd like everything to have the same colour
+\usebeamercolor{structure}
+\setbeamercolor{normal text}{fg=structure.fg}
+
+%% Add a line after the frametitle
+\addtobeamertemplate{frametitle}{}{\vspace*{-1ex}\rule{\textwidth}{1pt}}
+
+%% Use circular discs as itemized list markers;
+%% there's an existing option in Beamer for it so I'll use it
+\setbeamertemplate{itemize items}[circle]
+
+%% Remove default navigation symbols (We'll add the ones we need in the footline
+\setbeamertemplate{navigation symbols}{}
+
+
+%% And before the footline... actually we'd like to re-define
+%% the footline
+\setbeamertemplate{footline}{%
+   %% Beamer headlines and footlines are always full-paperwidth, so if you want the horizontal line to
+   %% not span it entirely you'll need to do a bit of arithmetic
+   \centering
+   \begin{minipage}{\dimexpr\paperwidth-\beamer@leftmargin-\beamer@rightmargin\relax}
+   \centering
+   \rule{\linewidth}{1pt}\vskip2pt
+   \usebeamerfont{footline}%
+   \usebeamercolor{footline}%
+   %% The frame number smack in the middle
+   \hfill\insertframenumber/\inserttotalframenumber
+   \hfill%
+   %% ONLY the navigation symbols we want at the far right.
+   %% We use an \llap so that it takes up zero width, and doesn't throw the page number off-centre!
+   \llap{\insertframenavigationsymbol\insertbackfindforwardnavigationsymbol}\par
+   \end{minipage}\vskip2pt
+}
+
+\setbeamercolor{block title alerted}{fg=white,bg=brown}
+
+\makeatother
+%%%% END STYLE CUSTOMISATION %%%%%%%%%%%%
+
+\usepackage[english]{babel}
+\usepackage[latin1]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{graphicx}
+
+\usepackage{subcaption}
+
+\usepackage{times}
+
+\usepackage{graphics}
+%\usepackage[draft]{graphics}
+
+\usepackage{xspace}
+\usepackage{amsmath}
+\usepackage{bm}
+\usepackage{pgfpages}
+\usepackage{fancybox}
+\usepackage{threeparttable}
+\usepackage{bbding}
+\usepackage{verbatim}
+\usepackage{booktabs}
+
+\usepackage{natbib}
+\bibpunct{(}{)}{;}{a}{}{,}
+
+\newcommand{\pkg}[1]{{\normalfont\fontseries{b}\selectfont #1}}
+\let\proglang=\textsf
+\let\code=\texttt
+
+\newcommand{\btheta}{ \mbox{\boldmath $\theta$}}
+\newcommand{\bbeta}{ \mbox{\boldmath $\beta$}}
+\newcommand{\balpha}{ \mbox{\boldmath $\alpha$}}
+\newcommand{\by}{ \mbox{\bf y}}
+\newcommand{\bY}{ \mbox{\bf Y}}
+\newcommand{\bX}{ \mbox{\bf X}}
+\newcommand{\bH}{ \mbox{\bf H}}
+\newcommand{\bI}{ \mbox{\bf I}}
+
+
+\title{Introduction to disease mapping - Part 1}
+\subtitle{}
+\author{Bayesian modelling for spatial and spatio-temporal data}
+\institute{MSc in Epidemiology}
+\date{Week 6}
+
+
+\begin{document}
+
+\begin{frame}[t]
+  \titlepage
+\end{frame}
+
+\begin{frame}
+    \frametitle{General framework - I}
+\begin{itemize}
+\item \vfill \textbf{Data} for a region of interest/reference area, geographical level and a specific period, e.g. {\color{cyan}{England, ward level, 2009-2012}}
+        \begin{itemize}\setlength\itemsep{\fill}
+            \item  $O_i$: Observed number of cases in area $i$
+            \begin{itemize}\setlength\itemsep{\fill}
+              \item {\color{cyan}{Lung cancer deaths in males aged 45+}}
+              \item {\color{cyan}{Congenital anomalies}}
+            \end{itemize}
+            \item  $n_i$: Population at risk in area $i$
+            \begin{itemize}\setlength\itemsep{\fill}
+              \item {\color{cyan}{Male population aged 45+}}
+              \item {\color{cyan}{Live births and stillbirths}}
+            \end{itemize}
+        \end{itemize}
+
+\item \textbf{Parameter of interest:} \alert{Relative risk, $\lambda$}, in each area $i$ compared with the chosen reference area
+\end{itemize}
+\end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
+    \frametitle{General framework - II}
+\begin{itemize}\setlength\itemsep{\fill}
+\item Standard statistical model if rare disease and/or small areas
+$$O_i \sim \hbox{Poisson}({\color{red}\lambda_i} E_i)$$
+where:
+\begin{itemize}\setlength\itemsep{\fill}
+\item $E_i$ is the expected number of cases in area $i$ (fixed and know function of n$_i$)
+\item ${\color{red}\lambda_i}$ estimated by Standardised Mortality/Incidence Ratio
+\begin{itemize} \setlength\itemsep{\fill}
+\item The standardized ratio is the maximum likelihood estimator for the unknown area-specific relative risk of events of interests in area $i$
+\end{itemize}
+\end{itemize}
+\vspace{10pt}
+\begin{equation*}
+\begin{array}{ccc}
+\hat{\lambda}_i = \hbox{SMR}_i \hbox{ or SIR}_i  =  \frac{O_i}{E_i} & \text{and} &\hbox{Var}(\hat{\lambda}_i) =  \frac{\lambda_i}{E_i} \rightarrow \hat{\hbox{Var}}(\hat{\lambda}) =  \frac{O_i}{E_i^2}
+\end{array}
+\end{equation*}
+\end{itemize}
+
+So that areas with small $E_{i}$ have high associated variance
+
+\vspace{1cm}
+\noindent {\small
+$\text{Recall: }X \sim \hbox{Poisson}(\mu) \Leftrightarrow \hbox{E}(X) = \hbox{Var}(X)=\mu$
+}
+\end{frame}
+
+\begin{frame}
+    \frametitle{Expected numbers of cases - definition}
+\begin{itemize}
+  \item Expected number of cases if the population had the same stratum-specific mortality/incidence rates as in a reference area
+  \item Adjustments (strata): age, gender ...
+
+  \end{itemize}
+
+\begin{block}{Indirect standardisation}
+    $$E_i = \sum_k n_{ik} r_k$$
+with
+      \begin{itemize}
+      \item[] $r_k$: disease rate for stratum $k$ in the reference population
+      \item[] $n_{ik}$: population at risk in area $i$, stratum $k$
+      \end{itemize}
+\vspace{0.2cm}
+If internal comparison: $\sum_{i=1}^N O_i = \sum_{i=1}^N E_i$
+\end{block}
+\note{
+\begin{itemize}
+\item age will almost need controlling for since different disease risks in different areas may reflect differences in age population
+\item direct standardisation: apply the disease rate in the population of interest (e.g. UK) to a standard population e.g. European standard population
+\item external comparison: if the reference population is not the population of the study of interest. For ex, to calculate the expected numbers in London, risks in England could be used
+\end{itemize}
+ }
+\end{frame}
+
+
+\begin{frame}
+\frametitle{Expected numbers of cases - calculation}
+\footnotesize{Lung cancer incidence in males, all ages, using the rates in England and Wales as reference, for the period 1985-2009}
+\vspace{-6pt}
+\begin{center}
+{\tiny
+\begin{tabular}{|l|rrr|rrr|}
+  \hline
+Strata   & \multicolumn{3}{|c|}{Reference area=EW} &  \multicolumn{3}{|c|}{Ward A}\\
+  \hline
+Age group & Population & Observed & Age-specific rate & Population & Observed & Expected\\
+ &  & & per 100,000 males &  & & \\
+ & $n_k$ & $O_k$ & $r_k=\frac{O_k}{n_k}$ & $n_{ik}$ & $O_{ik}$ & $E_{ik}=\frac{n_{ik}*r_k}{100000}$\\
+\hline
+0$-$4 &  41,400,692  &  15  & 0.04 &  11,438  & 0 &  0.00 \\
+5$-$9 &  41,143,722  &  6  & 0.01 &  9,697  & 0 &  0.00 \\
+10$-$14 &  41,469,696  &  9  & 0.02 &  9,026  & 0 &  0.00 \\
+15$-$19 &  43,087,823  &  39  & 0.09 &  8,650  & 0 &  0.01 \\
+20$-$24 &  45,441,353  &  79  & 0.17 &  12,409  & 0 &  0.02 \\
+25$-$29 &  46,873,725  &  172  & 0.37 &  16,963  & 0 &  0.06 \\
+30$-$34 &  46,927,658  &  518  & 1.10 &  17,303  & 0 &  0.19 \\
+35$-$39 &  46,936,367  &  1,465  & 3.12 &  13,847  & 0 &  0.43 \\
+40$-$44 &  45,304,711  &  4,136  & 9.13 &  11,843  &  1  &  1.08 \\
+45$-$49 &  41,657,557  &  9,835  & 23.61 &  9,457  &  5  &  2.23 \\
+50$-$54 &  38,451,416  &  20,929  & 54.43 &  8,561  &  3  &  4.66 \\
+55$-$59 &  35,842,426  &  40,427  & 112.79 &  7,613  &  8  &  8.59 \\
+60$-$64 &  32,480,032  &  68,230  & 210.07 &  6,968  &  5  &  14.64 \\
+65$-$69 &  28,231,499  &  95,794  & 339.32 &  6,290  &  15  &  21.34 \\
+70$-$74 &  23,315,240  &  110,371  & 473.39 &  5,098  &  27  &  24.13 \\
+75$-$79 &  17,297,264  &  102,038  & 589.91 &  4,049  &  22  &  23.89 \\
+80$-$84 &  10,498,214  &  68,273  & 650.33 &  2,616  &  20  &  17.01 \\
+85$+$ &  6,289,452  &  38,748  & 616.08 &  1,312  &  12  &  8.08 \\
+\hline
+TOTAL &  632,648,846  &  561,084  &  &  163,140  &  {\color{red}118}  &  {\color{red}126.38} \\
+\hline
+\end{tabular}
+}
+\end{center}
+
+\footnotesize{\noindent $\hbox{SIR}_A=\frac{118}{126.38}=0.93 \rightarrow$ Fewer incident cases of lung cancer for males in ward A than expected in EW after adjusting for differences in age}
+\end{frame}
+
+%\begin{frame}
+%\frametitle{Class exercise}
+%\vspace{40pt}
+%Using the previous setting, calculate the SIR in ward A for men above 65 years old
+%answer: 96/94.45=1.02
+%\end{frame}
+
+\begin{frame}
+\frametitle{Indirect standardization using R [1]}
+\begin{itemize} \setlength\itemsep{\fill}
+  \item In R we can perform indirect standardization using the package \texttt{SpatialEpi}.
+  \item As an example we calculate the standardized incidence ratios (SIRs) of lung cancer in Pennsylvania in 2002 using the data available in the \texttt{SpatialEpi} package.
+  \item The data contain the number of lung cancer cases and the population of Pennsylvania at county level, stratified by race (white and non-white), gender (female and male) and age (under 40, 40-59, 60-69 and 70+).
+  \item We obtain the expected counts in each county, representing the total number of disease cases we would expect if the population in the county behaved the way the population of Pennsylvania behaves (i.e. we perform an \color{cyan}{internal standardization}).
+ \end{itemize}
+\end{frame}
+
+
+\begin{frame}
+\frametitle{Indirect standardization using R [2]}
+\begin{itemize} \setlength\itemsep{\fill}
+  \item We use the command \texttt{expected()} from \texttt{SpatialEpi}, which takes three arguments:
+\begin{itemize}
+\item \texttt{population}: vector of population counts for each stratum in each area
+\item \texttt{cases}: vector of the observed number of cases in each area
+\item \texttt{n.strata}: number of strata considered
+\end{itemize}
+\item Caution: all counts are sorted by area first and then within each area the counts for all strata are listed (even if 0 count) in the same order.
+\end{itemize}
+\end{frame}
+
+\begin{frame} [fragile]
+\frametitle{Indirect standardization using R [3]}
+\begin{tiny}
+\begin{verbatim}
+library(SpatialEpi)
+library(tidyverse)
+
+# read in the Pennsylvania data from SpatialEpi package
+data("pennLC")
+LC <- pennLC$data
+head(LC)
+
+> head(LC)
+  county cases population race gender      age
+1  adams     0        365    o      f    40.59
+2  adams     1         68    o      f    60.69
+3  adams     0         73    o      f      70+
+4  adams     0       1492    o      f Under.40
+5  adams     0        387    o      m    40.59
+6  adams     0         69    o      m    60.69
+
+# obtain the total number of cases by county
+LC.OE <- group_by(LC, county) %>% summarize(O = sum(cases))
+head(LC.OE)
+
+> head(LC.OE)
+# A tibble: 6 x 2
+  county        O
+  <fct>     <int>
+1 adams        55
+2 allegheny  1275
+3 armstrong    49
+4 beaver      172
+5 bedford      37
+6 berks       308
+
+\end{verbatim}
+\end{tiny}
+\end{frame}
+
+
+
+\begin{frame} [fragile]
+\frametitle{Indirect standardization using R [4]}
+\begin{tiny}
+\begin{verbatim}
+
+# sort the data by county, race, gender and age
+LC <- arrange(LC, county, race, gender, age)
+
+# compute the expected (there are 2 races, 2 genders and 4 age groups for each county,
+# so the number of strata is: 2 x 2 x 4 = 16)
+expected <- expected(
+  population = LC$population,
+  cases = LC$cases, n.strata = 16)
+
+# add the vector of the expected cases to the data frame of the cases
+LC.OE$E <- expected[match(LC.OE$county, unique(LC$county))]
+
+# compute the SIRs as the ratio of the observed to the expected counts
+LC.OE$SIR <- LC.OE$O/LC.OE$E
+head(LC.OE)
+
+> head(LC.OE)
+# A tibble: 6 x 4
+  county        O      E   SIR
+  <fct>     <int>  <dbl> <dbl>
+1 adams        55   69.6 0.790
+2 allegheny  1275 1182.  1.08
+3 armstrong    49   67.6 0.725
+4 beaver      172  173.  0.997
+5 bedford      37   44.2 0.837
+6 berks       308  301.  1.02
+
+\end{verbatim}
+\end{tiny}
+\end{frame}
+
+\end{document} 

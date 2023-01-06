@@ -1,0 +1,688 @@
+---
+title: "Session 5.2: advanced INLA features"
+params: 
+   conference: "Spatial and Spatio-Temporal Bayesian Models with `R-INLA`"
+   location: "University of São Paulo"
+   date: 30 September 2022
+   short_title: "Spatial and Spatio-Temporal Bayesian Models with `R-INLA`"
+
+output:
+  xaringan::moon_reader: 
+    includes: 
+       in_header: "assets/latex_macros.html" 
+       # This line adds a logo based on the format selected in the file 'assets/include_logo.html'
+       # NB: the actual options (eg placement of the logo and actual logo file) can be changed there
+       after_body: "assets/insert-logo.html"
+    seal: false
+    yolo: no
+    lib_dir: libs
+    nature:
+      beforeInit: ["https://platform.twitter.com/widgets.js"]
+      navigation:
+        scroll: false # disable slide transitions by scrolling
+      highlightStyle: github
+      highlightLines: yes
+      countIncrementalSlides: no
+      ratio: '16:9'
+      titleSlideClass:
+      - center
+      - middle
+    self_contained: false 
+    css:
+    - "assets/beamer.css"
+---
+
+```{r echo=F,message=FALSE,warning=FALSE,comment=NA}
+# Sources the R file with all the relevant setup and commands
+source("assets/setup.R")
+
+# Stuff from 'xaringanExtra' (https://pkg.garrickadenbuie.com/xaringanExtra)
+# This allows the use of panels (from 'xaringanExtra')
+xaringanExtra::use_panelset()
+# This allows to copy code from the slides directly
+#xaringanExtra::use_clipboard()
+# This freezes the frame for when there's a gif included
+#xaringanExtra::use_freezeframe()
+
+# Defines the path to the file with the .bib entries (in case there are references)
+#bibfile=ReadBib("~/Dropbox/Lavori condivisi/2015_Book/ShortCourse/VIBASS/Biblio.bib",check = FALSE)
+#bibfile=ReadBib("~/Dropbox/Books/INLABook/ShortCourse/VIBASS/Biblio.bib",check = FALSE)
+bibfile=ReadBib("~/Dropbox/Lavori condivisi/2015_Book/ShortCourse/VIBASS/Biblio.bib",check = FALSE)
+```
+
+class: title-slide
+
+# `r rmarkdown::metadata$title``r vspace("10px")` `r rmarkdown::metadata$subtitle`
+
+## `r rmarkdown::metadata$author`
+
+### `r rmarkdown::metadata$institute`    
+
+### `r rmarkdown::metadata$params$conference`, `r rmarkdown::metadata$params$location` 
+
+<!-- Can also separate the various components of the extra argument 'params', eg as in 
+### `r paste(rmarkdown::metadata$params, collapse=", ")`
+-->
+
+`r ifelse(is.null(rmarkdown::metadata$params$date),format(Sys.Date(),"%e %B %Y"),rmarkdown::metadata$params$date)`
+
+
+
+---
+
+layout: true  
+
+.my-footer[ 
+.alignleft[ 
+&nbsp; &copy; Marta Blangiardo | Monica Pirani 
+]
+.aligncenter[
+`r rmarkdown::metadata$params$short_title` 
+]
+.alignright[
+`r rmarkdown::metadata$params$conference`, `r short_date` 
+]
+] 
+
+```{css,echo=FALSE, eval=FALSE}
+.red {
+  color: red;
+}
+.blue {
+  color: 0.14 0.34 0.55;
+}
+
+.content-box-blue { background-color: #F0F8FF; }
+
+}
+```
+
+```{css, echo=FALSE}
+.scrollable {
+  height: 80%;
+  overflow-y: auto;
+} 
+```
+
+---
+
+# Learning Objectives
+
+At the end of this session you should be able to:
+
+`r vspace("20px")`
+
+- implement a joint model with multiple likelihoods by using `R-INLA` and `inlabru`;
+
+
+`r vspace("20px")`
+
+
+- use the `copy` feature with `R-INLA`;
+
+
+`r vspace("30px")`
+
+- Implement with `inlabru` a model with two likelihoods and a shared spatial effect
+
+
+
+The topics treated in this lecture can be partially found in **Chapter 8** of the INLA book.  
+
+---
+
+# Outline 
+
+`r vspace("30px")`
+
+1\. [Joint model with multiple likelihoods](#jointmodel)
+
+`r vspace("30px")`
+
+2\. [The `copy` feature](#copyfeature)
+
+
+`r vspace("30px")`
+
+3\. [Two likelihoods model with shared spatial effect using `inlabru`](#stinlabru)
+
+
+
+`r vspace("30px")`
+
+4\. [Conclusions](#conclusions)
+
+
+---
+
+name: jointmodel
+  
+`r vspace("250px")`
+
+.myblue[.center[.huge[
+**Joint model with multiple likelihoods**]]]
+
+
+
+---
+
+# Multiple likelihoods
+
+- In many situations you need to combine data from different sources and/or differente characteristics. For example:
+`r vspace("10px")`
+  - a subset of the data follows a Gaussian distribution
+and the other follows a Poisson distribution
+`r vspace("10px")`
+  - the data come from the same distribution but with different hyperparameters (e.g. one subset of the data comes from a Gaussian distribution with precision $\tau_1$ and the other from a Gaussian with precision $\tau_2$).
+
+`r vspace("30px")`
+- In this case we need to be able to handle **multiple likelihoods** when implementing the **joint model**.
+
+
+`r vspace("30px")`
+
+- In `R-INLA` this requires to have a particular structure for the data. For example, in the case of two likelihoods with two responses $\bm y_1 = (y_{11},\ldots,y_{1n})$ and $\bm y_2 = (y_{21},\ldots,y_{2m})$, the data should be structured in a 2-columns matrix like the following:
+
+$$\begin{bmatrix} y_{11}  & NA \\ \ldots & NA \\  y_{1n} & NA\\ NA & y_{21} \\ NA & \ldots \\ NA & y_{2m} \end{bmatrix}$$
+
+---
+
+# Two likelihoods model: example
+
+This example shows how to use information from two data sources (Binomial and Poisson distribution) to estimate the effect of a common covariate $x$ and of two different intercepts.
+
+`r vspace("30px")`
+
+- **Likelihood 1**: 
+$$y_{1i} \sim Bin\left(n=1, p_i=\frac{\eta_{1i}}{1+\eta_{1i}}\right) \qquad i=1,\ldots,n$$ 
+`r vspace("10px")`
+where $\eta_{1i} = \alpha_1 + b x_{i}$
+
+`r vspace("30px")`
+
+- **Likelihood 2**: 
+$$y_{2i} \sim Poisson\left(\lambda_i=\exp(\eta_{2i})\right)\qquad i= 1,\ldots,m$$
+`r vspace("10px")`
+where $\eta_{2i} = \alpha_2 + b x_{i}$
+
+---
+
+# Two likelihoods model: data simulation
+- The use the following values for the simulation: $\alpha_1=1$, $\alpha_2=2$, $b=1$.
+`r vspace("10px")`
+
+- The covariate values are simulated from an Uniform(0,1) distribution:
+```{r}
+set.seed(44)
+n = 100
+m = 200
+x = runif(n+m)
+```
+
+
+- We simulate $n=100$ data from the **Binomial** distribution:
+```{r}
+eta1 = 1 + x[1:n] #linear predictor 1
+y1 = rbinom(n, size = 1, prob = exp(eta1)/(1+exp(eta1)))
+df1 = data.frame(x = x[1:n], y = y1) #used later for inlabru
+```
+
+- We simulate $m=200$ data from the **Poisson** distribution
+```{r}
+eta2 = 2 + x[(n+1):(n+m)] #linear predictor 2
+y2 = rpois(m, exp(eta2))
+df2 = data.frame(x = x[(n+1):(n+m)], y = y2) #used later for inlabru
+```
+
+---
+# Two likelihoods model: implementation with `inla`
+
+- Define the **block matrix** for the two response variables:
+```{r}
+y = matrix(NA, n+m, 2)  
+y[1:n, 1] = y1  # first column
+y[(n+1):(n+m), 2] = y2  #second column
+Ntrials = c(rep(1,n), rep(NA, m)) # required only for Binomial data
+```
+
+- Define the **block matrix** for the two intercepts:
+```{r}
+intercept1 = numeric(n+m) #empty vector
+intercept1[1:n] = 1
+intercept1[(n+1):(n+m)] = NA
+
+intercept2 = numeric(n+m) #empty vector
+intercept2[1:n] = NA
+intercept2[(n+1):(n+m)] = 1
+```
+
+- With this approach every row has only a single observed value.
+- Covariates and latent effects can be indexed from 1 to $n+m$. When a covariate or effect must only affect observations in a single likelihood, the values of the indices for the other likelihood must be set to `NA`.
+
+---
+
+# Two likelihoods model: implementation with `inla`
+
+- Fit the model with `inla`:
+```{r}
+
+formula = y  ~ -1 + intercept1 + intercept2 + x #all the terms
+
+library(INLA)
+output = inla(formula,
+              data = list(y = y, intercept1 = intercept1,#<<
+                          intercept2 = intercept2, x = x), 
+              family = c("binomial", "Poisson"),#<<
+              Ntrials = Ntrials)
+
+output$summary.fixed[,c("mean","0.025quant","0.975quant")]
+```
+
+---
+
+# Two likelihoods model: implementation with `inlabru`
+
+- Define the model components and the likelihoods:
+```{r}
+cmp = y ~ Intercept1(1) + Intercept2(1) + x
+
+library(inlabru)
+like1 = like(formula = y ~ Intercept1 + x,
+             family = "binomial",
+             data = df1, 
+             Ntrials = rep(1, nrow(df1)))
+
+like2 = like(formula = y ~ Intercept2 + x,
+             family = "Poisson",
+             data = df2)
+```
+
+- Fit the model with `inlabru`:
+```{r}
+outputbru = bru(cmp, like1, like2)
+outputbru$summary.fixed[,c("mean","0.025quant","0.975quant")]
+```
+
+---
+
+name: copyfeature
+  
+`r vspace("250px")`
+
+.myblue[.center[.huge[
+**The `copy` feature**]]]
+
+
+---
+
+# The `copy` feature
+
+-  In `R-INLA` when we have a model defined with the following formula
+```{r, eval=F}
+formula = y ~ f(idx1, model1, ...) + f(idx2, model2, ...)
+```
+it means that only one element from each sub-model contributes to the linear predictor for each observation. This means that the linear predictor is connected to only one element of the random effect `idx1` and to only one element of the random effect `idx2`.
+
+`r vspace("30px")`
+- This is not sufficient when an element of a model is needed more than once for each observation or when the same effect is shared among two or more linear predictors (and will be estimated by using two or more parts of the dataset). 
+
+`r vspace("10px")`
+- The solution for this is the `copy` feature. Formally, it defines a copy of a generic effect $\theta$ as $$\theta^{\star}=\beta \theta + \epsilon$$ where $\epsilon$ is a tiny error such that $\epsilon \sim \text {Normal}(0, b)$, with $b$  being a large and fixed value, and $\beta$ is a hyperparameter. By fixing $\beta=1$, it means that $\theta^{\star}$  is an exact copy of $\theta$. According to the specification of the `fixed` option (`TRUE` or `FALSE`), the hyperparameter $\beta$ is kept fixed or estimated.
+
+`r vspace("10px")`
+- Several copies of the same effect can be created and all will share the same hyperparameters. 
+
+---
+
+# The `copy feature`: example
+
+The following example is taken from Chapter 6 of `r Citet(bibfile,"gomez2020bayesian")`. It consider two likelihoods (Gaussian and Poisson) that share a common covariate with the same coefficient $\alpha$ (i.e. the common effect that will be copied). 
+
+`r vspace("10px")`
+- Gaussian observations:
+`r vspace("10px")`
+$$y_{1i} \sim Normal(\eta_{1i},\tau^{-1}), \qquad i=1,\ldots,n$$ 
+where the linear predictor is given by
+$$\eta_{1i}=\alpha x_i$$
+- Poisson observatins:
+`r vspace("10px")`
+$$y_{2i} \sim Poisson(\lambda_i=\exp(\eta_{2i})), \qquad i=1,\ldots,m$$ 
+where $$\eta_{2i}=\alpha^\star x_i=\beta\alpha x_i$$
+
+`r vspace("10px")`
+- The copied effect is the coefficient of covariate  $x$ which appears in both the linear predictors. This coefficient is the same in the two models and we will implement an exact copy.   
+
+- To be able to use the `copy` feature, the linear will be expressed as a latent effect through the `f()` function. In this case, it will be an `iid` random effect with an index vector with all values equal to 1 (the random effect value will be a single value which is the estimate of $\alpha$). 
+
+---
+
+# The `copy feature`: data simulation
+
+ We use the following values for the simulation: $\alpha=2$, $\tau=1$. Moreover, the covariate values are simulated from an Uniform(1,2) distribution.
+ 
+ `r vspace("10px")`
+ 
+```{r}
+set.seed(3)
+n = 150
+m = 50
+
+# Covariate values
+x <- runif(n+m, 1, 2)
+
+# Gaussian data
+y.gaus <- rnorm(n, mean = 2 * x[1:n])
+
+#Poisson data
+y.pois <- rpois(m, lambda = exp(2 * x[(n+1):(n+m)]))
+```
+
+
+---
+
+# The `copy` feature: implementation with `inla`
+- We prepare the two-columns matrix for `inla`:
+```{r}
+y <- matrix(NA, ncol = 2, nrow = n+m)
+y[1:n, 1] <- y.gaus
+y[(n+1):(n+m), 2] <- y.pois
+```
+
+- We will have two `iid` random effects. The values of the covariates are introduced as weights in the latent effect inside the `f()` function. We thus need to create two indices for the Gaussian and Poisson observations:
+```{r}
+idx.gaus <- c(rep(1, n), rep(NA, m)) #original random effect
+idx.pois <- c(rep(NA, n), rep(1, m)) #copied random effect
+```
+
+- Finally run `inla`:
+```{r}
+modinla <- inla(y ~ -1 + f(idx.gaus, x, model = "iid") + f(idx.pois, x, copy = "idx.gaus", fixed=T),
+                data = list(y = y, x = x),
+                family = c("gaussian", "poisson"))
+```
+
+---
+
+# The `copy` feature: implementation with `inlabru`
+
+- With `inlabru` everything is easier as we don't have to use the `copy` feature. 
+
+- We define the model component including only a single iid effect (`alpha`) with weights given by `x` and index `idx`:
+```{r}
+cmp = y ~ alpha(idx, x, model = "iid")
+```
+
+- As described before, we define the two likelihoods:
+```{r}
+lik1 <- like("gaussian",
+             formula = y ~ alpha,
+             data = data.frame(y = y.gaus, x = x[1:n], idx = 1))
+
+lik2 <- like("Poisson",
+             formula = y ~ alpha,
+             data = data.frame(y = y.pois, x = x[(n+1):(n+m)], idx = 1))
+```
+
+- And finally run the `bru()` function:
+```{r}
+modinlabru = bru(cmp, lik1, lik2)
+```
+
+---
+
+# The `copy` feature: comparison
+
+- We compare the random effect value
+```{r, echo=T}
+modinla$summary.random
+modinlabru$summary.random
+```
+
+
+
+---
+
+name: stinlabru
+  
+`r vspace("250px")`
+
+.myblue[.center[.huge[
+**Two likelihoods model with shared spatial effect using `inlabru`**]]]
+
+
+
+---
+
+# Two likelihoods and shared spatial effect: example
+
+.panelset[
+.panel[.panel-name[Model]
+
+- We consider two sets of observations in space (with $n_1$ and $n_2$ locations):
+\begin{align}
+y_{1i} &\sim \text{Normal}(\beta_1 +\gamma_1 x_{i} + \xi_{i}, \sigma^2_1) \qquad i=1,\ldots,n\\
+y_{2i} &\sim \text{Normal}(\beta_2 +\gamma_2 z_{i} + \xi_{i}, \sigma^2_2)\qquad i=1,\ldots,m\\
+\end{align}
+
+`r vspace("10px")`
+- Each set of data has its own intercept - $\beta_1$ and $\beta_2$ - and covariate (with $\gamma_1$ and $\gamma_2$ as linear effect).
+`r vspace("10px")`
+- The random effect $\xi$ is a  shared GF with range $r$ and variance $\sigma^2$.  It enters both in the linear predictor of $y_1$ and $y_2$.
+`r vspace("10px")`
+- For the simulation we use: $n=100$, $m=50$, $\beta_1=3$, $\gamma_1=2$, $\sigma^2_1=0.3$, $\beta_2=10$, $\gamma_2=0.5$, $\sigma^2_2=0.2$, $r=4$, $\sigma^2=\sqrt{0.5}$.
+]
+
+
+.panel[.panel-name[Data]
+.pull-left[
+```{r copyloc, eval=T, echo=F}
+data = readRDS("./data/dataexamplemisaligned.RDS")
+df1 = data[[1]]
+df2 = data[[2]]
+n1 = nrow(df1)
+n2 = nrow(df2)
+
+## ----mesh----------------------------------------------------------------
+mesh <- inla.mesh.2d(rbind(df1@coords,df2@coords), 
+                     max.edge = c(1, 1.25),
+                     offset = c(0.1, 1.5), 
+                     cutoff = 0.4)
+
+loc_all = data.frame(rbind(df1@coords,df2@coords))
+loc_all$lik = c(rep("y1",n1),rep("y2",n2))
+```
+```{r mesh1, eval=F}
+loc_all %>% 
+  ggplot() +
+  gg(mesh) +
+  geom_point(aes(s1,s2,col=lik))
+```
+]
+.pull-right[
+```{r mesh1out,ref.label="mesh1", fig.dim=c(4, 3.5), out.width="100%", echo=F}
+```
+]
+]
+]
+
+---
+# Implementation in `inlabru`
+
+1\. Define the SPDE model:
+```{r}
+spde <- inla.spde2.pcmatern(
+  mesh = mesh,
+  prior.range = c(1, 0.01), # P(range < 1) = 0.01
+  prior.sigma = c(1, 0.01)) # P(sigma > 1) = 0.01
+```
+
+
+2\. We write down all the model components of the joint model:
+```{r}
+jcmp <- ~ Intercept1(1) + Intercept2(1) +
+  beta1(x1, model="linear") + beta2(x2, model="linear") + 
+  field(coordinates, model = spde)
+```
+
+3\. We specify the two likelihoods:
+```{r}
+lik1 <- like("gaussian",
+             formula = y ~ Intercept1 + beta1 + field,
+             data = df1)
+lik2 <- like("gaussian",
+             formula = y ~ Intercept2 + beta2 + field,
+             data = df2)
+```
+
+---
+# Implementation in `inlabru` and output summary
+4\. We run `inlabru`:
+```{r}
+jfit <- bru(jcmp, lik1, lik2)
+```
+
+
+```{r}
+jfit$summary.fixed[,c("mean","0.025quant","0.975quant")]
+jfit$summary.hyperpar[,c("mean","0.025quant","0.975quant")]
+```
+
+---
+
+# Fixed effects
+```{r fixedeffect, echo=F}
+p1 = plot(jfit, "Intercept1") + 
+  geom_vline(xintercept = 3, col="blue", linetype="dotted", size=1.2)
+
+p2 = plot(jfit, "Intercept2") + 
+  geom_vline(xintercept = 10, col="blue", linetype="dotted", size=1.2)
+
+p3 = plot(jfit, "beta1") + 
+  geom_vline(xintercept = 2, col="blue", linetype="dotted", size=1.2)
+
+p4 = plot(jfit, "beta2") + 
+  geom_vline(xintercept = 0.5, col="blue", linetype="dotted", size=1.2)
+
+```
+
+.pull-left[
+```{r fixedeffectout,echo=F, fig.dim=c(4, 3.5), out.width="100%"}
+multiplot(p1, p2, cols=1)
+```
+]
+.pull-right[
+```{r fixedeffectout2,echo=F, fig.dim=c(4, 3.5), out.width="100%"}
+multiplot( p3, p4, cols=1)
+```
+]
+
+---
+
+# Spatial parameters
+.pull-left[
+```{r}
+spde.range <- spde.posterior(jfit,
+                             "field",
+                             what = "range")
+spde.var <- spde.posterior(jfit,
+                           "field",
+                           what = "variance")
+```
+
+```{r spatialpar}
+range.plot <- plot(spde.range) +
+  geom_vline(xintercept=4, col="blue", linetype="dotted", size=1.2)
+
+var.plot <- plot(spde.var) + 
+  geom_vline(xintercept=sqrt(0.5), col="blue", linetype="dotted", size=1.2)
+```
+```{r, eval=F}
+multiplot(range.plot,var.plot)
+```
+
+]
+
+.pull-right[
+```{r spatialparout,echo=F, fig.dim=c(4, 3.5), out.width="100%"}
+multiplot(range.plot,var.plot)
+```
+]
+
+
+---
+
+name: conclusions
+  
+`r vspace("250px")`
+
+.myblue[.center[.huge[
+**Conclusions**]]]
+
+
+---
+
+# Making the `R-INLA` work for you
+
+
+- The `R-INLA` package provide very fast computation for a large class of model and a wide range of applications from environmetrics to fisheries.
+
+`r vspace("20px")`
+- It is very easy to use for simple problems, but for more complex problems it may happen that you have to struggle a bit.
+`r vspace("20px")`
+- When you are solving a big problem, it is good to set the `verbose=TRUE`: it tells you how big the problem is; it keeps track of the optimiser steps; if something breaks, it (often) tells you where
+`r vspace("20px")`
+- Ask for help to the INLA team through the discussion forum (https://groups.google.com/g/r-inla-discussion-group) or through e-mail (see `inla.version()` for a list of e-mails).
+
+`r vspace("20px")`
+
+
+- The `inlabru` package is worth to be used when you have a spatial or spatio-temporal model: it will avoid you to work with `inla.stack` objects.
+
+--
+
+`r vspace("20px")`
+- For high performance computing  the PARDISO library is recommended, which makes it possible to parallelize the sparse linear algebra operations employed at all stages of the INLA algorithm. See `inla.pardiso()` for instruction about how to obtain a free license. Note that R-INLA supports PARDISO for MacOSX and Linux only.
+
+
+---
+
+# INLA is still an active project
+
+
+`r vspace("20px")`
+- In April 2022 a paper has been published in ArXiv with the title **A new avenue for Bayesian inference with INLA** (by Van Niekerk, Krainski, Rustand, and Rue): https://arxiv.org/pdf/2204.06797.pdf
+ 
+ 
+ `r vspace("20px")`
+ 
+- They propose a modern formulation of the INLA methodology based on the reformulation of the latent field by removing the linear predictors from the set of model parameters. 
+
+ `r vspace("20px")`
+- *This new framework stems from computational demands set by a certain class of models where the data is large and the model is moderate or small, termed data-rich models*.
+
+ 
+`r vspace("20px")`
+--
+
+- Regarding SPDE and `inlabru` the recent paper **The SPDE approach for Gaussian and non-Gaussian fields: 10 years and still running** `r Citep(bibfile,"LINDGREN2022")` discusses the ongoing research regarding non stationary and anisotropic model and space-time models on the manifold.
+
+
+
+
+---
+
+# The end
+
+.myblue[.center[.huge[
+**Thank you very much for your participation!**]]]
+
+
+`r include_fig("prisciNla.JPG", width="50%", title="")`
+
+---
+
+# References
+
+```{r refs, echo=FALSE, results="asis"}
+PrintBibliography(bibfile,.opts=list(max.names=3))
+```

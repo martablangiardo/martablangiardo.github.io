@@ -1,0 +1,228 @@
+%%% This Beamer example was created by LianTze Lim, April 2017.
+
+%%%% This is a VERY simple and minimalistic beamer theme,
+%%%% even reminiscent of marker pens on transparencies!
+%%%% It mimics the look of the "seminar" package, which
+%%%% can only be used with plain TeX.
+%%%% There are also some comments and example to show how
+%%%% to customise various elements, e.g. the font and colours.
+
+\documentclass[12pt]{beamer}
+%% If you'd like the default font size to be even larger, use 14pt or 17pt; these are supported by Beamer.
+
+\graphicspath{{Figures/}{Figures}}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% These lines should usually go into a .sty file,
+% but I'll leave them here so that it's easier to
+% see how to customise a Beamer theme.
+% Remember, the Beamer manual is your friend!!
+% http://texdoc.net/pkg/beamer
+%
+%% So if your re-definitions have a @ somewhere, you
+%% _MUST_ put a \makeatletter before these lines and then
+%% \makeatother after them. This trick can only be done
+%% in the preamble! BUT if you're doing these re-definitions
+%% in a .sty file (so that you \usepackage it later), you
+%% don't need the \makeatletter and \makeatother.
+\makeatletter
+
+%% Set the left and right margins
+\setbeamersize{text margin left=1em,text margin right=1em}
+
+%% FONTS
+\setbeamerfont{title}{series=\bfseries,size=\LARGE}
+\setbeamerfont{subtitle}{series=\bfseries,size=\Large}
+\setbeamerfont{frametitle}{series=\bfseries,size=\small}
+\setbeamerfont{block title}{series=\bfseries,size=\normalsize}
+\setbeamerfont{footline}{size=\small}
+
+%% COLOURS
+%% If you'd like everything to have the same colour
+\usebeamercolor{structure}
+\setbeamercolor{normal text}{fg=structure.fg}
+
+%% Add a line after the frametitle
+\addtobeamertemplate{frametitle}{}{\vspace*{-1ex}\rule{\textwidth}{1pt}}
+
+%% Use circular discs as itemized list markers;
+%% there's an existing option in Beamer for it so I'll use it
+\setbeamertemplate{itemize items}[circle]
+
+%% Remove default navigation symbols (We'll add the ones we need in the footline
+\setbeamertemplate{navigation symbols}{}
+
+
+%% And before the footline... actually we'd like to re-define
+%% the footline
+\setbeamertemplate{footline}{%
+   %% Beamer headlines and footlines are always full-paperwidth, so if you want the horizontal line to
+   %% not span it entirely you'll need to do a bit of arithmetic
+   \centering
+   \begin{minipage}{\dimexpr\paperwidth-\beamer@leftmargin-\beamer@rightmargin\relax}
+   \centering
+   \rule{\linewidth}{1pt}\vskip2pt
+   \usebeamerfont{footline}%
+   \usebeamercolor{footline}%
+   %% The frame number smack in the middle
+   \hfill\insertframenumber/\inserttotalframenumber
+   \hfill%
+   %% ONLY the navigation symbols we want at the far right.
+   %% We use an \llap so that it takes up zero width, and doesn't throw the page number off-centre!
+   \llap{\insertframenavigationsymbol\insertbackfindforwardnavigationsymbol}\par
+   \end{minipage}\vskip2pt
+}
+
+\setbeamercolor{block title alerted}{fg=white,bg=brown}
+
+\makeatother
+%%%% END STYLE CUSTOMISATION %%%%%%%%%%%%
+
+\usepackage[english]{babel}
+\usepackage[latin1]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{graphicx}
+
+\usepackage{subcaption}
+
+\usepackage{times}
+
+\usepackage{graphics}
+%\usepackage[draft]{graphics}
+
+\usepackage{xspace}
+\usepackage{amsmath}
+\usepackage{bm}
+\usepackage{pgfpages}
+\usepackage{fancybox}
+\usepackage{threeparttable}
+\usepackage{bbding}
+\usepackage{verbatim}
+\usepackage{booktabs}
+
+\usepackage{enumitem}
+\usepackage{pifont}
+
+\usepackage{natbib}
+\bibpunct{(}{)}{;}{a}{}{,}
+
+\newcommand{\pkg}[1]{{\normalfont\fontseries{b}\selectfont #1}}
+\let\proglang=\textsf
+\let\code=\texttt
+
+\newcommand{\btheta}{ \mbox{\boldmath $\theta$}}
+\newcommand{\bbeta}{ \mbox{\boldmath $\beta$}}
+\newcommand{\balpha}{ \mbox{\boldmath $\alpha$}}
+\newcommand{\by}{ \mbox{\bf y}}
+\newcommand{\bY}{ \mbox{\bf Y}}
+\newcommand{\bX}{ \mbox{\bf X}}
+\newcommand{\bH}{ \mbox{\bf H}}
+\newcommand{\bI}{ \mbox{\bf I}}
+
+
+\title{Introduction to spatial and spatio-temporal analysis}
+\subtitle{}
+\author{Bayesian modelling for spatial and spatio-temporal data}
+\institute{MSc in Epidemiology}
+\date{Week 6}
+
+
+\begin{document}
+
+\begin{frame}[t]
+  \titlepage
+\end{frame}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Module Details
+\begin{frame}
+\frametitle{Goals for weeks 6-10}
+\begin{itemize} [label=\ding{212}] \setlength\itemsep{\fill}
+\item Building on the theoretical concepts and tools studied in weeks 1-5, we will now learn the relevant statistical methods used in spatial and spatio-temporal analysis and we will apply  them using computational tutorials and practicals/homeworks.
+\item By the end of these five weeks, we will gain and master the fundamental strategies to:
+\begin{itemize} [label=\ding{212}] \setlength\itemsep{\fill}
+  \item \alert{manipulate}
+  \item \alert{explore}
+  \item \alert{visualize}
+  \item \alert{model}
+\end{itemize}
+spatially and temporally-related data, and \alert{critically discuss and utilise the results}. 
+%using freely-available and open-source tools and we will be confident in conducting analyses in a reproducible fashion.
+%\vspace{10pt}
+%\item We will handle model complexity within a Bayesian framework applying the concepts learnt in weeks 1-5, with statistical inference carried out using Markov Chain Monte Carlo (MCMC) methods.
+\end{itemize}
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{frame}
+\frametitle{Topics}
+\begin{itemize} \setlength\itemsep{\fill}
+  \item \textbf{Week 6}: Introduction to (i) spatial data types and coordinate reference systems, (ii) spatial autocorrelation, and (iii) disease mapping
+  \item \textbf{Week 7}: Areal data analysis and \emph{discrete} spatial models that belong to the family of \alert{Conditional Autoregressive (CAR) distributions}, also known as Gaussian Markov Random Fields (GMRF)
+  %We will study the most popular spatial prior distributions in disease mapping models, which belong to the family of \alert{Conditional Autoregressive (CAR) distributions}, also known as Gaussian Markov Random Fields (GMRF)
+  \item \textbf{Week 8}: Geostatistical data analysis and \emph{continuous} spatial models with \alert{Gaussian process based smoothers}
+  \item \textbf{Week 9}: Temporal processes and spatial-temporal analysis with focus on areal data
+  \item \textbf{Week 10}: Temporal processes and spatio-temporal analysis with focus on geostatistical data; datasets realise for mini-project reports
+    \end{itemize}
+\end{frame}
+
+
+\begin{frame}
+\frametitle{Nearby things tend to be more alike...}
+\vspace{15pt}
+Waldo Tobler's first law of geography:
+\begin{quote}{}
+  \centering \emph{Everything is related to everything else, but near things are more related than distant things \citep{Tobler1970}}
+\end{quote}
+
+\vspace{15pt}
+\textbf{Interpretation}:\\
+Data that are close together in space (or time) are often more similar  than those far apart
+(\alert{except when they aren't!})
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
+\frametitle{What is spatial analysis?}
+Spatial analysis represents a collection of techniques and models that explicitly use the spatial referencing associated with each data value or object that is specified within the system under study \citep{Haining2003}.
+\begin{scriptsize}
+\begin{tabular}{cc}
+\begin{minipage}{0.45\linewidth}
+\begin{alertblock}{\small Non-Spatial Analysis}
+\begin{itemize}
+\item Spatial data are analyzed using conventional statistical methods
+\item The geographical coordinates are excluded from the computational procedures
+\item The results are independent of the spatial arrangement of the geographical entities
+%\item Observations or entities are assumed to be independent and identically distributed.
+\item The analysis can also include temporal dependence
+\end{itemize}
+\end{alertblock}
+\end{minipage}
+
+&
+%\hspace{3pt}
+
+\begin{minipage}{0.45\linewidth}
+\begin{alertblock}{\small Spatial Analysis}
+\begin{itemize}
+\item Spatial data are analysed using spatial statistical methods
+\item The geographical coordinates are included into the computational procedures
+\item The results depend on the spatial arrangement of the geographical entities
+\item The analysis can also include temporal dependence
+\end{itemize}
+\end{alertblock}
+\end{minipage}
+\end{tabular}
+\end{scriptsize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Article and book cited in this lecture}
+\footnotesize{
+\bibliographystyle{asa}
+\bibliography{refs}
+}
+\end{frame}
+
+\end{document} 

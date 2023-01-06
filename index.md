@@ -1,74 +1,45 @@
 
-The course will provide a focus on how to use the Integrated Nested Laplace Approximation approach [INLA](https://www.r-inla.org/) for the analysis of spatial and spatio-temporal data.
+Welcome to the Bayesian modelling for Spatial and Spatio-Temporal Data module.
 
-We will first go through the basic of Bayesian inference and introduce INLA; then we will move to hierarchical models, priors and model selection. We will then focus on area level data and present how to model spatially structured random effects through conditional autoregressive specifications; following that, we will extend the approach to include temporal dependency and touch briefly on spatio-temporal interactions.
+Spatial and spatio-temporal analysis represent an increasingly important tool in public health research as well as in geographic and environmental epidemiology due to the emerging availability of spatial/temporal health data and the development of novel computational techniques, allowing for the analysis of large database.  
 
-Moving on to point-referenced data we will introduce the stochastic partial differential equation (SPDE) approach, used for spatial modelling on a continuous field. We will then extend this to deal with spatio-temporal data. 
+The module provides a comprehensive introduction to the concepts of Bayesian modelling and inference, and the statistical methods used in analysing spatial and spatio-temporal data.  In the first part of the course, students will learn about the main theoretical concepts of the Bayesian approach to probability and inference, before moving on to statistical modelling and interpretation. Successively, they will acquire concepts, methodologies and practical skills to manipulate, effectively visualize and model spatially- and temporally-related data. At the end of this module, students will be able to handle with confidence spatial and/or temporal data, identify patterns of dependence and level of noise in the data, describe and quantify risk of diseases as well as critically interpret and discuss the results from their analyses.  
 
-The course will maintain a very practical angle, with a mixture of lectures and practical sessions. For a book covering the topics of the course see [here](https://onlinelibrary.wiley.com/doi/book/10.1002/9781118950203). 
+Data analysis will be carried out using the statistical software R and model complexity will be handled within a Bayesian framework, while reproducible reporting will be ensured with R-Markdown. 
 
-It is recommended that people attending are familiar with [R](https://www.r-project.org/) and with the basic of the Bayesian approach.
+The module will be delivered by lectures and live computer-based tutorials and practicals, along with quizzes/practical sessions (homework, but not formally assessed), which will include real-life examples (from environmental science as well as chronic and infectious disease epidemiology), simulative examples and hands-on project.  
 
 It would be beneficial if attendees could bring their laptop having installed the latest R (version 4.2.1) and the following packages:
 
 - INLA (install.packages("INLA", repos="http://www.math.ntnu.no/inla/R/stable"))
 
-- install.packages(c("sf", "spdep", "RColorBrewer", "tmap", "ggplot2", "mapview", "cowplot", "tidyverse", "viridis", "patchwork", "knitr", "kableExtra", "inlabru", "maps", "spTimer", "lubridate", "mvtsplot", "GGally", "corrr", "SpatialEpi"))
+- install.packages("remotes")
+pkg_list = c("sf", "spData", "terra", "stars", "sp", "spdep", "geoR", "fields", "gstat", "tmap", "ggplot2", "RColorBrewer","dplyr", "tidyr", "mapview", "leaflet", "cowplot", "viridis", "patchwork", "knitr", "kableExtra", "lubridate", "mvtsplot", "GGally", "corrr", "SpatialEpi", "spTimer", "units", "stringr")
+remotes::install_cran(pkg_list)
+
+
+The html version of the slides and the practical material will be posted here before each week session
 
 ## Timetable
-### Day 1 - Mon 26th September 2022
+### Day 1 - Mon 16th Jan 2023
 
 - [Session 1.1](Session1.1): Introduction to Bayesian thinking
-- [Session 1.2](Session1.2): Introduction to INLA and R-INLA
+- [Session 1.2](Session1.2): Introduction to Bayes Theorem
 
 Break
 
-- [Practical 1](Practical1): INLA basics 
-- [Session1.3](Session1.3): Introduction to Spatial data
+- [Practical 1](Practical1): Conditional/joint probability and Bayes theorem 
+Solutions of practical 1 are [here](Practical1/Solutions.html)
 
-There is no material to download for practical 1. 
+### Day 2 - Mon 23th Jan 2023
 
-### Day 2 - Tue 27th September 2022
-
-- [Session 2.1](Session2.1) Hierarchical models, priors, prediction and model checking
-- [Practical 2a](Practical2a)
-Download the material for the practical 2a [here](Practical2a/Practical2a.zip)
-- [Practical 2b](Practical2b)
-Download the material for the practical 2b [here](Practical2b/Practical2b.zip)
+- [Session 2.1](Session2.1): Bayes Theorem for random variables and for general Bayesian inference; conjugate families
+- [Session 2.2](Session2.2): Posterior Predictive Distribution and Monte Carlo computation
 
 Break
 
-- [Session 2.2](Session2.2): Spatial models for small area data: disease mapping and ecological regression
-- [Practical 3a](Practical3)
-Download the material for the practical 3 [here](Practical3/Practical3.zip). For this practical we do section 1-3.
+- [Practical 2](Practical2)
+Solutions of practical 2 are [here](Practical2/Solutions.html)
 
-### Day 3 - Wed 28th September 2022
 
-- [Session 3.1](Session3.1): Introduction to temporal modelling
-- [Session 3.2](Session3.2): Spatio-temporal modelling for area data
-
-Break
-
-- [Practical 3b](Practical3): Spatio-temporal disease mapping and regression. We continue with sections 4-5 of Practical 3
-
-### Day 4 - Thur 29th September 2022
-
-- [Session 4.1](Session4.1): Models for geostatistical data and introduction to SPDE
-- [Session 4.2](Session4.2): inla.stack and inlabru
-
-Break
-
-- [Practical 4](Practical4): INLA-SPDE for geostatistical data
-
-Download the material for the practical 4 [here](Practical4/temperature.croatia.Rdata)
-
-### Day 5 - Fri 30th September 2022
-
-- [Session 5.1](Session5.1): Spatio-temporal model for geostatistical data
-- [Practical 5](Practical5): A space-time model with inlabru
-There is no material to download for practical 5
-
-Break
-
-- Final exam
 

@@ -1,0 +1,715 @@
+---
+title: "Session 4.2: `inla.stack` and `inlabru`"
+params: 
+   conference: "Spatial and Spatio-Temporal Bayesian Models with `R-INLA`"
+   location: "University of São Paulo"
+   date: 29 September 2022
+   short_title: "Spatial and Spatio-Temporal Bayesian Models with `R-INLA`"
+
+output:
+  xaringan::moon_reader: 
+    includes: 
+       in_header: "assets/latex_macros.html" 
+       # This line adds a logo based on the format selected in the file 'assets/include_logo.html'
+       # NB: the actual options (eg placement of the logo and actual logo file) can be changed there
+       after_body: "assets/insert-logo.html"
+    seal: false
+    yolo: no
+    lib_dir: libs
+    nature:
+      beforeInit: ["https://platform.twitter.com/widgets.js"]
+      navigation:
+        scroll: false # disable slide transitions by scrolling
+      highlightStyle: github
+      highlightLines: yes
+      countIncrementalSlides: no
+      ratio: '16:9'
+      titleSlideClass:
+      - center
+      - middle
+    self_contained: false 
+    css:
+    - "assets/beamer.css"
+---
+
+```{r echo=F,message=FALSE,warning=FALSE,comment=NA}
+# Sources the R file with all the relevant setup and commands
+source("assets/setup.R")
+
+# Stuff from 'xaringanExtra' (https://pkg.garrickadenbuie.com/xaringanExtra)
+# This allows the use of panels (from 'xaringanExtra')
+xaringanExtra::use_panelset()
+# This allows to copy code from the slides directly
+#xaringanExtra::use_clipboard()
+# This freezes the frame for when there's a gif included
+#xaringanExtra::use_freezeframe()
+
+# Defines the path to the file with the .bib entries (in case there are references)
+#bibfile=ReadBib("~/Dropbox/Books/INLABook/ShortCourse/VIBASS/Biblio.bib",check = FALSE)
+
+bibfile=ReadBib("C:/Users/Monica/Dropbox/VIBASS/Biblio.bib",check = FALSE)
+```
+
+class: title-slide
+
+# `r rmarkdown::metadata$title``r vspace("10px")` `r rmarkdown::metadata$subtitle`
+
+## `r rmarkdown::metadata$author`
+
+### `r rmarkdown::metadata$institute`    
+
+### `r rmarkdown::metadata$params$conference`, `r rmarkdown::metadata$params$location` 
+
+<!-- Can also separate the various components of the extra argument 'params', eg as in 
+### `r paste(rmarkdown::metadata$params, collapse=", ")`
+-->
+
+`r ifelse(is.null(rmarkdown::metadata$params$date),format(Sys.Date(),"%e %B %Y"),rmarkdown::metadata$params$date)`
+
+---
+
+layout: true  
+
+.my-footer[ 
+.alignleft[ 
+&nbsp; &copy; Marta Blangiardo | Monica Pirani 
+]
+.aligncenter[
+`r rmarkdown::metadata$params$short_title` 
+]
+.alignright[
+`r rmarkdown::metadata$params$conference`, `r short_date` 
+]
+] 
+
+```{css,echo=FALSE, eval=FALSE}
+.red {
+  color: red;
+}
+.blue {
+  color: 0.14 0.34 0.55;
+}
+
+.content-box-blue { background-color: #F0F8FF; }
+
+}
+```
+
+```{css, echo=FALSE}
+.scrollable {
+  height: 80%;
+  overflow-y: auto;
+} 
+```
+
+
+---
+
+# Learning Objectives
+
+At the end of this session you should be able to:
+
+`r vspace("20px")`
+
+- use `R-INLA` to implement a spatial geostatistical model with the  `inla.stack` approach;
+
+
+`r vspace("20px")`
+
+
+- use `inlabru` to implement a spatial geostatistical model;
+
+`r vspace("20px")`
+
+
+- perform spatial prediction and mapping.
+
+
+`r vspace("30px")`
+
+
+The topics treated in this lecture can be found in **Section 6.7 -- 6.9** of the INLA book.  
+
+---
+
+# Outline 
+
+`r vspace("30px")`
+
+
+1\. [Model fitting and spatial prediction with the `inla.stack` approach](#inlastackspatialpred)
+
+`r vspace("30px")`
+
+2\.  [Model fitting and spatial prediction with the `inlabru` package](#inlabru)
+
+---
+
+name: inlastack
+  
+`r vspace("250px")`
+
+.myblue[.center[.huge[
+**Model fitting and spatial prediction with the `inla.stack` approach**]]]
+
+---
+
+
+# The `inla.stack()` function 
+
+- A function named `inla.stack()` has been introduced in `R-INLA` for an optimal and easy management of the SPDE objects (data, covariates, indices and projector matrices) and for the construction of the linear predictor `r Cite(bibfile,"SPDEJSS2015")`.
+
+
+
+`r vspace("20px")`
+- In the `SPDEtoy` example the .red[**linear predictor**] is given by 
+$$\eta_i = b_0 +\xi_i = b_0 + \sum_{g=1}^{G}A_{ig} \tilde {\xi_g}$$
+and can be written as
+$$\bm\eta = \bm 1 b_0+\bm A\tilde{\bm \xi}$$
+where the first term refers to the intercept and the second to the spatial effect. Note that each term in the linear predictor is represented as the product of a projector matrix and an effect.
+
+`r vspace("20px")`
+- The main arguments of the `inla.stack()` function are:
+  - `data`: a vector list with the data
+  - `A`: a list of projector matrices 
+  - `effects`: the list of effects
+  - `tag` (optional): a label for the data stack
+  
+  
+---
+
+
+# The `inla.stack()` function for model fitting with the `SPDEtoy` data
+```{r,echo=F}
+
+library(INLA)
+#inla.setOption(inla.mode="experimental")
+data("SPDEtoy")
+coords <- as.matrix(SPDEtoy[,1:2])
+domain <- matrix(cbind(c(0,1,1,0.7,0),
+                       c(0,0,0.7,1,1)),ncol=2)
+mesh6 <- inla.mesh.2d(loc.domain=domain,
+                      max.edge=c(0.04, 0.2),#<<
+                      cutoff=0.05,#<<
+                      offset = c(0.1, 0.4))#<<
+A.est6 <- inla.spde.make.A(mesh=mesh6,
+                           loc=coords)
+spde <- inla.spde2.matern(mesh=mesh6, alpha=2)
+```
+
+1\. Define the `inla.stack` object for model fitting:
+```{r}
+stack.est <- inla.stack(
+  data = list(y = SPDEtoy$y),
+  A = list(1, A.est6),
+  effects = list(intercept = rep(1,nrow(SPDEtoy)),
+                 spatial.field = 1:spde$n.spde),
+  tag="est") 
+```
+  
+Note that the function `inla.stack()` will take care of eliminating any column in the projector matrix which is full of zeros. 
+
+2\. Define the `formula` by specifying an explicit intercept:
+```{r}
+formula = y ~ -1 + intercept + f(spatial.field, model = spde)
+```
+
+3\. Run `inla`! The function `inla.stack.data()` and `inla.stack.A()` are used for extracting the data and the projector matrix from the `stack.est` object:
+
+```{r}
+output6 <- inla(formula,
+                data = inla.stack.data(stack.est), #<<
+                control.predictor = list(A = inla.stack.A(stack.est), compute = TRUE)) #<<
+```
+
+
+---
+
+# Exploring the output
+
+The output is exactly equal to the one presented in Section 4.1. The same posterior summary statistics can be computed also when the `inla.stack` approach is adopted. 
+
+
+```{r}
+output6$summary.fixed[,c("mean","0.025quant","0.975quant")]
+```
+
+```{r}
+output6$summary.hyperpar[,c("mean","0.025quant","0.975quant")]
+```
+
+---
+
+# Spatial prediction with the `inla.stack()` approach
+
+- In geostatistics we are interested in predicting the (latent) spatial field (i.e. the linear predictor) at new spatial locations where we do not have data. 
+
+`r vspace("20px")`
+- It is possible to perform the spatial prediction jointly with the estimation by using the  `inla.stack` approach.
+
+`r vspace("20px")`
+- Consider the response variable distribution
+$$
+\bm y\sim\text{Normal}(\bm\eta=\bm 1 b_0+\bm A\tilde{\bm \xi},\sigma^2_e \bm I)
+$$
+we are interested in the posterior distribution of the linear predictor $\bm\eta$ everywhere in space, especially where we don't have observed data and `y=NA`.
+
+`r vspace("20px")`
+- With regard to spatial prediction, it is worth noting that the INLA-SPDE algorithm provides the posterior conditional distribution of $\bm\eta$ for all the triangulation vertices.
+By using the SPDE approximation, it is then immediate to get a prediction for $\bm\eta$ for any location in the triangulated domain (i.e. the posterior predictive distribution).
+
+---
+
+# Grid for spatial prediction
+
+
+.pull-left[
+Consider the following regular grid of points:
+```{r}
+grid.x = 20
+grid.y = 20
+pred.grid <- expand.grid(x = seq(0, 1, length.out = grid.x),
+                         y = seq(0, 1, length.out = grid.y))
+```
+
+It is necessary to define a new projector matrix:
+```{r}
+A.pred6 <- inla.spde.make.A(mesh = mesh6,
+                            loc = as.matrix(pred.grid))
+dim(A.pred6)
+```
+]
+.pull-right[
+```{r predgrid,fig.dim=c(4.5, 4.0), out.width="100%",echo=F}
+library(inlabru)
+pred.grid2 = SpatialPoints(pred.grid)
+ggplot() +
+  #gg(mesh6) +
+  gg(pred.grid2, col="brown")
+```
+]
+
+---
+
+# Model fitting jointly with spatial prediction
+For performing **jointly** the estimation and the prediction, we create a new `inla.stack` object:
+```{r}
+stack.pred <- inla.stack(data = list(y = NA),  #<<
+         A = list(1, A.pred6),
+         effects = list(intercept = rep(1, nrow(pred.grid)),
+                        spatial.field = 1:spde$n.spde),
+         tag = "pred") 
+```
+and then we join it to the `inla.stack` object created previously for the estimation (`stack.est`):
+```{r}
+join.stack <- inla.stack(stack.est, stack.pred) #full stack object
+```
+
+And finally, we run `INLA` again:
+```{r}
+output6pred <- inla(formula,
+                data = inla.stack.data(join.stack), #<<
+                control.compute = list(return.marginals=TRUE,
+                                       return.marginals.predictor=TRUE),
+                control.predictor = list(A = inla.stack.A(join.stack), compute = TRUE) #<<
+                )
+```
+
+The option `return.marginals.predictor=TRUE` is necessary to obtain the marginals for the linear predictor. 
+---
+
+# Retrieve the predictions
+
+To access the predictions (posterior summary stats or marginal distribution) at the target grid locations, we extract with the `inla.stack.index()` function the corresponding indexes from the full stack object using the corresponding tag set before (`pred`):
+```{r}
+index.pred <- inla.stack.index(join.stack, tag = "pred")$data
+length(index.pred)
+```
+
+We then extract the prediction posterior mean and sd at the first 3 grid points:
+```{r}
+output6pred$summary.linear.predictor[index.pred[1:3],c("mean","sd")]
+```
+
+In this case (identity link) `output6pred$summary.fitted.values` would return the same output.
+
+---
+
+# Manipulate the posterior predictive distribution 
+
+As described in Day 1, it is possible to manipulate marginal distributions. 
+
+.pull-left[
+Consider for example the first grid point and its posterior predictive distribution:
+```{r}
+distr.point1 = output6pred$marginals.linear.predictor[index.pred[1]][[1]]
+distr.point1.smooth = inla.smarginal(distr.point1)
+```
+
+
+```{r, eval=F, echo=T}
+ggplot(data.frame(distr.point1.smooth)) + 
+  geom_line(aes(x,y))
+```
+
+We can be also interested in computing the posterior probability of getting a value bigger than 13:
+```{r}
+1 - inla.pmarginal(13, distr.point1)
+```
+
+]
+
+
+.pull-right[
+```{r postpredgrid1, fig.dim=c(3, 2.5), out.width="100%",echo=F, eval=T}
+ggplot(data.frame(distr.point1.smooth)) + 
+  geom_line(aes(x,y))
+```
+]
+
+
+---
+
+# Mapping the linear predictor: posterior mean 
+
+We plot now the posterior mean of the linear predictor at the grid level.
+
+
+```{r,echo=F}
+#library(lattice)
+#library(RColorBrewer)
+#mycol = colorRampPalette(rev(brewer.pal(11,"RdYlBu")))(64)
+
+```
+
+.pull-left[
+```{r mapmean, eval=F}
+library(inlabru)
+post.mean.pred = output6pred$summary.linear.predictor[index.pred,"mean"]
+post.mean.df = SpatialPixelsDataFrame(SpatialPoints(pred.grid),
+                                      data = data.frame(post.mean.pred))
+
+
+library(viridis)
+ggplot() +
+  gg(post.mean.df, aes(x, y, post.mean.pred)) +
+  ggtitle("Posterior mean") + 
+  coord_fixed() + #x and y axis with the same length in the plot
+  scale_fill_viridis()
+```
+]
+
+.pull-right[
+```{r mapmeanout,echo=F, ref.label="mapmean", fig.dim=c(4, 3.5), out.width="100%"}
+```
+]
+
+---
+
+# Mapping the linear predictor: posterior standard deviation 
+  
+
+We plot the posterior standard deviation of the linear predictor at the grid level.
+
+
+.pull-left[
+```{r mapsd, eval=F, out.width="100%"}
+post.sd.pred = output6pred$summary.linear.predictor[index.pred,"sd"]
+
+post.sd.df = SpatialPixelsDataFrame(SpatialPoints(pred.grid),
+                                    data = data.frame(post.sd.pred))
+
+ggplot()+
+  gg(post.sd.df, aes(x, y, post.sd.pred)) +
+  ggtitle("Posterior standard deviation") + 
+  coord_fixed() +
+ scale_fill_viridis()
+```
+]
+
+.pull-right[
+```{r mapsdout, echo=F,ref.label="mapsd", fig.dim=c(4, 3.5), out.width="100%"}
+```
+]
+
+---
+
+name: inlabru
+  
+`r vspace("250px")`
+
+.myblue[.center[.huge[
+**Model fitting and spatial prediction with `inlabru`**]]]
+
+---
+
+# inlabru
+
+- `inlabru` is an `R` package for Bayesian spatial modelling, originally developed for ecological applications `r Cite(bibfile,"inlabru")` and the implementation of Log Gaussian Cox processes. 
+
+`r vspace("20px")` 
+
+- `inlabru` is a wrapper around `INLA` tailored towards spatial data. It makes fitting spatial models with INLA
+easier as there is no more need to deal with projector matrices and stack objects. It also extends the class of models that can be fitted. 
+
+`r vspace("20px")` 
+
+- The `inlabru` package works with spatial objects from the `sp` package (e.g. `SpatialPointsDataFrame`, `SpatialGridDataFrame`, `SpatialPixelsDataFrame`): https://cran.r-project.org/web/packages/sp/index.html
+
+
+ `r vspace("20px")` 
+- The function `gg()` is an extension of the `ggplot()` function for generating geometries from spatial fitted object. 
+
+
+`r vspace("20px")`
+See: 
+  - **Website**: https://sites.google.com/inlabru.org/inlabru
+  `r vspace("5px")`
+  - **Github**: https://github.com/inlabru-org/inlabru
+
+
+---
+
+# Model fitting with `inlabru`
+
+
+The function for fitting the model is called `bru()`:
+
+```{r, eval = F}
+library(inlabru)
+
+bru(components = ...,
+    ..., 
+    options = list(...)
+    )
+```
+
+where
+ `r vspace("10px")` 
+- `components` is a formula-like specification of the model components
+
+`r vspace("10px")` 
+- `...` requires the specification of the likelihood and of the data. This will be done using the function `like`.
+
+`r vspace("10px")` 
+- When running the `bru` some options are set (for example `control.compute$dic=TRUE`): see all of them with `bru_options_default()`. With `options` we can for example specify the `inla` `control.fixed` and `control.compute` options.
+
+---
+
+# The function `like()`
+
+
+The function `like()` makes it possible to specify the likelihood and other options related to the likelihood:
+
+```{r, eval=F}
+like(
+  formula = . ~ .,
+  family = "gaussian",
+  data = NULL,
+  E = NULL,
+  Ntrials = NULL,
+  control.family = NULL,
+  ...)
+```
+
+where 
+
+- `formula` specifies how the `components` are combined to create the linear predictor (you will use the arbitrary names adopted for specifying the model components). It is not required when the linear predictor is the sum of all the terms in `components`.
+
+
+ `r vspace("10px")` 
+- `family` (string) specifies the probability density function (PDF) of the response. All family types supported by the `INLA` package are supported by `inlabru`.
+
+
+---
+
+# The `inlabru` model components
+
+- The function `f()` used with `INLA` is replaced by an **arbitrary name** which is assigned to the effect. For example consider a model with a linear prediction including an intercept, the linear effect of a covariate `x` and a generic random effect:
+
+
+```{r, eval=F}
+y ~ Intercept(1) + x + yourREnane(main = index/covariate, model = "...", ...)
+```
+ `r vspace("10px")` 
+- Note that the specification of an implicit latent intercept is deprecated, and `+ Intercept(1)` or `+1` should be used instead.
+ `r vspace("10px")` 
+- The available `model` specifications are:
+  - `iid`
+  - a spatial effect created previously using `inla.spde2.matern()` or `inla.spde2.pcmatern()`
+  - all the models accepted by the INLA `f()` function.
+
+- The linear effect model of the covariate `x` can also be expressed in the formula as
+```{r, eval=F}
+beta(x, model="linear")
+```
+The difference is in the name used in the output: `x` (method 1) or `beta` (method 2).
+
+
+---
+
+# Very simple example with simulated data
+
+
+.pull-left[
+```{r}
+# Data simulation
+n1 <- 200
+x1 <- runif(n1)
+y1 <- rnorm(n1, mean = 3 + 2 * x1 )
+df1 <- data.frame(y = y1, x = x1)
+
+library(inlabru)
+# Model component
+cmp1 = y ~  Intercept(1) + x
+
+# Likelihood
+lik1 = like(formula = y ~ x + Intercept,
+            #formula = y ~ ., 
+            family = "gaussian",
+            data = df1)
+
+# Model fit
+fit1 <- bru(cmp1, lik1)
+fit1$summary.fixed[,c("mean","sd")]
+```
+]
+.pull-right[
+```{r}
+# Model component
+cmp2 = y ~  Intercept(1) + beta(x, model="linear")
+# Likelihood
+lik2 = like(formula = y ~ beta + Intercept,
+            family = "gaussian",
+            data = df1)
+# Model fit
+fit2 <- bru(cmp2, lik2)
+fit2$summary.fixed[,c("mean","sd")]
+```
+]
+
+
+
+---
+
+# `SPDEtoy` example with `inlabru`
+
+```{r, echo = F}
+library(tidyverse)
+data("SPDEtoy")
+```
+
+1\. We first trasform the SPDEtoy dataframe into a `SpatialPointsDataFrame`:
+```{r}
+coordinates(SPDEtoy) = c("s1","s2")
+class(SPDEtoy)
+```
+
+2\. We define the mesh and the `spde` object as done in Lecture 4.1:
+```{r,eval=F}
+domain <- matrix(cbind(c(0,1,1,0.7,0), c(0,0,0.7,1,1)),ncol=2)
+
+mesh6 <- inla.mesh.2d(loc.domain = domain,
+                      max.edge = c(0.04, 0.2),
+                      cutoff = 0.05,
+                      offset = c(0.1, 0.4))
+
+spde = inla.spde2.matern(mesh = mesh6)
+```
+
+---
+
+# `SPDEtoy` example with `inlabru`
+3\. Fit the model using `inlabru`:
+```{r}
+# Model components
+cmp_toy <- y ~ Intercept(1) + s.field(main = coordinates, model = spde) 
+# Likehood
+like_toy <- like(formula = y ~ Intercept + s.field,
+             data = SPDEtoy,
+             family = "gaussian")
+# Run inlabru!
+fit <- bru(cmp_toy, like_toy)
+class(fit)
+```
+`r vspace("10px")` 
+- Note that the function takes care of the construction of the projection matrices requied for the spatial SPDE model.
+
+- The post-processing is exactly as with `INLA`:
+```{r}
+fit$summary.fixed[,c("mean","sd")]
+```
+
+
+---
+
+# Prediction with `inlabru`
+
+4\. It is suggested to transform the prediction grid into a `SpatialPixels` object (it is also possible to use the function `pixel()` that generates a `SpatialPixels` object covering an `inla.mesh`):
+```{r}
+coordinates(pred.grid) = c("x","y")
+gridded(pred.grid) = TRUE
+class(pred.grid)
+```
+
+5\. For the prediction we use the `predict` function that internally calls `generate()` in order to draw samples from the fitted model. It takes a fitted  object given by `bru()` and produces predictions (100 by default) given a new set of values for the model covariates or the original values used for the model fit. 
+
+```{r}
+
+pred <- predict(fit, pred.grid, ~ Intercept + s.field, seed = 1, n.samples = 500)
+class(pred)
+```
+
+---
+
+# Output from the `predict` function 
+The argument `n.samples` (by default 100) specifies the number of samples to draw in order to calculate the posterior statistics.
+
+```{r}
+head(pred@data)
+```
+
+Note that it is possible to predict any function of any subset of the components of the model specification.
+---
+
+# Mapping using `gg`: posterior mean 
+.pull-left[
+```{r mapmeaninlabru,  out.width="100%", eval=F}
+ggplot() + 
+  gg(pred, aes(x, y, fill = mean)) +
+  ggtitle("Posterior mean") + 
+  coord_fixed() +
+  scale_fill_viridis()
+```
+]
+.pull-right[
+```{r,echo=F,ref.label="mapmeaninlabru", fig.dim=c(4, 3.5), out.width="100%"}
+```
+]
+
+---
+
+# Mapping using `gg`: posterior standard deviation 
+.pull-left[
+```{r mapsdinlabru,  out.width="100%",eval=F}
+ggplot() + 
+  gg(pred, aes(x, y, fill = sd)) +
+  ggtitle("Posterior standard deviation") + 
+  coord_fixed() +
+  scale_fill_viridis()
+```
+]
+.pull-right[
+```{r,echo=F,ref.label="mapsdinlabru", fig.dim=c(4, 3.5), out.width="100%"}
+```
+]
+
+
+---
+
+# References
+
+```{r refs, echo=FALSE, results="asis"}
+PrintBibliography(bibfile,.opts=list(max.names=3))
+```
+

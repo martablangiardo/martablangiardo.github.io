@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="" xml:lang="">
   <head>
-    <title>Session 2.2: Spatial models for small area data: disease mapping and ecological regression</title>
+    <title>Session 2.2: Posterior Predictive Distribution and Monte Carlo computation</title>
     <meta charset="utf-8" />
     <script src="libs/header-attrs/header-attrs.js"></script>
     <link href="libs/panelset/panelset.css" rel="stylesheet" />
@@ -76,21 +76,23 @@
 
 
 
+
+
 class: title-slide
 
-# Session 2.2: Spatial models for small area data: disease mapping and ecological regression&lt;span style="display:block; margin-top: 10px ;"&gt;&lt;/span&gt; 
+# Session 2.2: Posterior Predictive Distribution and Monte Carlo computation&lt;span style="display:block; margin-top: 10px ;"&gt;&lt;/span&gt; 
 
 ## 
 
 ###     
 
-### Spatial and Spatio-Temporal Bayesian Models with `R-INLA`, University of São Paulo 
+### Bayesian modelling for Spatial and Spatio-temporal data, Imperial College 
 
 &lt;!-- Can also separate the various components of the extra argument 'params', eg as in 
-### Spatial and Spatio-Temporal Bayesian Models with `R-INLA`, University of São Paulo, 27 September 2022, Spatial and Spatio-Temporal Bayesian Models with `R-INLA`
+### Bayesian modelling for Spatial and Spatio-temporal data, Imperial College, , MSc in Epidemiology
 --&gt;
 
-27 September 2022
+
 
 ---
 
@@ -101,33 +103,44 @@ layout: true
 &amp;nbsp; &amp;copy; Marta Blangiardo | Monica Pirani
 ]
 .aligncenter[
-Spatial and Spatio-Temporal Bayesian Models with `R-INLA` 
+MSc in Epidemiology 
 ]
 .alignright[
-Spatial and Spatio-Temporal Bayesian Models with `R-INLA`, 27 Sep 2022 
+Bayesian modelling for Spatial and Spatio-temporal data, NA 
 ]
 ] 
 
 
+&lt;style&gt;
+pre {
+  overflow-x: auto;
+}
+pre code {
+  word-wrap: normal;
+  white-space: pre;
+}
+&lt;/style&gt;
+
 
 ---
 
-# Learning Objectives
+# Learning objectives
 
-After this session you should be able to:
-   
-- Explain the main ideas underlying the use of Bayesian methods for producing spatially smoothed estimates of disease risk in small areas
- 
-- Describe different priors for spatial random effects 
- 
-- Explore aetiological hypothesis between a health outcome and exposure based on disease mapping
- 
-- Describe Poisson regression with spatial random effects for continuous and categorical covariates;
+After this lecture you should be able to 
+&lt;span style="display:block; margin-top: 40px ;"&gt;&lt;/span&gt;
+- Describe what the posterior predictive distribution (PPD) is  
+&lt;span style="display:block; margin-top: 40px ;"&gt;&lt;/span&gt;
+- Explain how the PPD is computable
+&lt;span style="display:block; margin-top: 40px ;"&gt;&lt;/span&gt;
+- Describe what Monte Carlo simulation is, and why it is useful
 
-- Use `R-INLA` to produce maps of smoothed estimates of disease risk, carry out spatial smoothing of disease risk and specify ecological regression models 
+&lt;span style="display:block; margin-top: 30px ;"&gt;&lt;/span&gt;
 
 
-The topics treated in this lecture are covered in Chapter 5-6 of the book **Spatial and Spatio-Temporal Bayesian models with R-INLA**
+- The topic of posterior prediction is treated in Section 8.3 of Johnson, Ott, and Dogucu (2022)
+
+- The topic of Monte Carlo simulation is presented in Sections 4.1-4.4  of Blangiardo and Cameletti (2015).
+
 
 ---
 
@@ -135,280 +148,137 @@ The topics treated in this lecture are covered in Chapter 5-6 of the book **Spat
 
 &lt;span style="display:block; margin-top: 30px ;"&gt;&lt;/span&gt;
 
-1\. [Spatial Structure](#spatial-structure)
+1\. [Bayesian predictive distribution](#Bayesian predictive distribution)
 
 &lt;span style="display:block; margin-top: 30px ;"&gt;&lt;/span&gt;
 
-2\. [Example: suicides in London](#Example)
+2\. [Computation of PPD](#Computation of PPD)
+
 
 &lt;span style="display:block; margin-top: 30px ;"&gt;&lt;/span&gt;
 
-3\. [Ecological regression with spatial random effects](#Poisson-regression)
+3\. [Introduction to Bayesian computing using Monte Carlo simulation](#Introduction to Bayesian computing using Monte Carlo simulation)
+
+
+&lt;span style="display:block; margin-top: 30px ;"&gt;&lt;/span&gt;
+
+4\. [Example of MC computation](#Example of MC computation)
 
 ---
 
-
-# Smoothed estimates of the RR (non spatial)
-
-- Poisson-logNormal model based on the assumption that the observations in the data set are identically distributed and independent
-
-&lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
-
-- However, data that occur close together in space (or time) are likely to be correlated    
-  .red[&amp;rarr; Dependence between observations is a more realistic assumption]
-
-&lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
-
-- Ignoring this dependence can lead to biased and inefficient inference    
-  .red[&amp;rarr; Smooth in space] prior distribution for the random effects should allow for spatial correlation
-
----
-
-name: spatial-structure
+name: Bayesian prediction
   
 &lt;span style="display:block; margin-top: 250px ;"&gt;&lt;/span&gt;
 
 .myblue[.center[.huge[
-**Spatial structure**]]]
+**Posterior Predictive Distribution**]]]
 
 ---
 
-# Intrinsic CAR model (Besag, York, and Mollie, 1991)
+# Bayesian prediction
 
-- Specify the distribution of each random effect as if we knew the values of the spatial random effects in .red[neighbouring areas]
 
-&lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
-
-- We have a conditional specification since we are conditioning on knowing the neighbours
+- Often the objective of our analysis is to predict a future event, based upon the data currently available.
 
 &lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
-
-- Rule for determining the neighbours of each area: most common based on common boundary
-
-&lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
-
-- Use of conditional autoregressive distributions
-
-.panelset[
-.panel[.panel-name[General definition]
-
-`$$\mathbf{u} \sim \hbox{ICAR}(\mathbf{W},\sigma^2_u)$$`
-
-with
-
-&lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt; 
-- `\(\mathbf{W}\)` matrix defining the neighbours (weights)
-- `\(\sigma^2_u\)` conditional variance parameter of `\(\mathbf{U}\)`
-
-`$$u_i \mid u_{j \;\; j\ne i} \sim \hbox{Normal}\left(\frac{\sum_{j} W_{ij} u_j}{\sum_{j} W_{ij}}, \frac{\sigma^2_u}{\sum_{j}  W_{ij}}\right)$$`
-]
-
-.panel[.panel-name[Common definition]
-
-`$$\mathbf{u} \sim \hbox{ICAR}(\mathbf{W},\sigma^2_u)$$`
-
-Let `\(\partial_i =\)` set of areas adjacent to `\(i\)`, `\(w_{ij}\)`  = 1 for `\(j \in \partial_i\)`, 0 otherwise
-`$$u_i \mid u_{j \;\; j\ne i} \sim \hbox{Normal}\left(\frac{\sum_{j \in \partial_i} u_j}{n_i}, \frac{\sigma^2_u}{n_i}\right)$$`
-
-&lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
-
-- `\(u_i\)` is smoothed towards mean risk in a set of neighbouring areas
-- Conditional variance inversely proportional to the number of neighbours (so more neighbours, less variability)
-
-]
-
-.panel[.panel-name[Remarks]
-- ICAR model is improper: the overall mean of the `\(\bm{u}\)` is not defined. So an additional constraints needs to be imposed:
-.red[**sum-to-zero constraint**:]  `\(\sum_i u_i  = 0\)`
-
-&lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;  
-
-- The parameter `\(\sigma^2_u\)` represents the .red[**conditional**] variance of the random effects (and not the marginal one) and its magnitude determines the amount of spatial variation
-
-&lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
-
-- No closed-form expression available for the .red[**marginal**] between-area variance of the spatial effects 
-  &amp;rarr; estimate marginal spatial variance empirically
-`$$s^2_{\text{u.marginal}} = \sum_i (u_i - \overline{u})^2 / (N-1)$$`
-]
-]
-
----
-
-#Combining ICAR with unstructured random effects
-- ICAR model makes a strong spatial assumption; it cannot take a limiting form that allows non-spatial variability
-
-- Besag, York and Mollie (BYM) recommended combining the ICAR prior and the standard normal prior to allow for both     
-  - spatially unstructured latent covariates `\(\bm{v}\)` modelled as iid
-  &amp;rarr; global smoothing
-  - spatially correlated latent covariates `\(\bm{u}\)` modelled as ICAR
-  &amp;rarr; local smoothing
-  
-.panelset[
-.panel[.panel-name[BYM]
-`\begin{align*}
-y_i &amp;\sim \text{Poisson}(\lambda_i = \rho_i E_i)\\
-\eta_i &amp;= \log \rho_i = b_0 + v_i + u_i\\
-v_i &amp;\sim \text{Normal}(0, \sigma^2_v)\\
-\mathbf{u} &amp;\sim \hbox{ICAR}(\mathbf{W},\sigma^2_u)
-\end{align*}`
-
-- Need to specify hyperprior distributions for:
-
-- `\(\sigma^2_v\)` (between-area unstructured marginal variance), e.g. `\(1/\sigma^2_v \sim \text{Gamma}(1,0.001)\)`
-- `\(\sigma^2_u\)` (between-area spatial conditional variance), e.g. `\(1/\sigma^2_u \sim \text{Gamma}(1,0.001)\)`
-- `\(b_0\)` (mean log relative risk), e.g. `\(b_0 \sim \text{Normal}(0,0.0001)\)` 
-]
-
-.panel[.panel-name[BYM2]
-
-`\begin{align*}
-y_i &amp;\sim \text{Poisson}(\lambda_i = \rho_i E_i)\\
-\eta_i &amp;= \log \rho_i = b_0 + b_i\\
-\boldsymbol{b} &amp;= \frac{1}{\sqrt{\tau_b}}(\sqrt{1-\phi}\boldsymbol{v}_{*} + \sqrt{\phi}\boldsymbol{u}_{*})
-\end{align*}`
-
-where `\(\boldsymbol{v}_{*}\)` and `\(\boldsymbol{u}_{*}\)` are standardised versions of `\(\bm{u}\)` and `\(\bm{v}\)`. 
-
-- Need to specify hyperprior distributions for:
-
-- `\(\phi\)` which is the weight of the spatially structured residual
-- `\(\tau_b\)` which is the marginal variance of the random effect 
-]
-]
-
----
-
-# Priors for BYM2
-    
-Under the BYM2 specification the hyperparameters `\(\tau_b\)` and `\(\phi\)` are modelled using .red[**Penalised Complexity** (PC) priors] (Simpson, Rue, Riebler, Martins, and Sorbye, 2017)
-
-- Regularise inference while not forcing too strong information
-
-- Penalise departure from a "base" model (eg parameter = some fixed value)
-
-- Prior tends to favour the base model &amp;rarr; need fairly strong evidence to move away from it
-
-- Distance between the **base** model `\(\color{red}g(\xi)\)` and an **alternative**, more complex model `\(\color{blue}f(\xi)\)` is measured by
-  
-.blue[
-`$$d(f,g) = \sqrt{2\kld(f,g)} \qquad {\style{font-family:inherit; font-size: 105%; color: black;}{\text{with}}} \qquad \kld(f,g) = \int f(\xi)\log\left(\frac{f(\xi)}{g(\xi)}\right)d\xi$$`
-]
-
 --
 
-- Penalisation done at a constant rate 
+- Consider this example: 
 
-.blue[   
-`$$p(d)=\lambda\exp(-\lambda d)\sim \dexp(\lambda) \qquad {\color{black}\Rightarrow} \qquad p(\xi)=\lambda e^{-\lambda d(\xi)}\left\lvert \frac{\partial d(\xi)}{\partial \xi} \right\rvert$$`
-]
+&lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
 
-- PC prior defined using probability statements on the model parameters (in the appropriate scale) to determine the value of `\(\lambda\)` using "reasonable" information
-
----
-
-# Priors for BYM2
-
-Using probability statements we can define the PC priors for the two hyperparameters as:
-&lt;span style="display:block; margin-top: -10px ;"&gt;&lt;/span&gt;
-.pull-left[
-.content-box-beamer[
-### Prior on `\(\tau_b\)`
-
-`$$P((1/\sqrt{\tau_b})&gt;U_1) = \alpha_1$$`
-
-which can be interpreted as .blue[*the probability that the standard deviation of the random effect is larger than*] `\(\class{blue}{U_1}\)` .blue[*is equal to*] `\(\class{blue}{\alpha_1}\)`
-]
-]
-
-.pull-right[
-.content-box-beamer[
-### Prior on `\(\phi\)`
-
-`$$P(\phi &lt; U_2) = \alpha_2$$`
-
-which can be interpreted as .blue[*the probability that the spatial random effect explains less than*] `\(\class{blue}{U_2}\)` .blue[*of the total variability is equal to*] `\(\class{blue}{\alpha_2}\)`
-]
-]
-
----
-count: false
-# Priors for BYM2
-
-Using probability statements we can define the PC priors for the two hyperparameters as:
-&lt;span style="display:block; margin-top: -10px ;"&gt;&lt;/span&gt;
-.pull-left[
-.content-box-beamer[
-### Prior on `\(\tau_b\)`
-
-`$$P((1/\sqrt{\tau_b})&gt;U_1) = \alpha_1$$`
-
-which can be interpreted as .blue[*the probability that the standard deviation of the random effect is larger than*] `\(\class{blue}{U_1}\)` .blue[*is equal to*] `\(\class{blue}{\alpha_1}\)`
-]
-]
-
-.pull-right[
-.content-box-beamer[
-### Prior on `\(\phi\)`
-
-`$$P(\phi &lt; U_2) = \alpha_2$$`
-
-which can be interpreted as .blue[*the probability that the spatial random effect explains less than*] `\(\class{blue}{U_2}\)` .blue[*of the total variability is equal to*] `\(\class{blue}{\alpha_2}\)`
-]
-]
-
-&lt;span style="display:block; margin-top: 5px ;"&gt;&lt;/span&gt;
-
-where `\(\lambda = \frac{-\log(\alpha_k)}{U_k}\)`
-
-
-
-- We need to define `\(U_1, U_2\)` and `\(\alpha_1, \alpha_2\)` and following Simpson, Rue, Riebler, et al. (2017):
+We estimate the prevalence of a disease in a UK hospital using a sample of n = 58 individuals. 
 &lt;span style="display:block; margin-top: 10px ;"&gt;&lt;/span&gt;
+We find that `\(y = 10\)` individuals have the disease. 
+&lt;span style="display:block; margin-top: 10px ;"&gt;&lt;/span&gt;
+.red[What is the probability that, if we additionally sample `\(k = 30\)` individuals this year, at least 5 will have the disease?]
 
 --
 
-  - A marginal sd not too large (e.g. 0.5);
+&lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
+
+- As usual we start specifying the data distribution:
+
+`$$y \sim \mathrm{Binomial}(\theta,n=58)$$`
+
+
+- Let's  `\(\theta\)` be the true disease prevalence and `\(y^{*}\)` be the .red[predicted value] 
 
 --
 
-  - `\(\alpha_1=0.01\)` (we want to allow for a small probability)
-
---
-
-  - `\(\alpha_2=2/3\)` (we expect a higher probability that the variability to be explained by the spatial random effect is lower than 50%)
-
---
-
-- Then 
-
-    1\. Assuming `\(U_1=0.5/0.31\)` translates into `\(P(\sigma_{\tau_b}&gt;1.62) = 0.01\)`, using the rule of thumb in Simpson, Rue, Riebler, et al. (2017)
-    
-    2\. Assuming `\(U_2=0.5\)` we get `\(P(\phi &lt; 0.5) = 2/3\)`
+- If `\(\theta\)` were known, then we would predict `$$y^*|\theta\sim \mbox{Binomial}(30,\theta)$$`
+	 thus `\(\mbox{P}(y\geq{5}) = 1-(\sum_{j=0}^4 \theta^{j}(1-\theta)^{30-j})\)`
+	 
+.blue[BUT ...] `\(\theta\)` is unknown
 
 ---
 
-# Poisson model with BYM random effects 
 
-- Choice of the adjacency matrix (neighbours): 2 areas are neighbours if they share a common border
+# Source of variation in prediction:
 
-  &amp;rarr; Adjacency matrix implemented in INLA     
+- We don't know the true value of the parameters and we specify a prior on it:
 
-- An area cannot be specified as its own neighbour
+`$$\theta \sim \mathrm{Beta}(a,b)$$`
 
-- Adjacency matrix must be symmetric
+- There is sampling variability ( `\(\rightarrow\)` choice of the data distribution)
 
---
-
-- `\(\text{RR}_i = \exp(b_0 + b_i)\)`: RR in area `\(i\)` relative to the age/sex structure (used to estimate the `\(E_i\)`)
-
-- `\(\hbox{residual RR}_i = \exp(b_i)\)`: residual RR in area `\(i\)` relative to the region average after adjusting for the overall risk
 
 --
 
-- `\(\sigma^2_b\)` reflects the marginal variability of the REs 
 
-- `\(\phi\)` represent the weight of the spatial structure
+To account for the sources of variation we iterate the following steps:
+
+
+1. Sample from the posterior distribution `\(\theta \sim p(\theta\mid y)\)`
+
+2. Sample new values `\(y^*\sim p(y\mid \theta)\)`
+
+- By repeating these steps a large number of times, we eventually obtain a reasonable approximation to the .red[posterior predictive distribution].
+
+---
+
+# Posterior Predictive Distribution (PPD)
+
+- The .red[PPD] represents our uncertainty over the outcome of a future data collection, accounting for the observed data and model choice
+
+
+- For the sake of prediction, the parameters are not of interest. They are vehicles by which the data inform about the predictive model
+
+
+- The .red[PPD] averages over their posterior uncertainty
+
+	`$$p(y^*|y) = \int p(y^*|\theta)p(\theta|y)d\theta$$`
+- This properly accounts for parametric uncertainty
+
+
+- The input is data, the output is a prediction distribution
+
+
+---
+
+name: Computation of PPD
+  
+&lt;span style="display:block; margin-top: 250px ;"&gt;&lt;/span&gt;
+
+.myblue[.center[.huge[
+**Computation**]]]
+
+
+---
+# Computing the PPD
+
+
+- Say `\(\theta^{(1)},...,\theta^{(M)}\)` are samples from the posterior
+
+
+- If we make a sample for `\(y^*\)` for each `\(\theta^{(m)}\)`, `$$y^{*(m)}\sim p(y|\theta^{(m)})$$` then the `\(y^{*(m)}\)` are samples from the PPD
+
+
+- The posterior predictive mean is approximated by the sample mean of the `\(y^{*(m)}\)`
+
+
+- The probability that `\(y^{*}\geq 5\)` is approximated by the sample proportion of the `\(y^{*(m)}\)` that are equal or above 5
+
 
 ---
 
@@ -417,550 +287,193 @@ name: Example
 &lt;span style="display:block; margin-top: 250px ;"&gt;&lt;/span&gt;
 
 .myblue[.center[.huge[
-**Example: Suicides in London**]]]
+**Example**]]]
 
 ---
 
-# Suicides in Greater London, M+F, 1989-1993, Boroughs
+# Example
 
-- 32 boroughs in Greater London
+- We estimate the prevalence of a disease in the UK population using a sample of `\(n=58\)` individuals.
 
-- Interest: mapping the RR in each borough
+- We find that `\(y=10\)` individuals have the diseases. 
 
-- Methods with no spatial structure: SMR, non spatial smoothing
-
-- Spatial smoothing using the BYM model
-
-`\begin{align*}
-y_i &amp; \sim  \hbox{Poisson}(\rho_i E_i)\\
-\log \rho_i  &amp; =  b_0 + b_i\\
-v_i &amp;\sim  \hbox{Normal}(0, \sigma^2_v)\\
-\bm{u} &amp; \sim  \hbox{ICAR}(\mathbf{W}, \sigma^2_u)
-\end{align*}`
-
-- Data: `\(\bm{y}\)` and `\(\bm{E}\)`
-- Priors: `\(\sigma^2_v\)`, `\(\sigma^2_u\)`, `\(b_0\)`
-- Parameters of interest: 
-  - residual RR `\((\hbox{resRR}_i=\exp(b_i))\)`
-  - marginal variance `\((1/ \tau_b)\)`
-  - percent of total variation in the log RR due to spatial effects `\((\phi)\)`
-  
----
-
-# Adjacency matrix in INLA
-    
-- It is possible to produces a graph from a shapefile
-
-&lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
-
-- Upload the shapefile using `sf` package
-
-
-```r
-&gt; library(sf)
-&gt; london.gen &lt;- read_sf("LDNSuicides.shp")
-&gt; london.gen$ID &lt;- seq(1,32)
-```
-
-
-
---
-
-- Use `poly2nb` and `nb2INLA` from the `spdep` package to transform the shapefile into adjacency matrix
-
-
-```r
-&gt; library(spdep)
-&gt; nb2INLA("LDN.graph",poly2nb(london.gen))
-&gt; LDN.adj &lt;- paste(getwd(),"/LDN.graph",sep="")
-```
-  
---
-
-- Now `LDN.graph` has been saved in the working directory and can be called when specifying the BYM model (see later)
-
----
-
-# Spatial distributions for area level data in INLA
-
-We introduce here the specification of the `ICAR` and `BYM2` models in `INLA`, which are done through `f()`:
-
-.panelset[
-.panel[.panel-name[ICAR in `INLA`]
-
-```r
-&gt; formula.ICAR &lt;- y ~ f(ID, model="besag", graph=LDN.adj)	
-```
-             
-&lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
-
-- `ID` is the area identifier
-
-&lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
-
-- `graph=LDN.adj` identifies the adjacency structure constructed as seen before
-
-&lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
-
-- `model=besag` specifies the intrinsic conditional autoregressive structure as described before
-
-On the example:
-
-
-```r
-&gt; formula &lt;- y ~ 1 + f(ID, model="besag",graph=LDN.adj, 
-+                     hyper=list(
-+                       prec=list(
-+                         prior="loggamma",param=c(1,0.0005))))
-```
-]
-
-.panel[.panel-name[BYM2 in `INLA`]
-
-```r
-&gt; formula.BYM2 &lt;- y ~ f(ID, model="bym2", graph=LDN.adj)	
-```
-
-&lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
-
-- `ID` is the area identifier
-
-&lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
-
-- `graph=LDN.adj` identifies the adjacency structure constructed as seen before
-
-&lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
-
-- `model=BYM2` specifies the combination of the intrinsic conditional autoregressive structure and unstructured random effect as described before
-
-On the example:
-
-
-```r
-&gt; formula &lt;- y ~ 1 + f(ID, model="bym2",graph="LDN.graph", 
-+         hyper=list(prec = list(
-+         prior = "pc.prec",
-+         param = c(0.5 / 0.31, 0.01)),
-+         phi = list(
-+         prior = "pc",
-+         param = c(0.5, 2 / 3))))
-```
-]
-]
-
----
-
-# Running the model in `INLA`
-
-
-To run the model in INLA
-
-```r
-&gt; mod.suicides &lt;- inla(formula,family="poisson",
-+                        data=data.suicides,E=E,
-+                        control.compute=list(dic=TRUE, waic=TRUE))
-```
-
-`R-INLA` estimates the parameters `\(\bm \theta = \{b_0, \bm{b}, \bm{u}\}\)` and the hyper-parameters  `\(\bm\psi=\{\tau_{b}, \phi\}\)`.
-
----
-
-# How to get information from random effects
- 
-- The random effect are obtained through 
-
-
-```r
-&gt; mod.suicides$summary.random$ID
-```
-
-
-```
-  ID        mean         sd  0.025quant    0.5quant  0.975quant        mode
-1  1 -0.08511856 0.10811752 -0.30284788 -0.08317996  0.12163080 -0.07936453
-2  2 -0.17473280 0.08541346 -0.34588651 -0.17351807 -0.01043052 -0.17110547
-3  3 -0.21986097 0.09665679 -0.41402404 -0.21833524 -0.03435677 -0.21535428
-4  4  0.12062758 0.08248794 -0.04249042  0.12101607  0.28156539  0.12180033
-5  5 -0.14179881 0.08402304 -0.30912150 -0.14099493  0.02098584 -0.13940103
-6  6  0.40352535 0.08256694  0.23957516  0.40418144  0.56383969  0.40554613
-           kld
-1 3.878316e-08
-2 6.814247e-08
-3 1.339563e-08
-4 1.657227e-07
-5 1.136309e-07
-6 1.352344e-07
-```
-
-which is a matrix formed by `\(2n\)` rows: 
-
-  - `\(1:n\)` rows include information on the area specific residuals `\(b_i\)`
-  - `\(n+1:2n\)` rows are the spatially structured residual `\(u_i\)`
-
----
-
-# How to get information from random effects
- 
-- All these parameters are on the logarithmic scale; to transform the **marginal** back to the natural scale:
+- .red[What is the probability that, if we additionally sample `\(k=30\)` individuals this year, at least 5 will have the disease?]
 .pull-left[
-
-```r
-&gt; b &lt;- mod.suicides$marginals.random$ID[1:Nareas]
-```
-this returns a list with `Nareas` number of elements, each representing the posterior marginal of `\(b_i\)` for that area
+1. .blue[Likelihood]: `\(y \sim \mbox{Binomial}(\theta,58)\)`
+2. .blue[Prior]: `\(\theta \sim \mbox{Beta}(1,1)\)` 
+3. .blue[Posterior]: `\(\theta \mid y \sim \mbox{Beta}(10+1,58-10+1)\)`
+4. .blue[PPD]: `\(y^* \sim \mbox{Binomial}(\theta \mid y,30)\)`
+5. `\(P(y\geq{5}) = \sum_{j=5}^{30} P(y^*=j)\)`
 ]
 
 .pull-right[
-&lt;img src="./img/fig2.1-1.png" style="display: block; margin: auto;" width="50%"&gt;
+&lt;center&gt;&lt;img src=./img/PPD_example.png width='60%' title=''&gt;&lt;/center&gt;
 ]
 
---
-&lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
+&lt;span style="display:block; margin-top: -100px ;"&gt;&lt;/span&gt;
+&lt;img src="./img/unnamed-chunk-3-1.png" style="display: block; margin: auto;" width="40%"&gt;
 
-- Then we can get the posterior mean and 95% credible intervals:
-
-.pull-left[
-
-```r
-&gt; zeta &lt;- lapply(b,function(x) inla.emarginal(exp,x))
-&gt; zeta_CI &lt;- lapply(b,function(x) 
-+ inla.qmarginal(c(0.025,0.975),
-+     inla.tmarginal(exp,x)))
-```
-]
-
-.pull-right[
-
-
-&lt;span style="display:block; margin-top: -150px ;"&gt;&lt;/span&gt;
-
-&lt;center&gt;&lt;img src=./img/trans1-plot-1.png width='50%' title=''&gt;&lt;/center&gt;
-]
 
 ---
 
-# Identification of spatial patterns
- 
-- What is the sensitivity vs specificity of smoothed RR?
-  - Ability to detect true patterns (sensitivity)
-  - Ability to discard false patterns (specificity)
-
-&lt;span style="display:block; margin-top: 10px ;"&gt;&lt;/span&gt;
-
-- Detection of increased/decreased RR 
-
-  &amp;rarr; Posterior probabilities that the residual RR is above/below 1 (Richardson, Thomson, Best, and Elliott, 2004)
-
-&lt;span style="display:block; margin-top: 10px ;"&gt;&lt;/span&gt;
-
-- Area with an increased risk
-`\begin{align*}
-\hbox{P(resRR}_i&gt;1)&gt;0.8 &amp; \Leftrightarrow \hbox{P}(e^{(u_i+v_i)}&gt;1)&gt;0.8\\
-&amp; \Leftrightarrow  \hbox{P}(u_i+v_i&gt;0)&gt;0.8
-\end{align*}`
-  
-- Area with a decreased risk
-`\begin{align*}
-\hbox{P(resRR}_i&lt;1)&gt;0.8 &amp; \Leftrightarrow  \hbox{P}(e^{(u_i+v_i)}&gt;1)&lt;0.2\\
-&amp; \Leftrightarrow  \hbox{P}(u_i+v_i&gt;0)&lt;0.2
-\end{align*}`
-     
----
-    
-# Posterior probability in INLA
-     
-- Remember the parametrisation `\(\zeta = \exp{(b_i)}\)`
-      
-- We can visualize `\(p(\zeta_i&gt;1\mid \bm y)=p(b_i&gt;0\mid \bm y)\)` using the built-in function `inla.pmarginal`:
-
-```r
-&gt; a &lt;- 0
-&gt; prob.b &lt;- lapply(b, function(x) {1 - inla.pmarginal(a, x)})
-```
-
---
-
-- Create an object with all the info to map
-
-```r
-&gt; RR_BYM &lt;- tibble(zeta=unlist(zeta),prob=unlist(prob.b), ID=seq(1,32))
-&gt; out_map &lt;- left_join(london.gen,datasuicides, by="ID") %&gt;% left_join(., RR_BYM, by="ID")
-&gt; out_map$pp_breaks &lt;- cut(out_map$prob, 
-+                            breaks = c(0, c(0.2, 0.8), 
-+                                       1), include.lowest = T)
-```
-
----
-
-#...and then create some maps
-
-.pull-left[
-### Map of posterior mean of `\(b_i\)`
-
-```r
-&gt; ggplot() + geom_sf(data = out_map, 
-+                    aes(fill = zeta)) + 
-+             scale_fill_viridis_c()
-```
-
-&lt;img src="./img/map-post-mean-1.png" &gt;
-]
-
-.pull-right[
-### Map of posterior probability of `\(b_i&gt;0\)`
-
-```r
-&gt; ggplot() + geom_sf(data = out_map, 
-+            aes(fill = pp_breaks)) + 
-+   scale_fill_manual(values = c("blue","orange","red"))
-```
-
-&lt;img src="./img/map-post-p-1.png" &gt;
-]
-
----
-
-# Output from different models
-
-.panelset[
-.panel[.panel-name[Comparing maps]     
-.pull-left[
-- **SMR** non smoothed RR
-                 
-- **HET** non spatially smoothed residual RR: `\(\exp(v)\)`
-                   
-- **CAR** spatially smoothed residual RR: `\(\exp(u)\)`
-                   
-- **BYM** spatially and non spatially smoothed residual RR: `\(\exp(b)=\exp(u+v)\)`
-]
-.pull-right[
-&lt;center&gt;&lt;img src=./img/Lungmales_4maps.jpg width='90%' title=''&gt;&lt;/center&gt;
-]
-]
-
-.panel[.panel-name[Shrinkage]
-.pull-left[  
-&lt;center&gt;&lt;img src=./img/Lungmales_shrinkage.jpg width='90%' title=''&gt;&lt;/center&gt;
-]
-
-.pull-right[
-- Shrinkage towards the mean due to the **borrowing of strength**
-]
-]
-
-.panel[.panel-name[Interpretation]
-
-- Smoothed relative risks are more stable (precise than observed)
-
-&amp;rarr; geographical patterns of risk are easier to detect using smoothed maps
-
-&lt;span style="display:block; margin-top: 10px ;"&gt;&lt;/span&gt;
-
-- Smoothed relative risks have higher specificity:
-  - Possible "false positive" values shrunk towards mean
-  - But in danger of over-smoothing (false negatives)
-
-&lt;span style="display:block; margin-top: 10px ;"&gt;&lt;/span&gt;
-
-- Visual impact of maps can be very dependent on the choice of colours and cut-points used to shade each region
-
-&amp;rarr; Care must be taken not to over-interpret any patterns identified
-
-]
-]
----
-
-name: Poisson-regression
+name: Introduction to Bayesian computing: Monte Carlo simulation
   
 &lt;span style="display:block; margin-top: 250px ;"&gt;&lt;/span&gt;
 
 .myblue[.center[.huge[
-**Ecological regression with spatial random effects**]]]
+**Introduction to Bayesian computing: Monte Carlo simulations**]]]
 
 ---
-# Disease Mapping vs Ecological Regression
-       
-## Disease mapping studies
-       
-- Focus is on description
-- Level of inference is at the aggregate (small area) level
-       
-      
-## Ecological correlation studies
-       
-- Focus is on **explanation**
-  
-  - Used for investigating specific exposure-disease hypotheses at small-area scale
+# Bayesian computing
 
-  - Poisson regression can be used to model relationship between any area-level exposure measure and incidence/prevalence of disease
+- In Session 2.1 we have introduced the concept of .red[conjugacy], and we said that if the the prior and posterior come from the same family of distributions, the prior is said to be **conjugate** to the likelihood `\(\rightarrow\)` the posterior is a known distribution. 
 
-  - Such area-level exposure measures include average annual pollution level, proportion of population who smoke, proportion of population living with x km of a landfill site, etc.
- 
----
+&lt;span style="display:block; margin-top: 10px ;"&gt;&lt;/span&gt;
 
-# Poisson regression with random effects
+- In real life it is (almost) impossible to use conjugacy so we need to resort to simulative approaches or approximations to perform computation:
 
-Straightforward extension of disease mapping model:
+  - Monte Carlo methods
+  &lt;span style="display:block; margin-top: 10px ;"&gt;&lt;/span&gt;
 
-.content-box-beamer[
-### Ecological regression with BYM structure
-  
-`\begin{align*}
-\hbox{y}_i &amp; \sim  \hbox{Poisson}(E_i \rho_i); \;\;\; i=1,...,N\\
-\log \rho_i &amp; =  b_0 + \class{red}{\beta_1 x_i} + u_i + v_i\\
-\text{residual RR}_i &amp;= \exp(b_i) = \exp(u_i + v_i)\\
-\boldsymbol{b} &amp;= \frac{1}{\sqrt{\tau_b}}(\sqrt{1-\phi}\boldsymbol{v}_{*} + \sqrt{\phi} \boldsymbol{u}_{*})\\ 
-v_i &amp;\sim \text{Normal}(0, \sigma^2_v) \;\;\; \mathbf{u} \sim \hbox{ICAR}(\mathbf{W},\sigma^2_u)
-\end{align*}`
-]
+  - Markov Chain Monte Carlo (MCMC) methods
+  &lt;span style="display:block; margin-top: 10px ;"&gt;&lt;/span&gt;
 
-&lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
-
-where
- 
-- `\(O_i\)` and `\(E_i\)`: Observed and expected nb of cases in each area `\(i\)`
-- `\(\lambda_i\)`: unknown RR
-- `\(x\)`  area-level covariate of interest
-- `\(\beta_1\)`: parameter associated with the covariate
-- `\(\bm v_{*}\)`: standardised version of unstructured random effects, i.i.d.
-- `\(\bm u_{*}\)`: standardised version of random effects with spatial structure, conditional distribution
+  - Integrated Nested Laplace Approximation (INLA)
 
 
 ---
-  
-# Interpretation of the parameters
+# Monte Carlo simulation
 
-- `\(\exp(\beta_1)\)` is the change in risk associated with a unit
-   change in exposure `\(x\)`
-   
-&lt;span style="display:block; margin-top: 30px ;"&gt;&lt;/span&gt;
-   
-- `\(b_i\)` is the  random effect in area `\(i\)`
+- A Monte Carlo (MC) simulation is a randomly evolving simulation.
 
-&lt;span style="display:block; margin-top: 30px ;"&gt;&lt;/span&gt;
 
-- `\(\exp(b_i)\)` is the residual or adjusted relative risk of disease
-   in area `\(i\)` .blue[after accounting for the effects of measured covariates and the
-   overall mean risk]
+- MC sampling is based on the idea that if you have a large random sample from a certain distribution, the statistics that you can calculate in this sample (mean, standard deviation, percentiles...) will be very similar to the corresponding theoretical values in the distribution.
 
-&lt;span style="display:block; margin-top: 30px ;"&gt;&lt;/span&gt;
 
-- The variance of the random effects reflects the amount of overdispersion
-   in the data (total residual variance = Poisson variance + random effects variance)
- 
+- If you have a complicated mathematical expression for a distribution and you cannot calculate algebraically important parameters, you could get the computer to generate a large random sample from such a distribution.
+
+
+- By calculating the mean of that parameter in the sample you could estimate the mean in the original distribution with great precision.
+
 ---
-# Poisson regression with random effects - INLA code
+# Example: a Monte Carlo approach to estimating tail-areas of distributions
 
-- Continuous covariate
+Suppose we want to know the probability of getting 8 or more heads when we toss a fair coin 10 times.
+
+
+- An *algebraic* approach would be:
+
+&lt;center&gt;&lt;img src=./img/Coin_Alg.png width='80%' title='INCLUDE TEXT HERE'&gt;&lt;/center&gt;
+
+
+- A *physical* approach would be to repeatedly throw a set of 10 coins
+and count the proportion of throws that there were 8 or more heads.
+
+---
+
+- A *simulation* approach uses a computer to toss the coins!
+
+&lt;center&gt;&lt;img src=./img/coin-toss.jpg width='60%' title='INCLUDE TEXT HERE'&gt;&lt;/center&gt;
+
+&lt;span style="display:block; margin-top: 10px ;"&gt;&lt;/span&gt;
+
+Proportion with 8 or more heads in 10 tosses: (a)  After 100 throws (0.02);  (b) after 10,000 throws (0.0577); (c) the true Binomial distribution (0.0547).
+
+---
+
+# Monte Carlo approach to approximate log-odds
+
+- We start with a Binomial likelihood 
+`$$y \mid \theta \sim \text{Binomial}(\theta, n)$$`
+combined with a 
+`$$\text{Beta}(a,b)$$`
+as prior for the probability of success `\(\theta\)`.
+
+&lt;span style="display:block; margin-top: 10px ;"&gt;&lt;/span&gt;
+
+- We are interested in the log-odds function of `\(\theta\)` defined as 
+`$$\log \left(\frac{\theta}{1-\theta}\right)$$`
+
+- The integral 
+`$$\int_0^1 \log\left(\frac{\theta}{1-\theta}\right) p(\theta\mid y)\text{d}\theta$$` 
+cannot be computed analytically; we resort to Monte Carlo approximation.
+
+---
+
+# Example of MC in practice
+
+- We simulate `\(m\)` independent values `\(\left\{\theta^{(1)},\ldots, \theta^{(m)}\right\}\)` from the 
+`$$\text{Beta}(a_1=y+a,b_1=n-y+b)$$` posterior distribution using the property of conjugacy (Beta prior is conjugate to the Binomial likelihood). 
+
+
+- We apply the log-odds transformation to each value obtaining the set of values
+`$$\left\{\log\left(\frac{\theta^{(1)}}{1-\theta^{(1)}}\right),\ldots,\log\left(\frac{\theta^{(m)}}{1-\theta^{(m)}}\right)\right\}$$`
+- Finally, we compute the sample mean 
+`$$\frac{\sum_{i=1}^m \log\left(\frac{\theta^{(i)}}{1-\theta^{(i)}}\right)}{m}$$`
+which is the Monte Carlo approximation to 
+`$$\log \left(\frac{\theta}{1-\theta}\right)$$`
+
+
+---
+
+# Example of MC: R code
+
+In `R`:
+
 
 ```r
-&gt; formula.ecoreg.inla &lt;- y ~ 1 + x +
-+         f(id,model="bym", graph=graph,                 
-+           hyper=list(prec.spatial=list(
-+                 prior="loggamma",param=c(0.01,0.01))))
+&gt; a &lt;- 1
+&gt; b &lt;- 1
+&gt; theta &lt;- rbeta(1,a,b)
+&gt; n &lt;- 1000
+&gt; y &lt;- rbinom(1, size=n, p=theta)
 ```
 
-  - Categorical covariate
+--
+
+- With this setting the exact posterior distribution of `\(\theta\)` is 
+
+`$$\text{Beta}(a_1=a+y,b_1=n-y+b)$$`
+
+- To approximate the log-odds, we simulate `\(m=50000\)` values from this Beta posterior distribution using the `rbeta` function.
+
 
 ```r
-&gt; formula.ecoreg.inla &lt;- y ~ 1 + cut(x,breaks=c(0,7,10,24),
-+                            include.lowest=TRUE) +
-+                            f(id,model="bym", graph=graph,   
-+                              hyper=list(prec.spatial=list(
-+                              prior="loggamma",param=c(0.01,0.01))))
+&gt; a1 &lt;- a + y
+&gt; b1 &lt;- n - y + b
+&gt; sim &lt;- rbeta(n=50000, shape1=a1, shape2=b1) 
+&gt; logodds &lt;- log(sim/(1-sim))
 ```
 
 ---
 
-# Comparison between DM and ecological regression
+# Results and comparison with the theoretical distribution
 
-&lt;span style="display:block; margin-top: -40px ;"&gt;&lt;/span&gt;
+The empirical distribution of the Monte Carlo sample is plotted below together with the exact posterior distribution of `\(\theta\)`.
 
-&lt;center&gt;&lt;img src=./img/LipCancer.png width='50%' title=''&gt;&lt;/center&gt;
-
-&lt;span style="display:block; margin-top: -40px ;"&gt;&lt;/span&gt;
-
-- Less extreme values when covariates are included
-
-&amp;rarr; part of the spatial variability is explained by the covariates
----
-# Poisson regression with random effects
-
-.content-box-beamer[
-
-### Extension to several variables
-
-`\begin{align*}
-\hbox{y}_i &amp; \sim  \hbox{Poisson}(E_i \rho_i); \;\;\; i=1,...,N\\
-\log \rho_i &amp; =  b_0 + \beta_1 x_{1i} +\beta_2 x_{2i} + b_i\\
-&amp; ...
-\end{align*}`
+.pull-left[
+&lt;center&gt;&lt;img src=./img/MCexample.png width='80%' title=''&gt;&lt;/center&gt;
 ]
 
-&lt;span style="display:block; margin-top: 10px ;"&gt;&lt;/span&gt;
+.pull-right[
+&lt;center&gt;&lt;img src=./img/MCexampleLogOdds.png width='80%' title=''&gt;&lt;/center&gt;
+]
 
-- `\(\exp(\beta_1)\)` is the relative risk of disease/death associated with a unit
-   increase in exposure `\(x_1\)`, after adjustment for `\(x_2\)`
-   
-&lt;span style="display:block; margin-top: 10px ;"&gt;&lt;/span&gt;
 
-- `\(\exp(\beta_2)\)` is the relative risk of disease/death associated with a unit
-   increase in exposure `\(x_2\)`, after adjustment for `\(x_1\)`
 
-&lt;span style="display:block; margin-top: 10px ;"&gt;&lt;/span&gt;
 
-- `\(\exp(b_i)\)` is the residual or adjusted relative risk of disease/death
-   in area `\(i\)` after accounting for the effects of measured covariates and the overall mean risk
- 
----
-     
- # Summary
-  
-- Hierarchical models allow "borrowing of strength" across units
- 
-  - posterior distribution of `\(\rho_i\)` for each unit borrows
-   strength from the likelihood contributions for
-   **all** the units, via their joint influence on the posterior
-   estimates of the unknown hyper-parameters
- 
-&lt;span style="display:block; margin-top: 10px ;"&gt;&lt;/span&gt;
- 
-- Judgements of exchangeability need careful assessment
- 
-  - units suspected a priori to be systematically different might be modelled by including relevant covariates so that residual variability more plausibly reflects exchangeability
-  - subgroups of prior interest should be considered separately
 
-&lt;span style="display:block; margin-top: 10px ;"&gt;&lt;/span&gt;
 
-- Mapping geographical variations in disease risk is an important epidemiological technique for
-   suggesting aetiological hypotheses
 
-&lt;span style="display:block; margin-top: 10px ;"&gt;&lt;/span&gt;
-
-- When combined with data on geographical variations in exposure, disease mapping techniques can be used to investigate and quantify **ecological** associations between disease risk and potential exposures
-
----
-
-# References
-
-Besag, J., J. York, and A. Mollie (1991). "Bayesian Image Restoration,
-with two Applications in Spatial Statistics". In: _Annals of the
-Institute of Statistical Mathematics_ 43, pp. 1-59.
-
-Richardson, S., A. Thomson, N. Best, et al. (2004). "Interpreting
-posterior relative risk estimates in disease-mapping studies". In:
-_Environmental Health Perspectives_ 112.9, pp. 1016-1025.
-
-Simpson, D., H. Rue, A. Riebler, et al. (2017). "Penalising Model
-Component Complexity: A Principled, Practical Approach to Constructing
-Priors". In: _Statistical Science_ 32.1, pp. 1 - 28. DOI:
-[10.1214/16-STS576](https://doi.org/10.1214%2F16-STS576). URL:
-[https://doi.org/10.1214/16-STS576](https://doi.org/10.1214/16-STS576).
     </textarea>
 <style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
 <script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script src="assets/remark-zoom.js"></script>
 <script src="https://platform.twitter.com/widgets.js"></script>
 <script>var slideshow = remark.create({
+"navigation": {
+"scroll": false
+},
 "highlightStyle": "github",
 "highlightLines": true,
 "countIncrementalSlides": false,
@@ -1061,36 +574,6 @@ if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
   }
   preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
 })(document);</script>
-<style>
-.logo {
-  background-image: url("assets/MRC-Centre-Logo.png");
-  background-size: 15% 10%;
-  background-repeat: no-repeat;
-  position: absolute;
-  top:  0.25%; /* 1.135em */
-  left: 85%;
-  width: 100%;
-  height: 100%;
-  z-index: 0;
-}
-</style>
-
-<script>
-document
-  .querySelectorAll(
-    '.remark-slide-content' +
-    ':not(.title-slide)' +
-    // add additional classes to exclude here, e.g.
-    // ':not(.inverse)' +
-    ':not(.hide-logo)' +
-    ':not(.thankyou-michelle)' +
-    ':not(.thankyou-barney)'
-  )
-  .forEach(el => {
-    el.innerHTML += '<div class="logo"></div>';
-  });
-</script>
-
 
 <script>
 slideshow._releaseMath = function(el) {
