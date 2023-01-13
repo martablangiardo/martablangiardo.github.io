@@ -1,11 +1,13 @@
 <!DOCTYPE html>
 <html lang="" xml:lang="">
   <head>
-    <title>Session 5.1: Hierarchical models: longitudinal data</title>
+    <title>Session 5.2: Missing data inputation</title>
     <meta charset="utf-8" />
     <script src="libs/header-attrs/header-attrs.js"></script>
     <link href="libs/panelset/panelset.css" rel="stylesheet" />
     <script src="libs/panelset/panelset.js"></script>
+    <script src="libs/kePrint/kePrint.js"></script>
+    <link href="libs/lightable/lightable.css" rel="stylesheet" />
     <!-- (Re)Defines a bunch of LaTeX commands that can then be used directly in the .Rmd file as '\command{...}' -->
     <script type="text/x-mathjax-config">
     MathJax.Hub.Config({
@@ -68,7 +70,7 @@
       }
     });
     </script>
-    <link rel="stylesheet" href="assets/beamer.css" type="text/css" />
+    <link rel="stylesheet" href="../assets/beamer.css" type="text/css" />
   </head>
   <body>
     <textarea id="source">
@@ -79,7 +81,7 @@
 
 class: title-slide
 
-# Session 5.1: Hierarchical models: longitudinal data&lt;span style="display:block; margin-top: 10px ;"&gt;&lt;/span&gt; 
+# Session 5.2: Missing data inputation&lt;span style="display:block; margin-top: 10px ;"&gt;&lt;/span&gt; 
 
 ## 
 
@@ -88,10 +90,10 @@ class: title-slide
 ### Spatial and Spatio-Temporal Bayesian Models with `R-INLA`, Imperial College 
 
 &lt;!-- Can also separate the various components of the extra argument 'params', eg as in 
-### Spatial and Spatio-Temporal Bayesian Models with `R-INLA`, Imperial College, January-March 2023, MSc in Epidemiology
+### Spatial and Spatio-Temporal Bayesian Models with `R-INLA`, Imperial College, , MSc in Epidemiology
 --&gt;
 
-January-March 2023
+
 
 ---
 
@@ -129,11 +131,17 @@ After this session you should be able to:
 
 &lt;span style="display:block; margin-top: 10px ;"&gt;&lt;/span&gt;
 
-- Specify hierarchical models for longitudinal data
+- Appreciate the importance of thinking about why data are
+missing, and stating your modelling assumptions
 
 &lt;span style="display:block; margin-top: 10px ;"&gt;&lt;/span&gt;
 
-- Distinguish between random intercept and random slope models and recognise when each is more appropriate
+- Understand the disadvantages of complete case analysis and
+other ad hoc methods
+
+&lt;span style="display:block; margin-top: 10px ;"&gt;&lt;/span&gt;
+
+- Learn about how Bayesian methods can be used as  ‘statistically principled’ for handling missing data
 
 &lt;span style="display:block; margin-top: 10px ;"&gt;&lt;/span&gt;
 
@@ -142,131 +150,120 @@ After this session you should be able to:
 &lt;span style="display:block; margin-top: 10px ;"&gt;&lt;/span&gt;
 
 
-The topics treated in this lecture are covered in Chapter 4 of Gómez-Rubio (2020).
+The topics treated in this lecture are covered in Chapter 12 of Gómez-Rubio (2020).
 
 ---
 
-# Outline
+# Why we care about missing data
 
-There is huge scope for elaborating the basic hierarchical models
-discussed in the previous lecture to reflect additional structure and complexity
-in the data, e.g.
+- Missing data are common!
 
-&lt;span style="display:block; margin-top: 10px ;"&gt;&lt;/span&gt;
-
-- Adding covariates at different levels of the hierarchy
+- Usually inadequately handled in both observational and
+experimental research
 
 &lt;span style="display:block; margin-top: 10px ;"&gt;&lt;/span&gt;
 
-- Adding further levels to the hierarchy (patients within wards within hospitals, pupils within schools within local authorities, `\(\ldots\)`)
+- For example, Wood, White, and Thompson (2004) reviewed 71 recently published BMJ, JAMA, Lancet and NEJM papers
+  - 89% had partly missing outcome data
+  - In 37 trials with repeated outcome measures, 46% performed complete case analysis
+  - Only 21% reported sensitivity analysis
 
 &lt;span style="display:block; margin-top: 10px ;"&gt;&lt;/span&gt;
 
-- Adding non-nested (cross-classified) levels (patients within GPs crossed with hospitals, `\(\ldots\)`)
-
-&lt;span style="display:block; margin-top: 10px ;"&gt;&lt;/span&gt;
-
-- **Repeated observations on some/all units (longitudinal data - we will see it in this lecture)**
-
-&lt;span style="display:block; margin-top: 10px ;"&gt;&lt;/span&gt;
-
-- Modelling temporal or spatial structure in data, `\(\ldots\)` (we will see it from next week)
-
-&lt;span style="display:block; margin-top: 10px ;"&gt;&lt;/span&gt;
+- Sterne, White, Carlin, Spratt, Royston, Kenward, Wood, and Carpenter (2009) reviewed articles using Multiple Imputation in BMJ, JAMA, Lancet and NEJM from 2002 to 2007
+  - 59 articles found, with use doubling over 6 year period
+  - However, the reporting was almost always inadequate
 
 ---
 
 # Outline 
 
-1\. [What are longitudinal data](#longitudinal)
+1\. [How do missing data arise?](#how)
 
 &lt;span style="display:block; margin-top: 30px ;"&gt;&lt;/span&gt;
 
-2\. [Example: antidepressant clinical trial](#example)
+2\. [Example: children height and weight](#example)
 
 &lt;span style="display:block; margin-top: 30px ;"&gt;&lt;/span&gt;
 
-3\. [Model specification](#model)
+3\. [Bayesian imputation](#model)
 
 &lt;span style="display:block; margin-top: 30px ;"&gt;&lt;/span&gt;
 
-4\. [Interpretation](#interpretation)
+4\. [Extending the model](#extending)
 
+&lt;span style="display:block; margin-top: 30px ;"&gt;&lt;/span&gt;
 
 ---
 
-name: longitudinal
+name: how
 
 &lt;span style="display:block; margin-top: 250px ;"&gt;&lt;/span&gt;
 
 .myblue[.center[.huge[
-**What are longitudinal data**]]]
+**How do missing data arise?**]]]
 
 
 ---
 
-# What are longitudinal data?
+# How do missing data arise?
 
-- Arise in studies where individual (or units) are measured repeatedly over time
-
-&lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
-
-- For a given individual, observations over time will be typically dependent
-
-&lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
-
-- Longitudinal data can arise in various forms:
-
-&lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
-
-  - continuous or discrete response; discrete response can be binary/binomial, categorical or counts
-
-&lt;span style="display:block; margin-top: 10px ;"&gt;&lt;/span&gt;
-  
-  - equally spaced or irregularly spaced
-
-&lt;span style="display:block; margin-top: 10px ;"&gt;&lt;/span&gt;
-
-  - same or different time points for each individual
-
-&lt;span style="display:block; margin-top: 10px ;"&gt;&lt;/span&gt;
-
-  - with or without missing data
-
-&lt;span style="display:block; margin-top: 10px ;"&gt;&lt;/span&gt;
-
-  - many or few time points, `\(T\)`
-
-&lt;span style="display:block; margin-top: 10px ;"&gt;&lt;/span&gt;
-
-  - many or few individuals or units, `\(n\)`
-
+&lt;center&gt;&lt;img src=./img/Missing_DAG.png width='80%' title='INCLUDE TEXT HERE'&gt;&lt;/center&gt;
 
 ---
 
-# Analysing longitudinal data
+# Different types of missing data: MCAR
+
+- There are three types of missing data, depending on why the missingness arise. Let's define `\(m_i\)` as the variable indicating if the `\(i-th\)` observation is missing
+
+`$$m_i \sim \text{Bernoulli}(p_i)$$`
+
+1\. .red[Missing completely at random] (MCAR) occurs when the missing data are independent from the observed or unobserved data: 
+
+`$$\text{logit}(p_i) = \theta_0$$`
+This means that the missing values can be ignored and the analysis can be conducted as usual. 
+
+---
+
+# Different types of missing data: MAR and MNAR
+
+2\. .red[Missing at random] (MAR) occurs when the missing data depends ONLY on the observed data: 
+
+`$$\text{logit}(p_i) = \theta_0 + \bf{x}_i \mathbf{\theta}_1$$`
+ In this case, this can be introduced into the model so that missing observations are imputed as part of the model fitting.
  
-- There are many different ways to analyse longitudinal data
+--
 
 &lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
 
-- This is a very big field, so we have to be selective
+3\. .red[Missing at random] (MNAR) occurs when the missing data depends on both the observed and missing data: 
 
-&lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
+`$$\text{logit}(p_i) = \theta_0 + \bf{x}_i \mathbf{\theta}_1 + \lambda y_i$$`
 
--  The key feature of longitudinal data is the need to account for the dependence structure of the data
+This scenario is difficult to tackle since there is no information about the missingness mechanism and the missing data.
 
-&lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
+---
 
-- Two common methods:
+# Missing response or missing covariates
 
-  - random effects (hierarchical) models
-  &lt;span style="display:block; margin-top: 10px ;"&gt;&lt;/span&gt;
-  - autoregressive models
+- Additionally, it is crucial to distinguish between missing values .blue[in the response] and .blue[in the covariates]. 
 
-&lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
+&lt;span style="display:block; margin-top: 30px ;"&gt;&lt;/span&gt;
 
-- Here, we will focus on random effects models
+- When the missingness is in the response (and it is MCAR or MAR), these can naturally be predicted as the distribution of the response values is determined by the statistical model to be fit (posterior predictive distribution in the Bayesian approach)
+
+&lt;span style="display:block; margin-top: 30px ;"&gt;&lt;/span&gt;
+
+- Missingness in the covariats requires additional steps:
+&lt;span style="display:block; margin-top: 10px ;"&gt;&lt;/span&gt;
+  - a model needs to be specified on the covariate (imputation model) if the missingness mechanism is MCAR or MAR
+&lt;span style="display:block; margin-top: 10px ;"&gt;&lt;/span&gt;
+  - an additional model of missingness needs to be specified if the mechanism is MNAR
+&lt;span style="display:block; margin-top: 10px ;"&gt;&lt;/span&gt;  
+  - Here we will consider only missing values in the response
+&lt;span style="display:block; margin-top: 10px ;"&gt;&lt;/span&gt;  
+  - `R-INLA` reguires a certain degree of complexity to deal with missing values in covariates, if you are interested in learning more look at Gómez-Rubio, Cameletti, and Blangiardo (2022)
+  
 
 ---
 
@@ -275,344 +272,487 @@ name: example
 &lt;span style="display:block; margin-top: 250px ;"&gt;&lt;/span&gt;
 
 .myblue[.center[.huge[
-**Example: sleep study**]]]
+**Example: height and weight of children**]]]
 
 
 ---
 
-# Sleep study
+# Example: height and weight of children
 
-- Belenky, Wesensten, Thorne, Thomas, Sing, Redmond, Russo, and Balkin (2003) describes a study of reaction time in patients under sleep deprivation up to 10 days.
+- Information of 10,030 children measured within the Fifth Dutch Growth Study 2009 (Schönbeck, Talma, Van Dommelen, Bakker, Buitendijk, HiraSing, and Van Buuren, 2013)
 
 &lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
-- 18 subjects followed for 10 days 
+
+- Data available from the `fdgs` dataset in the `library(mice)` (Van Buuren and Groothuis-Oudshoorn, 2011)
+
 &lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
-- Subjects rated on average reaction time (in ms) for different activities at each measurement
-&lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
+
+
+
+&lt;table class=" lightable-classic" style='font-family: "Arial Narrow", "Source Sans Pro", sans-serif; width: auto !important; margin-left: auto; margin-right: auto;'&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;"&gt; Variable &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; Description &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Missing &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; id &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Child ID &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; reg &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Region (5 levels) &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; age &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Age (year) &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; sex &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Sex &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; hgt &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Height (cm) &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 23 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; wgt &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Weight (kg) &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 20 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; hgt.z &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Re-scaled height (as a Z-score) &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 23 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; wgt.z &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Re-scaled weight (as a Z-score) &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 20 &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+---
+# Summarising the data
+
+- The data can be summarised using
 
 
 ```r
-&gt; library(lme4)
-&gt; data(sleepstudy)
-&gt; head(sleepstudy)
+&gt; summary(fdgs)
 ```
 
 ```
-  Reaction Days Subject
-1 249.5600    0     308
-2 258.7047    1     308
-3 250.8006    2     308
-4 321.4398    3     308
-5 356.8519    4     308
-6 414.6901    5     308
+       id            reg            age              sex            hgt             wgt              hgt.z               wgt.z         
+ Min.   :100001   North: 732   Min.   : 0.008214   boy :4829   Min.   : 46.0   Min.   :  2.585   Min.   :-4.470000   Min.   :-5.04000  
+ 1st Qu.:106352   East :2528   1st Qu.: 1.618754   girl:5201   1st Qu.: 83.8   1st Qu.: 11.600   1st Qu.:-0.678000   1st Qu.:-0.62475  
+ Median :203855   South:2931   Median : 8.084873               Median :131.5   Median : 27.500   Median :-0.019000   Median : 0.02600  
+ Mean   :180091   West :2578   Mean   : 8.157936               Mean   :123.9   Mean   : 32.385   Mean   :-0.006054   Mean   : 0.04573  
+ 3rd Qu.:210591   City :1261   3rd Qu.:13.547570               3rd Qu.:162.3   3rd Qu.: 51.100   3rd Qu.: 0.677000   3rd Qu.: 0.70700  
+ Max.   :401955                Max.   :21.993155               Max.   :208.0   Max.   :135.300   Max.   : 3.900000   Max.   : 4.74100  
+                                                               NA's   :23      NA's   :20        NA's   :23          NA's   :20        
 ```
-&lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
 
-- Reaction time will be rescaled by dividing by 1000 to have the reaction time in seconds
+- Note that several variables in the dataset have missing observations. In particular, height `(hgt)` and weight `(wgt)`, which are common variables used as response or predictors in models
+
+---
+
+# Subsetting the data
+
+- In order to provide a smaller dataset to speed up computations, only the children with missing values (in height and weight) and another 1000 ones taken at random will be used in the analysis
+
 
 ```r
-&gt; sleepstudy$Reaction &lt;- sleepstudy$Reaction / 1000
+&gt; # Subsect 1, observations with NA's
+&gt; subset1 &lt;- which(is.na(fdgs$wgt) | is.na(fdgs$hgt))
+&gt; 
+&gt; #Subset 2, random sample of 500 individuals
+&gt; set.seed(1)
+&gt; subset2 &lt;- sample((1:nrow(fdgs))[-subset1], 1000)
+&gt; # Subset 1 + subset 2
+&gt; fdgs.sub &lt;- fdgs[c(subset1, subset2), ]
+&gt; summary(fdgs.sub)
 ```
 
+```
+       id            reg           age             sex           hgt              wgt              hgt.z              wgt.z        
+ Min.   :100098   North: 78   Min.   : 0.07118   boy :493   Min.   : 46.00   Min.   :  2.585   Min.   :-4.26300   Min.   :-4.0750  
+ 1st Qu.:106293   East :275   1st Qu.: 1.74264   girl:550   1st Qu.: 86.28   1st Qu.: 11.960   1st Qu.:-0.66800   1st Qu.:-0.6520  
+ Median :204306   South:298   Median : 8.59411              Median :136.05   Median : 29.000   Median :-0.04550   Median :-0.0070  
+ Mean   :183214   West :250   Mean   : 8.56536              Mean   :127.04   Mean   : 33.614   Mean   :-0.02313   Mean   : 0.0202  
+ 3rd Qu.:211388   City :142   3rd Qu.:14.16427              3rd Qu.:165.10   3rd Qu.: 53.100   3rd Qu.: 0.64550   3rd Qu.: 0.6960  
+ Max.   :401949               Max.   :21.88364              Max.   :199.00   Max.   :117.300   Max.   : 3.20000   Max.   : 3.6300  
+                                                            NA's   :23       NA's   :20        NA's   :23         NA's   :20       
+```
 ---
-
-# Sleep Example: data
-
-&lt;img src="./img/unnamed-chunk-5-1.png" style="display: block; margin: auto;" width="50%"&gt;
----
-
-# Sleep Example: objective
-
-- Study objective: is the length of sleep deprivation a determinant of reaction time?
-&lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
-
-- The variables we will use are:
-&lt;span style="display:block; margin-top: 10px ;"&gt;&lt;/span&gt;
-  - `\(y\)`: Reaction time (in s)
-  - `\(t\)`: Days
-
-&lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
-
-- For simplicity we will
-&lt;span style="display:block; margin-top: 10px ;"&gt;&lt;/span&gt;
-  - assume a linear relationship
-&lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
-
-- The models we will consider are:
-&lt;span style="display:block; margin-top: 10px ;"&gt;&lt;/span&gt;
-  - a non-hierarchical model (standard linear regression) (LM)
-  - a hierarchical model with random intercepts (LMM)
-  - a hierarchical model with random intercepts and random slopes (LMM2)
-
----
-
 name: model
 
 &lt;span style="display:block; margin-top: 250px ;"&gt;&lt;/span&gt;
 
 .myblue[.center[.huge[
-**Model specification**]]]
+**Bayesian imputation**]]]
 
 
 ---
 
-# Sleep Example: a Bayesian (non-hierarchical) linear model (LM)
-
-- Specification:
-  1\. probability distribution for responses:
-`$$y_{it} \sim \mbox{Normal}(\mu_{it},\sigma^2)$$`
-
-  - `\(\color{blue}{y_{it}}\)` = the reaction time for individual `\(i\)` on day `\(t\)` `\((\mbox{days } 0,\ldots,9)\)`
-&lt;span style="display:block; margin-top: 10px ;"&gt;&lt;/span&gt;
-  - linear predictor: `\(\color{blue}{\mu_{it}}=\alpha+\beta t\)`
-&lt;span style="display:block; margin-top: 10px ;"&gt;&lt;/span&gt;
-  - `\(\color{blue}{t}\)` = the day of the measurement
-
-&lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
-
-2\. .red[In this model no account is taken of the repeated structure (observations are nested within individuals)]
-
-&lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
-
-3\. Assume vague priors for all parameters:
-
-`\begin{align*}
-\alpha, \beta  &amp; \sim  \mbox{Normal}(0,10000)\\
-\frac{1}{\sigma^2} &amp; \sim  \mbox{Gamma}(1,0.001)
-\end{align*}`
-
----
-
-# Sleep Example: a Bayesian hierarchical linear model
-
-- Modify LM to allow a separate intercept for each individual:
-
-&lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
-
-`\begin{align*}
-y_{it} &amp; \sim  \mbox{Normal}(\mu_{it},\sigma^2) \\
-\mu_{it}  &amp; =  \textcolor{red}{\alpha_i}+\beta t
-\end{align*}`
-
-We are assuming that *conditionally* on `\(\alpha_i\)`, `\(\{y_{it}, t=0,\ldots,9 \}\)` are independent
-&lt;span style="display:block; margin-top: 10px ;"&gt;&lt;/span&gt;
-
-- Assume that all the `\(\{\alpha_i\}\)` follow a *common* prior distribution, e.g.
-`$$\color{red}{\alpha_i \sim \mbox{Normal}(\mu_{\alpha}, \sigma^2_{\alpha}) \;\;\;\; i=1,\ldots,246}$$` 
-
-- Here we are assuming exchangeability between all the individuals
-- We may then assume vague priors for the *hyperparameters* of the population distribution:
-
-`\begin{align*}
-\color{red}{\mu_{\alpha}} &amp; \color{red}{\sim  \mbox{Normal}(0,10000)} \\
-\color{red}{\frac{1}{\sigma_{\alpha}}} &amp; \color{red}{\sim  \mbox{Gamma}(1,0.001)}
-\end{align*}`
-
-- This is an example of a *Hierarchical LM* or *Linear Mixed Model (LMM)* or *Random Intercepts* model
-
----
-
-# Comparing the two models
-
-&lt;center&gt;&lt;img src=./img/DAGS.png width='80%' title='INCLUDE TEXT HERE'&gt;&lt;/center&gt;
-
-.pull-left[
-
-(left): LM
-
-]
-
-.pull-right[
-
-(right): LMM - random intercept
-
-]
-
----
-
-# HAMD example: long vs wide format
-
-- In `R-INLA` is extremely easy to work with longitudinal data, as long as the dataset is in *long format*
-
-.panelset[
-.panel[.panel-name[Long format]
-
-```
-    Reaction Days Subject
-1  0.2495600    0     308
-2  0.2587047    1     308
-3  0.2508006    2     308
-4  0.3214398    3     308
-5  0.3568519    4     308
-6  0.4146901    5     308
-7  0.3822038    6     308
-8  0.2901486    7     308
-9  0.4305853    8     308
-10 0.4663535    9     308
-```
-- Note that a score is present only if the corresponding subject has been observed at that time point
-]
-
-.panel[.panel-name[Wide format]
+# Model specification
 
 
-```
-   Subject Reaction.0 Reaction.1 Reaction.2 Reaction.3 Reaction.4
-1      308  0.2495600  0.2587047  0.2508006  0.3214398  0.3568519
-11     309  0.2227339  0.2052658  0.2029778  0.2047070  0.2077161
-21     310  0.1990539  0.1943322  0.2343200  0.2328416  0.2293074
-31     330  0.3215426  0.3004002  0.2838565  0.2851330  0.2857973
-41     331  0.2876079  0.2850000  0.3018206  0.3201153  0.3162773
-51     332  0.2348606  0.2428118  0.2729613  0.3097688  0.3174629
-61     333  0.2838424  0.2895550  0.2767693  0.2998097  0.2971710
-71     334  0.2654731  0.2762012  0.2433647  0.2546723  0.2790244
-81     335  0.2416083  0.2739472  0.2544907  0.2708021  0.2514519
-91     337  0.3123666  0.3138058  0.2916112  0.3461222  0.3657324
-```
-- Note that with this format should a subject not have measurement for the entire set of days, R would pad these out with NAs 
-
-]
-]
-
----
-
-# Sleep example: `R-INLA` code for LM
-
-.panelset[
-.panel[.panel-name[Code]
+- We first predict weight as a function of age and sex. We specify:
+`$$wgt_i \sim \text{Normal}(\alpha+beta_1 sex_i + \beta_2 age_i, \sigma^2)$$`
+- where `wgt` is missing we will have `NA` in the corresponding vector, e.g.
 
 ```r
-&gt; library(INLA)
-&gt; formula_LM &lt;- Reaction ~ Days
-&gt; lm &lt;- inla(formula_LM, data=sleepstudy, family="gaussian", control.compute = list(waic=TRUE))
-&gt; 
-&gt; #Plot
-&gt; ggplot(data = sleepstudy, aes(x=Days, y=Reaction)) + geom_point(aes(colour = Subject), alpha = .9) + 
-+   #geom_smooth(method="lm") 
-+   geom_abline(intercept=lm$summary.fixed[1,1], slope=lm$summary.fixed[2,1]) + labs(title = "Linear Model (LM)")+
-+   theme(legend.position = "none")
+&gt; fdgs.sub$wgt[1:10]
 ```
-]
 
-.panel[.panel-name[Plot]
-&lt;img src="./img/unnamed-chunk-9-1.png" style="display: block; margin: auto;" width="45%"&gt;
-- all the subjects share the same intercept and slope
-]
-]
+```
+ [1] 23.200     NA     NA     NA  8.445     NA  6.960 10.420     NA 14.100
+```
+ 
+- Remember the posterior predictive distribution (presented in lecture 2.2):
+
+	`$$p(\mathbf{y}^*|\mathbf{y}) = \int p(y^*|\theta)p(\theta|\mathbf{y})d\theta$$`
+
+  - here `\(\mathbf{y}^*\)` identifies the missing values, while `\(\mathbf{y}\)` is the set of observed values for `wgt` 
 
 ---
 
-# Sleep example: `R-INLA` code for LMM
+# Running the model in `R-INLA`
 
-.panelset[
-.panel[.panel-name[Code]
 
-```r
-&gt; library(INLA)
-&gt; formula_LMM &lt;- Reaction ~ Days + f(Subject,model="iid")
-&gt; lmm &lt;- inla(formula_LMM, data=sleepstudy, family="gaussian", control.compute = list(waic=TRUE))
-&gt; #Plot
-&gt; p &lt;- ggplot(data = sleepstudy, aes(x=Days, y=Reaction, group=Subject))
-&gt; p + geom_point(aes(colour = Subject), alpha = .9) + geom_abline(slope=lmm$summary.fixed[2,1], intercept=lmm$summary.fixed[1,1]+lmm$summary.random$Subject$mean)+ labs(title = "Random Intercept Model (LMM)")+
-+   theme(legend.position = "none")
 ```
-]
 
-.panel[.panel-name[Plot]
-&lt;img src="./img/unnamed-chunk-11-1.png" style="display: block; margin: auto;" width="40%"&gt;
-- each individual has a different regression line
-- but all individuals have the same slope (parallel lines)
+Call:
+   "inla(formula = wgt ~ age + sex, data = fdgs.sub, control.predictor = list(compute = TRUE))" 
+Time used:
+    Pre = 0.592, Running = 0.308, Post = 0.0892, Total = 0.988 
+Fixed effects:
+              mean    sd 0.025quant 0.5quant 0.975quant   mode kld
+(Intercept)  6.259 0.436      5.403    6.259      7.115  6.259   0
+age          3.331 0.034      3.265    3.331      3.397  3.331   0
+sexgirl     -2.379 0.446     -3.255   -2.379     -1.503 -2.379   0
 
-]
-]
+Model hyperparameters:
+                                        mean    sd 0.025quant 0.5quant 0.975quant mode
+Precision for the Gaussian observations 0.02 0.001      0.018     0.02      0.021 0.02
+
+Expected number of effective parameters(stdev): 3.00(0.00)
+Number of equivalent replicates : 341.01 
+
+Marginal log-Likelihood:  -3486.82 
+Posterior marginals for the linear predictor and
+ the fitted values are computed
+```
+
+- Note that we need to include `control.predictor=list(compute = TRUE)` so `INLA` can estimate the predictive distribution for the missing observations.
 
 ---
 
-name: interpretation
+# Getting the posterior prediction
+
+We now subset the children indexes with missing values so we can report their predictive distributions:
+
+
+```
+ [1] "275"  "1278" "1419" "2135" "2684" "2940" "3069" "3189" "3543" "4262" "5687" "6485" "7101" "7108" "7506" "8064" "8065" "8067" "8098" "8588"
+```
+
+```
+                           mean        sd
+fitted.Predictor.0002 23.067926 0.3203762
+fitted.Predictor.0003 27.617340 0.3331862
+fitted.Predictor.0004 54.019924 0.3768773
+fitted.Predictor.0006 13.144500 0.3930787
+fitted.Predictor.0009  7.838159 0.3940498
+fitted.Predictor.0011 11.557686 0.4023548
+fitted.Predictor.0014 12.323734 0.3978228
+fitted.Predictor.0015  6.506694 0.4026595
+fitted.Predictor.0021 17.111536 0.3719146
+fitted.Predictor.0022 70.908188 0.4867834
+```
+---
+
+# Imputing `hgt` using the same approach
+
+- Similarly, a model can be fit to explain weight based on age and sex and to compute the predictive distribution of the missing observations:
+
+
+```
+
+Call:
+   c("inla(formula = hgt ~ age + sex, data = fdgs.sub, control.compute = list(config = TRUE), ", " control.predictor = list(compute = TRUE))") 
+Time used:
+    Pre = 0.321, Running = 0.334, Post = 0.154, Total = 0.809 
+Fixed effects:
+              mean    sd 0.025quant 0.5quant 0.975quant   mode kld
+(Intercept) 77.148 0.720     75.734   77.148     78.561 77.148   0
+age          6.023 0.055      5.914    6.023      6.131  6.023   0
+sexgirl     -4.716 0.730     -6.149   -4.716     -3.284 -4.716   0
+
+Model hyperparameters:
+                                         mean   sd 0.025quant 0.5quant 0.975quant  mode
+Precision for the Gaussian observations 0.007 0.00      0.007    0.007      0.008 0.007
+
+Expected number of effective parameters(stdev): 3.00(0.00)
+Number of equivalent replicates : 340.06 
+
+Marginal log-Likelihood:  -3976.27 
+Posterior marginals for the linear predictor and
+ the fitted values are computed
+```
+
+---
+
+# Imputing `hgt` using the same approach
+
+- and similarly to what we did with `wgt` we can obtain the predictions using
+
+
+```
+                           mean        sd
+fitted.Predictor.0001 122.24529 0.5354429
+fitted.Predictor.0005  83.24902 0.6831945
+fitted.Predictor.0007  74.64156 0.6785414
+fitted.Predictor.0008  82.80382 0.6857813
+fitted.Predictor.0010  88.26140 0.6012727
+fitted.Predictor.0012  96.55556 0.6135087
+fitted.Predictor.0013  86.31596 0.6657859
+fitted.Predictor.0016  81.84746 0.6913874
+fitted.Predictor.0017  77.75821 0.7160824
+fitted.Predictor.0018  81.59988 0.6371612
+```
+---
+name: extending
 
 &lt;span style="display:block; margin-top: 250px ;"&gt;&lt;/span&gt;
 
 .myblue[.center[.huge[
-**Interpretation**]]]
+**Extending the model**]]]
+
 
 ---
 
-# Sleep Example: revisiting the data
-.pull-left[
-&lt;img src="./img/unnamed-chunk-12-1.png" style="display: block; margin: auto;" width="100%"&gt;
-]
 
-.pull-right[
-- .blue[blue]: regression line for each subject; 
-- black: regression line from the LMM 
-&lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
-- Note that some of the subjects do not fit well in the *parallel lines* scenario 
-&lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
-- .red[So we add random slopes to the hierarchical model]
-]
+# Joint model of height and weight
 
----
+- The two previous models consider height and weight separately, but it is clear that there is a high correlation between height and weight, which is caused by the age and sex of the child. 
 
-# Sleep Example: adding random slopes
 
-- Modify LMM to allow a separate slope for each individual:
+```
+[1] 0.9999865
+```
+- We can build a joint model for height and weight to exploit a correlated effect between the coefficients of age in both models.
+
 `\begin{align*}
-y_{it} &amp; \sim  \mbox{Normal}(\mu_{it},\sigma^2) \\
-\mu_{it}  &amp; =  \alpha_i+\color{red}{\beta_{i}}t
+hgt_i &amp;= \alpha_h + \beta_{h1} sex_i + \beta_{h2} age_i + \epsilon_{1i}\\
+wgt_i &amp;= \alpha_w + \beta_{w1} sex_i + \beta_{w2} age_i + \epsilon_{2i}\\
 \end{align*}`
 
-- As for the `\(\{\alpha_i\}\)`, assume that the `\(\{\beta_{i}\}\)` follow *common* prior distributions with vague priors on their *hyperparameters*
+with 
+  - `\(\alpha_h,\alpha_w\)` model intercepts
+  - `\(\beta_{h1},\beta_{w1}\)` the effect of sex
+  - `\(\beta_{h2},\beta_{w2}\)` the effect of age
+  - `\(\mathbf{\epsilon_{1}},\mathbf{\epsilon}_{2}\)` the error terms (note that this specification is equivalent to the one above for the separate models)
+  
+---
 
---
+# Joint model of height and weight: prior
 
-&lt;span style="display:block; margin-top: 10px ;"&gt;&lt;/span&gt;
+- The vectors `\((\mathbf{\beta}_{1h}, \mathbf{\beta}_{1w})\)` and `\((\mathbf{\beta}_{2h}, \mathbf{\beta}_{2w})\)` are modeled using a multivariate Gaussian distribution with mean 0 and covariance matrix with `\(1/\tau_{hj}\)` and `\(1/\tau_{wj}\)` as variances and `\(\rho  / \sqrt{(\tau_{hj} \tau_{wj})}\)` as the covariance where `\(\rho_j\)` is the correlation parameter.
 
-- In `R-INLA`
+- First, the bivariate response variable needs to be put in a two-column matrix given that the model will be made of two data distributions
 
 
 ```r
-&gt; Subject2&lt;-sleepstudy$Subject
-&gt; formula_LMM2 &lt;- Reaction ~ f(Subject, model="iid") + f(Subject2, Days, model="iid")
-&gt; lmm2 &lt;- inla(formula_LMM2, data=sleepstudy, family="gaussian", control.compute = list(waic=TRUE))
-&gt; #To access the summaries of the beta_i
-&gt; lmm2$summary.random$Subject2[1:5,]
+&gt; n &lt;- nrow(fdgs.sub)
+&gt; y &lt;- matrix(NA, nrow = 2 * n, ncol = 2)
+&gt; y[1:n, 1] &lt;- fdgs.sub$hgt
+&gt; y[n + 1:n, 2] &lt;- fdgs.sub$wgt
 ```
 
-```
-   ID          mean          sd   0.025quant      0.5quant  0.975quant          mode          kld
-1 308  0.0202626344 0.002468318  0.015404885  0.0202640016 0.025107546  0.0202669017 1.423632e-13
-2 309 -0.0002377739 0.002572373 -0.005251515 -0.0002505348 0.004841343 -0.0002767014 4.747123e-13
-3 310  0.0033595434 0.002578983 -0.001667998  0.0033471788 0.008450352  0.0033218474 5.995693e-13
-4 330  0.0045935386 0.002512368 -0.000380402  0.0046067329 0.009491057  0.0046344311 7.386043e-13
-5 331  0.0065542981 0.002500534  0.001603901  0.0065671570 0.011430067  0.0065941373 7.456124e-13
+- Similarly, as we have two intercepts, we need to define these explicitly as covariates with all values equal to one:
+
+```r
+&gt; I &lt;- matrix(NA, nrow = 2 * n, ncol = 2)
+&gt; I[1:n, 1] &lt;- 1
+&gt; I[n + 1:n, 2] &lt;- 1
 ```
 
 ---
 
-# HAMD Example: random intercepts and slopes
+# Correlated effects
+
+- Now we need to define the correlated effects. We will use the random effect specification similar to what we saw with the hierarchical models (`iid`), but modified to have the two coefficients as correlated `f(...,model=iid2d)`. 
+
+- In order to do so we need to modify the variables `age` and `sex` as they will be passed to the model as weights of the latent random effects `iid2d` specification. We need them to be twice as long to match the dimension of the response:
+
+
+```r
+&gt; age.joint &lt;- rep(fdgs.sub$age, 2)
+&gt; sex.joint &lt;- rep(fdgs.sub$sex, 2)
+```
+
+- Finally we need two index vectors to indicate which coefficient to use from the `iid2d` model is required. These indexes will be 1 for the first half of observations (to indicate that the coefficient is `\(\beta_h\)` and 2 for the second half (to indicate that the coefficient is `\(\beta_w\)`).
+
+
+```r
+&gt; idx.age = rep(1:2, each = n)
+&gt; idx.sex = rep(1:2, each = n)
+```
+
+---
+
+# Model fitting
+
+
+
+The model is fit and summarized as seen below
+
+```r
+&gt; # Model formula
+&gt; joint.f &lt;- y ~ -1 + I + f(idx.sex, sex, model="iid2d", n=2) + f(idx.age, age, model = "iid2d", n = 2) 
+&gt; # Model fit
+&gt; fdgs.joint &lt;- inla(joint.f, 
++   data = list(y = y, I = I, sex = sex.joint, age = age.joint, idx.age = idx.age, idx.sex= idx.sex),
++   family = rep("gaussian", 2),
++   control.predictor = list(compute = TRUE))
+&gt; # Summary fixed (intercept)
+&gt; fdgs.joint$summary.fixed
+```
+
+```
+        mean        sd 0.025quant  0.5quant 0.975quant      mode          kld
+I1 81.164886 1.2649717  78.634904 81.182144  83.605241 81.223190 5.981651e-05
+I2  8.420074 0.7260417   6.984118  8.423778   9.836821  8.433324 6.398880e-06
+```
+
+---
+
+# Hyperparameters and variable effects
+
+- The hyperparameters can be obtained through
+
+
+```r
+&gt; fdgs.joint$summary.hyperpar
+```
+
+```
+                                                 mean           sd  0.025quant    0.5quant  0.975quant        mode
+Precision for the Gaussian observations    0.00744220 0.0003375615 0.006755871 0.007454596 0.008076937 0.007509341
+Precision for the Gaussian observations[2] 0.01975768 0.0009051798 0.017910916 0.019794657 0.021451062 0.019955467
+Precision for idx.sex (component 1)        0.40161864 0.2528078387 0.110398599 0.339444166 1.060544546 0.243881532
+Precision for idx.sex (component 2)        1.21415734 0.6723889716 0.382658272 1.062990094 2.935511127 0.813767261
+Rho1:2 for idx.sex                         0.76937461 0.1358915788 0.424048190 0.798977786 0.944363137 0.858776899
+Precision for idx.age (component 1)        0.12409181 0.0581448273 0.041365918 0.114484425 0.264431485 0.093585397
+Precision for idx.age (component 2)        0.37498182 0.1919860022 0.116769259 0.338415491 0.848323172 0.265652391
+Rho1:2 for idx.age                         0.95304049 0.0382801863 0.852029916 0.963259210 0.993755533 0.982233087
+```
+
+- While the coefficients for `age` and `sex` are part of the random effects of the model:
 .pull-left[
-&lt;img src="./img/unnamed-chunk-14-1.png" style="display: block; margin: auto;" width="100%"&gt;
+
+```r
+&gt; #Sex
+&gt; fdgs.joint$summary.random$idx.sex
+```
+
+```
+  ID      mean        sd 0.025quant  0.5quant 0.975quant      mode          kld
+1  1 -4.267494 0.7254319  -5.651833 -4.283208  -2.804532 -4.322619 7.875905e-05
+2  2 -2.235662 0.4096522  -3.032550 -2.238969  -1.423679 -2.247918 1.263944e-05
+```
 ]
 
 .pull-right[
-- .red[LMM with random intercepts only:]
-  - each individual has a different regression line
-  - but for each treatment, only intercept varies by individual
+&lt;span style="display:block; margin-top: -23px ;"&gt;&lt;/span&gt;
 
-&lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
+```r
+&gt; #Age
+&gt; fdgs.joint$summary.random$idx.age
+```
 
-- .red[LMM with random intercepts and random slopes:]
-  - now intercepts and slopes both vary
-  -  better fit for each individual
+```
+  ID     mean         sd 0.025quant 0.5quant 0.975quant     mode          kld
+1  1 6.022923 0.05503646   5.914861 6.022919   6.130908 6.022916 9.852672e-08
+2  2 3.330778 0.03355411   3.264889 3.330777   3.396609 3.330777 1.539765e-07
+```
+]
+---
+
+# Estimates of missing values
+
+- Finally we can access the predicted values for the children with missing data as follows:
+
+.panelset[
+.panel[.panel-name[Height]
+
+```r
+&gt; #Height
+&gt; fdgs.joint$summary.fitted.values[hgt.na, c("mean", "sd")][1:10,]
+```
+
+```
+                           mean        sd
+fitted.Predictor.0001 121.99718 0.5320206
+fitted.Predictor.0005  82.99864 0.6783616
+fitted.Predictor.0007  74.83954 0.6747676
+fitted.Predictor.0008  82.55342 0.6809285
+fitted.Predictor.0010  88.46017 0.5979600
+fitted.Predictor.0012  96.30597 0.6092518
+fitted.Predictor.0013  86.06576 0.6610920
+fitted.Predictor.0016  81.59701 0.6864905
+fitted.Predictor.0017  77.50752 0.7109940
+fitted.Predictor.0018  81.79826 0.6336382
+```
+]
+.panel[.panel-name[Weight]
+
+```r
+&gt; #Height
+&gt; fdgs.joint$summary.fitted.values[wgt.na, c("mean", "sd")][1:10,]
+```
+
+```
+                           mean        sd
+fitted.Predictor.0002 107.32457 0.5228136
+fitted.Predictor.0003 115.51666 0.5430331
+fitted.Predictor.0004 163.29118 0.6108598
+fitted.Predictor.0006  89.34724 0.6434531
+fitted.Predictor.0009  79.78649 0.6451542
+fitted.Predictor.0011  86.47801 0.6588265
+fitted.Predictor.0014  87.86315 0.6513185
+fitted.Predictor.0015  77.37898 0.6593448
+fitted.Predictor.0021  96.52034 0.6082740
+fitted.Predictor.0022 193.79404 0.7881245
+```
+]
 ]
 
 ---
 
 # References
 
-Belenky, G., N. J. Wesensten, D. R. Thorne, et al. (2003). "Patterns of performance degradation and restoration during sleep restriction and subsequent recovery: A sleep dose-response study". In: _Journal of sleep research_ 12.1, pp. 1-12.
-
 Gómez-Rubio, V. (2020). _Bayesian inference with INLA_. CRC Press.
+
+Gómez-Rubio, V., M. Cameletti, and M. Blangiardo (2022). "Missing data analysis and imputation via latent Gaussian Markov random fields". In: _SORT-Statistics and Operations Research Transactions_, pp. 217-244.
+
+Schönbeck, Y., H. Talma, P. Van Dommelen, et al. (2013). "The world’s tallest nation has stopped growing taller: the height of Dutch children from 1955 to 2009". In: _Pediatric research_ 73.3, pp. 371-377.
+
+Sterne, J. A., I. R. White, J. B. Carlin, et al. (2009). "Multiple imputation for missing data in epidemiological and clinical research: potential and pitfalls". In: _Bmj_ 338.
+
+Van Buuren, S. and K. Groothuis-Oudshoorn (2011). "mice: Multivariate imputation by chained equations in R". In: _Journal of statistical software_ 45, pp. 1-67.
+
+Wood, A. M., I. R. White, and S. G. Thompson (2004). "Are missing outcome data adequately handled? A review of published randomized controlled trials in major medical journals". In: _Clinical trials_ 1.4, pp. 368-376.
     </textarea>
 <style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
 <script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
