@@ -263,8 +263,8 @@ with conditional probability function
 
 This model allows to calculate ANY conditional probability. For instance, conditioning on `\(\theta=0.4\)` let's see the difference in the probability of getting 12 or 15 successes
 
-1. `$$p(y=12 \mid \theta=0.4) = \frac{20!}{12!8!}0.4^{12}(1-0.4)^{8}= 0.022$$` 
-2. `$$p(y=15 \mid \theta=0.4) = \frac{20!}{15!5!}0.4^{15}(1-0.4)^{5} = 0.174$$`
+1. `$$p(y=12 \mid \theta=0.4) = \frac{20!}{12!8!}0.4^{12}(1-0.4)^{8}= 0.035$$` 
+2. `$$p(y=15 \mid \theta=0.4) = \frac{20!}{15!5!}0.4^{15}(1-0.4)^{5} = 0.0013$$`
 
 -- 
 
@@ -273,20 +273,20 @@ Note you can get these results in R using
 
 ```r
 &gt; #1
-&gt; dbinom(12,20,0.8)
+&gt; dbinom(12,20,0.4)
 ```
 
 ```
-[1] 0.02216088
+[1] 0.03549744
 ```
 
 ```r
 &gt; #2
-&gt; dbinom(15,20,0.8)
+&gt; dbinom(15,20,0.4)
 ```
 
 ```
-[1] 0.1745595
+[1] 0.001294494
 ```
 ---
 
