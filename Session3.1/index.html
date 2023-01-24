@@ -644,7 +644,7 @@ or equivalently
 
 1\. can be easily estimated as
 
-`$$\class{red}{p(\boldsymbol\psi\mid\boldsymbol{y})} \class{black}{= \frac{p(\boldsymbol\theta,\boldsymbol\psi\mid\boldsymbol{y})}{p(\boldsymbol\theta\mid\boldsymbol\psi,\boldsymbol{y})}} \text{ (Recall slide 18)}$$`
+`$$\class{red}{p(\boldsymbol\psi\mid\boldsymbol{y})} \class{black}{= \frac{p(\boldsymbol\theta,\boldsymbol\psi\mid\boldsymbol{y})}{p(\boldsymbol\theta\mid\boldsymbol\psi,\boldsymbol{y})}} \text{ (Recall slide 17)}$$`
 
 ---
 
@@ -716,25 +716,20 @@ where
 2\. is slightly more complex, because in general there will be more elements in `\(\boldsymbol\theta\)` than there are in `\(\boldsymbol\psi\)` and thus this computation is more expensive.
 
 --
+&lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
 
-.olive[**Gaussian Approximation**]: one easy and cheap possibility is to start from `\(\tilde{p}(\boldsymbol\theta\mid\boldsymbol\psi,\boldsymbol{y})\)` and approximate the density of `\(\class{orange}{\theta_i\mid\boldsymbol\psi,\boldsymbol{y}}\)`,  with the Gaussian marginal derived from `\(\tilde{p}(\boldsymbol\theta\mid\boldsymbol\psi,\boldsymbol{y})\)`. While this is very fast, the approximation is generally not very good
+.olive[**Gaussian Approximation**]: one easy and cheap possibility is to start from `\(\tilde{p}(\boldsymbol\theta\mid\boldsymbol\psi,\boldsymbol{y})\)` and approximate the density of `\(\class{orange}{\theta_i\mid\boldsymbol\psi,\boldsymbol{y}}\)`,  with the Gaussian marginals. While this is very fast, the approximation is generally not very good.
 
 --
-
-.olive[**Full Laplace Approximation**]: alternatively, we can write `\(\boldsymbol\theta=\{\theta_i,\boldsymbol\theta_{-i}\}\)`, use the definition of conditional probability and again Laplace approximation to obtain
-
-`\begin{align*}
-\class{orange}{p(\theta_i \mid\boldsymbol\psi,\boldsymbol{y})} &amp; \class{black}{= \frac{p\left((\theta_i,\boldsymbol\theta_{-i})\mid \boldsymbol\psi,\boldsymbol{y}\right)}{p(\boldsymbol\theta_{-i}\mid\theta_i,\boldsymbol\psi,\boldsymbol{y})}}\\
-&amp; \propto \left. \frac{p(\boldsymbol\psi)p(\boldsymbol\theta\mid\boldsymbol\psi)p(\boldsymbol{y}\mid\boldsymbol\theta,\boldsymbol \psi)}{\tilde{p}(\boldsymbol\theta_{-i}\mid\theta_i,\boldsymbol\psi,\boldsymbol{y})}\right|_{\boldsymbol\theta_{-i}={\boldsymbol\theta}^*_{-i}(\theta_i,\boldsymbol\psi)} =: \class{orange}{\tilde{p}(\theta_i\mid\boldsymbol\psi,\boldsymbol{y})}
-\end{align*}`
+&lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
+.olive[**Full Laplace Approximation**]: alternatively, we can write `\(\boldsymbol\theta=\{\theta_i,\boldsymbol\theta_{-i}\}\)`, use the definition of conditional probability and again Laplace approximation to obtain `\(\class{orange}{\tilde{p}(\theta_i\mid\boldsymbol\psi,\boldsymbol{y})}\)`
 (very computationally expensive)
 
 --
-
-- The most efficient algorithm is the .olive[**Simplified Laplace Approximation**]:
-    - Based on a Taylor's series expansion of the Laplace approximation `\(\class{orange}{\tilde{p}(\theta_i\mid\boldsymbol\psi,\boldsymbol{y})}\)`.
-     - The accuracy of this approximation is sufficient in many applied cases and that the computing time is considerably shorter, it is the standard option.
-
+&lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
+The most efficient algorithm is the .olive[**Simplified Laplace Approximation**]:
+- Based on a Taylor's series expansion of the Laplace approximation `\(\class{orange}{\tilde{p}(\theta_i\mid\boldsymbol\psi,\boldsymbol{y})}\)`.
+- The accuracy of this approximation is sufficient in many applied cases and that the computing time is considerably shorter, it is the standard option.
 
 ---
 
@@ -1136,40 +1131,17 @@ The .olive[`control.xxx=list(...)`] statements  in the .olive[`inla`] function c
 ---
 
 # Step by step guide to using `R-INLA`
+
 `R` returns an object .olive[`m`] in the class `inla`, which has some methods available as for example .olive[`summary()`]  and  .olive[`plot()`].
 
 &lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
 
+Some of the elements in an `inla` object returned by a call to `inla()` are:
 
+&lt;center&gt;&lt;img src=./img/Table_out_inla.png width='60%' title=''&gt;&lt;/center&gt;
 
-.scrollable[
+.center[Source: Gómez-Rubio (2020), Section 2.3.1]
 
-```r
-&gt; names(m)[1:38]
-```
-
-```
- [1] "names.fixed"                 "summary.fixed"              
- [3] "marginals.fixed"             "summary.lincomb"            
- [5] "marginals.lincomb"           "size.lincomb"               
- [7] "summary.lincomb.derived"     "marginals.lincomb.derived"  
- [9] "size.lincomb.derived"        "mlik"                       
-[11] "cpo"                         "po"                         
-[13] "waic"                        "model.random"               
-[15] "summary.random"              "marginals.random"           
-[17] "size.random"                 "summary.linear.predictor"   
-[19] "marginals.linear.predictor"  "summary.fitted.values"      
-[21] "marginals.fitted.values"     "size.linear.predictor"      
-[23] "summary.hyperpar"            "marginals.hyperpar"         
-[25] "internal.summary.hyperpar"   "internal.marginals.hyperpar"
-[27] "offset.linear.predictor"     "model.spde2.blc"            
-[29] "summary.spde2.blc"           "marginals.spde2.blc"        
-[31] "size.spde2.blc"              "model.spde3.blc"            
-[33] "summary.spde3.blc"           "marginals.spde3.blc"        
-[35] "size.spde3.blc"              "logfile"                    
-[37] "misc"                        "dic"                        
-```
-]
 ---
 
 #Toy example
@@ -1182,20 +1154,13 @@ We consider the .olive[`iris`] dataset included in the .olive[`R`] datasets (see
 ```
 
 ```
-  Sepal.Length    Sepal.Width     Petal.Length    Petal.Width   
- Min.   :4.300   Min.   :2.000   Min.   :1.000   Min.   :0.100  
- 1st Qu.:5.100   1st Qu.:2.800   1st Qu.:1.600   1st Qu.:0.300  
- Median :5.800   Median :3.000   Median :4.350   Median :1.300  
- Mean   :5.843   Mean   :3.057   Mean   :3.758   Mean   :1.199  
- 3rd Qu.:6.400   3rd Qu.:3.300   3rd Qu.:5.100   3rd Qu.:1.800  
- Max.   :7.900   Max.   :4.400   Max.   :6.900   Max.   :2.500  
-       Species  
- setosa    :50  
- versicolor:50  
- virginica :50  
-                
-                
-                
+  Sepal.Length    Sepal.Width     Petal.Length    Petal.Width          Species  
+ Min.   :4.300   Min.   :2.000   Min.   :1.000   Min.   :0.100   setosa    :50  
+ 1st Qu.:5.100   1st Qu.:2.800   1st Qu.:1.600   1st Qu.:0.300   versicolor:50  
+ Median :5.800   Median :3.000   Median :4.350   Median :1.300   virginica :50  
+ Mean   :5.843   Mean   :3.057   Mean   :3.758   Mean   :1.199                  
+ 3rd Qu.:6.400   3rd Qu.:3.300   3rd Qu.:5.100   3rd Qu.:1.800                  
+ Max.   :7.900   Max.   :4.400   Max.   :6.900   Max.   :2.500                  
 ```
 
 We specify a simple regression model with `Petal.length` and `Petal.width` as dependent and independent variables, respectively:
@@ -1212,6 +1177,7 @@ We specify a simple regression model with `Petal.length` and `Petal.width` as de
 
 
 ```r
+&gt; library(INLA)
 &gt; formula &lt;- Petal.Length ~  1 + Petal.Width
 &gt; output &lt;- inla(formula, family="gaussian", data=iris)
 ```
@@ -1225,12 +1191,9 @@ We specify a simple regression model with `Petal.length` and `Petal.width` as de
 ```
 
 ```
-                mean         sd 0.025quant 0.5quant 0.975quant     mode
-(Intercept) 1.083565 0.07293226  0.9401746 1.083563   1.226833 1.083565
-Petal.Width 2.229935 0.05137177  2.1289336 2.229933   2.330849 2.229935
-                     kld
-(Intercept) 1.284615e-06
-Petal.Width 1.284522e-06
+                mean         sd 0.025quant 0.5quant 0.975quant     mode          kld
+(Intercept) 1.083565 0.07293226  0.9401746 1.083563   1.226833 1.083565 1.284615e-06
+Petal.Width 2.229935 0.05137177  2.1289336 2.229933   2.330849 2.229935 1.284522e-06
 ```
 
 - For each unstructured *fixed* effect, `R-INLA` reports a set of summary statistics from the posterior distribution.
@@ -1252,10 +1215,8 @@ Petal.Width 1.284522e-06
 ```
 
 ```
-                                            mean        sd 0.025quant 0.5quant
-Precision for the Gaussian observations 4.432532 0.5109594    3.48813 4.412588
-                                        0.975quant     mode
-Precision for the Gaussian observations    5.48995 4.372888
+                                            mean        sd 0.025quant 0.5quant 0.975quant     mode
+Precision for the Gaussian observations 4.432532 0.5109594    3.48813 4.412588    5.48995 4.372888
 ```
 
 - For each hyperparameter the summary statistics are reported to describe the posterior distribution.
@@ -1326,7 +1287,7 @@ Precision for the Gaussian observations    5.48995 4.372888
 ```
 
 ```
-[1] 2.250379 2.166679 2.235001 2.225636
+[1] 2.160636 2.190686 2.205257 2.170303
 ```
 
 ]
@@ -1428,19 +1389,19 @@ The INLA approach is not a rival/competitor/replacement to/of MCMC, just a bette
 
 # References
 
-Blangiardo, M. and M. Cameletti (2015). _Spatial and spatio-temporal
-Bayesian models with R-INLA_. John Wiley &amp; Sons.
+Blangiardo, M. and M. Cameletti (2015). _Spatial and spatio-temporal Bayesian models with R-INLA_. John
+Wiley &amp; Sons.
 
-Johnson, A. A., M. Q. Ott, and M. Dogucu (2022). _Bayes Rules!: An
-Introduction to Applied Bayesian Modeling_. CRC Press.
+Gómez-Rubio, V. (2020). _Bayesian inference with INLA_. CRC Press.
 
-Martins, T. G., D. Simpson, F. Lindgren, et al. (2013). "Bayesian
-computing with INLA: New features". In: _Computational Statistics &amp;
-Data Analysis_ 67, pp. 68-83.
+Johnson, A. A., M. Q. Ott, and M. Dogucu (2022). _Bayes Rules!: An Introduction to Applied Bayesian
+Modeling_. CRC Press.
 
-Rue, H., S. Martino, and N. Chopin (2009). "Approximate Bayesian
-inference for latent Gaussian model by using integrated nested Laplace
-approximations (with discussion)". In: _J. R. Statist. Soc. B_ 71, pp.
+Martins, T. G., D. Simpson, F. Lindgren, et al. (2013). "Bayesian computing with INLA: New features".
+In: _Computational Statistics &amp; Data Analysis_ 67, pp. 68-83.
+
+Rue, H., S. Martino, and N. Chopin (2009). "Approximate Bayesian inference for latent Gaussian model by
+using integrated nested Laplace approximations (with discussion)". In: _J. R. Statist. Soc. B_ 71, pp.
 319-392.
     </textarea>
 <style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>

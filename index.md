@@ -43,5 +43,18 @@ Break
 
 Solutions of practical 2 are [here](Practical2/solutions.html)
 
+### Day 3 - Mon 30th Jan 2023
+
+- [Session 3.1](Session3.1): Introduction to INLA and R-INLA (there will be a 10 minute break halfway through it)
+
+Break
+
+- [Practical 3a](Practical3a): Tutorial on R-INLA
+
+Lunch
+
+- [Practical 3b](Practical3b): Regression and comparison of Bayesian vs Frequentist approach in R-INLA
+
+Solutions of practical 3b are [here](Practical3b/Practical3b_Solutions.html)
 
 
