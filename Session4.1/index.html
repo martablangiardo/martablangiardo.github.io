@@ -85,10 +85,10 @@ class: title-slide
 
 ###     
 
-### Spatial and Spatio-Temporal Bayesian Models with `R-INLA`, Imperial College 
+### Bayesian modelling for Spatial and Spatio-temporal data, Imperial College 
 
 &lt;!-- Can also separate the various components of the extra argument 'params', eg as in 
-### Spatial and Spatio-Temporal Bayesian Models with `R-INLA`, Imperial College, , MSc in Epidemiology
+### Bayesian modelling for Spatial and Spatio-temporal data, Imperial College, , MSc in Epidemiology
 --&gt;
 
 
@@ -105,7 +105,7 @@ layout: true
 MSc in Epidemiology 
 ]
 .alignright[
-Spatial and Spatio-Temporal Bayesian Models with `R-INLA`, NA 
+Bayesian modelling for Spatial and Spatio-temporal data, NA 
 ]
 ] 
 
@@ -338,7 +338,7 @@ with
 `$$\hbox{SIR}_A=\frac{118}{126.38}=0.93$$` 
 - Fewer incident cases of lung cancer for males in ward A than expected in EW after adjusting for differences in age.
 &lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
-- In R we can perform indirect standardization using the package `SpatialEpi` (we will see it in the Practical).
+- In R we can perform indirect standardization using the package `SpatialEpi` (we will see it in the Practical in week 6).
 
 ---
 
@@ -487,7 +487,7 @@ name: interpretation
 ---
 
 # Parameter interpretation and useful quantities 
-- `\(\rho_i\)` is the log-relative risk for the area i compared to the average area with the same structure in the Expected values.
+- `\(\rho_i\)` is the log-relative risk for the area i compared to the average area with the same structure in the expected values.
 
 - `\(v_{i}\)` are the random effects. It can also be seen as the latent variable which captures the effect of unknown or unmeasured area level covariates.
 
@@ -581,7 +581,7 @@ Note that
 
 # Results for lip cancer in Scotland example
 
-- `\(\text{exp}(v_i)\)` is the relative risk of lip cancer in area `\(i\)` relative to average across Scotland (see map)
+- `\(\text{exp}(b_0 + v_i)\)` is the relative risk of lip cancer in area `\(i\)` relative to the average area with the same age/sex structure (see map)
 
 - `\(\sigma_v\)` is the between-area standard deviation of log relative risk of lip cancer
 
@@ -645,7 +645,7 @@ To obtain the quantile ratio we need to follow these steps:
 
 ```
 Predictor:1 Predictor:2 Predictor:3 
-   1.442716    1.492742    0.986077 
+   1.371356    1.518272    1.485727 
 ```
 &lt;span style="display:block; margin-top: -10px ;"&gt;&lt;/span&gt;
 Note that:
@@ -679,7 +679,7 @@ Note that:
 ```
 
 ```
-[1] 10.89525
+[1] 11.36826
 ```
 
 - The `\(QR90\)` points towards a large spatial variability. 
@@ -912,7 +912,7 @@ v_i &amp;\sim N(0,\sigma^2_{v})\\
 
 The assumptions are 
   1. that the data are distributed as .red[Poisson]
-  2. that there is a linear relationship between air pollution and the risk of asthma attacks
+  2. that there is a linear relationship between air pollution and the log risk of asthma attacks
   3. that the days are similar (we include a random effect)
 ---
 
@@ -931,11 +931,11 @@ The assumptions are
 
 ```
                           mean       sd 0.025quant  0.5quant 0.975quant      mode
-fitted.Predictor.001  6.985146 1.791751   3.922625  6.834330  10.916062  6.542981
-fitted.Predictor.002  9.195480 2.074597   5.575915  9.044254  13.683973  8.751043
-fitted.Predictor.003 31.753928 3.942533  24.457993 31.602920  39.910506 31.304718
-fitted.Predictor.004  3.098465 1.146065   1.298471  2.952525   5.740608  2.672587
-fitted.Predictor.005  3.772048 1.282253   1.709610  3.623755   6.689284  3.338876
+fitted.Predictor.001  7.503591 1.863704   4.300281  7.352443  11.576539  7.060187
+fitted.Predictor.002  8.728280 2.019980   5.217256  8.576962  13.108621  8.283736
+fitted.Predictor.003 46.602489 4.792813  37.637212 46.451516  56.423628 46.152026
+fitted.Predictor.004  3.111749 1.151580   1.302755  2.965233   5.766465  2.684249
+fitted.Predictor.005  3.797450 1.289824   1.721835  3.648644   6.730828  3.362809
 ```
 ]
 
@@ -951,7 +951,7 @@ fitted.Predictor.005  3.772048 1.282253   1.709610  3.623755   6.689284  3.33887
 Now let's assume we run a different model 
 
 `\begin{align}
-y_i &amp;\sim \text{Normal}(\theta_i, \tau)\\
+y_i &amp;\sim \text{Normal}(E\theta_i, \tau)\\
 \theta_i &amp;= b_0 + \beta x_i\\
 b_0, \beta &amp;\sim N(0,0.001)\\
 \text{log}(\tau) &amp;\sim \text{logGamma}(1,0.00005)
@@ -980,11 +980,11 @@ The assumptions are
 
 ```
                           mean       sd 0.025quant  0.5quant 0.975quant      mode
-fitted.Predictor.001  9.701709 2.462086   4.872657  9.701679  14.531318  9.701644
-fitted.Predictor.002 31.196402 1.656289  27.947745 31.196401  34.445320 31.196417
-fitted.Predictor.003 42.881504 2.317063  38.336760 42.881516  47.426541 42.881563
-fitted.Predictor.004 -6.785074 3.970073 -14.571813 -6.785130   1.002607 -6.785199
-fitted.Predictor.005 33.392870 1.731675  29.996342 33.392872  36.789656 33.392893
+fitted.Predictor.001 10.757647 2.428888   5.993702 10.757617   15.52213 10.757584
+fitted.Predictor.002 32.289257 1.633942  29.084428 32.289256   35.49434 32.289272
+fitted.Predictor.003 43.994430 2.285806  39.510989 43.994441   48.47815 43.994487
+fitted.Predictor.004 -5.757451 3.916548 -13.439219 -5.757505    1.92523 -5.757572
+fitted.Predictor.005 34.489499 1.708311  31.138794 34.489501   37.84045 34.489522
 ```
 ]
 
@@ -998,7 +998,7 @@ fitted.Predictor.005 33.392870 1.731675  29.996342 33.392872  36.789656 33.39289
 
 &lt;span style="display:block; margin-top: 50px ;"&gt;&lt;/span&gt;
 
-- Both models seem reasonable (the predicted values are in line with the observed ones), but there is more of a shift on the right for the Gaussian model (as expected given its simmetric property)
+- Both models seem reasonable (the predicted values are in line with the observed ones), but there is more of a shift on the right for the Gaussian model (as expected given its symmetric property)
 
 &lt;span style="display:block; margin-top: 50px ;"&gt;&lt;/span&gt;
 
@@ -1006,6 +1006,38 @@ fitted.Predictor.005 33.392870 1.731675  29.996342 33.392872  36.789656 33.39289
 
 ---
 
+# Model comparison: Bayesian p-value
+
+- We can use the posterior predictive distribution to compare to the observed one through a *p-value*
+
+- Let's go back to `asthma_model1` and `asthma_model2` as output of running the `inla` function and use `inla.pmarginal`
+
+.pull-left[
+
+```r
+&gt; # Model 1
+&gt; Bayesian_p1 &lt;- c()
+&gt; for(i in 1:500){
++ Bayesian_p1[i] &lt;- inla.pmarginal(y[i],asthma_model1$marginals.fitted.values[[i]])
++ }
+&gt; 
+&gt; #Model 2
+&gt; Bayesian_p2 &lt;- c()
+&gt; for(i in 1:500){
++ Bayesian_p2[i] &lt;- inla.pmarginal(y[i],asthma_model2$marginals.fitted.values[[i]])
++ }
+```
+]
+
+.pull-right[
+&lt;img src="./img/unnamed-chunk-13-1.png" style="display: block; margin: auto;" width="75%"&gt;
+]
+
+- Ideally we would expect a uniform distribution of the p-values which would tell us there is no pattern of over(under) estimation in the prediction
+
+- Here model 1 seems a bit better than model 2
+
+---
 # Model comparison: fit vs complexity
 
 
@@ -1056,13 +1088,13 @@ where `\(\theta\)` identifies the parameter of the likelihood
 
   - Complexity measured by estimate of the "effective number of parameters":
 
-  `$$p_D = \textsf{E}_{\theta\mid y}\left[D(\theta)\right] + D(\textsf{E}_{\theta\mid y}\left[\theta \right])$$`
+  `$$p_D = \overline{D} - D(\overline{\theta})$$`
 
 --
 
   - The DIC is then defined analogously to AIC as
 
-`$$\hbox{DIC} = D(\textsf{E}_{\theta\mid y}\left[\theta \right]) + 2p_D$$`
+`$$\hbox{DIC} = \overline{D} + p_D$$`
 
   - Models with smaller DIC are better supported by the data
 
@@ -1075,7 +1107,7 @@ where `\(\theta\)` identifies the parameter of the likelihood
 We run the model adding the `dic` (here for model 1, it is the same for model 2):
 
 ```r
-&gt; asthma_model1 &lt;- inla(asthma_formula1, data=data,family="gamma",control.predictor=list(link=1,compute=TRUE), 
+&gt; asthma_model1 &lt;- inla(asthma_formula1, data=data,family="poisson",E=E,control.predictor=list(link=1,compute=TRUE), 
 +                       control.compute=list(dic=TRUE))
 ```
 
@@ -1088,7 +1120,7 @@ And now check the value of the DIC
 ```
 
 ```
-[1] 3234.951
+[1] 3264.784
 ```
 
 ```r
@@ -1097,7 +1129,7 @@ And now check the value of the DIC
 ```
 
 ```
-[1] 5000.751
+[1] 4987.131
 ```
 The first model is without any doubt preferred as the DIC is (much!) smaller.
 
@@ -1107,7 +1139,7 @@ The first model is without any doubt preferred as the DIC is (much!) smaller.
 
 The DIC has been criticised over the years, specifically:
 
-1\. `\(p_D\)` is not invariant to reparameterization. For example, we would obtain a (slightly) different value if we parameterized in terms of `\(\sigma\)` or  `\(log\sigma\)`
+1\. `\(p_D\)` is not invariant to reparameterization. For example, we would obtain a (slightly) different value if we parameterized in terms of `\(\sigma\)` or  `\(\log\sigma\)`
 
 2\. It is not based on a proper predictive criterion
 
@@ -1155,7 +1187,7 @@ What is the alternative?
 We run the model adding the `waic` (here for model 1, it is the same for model 2):
 
 ```r
-&gt; asthma_model1 &lt;- inla(asthma_formula1, data=data,family="gamma",control.predictor=list(link=1,compute=TRUE), 
+&gt; asthma_model1 &lt;- inla(asthma_formula1, data=data,family="poisson",E=E,control.predictor=list(link=1,compute=TRUE), 
 +                       control.compute=list(waic=TRUE))
 ```
 
@@ -1168,7 +1200,7 @@ And now check the value of the DIC
 ```
 
 ```
-[1] 3136.417
+[1] 3169.651
 ```
 
 ```r
@@ -1177,7 +1209,7 @@ And now check the value of the DIC
 ```
 
 ```
-[1] 5022.164
+[1] 5004.256
 ```
 There is accordance between DIC and WAIC as the first model is still preferred as the WAIC  is smaller.
 

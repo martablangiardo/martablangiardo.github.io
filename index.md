@@ -58,3 +58,13 @@ Lunch
 Solutions of practical 3b are [here](Practical3b/Practical3b_Solutions.html)
 
 
+### Day 4 - Mon 6th Feb 2023
+
+- [Session 4.1](Session4.1): Introduction to hierarchical models, choice of prior and model checking (there will be a 10 minute break halfway through it)) 
+
+Lunch
+
+- [Practical 4](Practical4): Hierarchical models, regression and model checking in R-INLA
+
+Solutions of practical 4 are [here](Practical4/Practical4_Solutions.html)
+
