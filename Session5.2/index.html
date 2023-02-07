@@ -136,8 +136,7 @@ missing, and stating your modelling assumptions
 
 &lt;span style="display:block; margin-top: 10px ;"&gt;&lt;/span&gt;
 
-- Understand the disadvantages of complete case analysis and
-other ad hoc methods
+- Understand the disadvantages of complete case analysis
 
 &lt;span style="display:block; margin-top: 10px ;"&gt;&lt;/span&gt;
 
@@ -164,14 +163,19 @@ experimental research
 &lt;span style="display:block; margin-top: 10px ;"&gt;&lt;/span&gt;
 
 - For example, Wood, White, and Thompson (2004) reviewed 71 recently published BMJ, JAMA, Lancet and NEJM papers
+
   - 89% had partly missing outcome data
+  
   - In 37 trials with repeated outcome measures, 46% performed complete case analysis
+  
   - Only 21% reported sensitivity analysis
 
-&lt;span style="display:block; margin-top: 10px ;"&gt;&lt;/span&gt;
+&lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
 
 - Sterne, White, Carlin, Spratt, Royston, Kenward, Wood, and Carpenter (2009) reviewed articles using Multiple Imputation in BMJ, JAMA, Lancet and NEJM from 2002 to 2007
+
   - 59 articles found, with use doubling over 6 year period
+  
   - However, the reporting was almost always inadequate
 
 ---
@@ -234,9 +238,9 @@ This means that the missing values can be ignored and the analysis can be conduc
  
 --
 
-&lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
+&lt;span style="display:block; margin-top: 40px ;"&gt;&lt;/span&gt;
 
-3\. .red[Missing at random] (MNAR) occurs when the missing data depends on both the observed and missing data: 
+3\. .red[Missing non at random] (MNAR) occurs when the missing data depends on both the observed and missing data: 
 
 `$$\text{logit}(p_i) = \theta_0 + \bf{x}_i \mathbf{\theta}_1 + \lambda y_i$$`
 
@@ -407,7 +411,7 @@ name: model
 
 
 - We first predict weight as a function of age and sex. We specify:
-`$$wgt_i \sim \text{Normal}(\alpha+beta_1 sex_i + \beta_2 age_i, \sigma^2)$$`
+`$$wgt_i \sim \text{Normal}(\alpha+\beta_1 sex_i + \beta_2 age_i, \sigma^2)$$`
 - where `wgt` is missing we will have `NA` in the corresponding vector, e.g.
 
 ```r
@@ -429,31 +433,30 @@ name: model
 # Running the model in `R-INLA`
 
 
+```r
+&gt; library("INLA")
+&gt; wgt.inla &lt;- inla(wgt ~ age + sex, data = fdgs.sub,
++ control.predictor = list(compute = TRUE), control.compute=list(return.marginals.predictor=TRUE))
+&gt; wgt.inla$summary.fixed
 ```
 
-Call:
-   "inla(formula = wgt ~ age + sex, data = fdgs.sub, control.predictor = list(compute = TRUE))" 
-Time used:
-    Pre = 0.592, Running = 0.308, Post = 0.0892, Total = 0.988 
-Fixed effects:
-              mean    sd 0.025quant 0.5quant 0.975quant   mode kld
-(Intercept)  6.259 0.436      5.403    6.259      7.115  6.259   0
-age          3.331 0.034      3.265    3.331      3.397  3.331   0
-sexgirl     -2.379 0.446     -3.255   -2.379     -1.503 -2.379   0
-
-Model hyperparameters:
-                                        mean    sd 0.025quant 0.5quant 0.975quant mode
-Precision for the Gaussian observations 0.02 0.001      0.018     0.02      0.021 0.02
-
-Expected number of effective parameters(stdev): 3.00(0.00)
-Number of equivalent replicates : 341.01 
-
-Marginal log-Likelihood:  -3486.82 
-Posterior marginals for the linear predictor and
- the fitted values are computed
+```
+                 mean         sd 0.025quant  0.5quant 0.975quant      mode          kld
+(Intercept)  6.259187 0.43627989   5.403400  6.259187   7.114973  6.259188 1.409212e-12
+age          3.330942 0.03371347   3.264811  3.330942   3.397073  3.330942 2.344304e-12
+sexgirl     -2.378944 0.44640004  -3.254580 -2.378944  -1.503304 -2.378945 1.430725e-12
 ```
 
-- Note that we need to include `control.predictor=list(compute = TRUE)` so `INLA` can estimate the predictive distribution for the missing observations.
+```r
+&gt; wgt.inla$summary.hyperpar
+```
+
+```
+                                              mean           sd 0.025quant   0.5quant 0.975quant       mode
+Precision for the Gaussian observations 0.01972496 0.0008752915 0.01805436 0.01971032 0.02147894 0.01968097
+```
+
+- Note that we need to include `control.predictor=list(compute = TRUE)` so `INLA` can estimate the predictive distribution for the missing observations, while `control.compute=list(return.marginals.predictor=TRUE)` tells inla that we want to access the entire posterior distribution of the prediction (rather than only the summary)
 
 ---
 
@@ -462,75 +465,105 @@ Posterior marginals for the linear predictor and
 We now subset the children indexes with missing values so we can report their predictive distributions:
 
 
+```r
+&gt; wgt.na &lt;- which(is.na(fdgs.sub$wgt))
+&gt; rownames(fdgs.sub)[wgt.na]
+```
+
 ```
  [1] "275"  "1278" "1419" "2135" "2684" "2940" "3069" "3189" "3543" "4262" "5687" "6485" "7101" "7108" "7506" "8064" "8065" "8067" "8098" "8588"
 ```
 
+```r
+&gt; # Obtain the predictive distribution
+&gt; wgt.inla$summary.fitted.values[wgt.na, c("mean", "sd")][1:5,]
+```
+
 ```
                            mean        sd
-fitted.Predictor.0002 23.067926 0.3203762
-fitted.Predictor.0003 27.617340 0.3331862
-fitted.Predictor.0004 54.019924 0.3768773
-fitted.Predictor.0006 13.144500 0.3930787
-fitted.Predictor.0009  7.838159 0.3940498
-fitted.Predictor.0011 11.557686 0.4023548
-fitted.Predictor.0014 12.323734 0.3978228
-fitted.Predictor.0015  6.506694 0.4026595
-fitted.Predictor.0021 17.111536 0.3719146
-fitted.Predictor.0022 70.908188 0.4867834
+fitted.Predictor.0002 23.067927 0.3204041
+fitted.Predictor.0003 27.617341 0.3332160
+fitted.Predictor.0004 54.019923 0.3769133
+fitted.Predictor.0006 13.144501 0.3931169
+fitted.Predictor.0009  7.838159 0.3940881
 ```
+
+Remember that you can also access the marginal posterior distributions (rather than the summary) using `wgt.inla$marginals.fitted.values`
 ---
 
 # Imputing `hgt` using the same approach
 
-- Similarly, a model can be fit to explain weight based on age and sex and to compute the predictive distribution of the missing observations:
+- Similarly, a model can be fit to explain height based on age and sex and to compute the predictive distribution of the missing observations:
 
 
+```r
+&gt; hgt.inla &lt;- inla(hgt ~ age + sex, data = fdgs.sub,
++ control.predictor = list(compute = TRUE),
++ control.compute = list(return.marginals.predictor=TRUE))
+&gt; hgt.inla$summary.fixed
 ```
 
-Call:
-   c("inla(formula = hgt ~ age + sex, data = fdgs.sub, control.compute = list(config = TRUE), ", " control.predictor = list(compute = TRUE))") 
-Time used:
-    Pre = 0.321, Running = 0.334, Post = 0.154, Total = 0.809 
-Fixed effects:
-              mean    sd 0.025quant 0.5quant 0.975quant   mode kld
-(Intercept) 77.148 0.720     75.734   77.148     78.561 77.148   0
-age          6.023 0.055      5.914    6.023      6.131  6.023   0
-sexgirl     -4.716 0.730     -6.149   -4.716     -3.284 -4.716   0
+```
+                 mean         sd 0.025quant  0.5quant 0.975quant      mode          kld
+(Intercept) 77.148121 0.71996137  75.735870 77.148122  78.560365 77.148124 1.315960e-12
+age          6.022575 0.05540469   5.913895  6.022575   6.131254  6.022575 2.314710e-12
+sexgirl     -4.716077 0.73001342  -6.148035 -4.716079  -3.284104 -4.716084 1.218303e-12
+```
 
-Model hyperparameters:
-                                         mean   sd 0.025quant 0.5quant 0.975quant  mode
-Precision for the Gaussian observations 0.007 0.00      0.007    0.007      0.008 0.007
+```r
+&gt; hgt.inla$summary.hyperpar
+```
 
-Expected number of effective parameters(stdev): 3.00(0.00)
-Number of equivalent replicates : 340.06 
-
-Marginal log-Likelihood:  -3976.27 
-Posterior marginals for the linear predictor and
- the fitted values are computed
+```
+                                               mean           sd 0.025quant    0.5quant  0.975quant        mode
+Precision for the Gaussian observations 0.007400594 0.0003314709 0.00676327 0.007397839 0.008064696 0.007397394
 ```
 
 ---
 
 # Imputing `hgt` using the same approach
 
-- and similarly to what we did with `wgt` we can obtain the predictions using
+.pull-left[
+&lt;span style="display:block; margin-top: 24px ;"&gt;&lt;/span&gt;
+- We can obtain the predictions using
 
+
+
+```r
+&gt; hgt.na &lt;- which(is.na(fdgs.sub$hgt))
+&gt; hgt.inla$summary.fitted.values[hgt.na, c("mean", "sd")][1:10,]
+```
 
 ```
                            mean        sd
-fitted.Predictor.0001 122.24529 0.5354429
-fitted.Predictor.0005  83.24902 0.6831945
-fitted.Predictor.0007  74.64156 0.6785414
-fitted.Predictor.0008  82.80382 0.6857813
-fitted.Predictor.0010  88.26140 0.6012727
-fitted.Predictor.0012  96.55556 0.6135087
-fitted.Predictor.0013  86.31596 0.6657859
-fitted.Predictor.0016  81.84746 0.6913874
-fitted.Predictor.0017  77.75821 0.7160824
-fitted.Predictor.0018  81.59988 0.6371612
+fitted.Predictor.0001 122.24529 0.5354315
+fitted.Predictor.0005  83.24902 0.6831827
+fitted.Predictor.0007  74.64156 0.6785295
+fitted.Predictor.0008  82.80382 0.6857695
+fitted.Predictor.0010  88.26140 0.6012610
+fitted.Predictor.0012  96.55557 0.6134972
+fitted.Predictor.0013  86.31596 0.6657742
+fitted.Predictor.0016  81.84746 0.6913755
+fitted.Predictor.0017  77.75821 0.7160705
+fitted.Predictor.0018  81.59988 0.6371494
 ```
+]
+
+.pull-right[
+- We can plot the entire posterior distributions for each child with:
+
+```r
+&gt; # First child with missing value
+&gt; plot(hgt.inla$marginals.fitted.values[[hgt.na[1]]], type="l")
+```
+
+&lt;img src="./img/unnamed-chunk-11-1.png" style="display: block; margin: auto;" width="80%"&gt;
+]
+
 ---
+
+
+
 name: extending
 
 &lt;span style="display:block; margin-top: 250px ;"&gt;&lt;/span&gt;
@@ -567,7 +600,7 @@ with
 
 # Joint model of height and weight: prior
 
-- The vectors `\((\mathbf{\beta}_{1h}, \mathbf{\beta}_{1w})\)` and `\((\mathbf{\beta}_{2h}, \mathbf{\beta}_{2w})\)` are modeled using a multivariate Gaussian distribution with mean 0 and covariance matrix with `\(1/\tau_{hj}\)` and `\(1/\tau_{wj}\)` as variances and `\(\rho  / \sqrt{(\tau_{hj} \tau_{wj})}\)` as the covariance where `\(\rho_j\)` is the correlation parameter.
+- The vectors `\((\mathbf{\beta}_{1h}, \mathbf{\beta}_{1w})\)` and `\((\mathbf{\beta}_{2h}, \mathbf{\beta}_{2w})\)` are modeled using a multivariate Gaussian distribution with mean 0 and covariance matrix with `\(1/\tau_{hj}\)` and `\(1/\tau_{wj}\)` as variances and `\(\rho_j  / \sqrt{(\tau_{jh} \tau_{jw})}\)` as the covariance where `\(\rho_j\)` is the correlation parameter.
 
 - First, the bivariate response variable needs to be put in a two-column matrix given that the model will be made of two data distributions
 
@@ -631,8 +664,8 @@ The model is fit and summarized as seen below
 
 ```
         mean        sd 0.025quant  0.5quant 0.975quant      mode          kld
-I1 81.164886 1.2649717  78.634904 81.182144  83.605241 81.223190 5.981651e-05
-I2  8.420074 0.7260417   6.984118  8.423778   9.836821  8.433324 6.398880e-06
+I1 81.016834 1.1187456  78.824974 81.015596  83.216242 81.014056 5.459222e-10
+I2  8.391859 0.6534032   7.094048  8.396656   9.660892  8.404877 6.700648e-09
 ```
 
 ---
@@ -647,15 +680,15 @@ I2  8.420074 0.7260417   6.984118  8.423778   9.836821  8.433324 6.398880e-06
 ```
 
 ```
-                                                 mean           sd  0.025quant    0.5quant  0.975quant        mode
-Precision for the Gaussian observations    0.00744220 0.0003375615 0.006755871 0.007454596 0.008076937 0.007509341
-Precision for the Gaussian observations[2] 0.01975768 0.0009051798 0.017910916 0.019794657 0.021451062 0.019955467
-Precision for idx.sex (component 1)        0.40161864 0.2528078387 0.110398599 0.339444166 1.060544546 0.243881532
-Precision for idx.sex (component 2)        1.21415734 0.6723889716 0.382658272 1.062990094 2.935511127 0.813767261
-Rho1:2 for idx.sex                         0.76937461 0.1358915788 0.424048190 0.798977786 0.944363137 0.858776899
-Precision for idx.age (component 1)        0.12409181 0.0581448273 0.041365918 0.114484425 0.264431485 0.093585397
-Precision for idx.age (component 2)        0.37498182 0.1919860022 0.116769259 0.338415491 0.848323172 0.265652391
-Rho1:2 for idx.age                         0.95304049 0.0382801863 0.852029916 0.963259210 0.993755533 0.982233087
+                                                  mean           sd  0.025quant   0.5quant  0.975quant        mode
+Precision for the Gaussian observations    0.007337564 0.0004351792 0.006731568 0.00731645 0.008057808 0.007251096
+Precision for the Gaussian observations[2] 0.019735832 0.0011908765 0.018050540 0.01962622 0.022008854 0.019259956
+Precision for idx.sex (component 1)        0.479444359 0.2656799385 0.110371521 0.43197154 1.116284475 0.305331749
+Precision for idx.sex (component 2)        1.510806333 0.7345656354 0.466994457 1.38398023 3.289255210 1.110848996
+Rho1:2 for idx.sex                         0.850682971 0.0750803297 0.663412322 0.86527502 0.953101619 0.893537515
+Precision for idx.age (component 1)        0.224562551 0.0969687283 0.080319436 0.20975570 0.454733424 0.178464817
+Precision for idx.age (component 2)        0.608992589 0.4076230902 0.153968261 0.50568852 1.683601440 0.350223801
+Rho1:2 for idx.age                         0.782644550 0.1210974817 0.487197186 0.80549517 0.950876221 0.860443692
 ```
 
 - While the coefficients for `age` and `sex` are part of the random effects of the model:
@@ -668,8 +701,8 @@ Rho1:2 for idx.age                         0.95304049 0.0382801863 0.852029916 0
 
 ```
   ID      mean        sd 0.025quant  0.5quant 0.975quant      mode          kld
-1  1 -4.267494 0.7254319  -5.651833 -4.283208  -2.804532 -4.322619 7.875905e-05
-2  2 -2.235662 0.4096522  -3.032550 -2.238969  -1.423679 -2.247918 1.263944e-05
+1  1 -4.194114 0.6133787  -5.399120 -4.193921  -2.990632 -4.194448 7.548061e-10
+2  2 -2.202628 0.3518744  -2.882278 -2.206638  -1.497925 -2.212816 1.713976e-08
 ```
 ]
 
@@ -683,61 +716,49 @@ Rho1:2 for idx.age                         0.95304049 0.0382801863 0.852029916 0
 
 ```
   ID     mean         sd 0.025quant 0.5quant 0.975quant     mode          kld
-1  1 6.022923 0.05503646   5.914861 6.022919   6.130908 6.022916 9.852672e-08
-2  2 3.330778 0.03355411   3.264889 3.330777   3.396609 3.330777 1.539765e-07
+1  1 6.027020 0.05568376   5.917811 6.027021   6.136224 6.027022 4.754975e-11
+2  2 3.328184 0.03383798   3.261822 3.328183   3.394549 3.328184 4.227513e-11
 ```
 ]
 ---
 
 # Estimates of missing values
 
-- Finally we can access the predicted values for the children with missing data as follows:
+- Finally to access the predicted values for the children with missing data we need to remember that we now have the response `y` stacked (first height, then weight)
 
-.panelset[
-.panel[.panel-name[Height]
+- As height is the first variable we can use `hgt.na` to get to the indexes of the children with missing data
+
+- For weight we need to use `wgt.na` and add `n` to each index, as this is the total number of observations, so the data for weight will start on the index 1044
+
+
+```r
+&gt; joint.wgt.na = wgt.na+n
+```
+
 
 ```r
 &gt; #Height
 &gt; fdgs.joint$summary.fitted.values[hgt.na, c("mean", "sd")][1:10,]
+&gt; #Weight
+&gt; fdgs.joint$summary.fitted.values[joint.wgt.na, c("mean", "sd")][1:10,]
 ```
+---
 
-```
-                           mean        sd
-fitted.Predictor.0001 121.99718 0.5320206
-fitted.Predictor.0005  82.99864 0.6783616
-fitted.Predictor.0007  74.83954 0.6747676
-fitted.Predictor.0008  82.55342 0.6809285
-fitted.Predictor.0010  88.46017 0.5979600
-fitted.Predictor.0012  96.30597 0.6092518
-fitted.Predictor.0013  86.06576 0.6610920
-fitted.Predictor.0016  81.59701 0.6864905
-fitted.Predictor.0017  77.50752 0.7109940
-fitted.Predictor.0018  81.79826 0.6336382
-```
-]
-.panel[.panel-name[Weight]
+# Comparing the results of the joint and separate models
 
-```r
-&gt; #Height
-&gt; fdgs.joint$summary.fitted.values[wgt.na, c("mean", "sd")][1:10,]
-```
+.pull-left[
 
-```
-                           mean        sd
-fitted.Predictor.0002 107.32457 0.5228136
-fitted.Predictor.0003 115.51666 0.5430331
-fitted.Predictor.0004 163.29118 0.6108598
-fitted.Predictor.0006  89.34724 0.6434531
-fitted.Predictor.0009  79.78649 0.6451542
-fitted.Predictor.0011  86.47801 0.6588265
-fitted.Predictor.0014  87.86315 0.6513185
-fitted.Predictor.0015  77.37898 0.6593448
-fitted.Predictor.0021  96.52034 0.6082740
-fitted.Predictor.0022 193.79404 0.7881245
-```
-]
+.red[Weight]
+
+&lt;img src="./img/unnamed-chunk-24-1.png" &gt;
 ]
 
+.pull-right[
+
+.red[Height]
+
+&lt;img src="./img/unnamed-chunk-25-1.png" &gt;
+]
 ---
 
 # References
