@@ -1,0 +1,48 @@
+This is BibTeX, Version 0.99d (TeX Live 2015/W32TeX)
+Capacity: max_strings=35307, hash_size=35307, hash_prime=30011
+The top-level auxiliary file: SeminarLSHTM.aux
+The style file: asa.bst
+Database file #1: refs.bib
+Warning--empty publisher in who2016
+You've used 15 entries,
+            2777 wiz_defined-function locations,
+            721 strings with 7764 characters,
+and the built_in function-call counts, 7556 in all, are:
+= -- 630
+> -- 484
+< -- 5
++ -- 178
+- -- 162
+* -- 756
+:= -- 1378
+add.period$ -- 24
+call.type$ -- 15
+change.case$ -- 114
+chr.to.int$ -- 14
+cite$ -- 16
+duplicate$ -- 297
+empty$ -- 501
+format.name$ -- 201
+if$ -- 1431
+int.to.chr$ -- 2
+int.to.str$ -- 1
+missing$ -- 21
+newline$ -- 50
+num.names$ -- 60
+pop$ -- 133
+preamble$ -- 1
+purify$ -- 114
+quote$ -- 0
+skip$ -- 189
+stack$ -- 0
+substring$ -- 374
+swap$ -- 64
+text.length$ -- 0
+text.prefix$ -- 0
+top$ -- 0
+type$ -- 117
+warning$ -- 1
+while$ -- 58
+width$ -- 0
+write$ -- 165
+(There was 1 warning)

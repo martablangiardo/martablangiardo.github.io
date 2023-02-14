@@ -87,10 +87,10 @@ class: title-slide
 
 ###     
 
-### Spatial and Spatio-Temporal Bayesian Models with `R-INLA`, Imperial College 
+### Bayesian modelling for Spatial and Spatio-temporal data, Imperial College 
 
 &lt;!-- Can also separate the various components of the extra argument 'params', eg as in 
-### Spatial and Spatio-Temporal Bayesian Models with `R-INLA`, Imperial College, , MSc in Epidemiology
+### Bayesian modelling for Spatial and Spatio-temporal data, Imperial College, , MSc in Epidemiology
 --&gt;
 
 
@@ -107,7 +107,7 @@ layout: true
 MSc in Epidemiology 
 ]
 .alignright[
-Spatial and Spatio-Temporal Bayesian Models with `R-INLA`, NA 
+Bayesian modelling for Spatial and Spatio-temporal data, NA 
 ]
 ] 
 
@@ -378,7 +378,7 @@ name: example
 &gt; # Subsect 1, observations with NA's
 &gt; subset1 &lt;- which(is.na(fdgs$wgt) | is.na(fdgs$hgt))
 &gt; 
-&gt; #Subset 2, random sample of 500 individuals
+&gt; #Subset 2, random sample of 1000 individuals
 &gt; set.seed(1)
 &gt; subset2 &lt;- sample((1:nrow(fdgs))[-subset1], 1000)
 &gt; # Subset 1 + subset 2
@@ -505,9 +505,9 @@ Remember that you can also access the marginal posterior distributions (rather t
 
 ```
                  mean         sd 0.025quant  0.5quant 0.975quant      mode          kld
-(Intercept) 77.148121 0.71996137  75.735870 77.148122  78.560365 77.148124 1.315960e-12
-age          6.022575 0.05540469   5.913895  6.022575   6.131254  6.022575 2.314710e-12
-sexgirl     -4.716077 0.73001342  -6.148035 -4.716079  -3.284104 -4.716084 1.218303e-12
+(Intercept) 77.148123 0.71913452  75.737499 77.148124  78.558741 77.148127 4.396621e-13
+age          6.022575 0.05534105   5.914020  6.022575   6.131129  6.022575 5.800089e-13
+sexgirl     -4.716082 0.72917544  -6.146392 -4.716085  -3.285759 -4.716090 1.414878e-12
 ```
 
 ```r
@@ -515,8 +515,8 @@ sexgirl     -4.716077 0.73001342  -6.148035 -4.716079  -3.284104 -4.716084 1.218
 ```
 
 ```
-                                               mean           sd 0.025quant    0.5quant  0.975quant        mode
-Precision for the Gaussian observations 0.007400594 0.0003314709 0.00676327 0.007397839 0.008064696 0.007397394
+                                               mean           sd  0.025quant    0.5quant  0.975quant        mode
+Precision for the Gaussian observations 0.007389007 0.0003329018 0.006773911 0.007380184 0.008053726 0.007377926
 ```
 
 ---
@@ -536,16 +536,16 @@ Precision for the Gaussian observations 0.007400594 0.0003314709 0.00676327 0.00
 
 ```
                            mean        sd
-fitted.Predictor.0001 122.24529 0.5354315
-fitted.Predictor.0005  83.24902 0.6831827
-fitted.Predictor.0007  74.64156 0.6785295
-fitted.Predictor.0008  82.80382 0.6857695
-fitted.Predictor.0010  88.26140 0.6012610
-fitted.Predictor.0012  96.55557 0.6134972
-fitted.Predictor.0013  86.31596 0.6657742
-fitted.Predictor.0016  81.84746 0.6913755
-fitted.Predictor.0017  77.75821 0.7160705
-fitted.Predictor.0018  81.59988 0.6371494
+fitted.Predictor.0001 122.24529 0.5349417
+fitted.Predictor.0005  83.24902 0.6825577
+fitted.Predictor.0007  74.64156 0.6779088
+fitted.Predictor.0008  82.80382 0.6851421
+fitted.Predictor.0010  88.26140 0.6007111
+fitted.Predictor.0012  96.55557 0.6129360
+fitted.Predictor.0013  86.31596 0.6651651
+fitted.Predictor.0016  81.84746 0.6907431
+fitted.Predictor.0017  77.75821 0.7154154
+fitted.Predictor.0018  81.59988 0.6365666
 ```
 ]
 
@@ -663,9 +663,9 @@ The model is fit and summarized as seen below
 ```
 
 ```
-        mean        sd 0.025quant  0.5quant 0.975quant      mode          kld
-I1 81.016834 1.1187456  78.824974 81.015596  83.216242 81.014056 5.459222e-10
-I2  8.391859 0.6534032   7.094048  8.396656   9.660892  8.404877 6.700648e-09
+        mean        sd 0.025quant  0.5quant 0.975quant     mode          kld
+I1 80.267026 1.3779108   77.58489 80.304897  82.853943 80.53616 2.302477e-07
+I2  8.526882 0.6809558    7.22570  8.512776   9.907475  8.48471 3.874721e-08
 ```
 
 ---
@@ -680,15 +680,15 @@ I2  8.391859 0.6534032   7.094048  8.396656   9.660892  8.404877 6.700648e-09
 ```
 
 ```
-                                                  mean           sd  0.025quant   0.5quant  0.975quant        mode
-Precision for the Gaussian observations    0.007337564 0.0004351792 0.006731568 0.00731645 0.008057808 0.007251096
-Precision for the Gaussian observations[2] 0.019735832 0.0011908765 0.018050540 0.01962622 0.022008854 0.019259956
-Precision for idx.sex (component 1)        0.479444359 0.2656799385 0.110371521 0.43197154 1.116284475 0.305331749
-Precision for idx.sex (component 2)        1.510806333 0.7345656354 0.466994457 1.38398023 3.289255210 1.110848996
-Rho1:2 for idx.sex                         0.850682971 0.0750803297 0.663412322 0.86527502 0.953101619 0.893537515
-Precision for idx.age (component 1)        0.224562551 0.0969687283 0.080319436 0.20975570 0.454733424 0.178464817
-Precision for idx.age (component 2)        0.608992589 0.4076230902 0.153968261 0.50568852 1.683601440 0.350223801
-Rho1:2 for idx.age                         0.782644550 0.1210974817 0.487197186 0.80549517 0.950876221 0.860443692
+                                                  mean           sd  0.025quant    0.5quant  0.975quant        mode
+Precision for the Gaussian observations    0.007337596 0.0004172818 0.006774133 0.007318861 0.008004608 0.007259338
+Precision for the Gaussian observations[2] 0.018541823 0.0019150306 0.014335014 0.018792025 0.021462223 0.019982684
+Precision for idx.sex (component 1)        1.481392877 0.8033213872 0.355245392 1.308491877 3.460300760 0.973468266
+Precision for idx.sex (component 2)        1.129493833 0.3566236738 0.553395272 1.083212559 1.977956602 1.012288592
+Rho1:2 for idx.sex                         0.908061163 0.0372681826 0.823147281 0.913799153 0.968141536 0.922411664
+Precision for idx.age (component 1)        0.135955387 0.0714230344 0.037193437 0.120675222 0.317581958 0.093952898
+Precision for idx.age (component 2)        0.473323864 0.2152114723 0.142282194 0.436273862 0.973036353 0.363627573
+Rho1:2 for idx.age                         0.850630195 0.0876812717 0.615764156 0.870459082 0.964598500 0.907124461
 ```
 
 - While the coefficients for `age` and `sex` are part of the random effects of the model:
@@ -701,8 +701,8 @@ Rho1:2 for idx.age                         0.782644550 0.1210974817 0.487197186 
 
 ```
   ID      mean        sd 0.025quant  0.5quant 0.975quant      mode          kld
-1  1 -4.194114 0.6133787  -5.399120 -4.193921  -2.990632 -4.194448 7.548061e-10
-2  2 -2.202628 0.3518744  -2.882278 -2.206638  -1.497925 -2.212816 1.713976e-08
+1  1 -3.696337 0.8079609  -5.173290 -3.739462  -2.150009 -4.010174 6.196229e-07
+2  2 -2.298248 0.3806492  -3.087038 -2.285195  -1.582653 -2.259685 9.652494e-08
 ```
 ]
 
@@ -716,8 +716,8 @@ Rho1:2 for idx.age                         0.782644550 0.1210974817 0.487197186 
 
 ```
   ID     mean         sd 0.025quant 0.5quant 0.975quant     mode          kld
-1  1 6.027020 0.05568376   5.917811 6.027021   6.136224 6.027022 4.754975e-11
-2  2 3.328184 0.03383798   3.261822 3.328183   3.394549 3.328184 4.227513e-11
+1  1 6.025753 0.05597438   5.915993 6.025741   6.135574 6.025718 1.360697e-11
+2  2 3.329477 0.03258704   3.265565 3.329477   3.393393 3.329475 1.212766e-11
 ```
 ]
 ---

@@ -1,0 +1,93 @@
+\begin{thebibliography}{15}
+\newcommand{\enquote}[1]{``#1''}
+\expandafter\ifx\csname natexlab\endcsname\relax\def\natexlab#1{#1}\fi
+
+\bibitem[{Atkinson et~al.(2016)Atkinson, Analitis, Samoli, Fuller, Green,
+  Mudway, and Anderson}]{Atkinson:2016}
+Atkinson, R., Analitis, A., Samoli, E., Fuller, G., Green, D., Mudway, I., and
+  Anderson, H. e.~a. (2016), \enquote{Short-term exposure to traffic-related
+  air pollution and daily mortality in London, UK,} \textit{Journal of Exposure
+  Science and Environmental Epidemiology}, 26, 125--132.
+
+\bibitem[{Bobb et~al.(2015)Bobb, Valeri, Henn, Christiani, Wright, Mazumdar,
+  Godleski, and Coull}]{Bobb:2015}
+Bobb, J., Valeri, L., Henn, B., Christiani, D., Wright, R., Mazumdar, M.,
+  Godleski, J., and Coull, B. (2015), \enquote{Bayesian kernel machine
+  regression for estimating the health effects of multi-pollutant mixtures,}
+  \textit{Biostatistics}, 16, 493--508.
+
+\bibitem[{Coull and Park(2015)}]{cull2015}
+Coull, B.~A. and Park, E.~S. (2015), \textit{Development of Statistical Methods
+  for Multipollutant Research}, Boston, MA: Health Effects Institute,
+  {R}esearch Report 183 - I \& II.
+
+\bibitem[{{IARC}(2013)}]{iarc2013}
+{IARC} (2013), \textit{IARC monographs on the evaluation of carcinogenic risks
+  to humans. Volume 109. Outdoor air pollution}, Lyon, France: International
+  Agency for Research on Cancer.
+
+\bibitem[{Jackson et~al.(2009)Jackson, Best, and
+  Richardson}]{jackson_bayesian_2009}
+Jackson, C.~H., Best, N.~G., and Richardson, S. (2009), \enquote{Bayesian
+  graphical models for regression on multiple data sets with different
+  variables,} \textit{Biostatistics}, 10, 335--51.
+
+\bibitem[{Li et~al.(2012)Li, Best, Hansell, Ahmed, and Richardson}]{kxs005}
+Li, G., Best, N., Hansell, A., Ahmed, I., and Richardson, S. (2012),
+  \enquote{BaySTDetect: detecting unusual temporal patterns in small area data
+  via Bayesian model choice,} \textit{Biostatistics}, 13, 695--710.
+
+\bibitem[{Marshall et~al.(2004)Marshall, Bottle, and Aylin}]{Marshall:2004}
+Marshall, C.and~Best, N., Bottle, A., and Aylin, P. (2004),
+  \enquote{Statistical Issues in the Prospective Monitoring of Health Outcomes
+  across Multiple Units,} \textit{JRSSA}, 167, 541--559.
+
+\bibitem[{McCandless et~al.(2012)McCandless, Richardson, and
+  Best}]{Mccandless2012}
+McCandless, L.~C., Richardson, S., and Best, N. (2012), \enquote{Adjustment for
+  missing confounders using external validation data and propensity scores,}
+  \textit{Journal of the American Statistical Association}, 4, 40--51.
+
+\bibitem[{Molitor et~al.(2016)Molitor, Coker, Jerrett, Ritz, and
+  Li}]{molitor2016}
+Molitor, J., Coker, E., Jerrett, M., Ritz, B., and Li, A. (2016),
+  \textit{Modeling of Multipollutant Profiles and Spatially Varying Health
+  Effects with Applications to Indicators of Adverse Birth Outcomes}, Boston,
+  MA: Health Effects Institute, {R}esearch Report 183 - III.
+
+\bibitem[{Molitor et~al.(2009)Molitor, Best, Jackson, and
+  Richardson}]{molitor_using_2009}
+Molitor, N.-T., Best, N., Jackson, C., and Richardson, S. (2009),
+  \enquote{Using {Bayesian} graphical models to model biases in observational
+  studies and to combine multiple sources of data: application to low birth
+  weight and water disinfection by-products,} \textit{Journal of the Royal
+  Statistical Society: Series A (Statistics in Society)}, 172, 615--637.
+
+\bibitem[{Pirani et~al.(2015)Pirani, Best, Blangiardo, Liverani, Atkinson, and
+  Fuller}]{PIRANI201556}
+Pirani, M., Best, N., Blangiardo, M., Liverani, S., Atkinson, R.~W., and
+  Fuller, G.~W. (2015), \enquote{Analysing the health effects of simultaneous
+  exposure to physical and chemical properties of airborne particles,}
+  \textit{Environment International}, 79, 56 -- 64.
+
+\bibitem[{{WHO}(2016)}]{who2016}
+{WHO} (2016), \textit{Ambient air pollution: A global assessment of exposure
+  and burden of disease}, Geneva, Switzerland.
+
+\bibitem[{{WHO/Europe}(2006{\natexlab{a}})}]{WHOsurv}
+{WHO/Europe} (2006{\natexlab{a}}), \textit{Communicable disease surveillance
+  and response systems}, WHO.
+
+\bibitem[{{WHO/Europe}(2006{\natexlab{b}})}]{whoeuro2006}
+--- (2006{\natexlab{b}}), \textit{Health Risks of Particulate Matter from
+  Long-range Transboundary Air Pollution}, Copenhagen, Denmark: WHO Regional
+  Office for Europe.
+
+\bibitem[{Williams et~al.(2014)Williams, Atkinson, Anderson, and
+  Kelly}]{Williams:2014}
+Williams, M., Atkinson, R., Anderson, R., and Kelly, F. (2014),
+  \enquote{Associations between daily mortality in London and combined oxidant
+  capacity, ozone and nitrogen dioxide,} \textit{Air Quality, Atmosphere and
+  Health}, 7, 407--414.
+
+\end{thebibliography}

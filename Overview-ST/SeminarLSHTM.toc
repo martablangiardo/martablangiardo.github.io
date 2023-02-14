@@ -1,0 +1,11 @@
+\beamer@endinputifotherversion {3.36pt}
+\beamer@sectionintoc {1}{Me}{2}{0}{1}
+\beamer@sectionintoc {2}{What is environmental epidemiology?}{3}{0}{2}
+\beamer@sectionintoc {3}{Modelling framework for small area data}{11}{0}{3}
+\beamer@sectionintoc {4}{Disease surveillance}{20}{0}{4}
+\beamer@sectionintoc {5}{Risk assessment}{30}{0}{5}
+\beamer@subsectionintoc {5}{1}{Residual confounding}{34}{0}{5}
+\beamer@sectionintoc {6}{External information to deal with residual confounding}{37}{0}{6}
+\beamer@subsectionintoc {6}{1}{Correlated Exposures}{61}{0}{6}
+\beamer@sectionintoc {7}{Conclusions \& Future directions}{72}{0}{7}
+\beamer@sectionintoc {8}{References}{74}{0}{8}

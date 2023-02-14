@@ -85,10 +85,10 @@ class: title-slide
 
 ###     
 
-### Spatial and Spatio-Temporal Bayesian Models with `R-INLA`, Imperial College 
+### Bayesian modelling for Spatial and Spatio-temporal data, Imperial College 
 
 &lt;!-- Can also separate the various components of the extra argument 'params', eg as in 
-### Spatial and Spatio-Temporal Bayesian Models with `R-INLA`, Imperial College, , MSc in Epidemiology
+### Bayesian modelling for Spatial and Spatio-temporal data, Imperial College, , MSc in Epidemiology
 --&gt;
 
 
@@ -105,7 +105,7 @@ layout: true
 MSc in Epidemiology 
 ]
 .alignright[
-Spatial and Spatio-Temporal Bayesian Models with `R-INLA`, NA 
+Bayesian modelling for Spatial and Spatio-temporal data, NA 
 ]
 ] 
 
@@ -341,7 +341,9 @@ name: example
 - The models we will consider are:
 &lt;span style="display:block; margin-top: 10px ;"&gt;&lt;/span&gt;
   - a non-hierarchical model (standard linear regression) (LM)
+  &lt;span style="display:block; margin-top: 10px ;"&gt;&lt;/span&gt;
   - a hierarchical model with random intercepts (LMM)
+  &lt;span style="display:block; margin-top: 10px ;"&gt;&lt;/span&gt;
   - a hierarchical model with random intercepts and random slopes (LMM2)
 
 ---
@@ -579,12 +581,12 @@ y_{it} &amp; \sim  \mbox{Normal}(\mu_{it},\sigma^2) \\
 ```
 
 ```
-   ID          mean          sd   0.025quant      0.5quant  0.975quant          mode          kld
-1 308  0.0202626344 0.002468318  0.015404885  0.0202640016 0.025107546  0.0202669017 1.423632e-13
-2 309 -0.0002377739 0.002572373 -0.005251515 -0.0002505348 0.004841343 -0.0002767014 4.747123e-13
-3 310  0.0033595434 0.002578983 -0.001667998  0.0033471788 0.008450352  0.0033218474 5.995693e-13
-4 330  0.0045935386 0.002512368 -0.000380402  0.0046067329 0.009491057  0.0046344311 7.386043e-13
-5 331  0.0065542981 0.002500534  0.001603901  0.0065671570 0.011430067  0.0065941373 7.456124e-13
+   ID          mean          sd    0.025quant      0.5quant  0.975quant          mode          kld
+1 308  0.0202608371 0.002467960  0.0154097229  0.0202622004 0.025104148  0.0202648576 1.135176e-09
+2 309 -0.0002378002 0.002571747 -0.0052462856 -0.0002505699 0.004842109 -0.0002767895 2.283893e-09
+3 310  0.0033592411 0.002578380 -0.0016630323  0.0033468714 0.008450743  0.0033214912 2.147903e-09
+4 330  0.0045927363 0.002511728 -0.0003738481  0.0046060478 0.009485300  0.0046336326 2.680662e-09
+5 331  0.0065533556 0.002499922  0.0016102701  0.0065663167 0.011424364  0.0065931589 2.665975e-09
 ```
 
 ---
