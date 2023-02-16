@@ -72,7 +72,7 @@ Lunch
 
 Solutions of practical 4 are [here](Practical4/Practical4_Solutions.html)
 
-### Day 5 - Mon 13th Fe 2023
+### Day 5 - Mon 13th Feb 2023
 
 - [Session 5.1](Session5.1): Hierarchical models for longitudinal data
 
@@ -88,9 +88,9 @@ Solutions of practical 5 are [here](Practical5/Practical5_Solutions.html)
 
 - Independent paper reading: "Benefit of woodland and other natural environments for adolescents’ cognition and mental health" [link here](https://www.nature.com/articles/s41893-021-00751-1) 
 
-### Day 6 - Mon 20th Fe 2023
+### Day 6 - Mon 20th Feb 2023
 
-- Group Discussion on the paper: "Benefit of woodland and other natural environments for adolescents’ cognition and mental health" [link here](https://www.nature.com/articles/s41893-021-00751-1) Hierarchical models for longitudinal data
+- Group Discussion on the paper: "Benefit of woodland and other natural environments for adolescents’ cognition and mental health" [link here](https://www.nature.com/articles/s41893-021-00751-1) 
 
 Break
 
