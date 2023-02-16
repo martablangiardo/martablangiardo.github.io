@@ -1,0 +1,759 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>Session 6: Introduction to geospatial data</title>
+    <meta charset="utf-8" />
+    <script src="libs/header-attrs/header-attrs.js"></script>
+    <link href="libs/panelset/panelset.css" rel="stylesheet" />
+    <script src="libs/panelset/panelset.js"></script>
+    <!-- (Re)Defines a bunch of LaTeX commands that can then be used directly in the .Rmd file as '\command{...}' -->
+    <script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+      TeX: {
+        /* This enables color macros */
+        extensions: ["color.js"],
+        Macros: {
+          /* Probability & mathematical symbols */
+          Pr: "{\\style{font-family:inherit; font-size: 110%;}{\\text{Pr}}}",
+          exp: "{\\style{font-family:inherit; font-size: 105%;}{\\text{exp}}}",
+          log: "{\\style{font-family:inherit; font-size: 105%;}{\\text{log}}}",
+          ln: "{\\style{font-family:inherit; font-size: 105%;}{\\text{ln}}}",
+          logit: "{\\style{font-family:inherit; font-size: 100%;}{\\text{logit}}}",
+          HR: "{\\style{font-family:inherit; font-size: 105%;}{\\text{HR}}}",
+          OR: "{\\style{font-family:inherit; font-size: 105%;}{\\text{OR}}}",
+          E: "{\\style{font-family:inherit; font-size: 105%;}{\\text{E}}}",
+          Var: "{\\style{font-family:inherit; font-size: 105%;}{\\text{Var}}}",
+          Cov: "{\\style{font-family:inherit; font-size: 105%;}{\\text{Cov}}}",
+          Corr: "{\\style{font-family:inherit; font-size: 105%;}{\\text{Corr}}}",
+          DIC: "{\\style{font-family:inherit; font-size: 105%;}{\\text{DIC}}}",
+          se: "{\\style{font-family:inherit; font-size: 100%;}{\\text{se}}}",
+          sd: "{\\style{font-family:inherit; font-size: 100%;}{\\text{sd}}}",
+          kld: "{\\style{font-family:inherit; font-size: 100%;}{\\text{kld}}}",
+          /* Distributions */
+          dnorm: "{\\style{font-family:inherit;}{\\text{Normal}}}",
+          dt: "{\\style{font-family:inherit;}{\\text{t}}}",
+          ddirch: "{\\style{font-family:inherit;}{\\text{Dirichlet}}}",
+          dmulti: "{\\style{font-family:inherit;}{\\text{Multinomial}}}",
+          dbeta: "{\\style{font-family:inherit;}{\\text{Beta}}}",
+          dgamma: "{\\style{font-family:inherit;}{\\text{Gamma}}}",
+          dbern: "{\\style{font-family:inherit;}{\\text{Bernoulli}}}",
+          dbin: "{\\style{font-family:inherit;}{\\text{Binomial}}}",
+          dpois: "{\\style{font-family:inherit;}{\\text{Poisson}}}",
+          dweib: "{\\style{font-family:inherit;}{\\text{Weibull}}}",
+          dexp: "{\\style{font-family:inherit;}{\\text{Exponential}}}",
+          dlnorm: "{\\style{font-family:inherit;}{\\text{logNormal}}}",
+          dunif: "{\\style{font-family:inherit;}{\\text{Uniform}}}",
+          /* LaTeX formatting */
+          bm: ["{\\boldsymbol #1}",1],
+          /* These create macros to typeset numbers in maths with the basic font */
+          0: "{\\style{font-family:inherit; font-size: 105%;}{\\text{0}}}",
+          1: "{\\style{font-family:inherit; font-size: 105%;}{\\text{1}}}",
+          2: "{\\style{font-family:inherit; font-size: 105%;}{\\text{2}}}",
+          3: "{\\style{font-family:inherit; font-size: 105%;}{\\text{3}}}",
+          4: "{\\style{font-family:inherit; font-size: 105%;}{\\text{4}}}",
+          5: "{\\style{font-family:inherit; font-size: 105%;}{\\text{5}}}",
+          6: "{\\style{font-family:inherit; font-size: 105%;}{\\text{6}}}",
+          7: "{\\style{font-family:inherit; font-size: 105%;}{\\text{7}}}",
+          8: "{\\style{font-family:inherit; font-size: 105%;}{\\text{8}}}",
+          9: "{\\style{font-family:inherit; font-size: 105%;}{\\text{9}}}",
+          /* Health economics quantities */
+          icer: "{\\style{font-family:inherit; font-size: 100%;}{\\text{ICER}}}",
+          nb: "{\\style{font-family:inherit; font-size: 100%;}{\\text{NB}}}",
+          ol: "{\\style{font-family:inherit; font-size: 100%;}{\\text{OL}}}",
+          ceac: "{\\style{font-family:inherit; font-size: 100%;}{\\text{CEAC}}}",
+          evpi: "{\\style{font-family:inherit; font-size: 100%;}{\\text{EVPI}}}",
+          evppi: "{\\style{font-family:inherit; font-size: 100%;}{\\text{EVPPI}}}",
+          evsi: "{\\style{font-family:inherit; font-size: 100%;}{\\text{EVSI}}}"
+        }
+      }
+    });
+    </script>
+    <link rel="stylesheet" href="assets/beamer.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+
+
+
+
+
+
+class: title-slide
+
+# Session 6: Introduction to geospatial data&lt;span style="display:block; margin-top: 10px ;"&gt;&lt;/span&gt; 
+
+## 
+
+###     
+
+### Bayesian modelling for Spatial and Spatio-temporal data, Imperial College London 
+
+&lt;!-- Can also separate the various components of the extra argument 'params', eg as in 
+### Bayesian modelling for Spatial and Spatio-temporal data, Imperial College London, 
+--&gt;
+
+
+
+---
+
+layout: true  
+
+.my-footer[ 
+.alignleft[ 
+&amp;nbsp; &amp;copy; Marta Blangiardo | Monica Pirani
+]
+.aligncenter[
+ 
+]
+.alignright[
+Bayesian modelling for Spatial and Spatio-temporal data, NA 
+]
+] 
+
+
+&lt;style&gt;
+pre {
+  overflow-x: auto;
+}
+pre code {
+  word-wrap: normal;
+  white-space: pre;
+}
+&lt;/style&gt;
+
+---
+# Learning objectives
+
+After this lecture you should be able to 
+&lt;span style="display:block; margin-top: 40px ;"&gt;&lt;/span&gt;
+
+- Describe the different types of spatial data, and how they are represented in R 
+
+&lt;span style="display:block; margin-top: 40px ;"&gt;&lt;/span&gt;
+
+- Describe Coordinate Reference Systems (Geographical and Projected CRS)
+
+&lt;span style="display:block; margin-top: 40px ;"&gt;&lt;/span&gt;
+
+The topics treated in this lecture are presented in:
+
+
+- Chapter 2 of the book **Geocomputation with R** https://geocompr.robinlovelace.net/index.html
+
+
+- Chapter 2  of the book **Geospatial Health Data: Modeling and Visualization with R-INLA and Shiny**  https://www.paulamoraga.com/book-geospatial/index.html
+
+
+---
+
+# Outline 
+
+&lt;span style="display:block; margin-top: 30px ;"&gt;&lt;/span&gt;
+
+1\. [The different types of spatial data](#spatialData)
+
+&lt;span style="display:block; margin-top: 30px ;"&gt;&lt;/span&gt;
+
+2\. [Spatial data in R](#SpatialR)
+
+&lt;span style="display:block; margin-top: 30px ;"&gt;&lt;/span&gt;
+
+3\. [Coordinate Reference Systems ](#CRS)
+
+
+---
+
+name: spatialData
+  
+&lt;span style="display:block; margin-top: 250px ;"&gt;&lt;/span&gt;
+
+.myblue[.center[.huge[
+**What are the different types of spatial data?**]]]
+
+---
+
+
+# Terminology
+
+- The data are seen as being a realization of a stochastic process, that is, of a set of random numbers each of which is associated with a spatial location.
+  - A spatial process in `\(d\)` dimensions is denoted as:
+
+`$$\{Z(\bm{s}): \bm{s} \in \mathcal{D} \subset \mathbb{R}^d \}$$` 
+
+where
+- `\(Z\)` is the attribute we observe (e.g. temperature, number of sudden infant deaths etc.)
+&lt;span style="display:block; margin-top: 10px ;"&gt;&lt;/span&gt;
+- `\(\bm{s}\)` is the location where `\(Z\)` is observed (e.g. coordinates such as latitude and longitude)
+&lt;span style="display:block; margin-top: 10px ;"&gt;&lt;/span&gt;
+- `\(\mathcal{D}\)` is the domain, and it is called the **index set** = possible locations
+
+&lt;span style="display:block; margin-top: 70px ;"&gt;&lt;/span&gt;
+- Symbols are as follows: `\(\{\}\)` a set (a collection of elements); `\(\in\)` element of or belongs to; `\(\subset\)` subset of; `\(\mathbb{R}\)` real numbers set
+
+---
+
+# Type of spatial data
+
+Cressie (1993) distinguishes three types of spatial data, based on the nature of the spatial domain `\(\mathcal{D}\)`:
+
+&lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
+
+- .red[Areal data (also known as lattice data)]: `\(\mathcal{D}\)` is fixed (of regular or irregular shape) and partitioned into a finite number of areal units (e.g. census tract, pixels) with well-defined boundaries. 
+
+&lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
+
+- .red[Geostatistical (or point-referenced) data]: `\(\mathcal{D}\)` is a continuous fixed set. By continuous we mean that `\(Z(\bm{s})\)` can be observed everywhere within `\(\mathcal{D}\)`. By fixed we mean that the points in `\(\mathcal{D}\)` are non-stochastic. 
+
+&lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
+
+- .red[Point pattern data]: `\(\mathcal{D}\)` is itself random. Its index set gives the locations of random **events** that are the spatial point pattern. 
+
+---
+
+# Example of areal data [1]
+
+Lattice data can be either irregularly aligned or gridded, and occur in the form of aggregated observation over areas.
+&lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
+.pull-left[&lt;center&gt;&lt;img src=./img/poverty_US.jpg width='65%' title=''&gt;&lt;/center&gt;
+.center[Percentage of people in poverty by County: 2015-2019. Source: American Community Survey 2015-2019, 5-Year Data Release.]
+]
+
+.pull-right[
+- This figure is an example of a **choropleth map**, which uses shades of color (or grey scale) to classify the values of the variable that we are mapping into classes.
+&lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
+- From the choropleth map we know which areas are adjacent which other areas. The relationship between areal units is characterized in terms of .red[adjacency].
+&lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
+- The *sites* `\(\boldsymbol{s} \in \mathcal{D}\)` in this case are actually the polygons themselves. 
+]
+
+---
+
+# Example of areal data [2]
+
+&lt;center&gt;&lt;img src=./img/Italy_Covid_March2020.jpg width='38%' title=''&gt;&lt;/center&gt;
+
+.center[Map of the percent excess mortality for the 107 Italian provinces during the first wave of Covid-19 pandemic. Epidemiological week 18-24 March, 2020; males.]
+
+---
+
+# Example of regular lattice data [3]
+
+&lt;center&gt;&lt;img src=./img/Getis-Ord.jpg width='40%' title=''&gt;&lt;/center&gt;
+
+.center[Regular lattice: Getis-Ord remote sensing example data (from package `spdep`).]
+
+
+---
+
+# Example of geostatistical data [1]
+
+&lt;center&gt;&lt;img src=./img/Wind_Temp_StationsUS.jpg width='45%' title=''&gt;&lt;/center&gt;
+
+.center[Map of wind and temperature stations in US (2019).]
+
+&lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
+
+The data are gathered at a discrete set of points in an region of interest `\((\mathcal{D})\)`, with the aim of understanding
+the behaviour of an unobserved, spatially continuous phenomenon that exists throughout that region and could, in principle, be observed at any point in `\(\mathcal{D}\)`.
+
+---
+
+# Example of geostatistical data [2]
+.center[Average air temperature in degree Celsius (March-November 2018)]
+.pull-left[
+&lt;center&gt;&lt;img src=./img/Rplot_Temp_Dry2018.jpeg width='80%' title=''&gt;&lt;/center&gt;
+
+.center[Observed]
+]
+
+.pull-right[
+&lt;center&gt;&lt;img src=./img/Rplot_Temp_Pred_Dry2018.jpeg width='57%' title=''&gt;&lt;/center&gt;
+
+.center[Predicted]
+]
+
+
+&lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
+
+We can reconstruct a surface from the finite set of observations taken at a finite number of spatial locations.
+
+---
+
+# Examples of point pattern data [1]
+
+&lt;center&gt;&lt;img src=./img/colera.jpg width='40%' title=''&gt;&lt;/center&gt;
+.center[John Snow's map of the 1854 London cholera outbreak]
+&lt;span style="display:block; margin-top: 10px ;"&gt;&lt;/span&gt;
+- In 1854, cholera hit the city of London. No one knew where the disease started. So, British physician John Snow started mapping the outbreak.
+- It wasn’t just the disease. But he also mapped out roads, property boundaries, and water lines.
+- When he added these features to a map, something interesting happened. He noticed that cholera cases were only along one water line. This was a breakthrough that connected geography to public health safety.
+- The question of primary interest is whether, and if so where and when, statistically unusual local concentrations of cases occur.
+
+---
+
+# Examples of point pattern data [2]
+
+&lt;center&gt;&lt;img src=./img/Earthquakes_Italy.jpg width='38%' title=''&gt;&lt;/center&gt;
+
+.center[Location of earthquakes in Italy 1900-2017 (moment magnitude scale).]
+&lt;span style="display:block; margin-top: 10px ;"&gt;&lt;/span&gt;
+Other examples in which points are the location of an .red[event] of interest:
+- Location of crimes
+- Location of trees
+
+
+---
+
+# Data we will work with
+In this course, we will work with:
+&lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
+
+- Areal or lattice data
+&lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
+
+- Geostatistical or spatial-referenced data
+
+---
+
+name: spatialR
+  
+&lt;span style="display:block; margin-top: 250px ;"&gt;&lt;/span&gt;
+
+.myblue[.center[.huge[
+**Spatial Data in R**]]]
+
+---
+
+
+# Spatial data in R: Vectors
+
+The are two fundamental distinctions: spatial .red[vector] data and .red[raster].
+
+- .red[Vector] represents the world using .red[points], .red[lines] and .red[polygons] or combinations of those, where:
+&lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
+- *Point*, is a single point location, such as a geocoded address or a temperature sensor or the location of a bus stop;
+&lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
+- *Line*, is a set of ordered points, connected by straight line segments such as route travel or connections between locations;
+&lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
+- *Polygon*, is an area, marked by one or more enclosing lines such as local authority districts or census tracts.
+
+---
+
+Simple features, `sf` package , support 18 geometry types. Of these, 7 are used in the vast majority of geographic research:
+
+&lt;center&gt;&lt;img src=./img/Features_supported_by_sf.jpg width='40%' title=''&gt;&lt;/center&gt;
+
+Core geometry types supported by the R package sf. Source: Lovelace, Nowosad, and Muenchow (2019), Section 2.2.
+
+---
+
+# Spatial data in R: Rasters
+
+- .red[Raster]: typically divides the surface into cells (also called pixels) of constant size. The cell of one raster layer can only hold a single value, which might be numeric or categorical.
+
+&lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
+
+
+- Examples of continuous and categorical raster data. 
+
+&lt;center&gt;&lt;img src=./img/Raster_data.jpg width='60%' title=''&gt;&lt;/center&gt;
+
+.center[Source: Lovelace, Nowosad, and Muenchow (2019), Section 2.3.]
+
+---
+
+# Some useful R packages 
+
+-   `sf`, which is a recently developed package for spatial vector data (points, lines, polygons etc.) and combines the functionality of three previous packages `sp`, `rgeos` and `rgdal`. It refers to a formal standard that describes how objects in the real world can be represented in computers, with emphasis on the spatial geometry of these objects
+&lt;span style="display:block; margin-top: 10px ;"&gt;&lt;/span&gt;
+- `sp`, which precedes `sf`, and with the `rgdal` and `rgeos` package, it created a powerful tool to works with spatial data. However, `rgdal`, `rgeos`, and `maptools`
+will be supported only until late 2023. `sp` was first release on CRAN in 2005 and provides classes and methods to create points, lines, polygons, and grids and to operate on them. Many R packages still depends on the `sp` package
+&lt;span style="display:block; margin-top: 10px ;"&gt;&lt;/span&gt;
+- `spdep`, which includes functions and tests for evaluating spatial patterns and autocorrelation
+&lt;span style="display:block; margin-top: 10px ;"&gt;&lt;/span&gt;
+- `terra` is a successor of the `raster` package. It contains classes and methods representing raster objects (but it has also its own vector data classes). It allows raster data to be loaded, processed and saved.
+&lt;span style="display:block; margin-top: 10px ;"&gt;&lt;/span&gt;
+- The `stars` package contains classes and methods representing spatio-temporal data (raster and vector data cubes)
+&lt;span style="display:block; margin-top: 10px ;"&gt;&lt;/span&gt;
+- `tidyverse`, which is a coherent system of packages for data manipulation, exploration and visualization
+&lt;span style="display:block; margin-top: 10px ;"&gt;&lt;/span&gt;
+- `ggplot2`, `tmap`, `leaflet`, `mapview` and `gganimate` for visualization and maps
+
+---
+
+# `sp` and `sf`
+
+Many spatial R packages still depends on the `sp`, thus it is important to know how to convert `sp` to and from `sf` objects
+
+
+```r
+&gt; library(spData); library(sf); library(tidyverse)
+&gt; 
+&gt; # world is a sf object containing a world map data
+&gt; # from Natural Earth with a few variables from World Bank
+&gt; world = st_read(system.file("shapes/world.gpkg", package="spData"))
+&gt; plot(world["pop"])                # plot world population
+&gt; 
+&gt; world_sp = as(world, "Spatial")  # from sf to sp object
+&gt; class(world_sp)                   # "SpatialPolygonsDataFrame"
+&gt; 
+&gt; world_sf = st_as_sf(world_sp)    # from sp to sf object
+&gt; class(world_sf)                   # "sf"  "data.frame"
+```
+
+&lt;center&gt;&lt;img src=./img/World_pop.jpeg width='30%' title=''&gt;&lt;/center&gt;
+
+---
+
+# `sp` and `sf`
+
+`sf` works well with the `tidyverse` collection of R packages.
+
+For example, functions can be combined using the pipe operator `\(\%&gt;\%\)` given that both packages are loaded
+
+
+```r
+&gt; # Select and plot information for a single attribute
+&gt; world %&gt;% select(lifeExp) %&gt;% plot()
+```
+
+&lt;center&gt;&lt;img src=./img/LifeExp.jpeg width='50%' title=''&gt;&lt;/center&gt;
+
+---
+
+# `sp` and `sf`
+
+`sf` object includes spatial metadata like the coordinate reference
+system (CRS), which are stored in a list column.
+
+We can extract and plot only the geometry with the function `st_geometry()`
+
+
+```r
+&gt; # Extract geometry
+&gt; worlg_geo = st_geometry(world)
+&gt; # Extract and plot out only the geometries
+&gt; world %&gt;% st_geometry() %&gt;% plot()
+```
+
+&lt;center&gt;&lt;img src=./img/World_geom.jpeg width='50%' title=''&gt;&lt;/center&gt;
+---
+
+name: CRS
+  
+&lt;span style="display:block; margin-top: 250px ;"&gt;&lt;/span&gt;
+
+.myblue[.center[.huge[
+**Coordinate Reference Systems**]]]
+
+---
+
+# Coordinate Reference Systems (CRS)
+
+- A CRS defines how the spatial elements of the data relate to the surface of the Earth. 
+
+- There are two main types of CRS:
+
+ 1. .red[Geographic coordinate reference systems (GCRS)]: coordinate systems that identify any location on the Earth's surface using longitude and latitude, with units in decimal degrees or degrees.
+
+ 2. .red[Projected coordinate reference systems (PCRS)]: coordinate systems that provide various mechanisms to project maps of the Earth's ellipsoid shape onto a two-dimensional Cartesian coordinate plan. They are localized to minimize visual distortion in a particular region, with units on feet or meter. Projected coordinate systems are referred to as map projections.
+
+
+&lt;center&gt;&lt;img src=./img/GCS_PCS.jpg width='45%' title=''&gt;&lt;/center&gt;
+
+&lt;span style="display:block; margin-top: 10px ;"&gt;&lt;/span&gt;
+
+.center[Source: https://www.esri.com/arcgis-blog/products/arcgis-pro/mapping/gcs_vs_pcs/]
+
+---
+# GCRS [1]
+
+Geographic CRS refers to a point on the Earth by its latitude and longitude values, which are angles measured from the Earth's center to a point on the Earth's surface.
+
+- The .blue[latitude] of a point on Earth's surface is the angle between the equatorial plane and the line that passes through that point and the center of the Earth. Latitude values are measured relative to the equator (0 degrees) and range from -90 degrees at the south pole to 90 degrees at the north pole. 
+
+- The .blue[longitude] of a point on the Earth’s surface is the angle west or east of the prime meridian to another meridian that passes through that point. Longitude values range from -180 degrees when running west to 180 degrees when running east.
+
+&lt;center&gt;&lt;img src=./img/LongLat3.jpg width='25%' title=''&gt;&lt;/center&gt;
+
+&lt;span style="display:block; margin-top: 15px ;"&gt;&lt;/span&gt;
+
+.center[Source: https://annefou.github.io/metos_python/03-crs_proj/]
+
+
+---
+# GCRS [2]
+
+- Obviously we cannot actually measure these angles, but we can estimate them. To do so, we need a model of the shape of the Earth. Such a model is called as the .red[datum].
+
+- Datum contains information on what **ellipsoid** is used to approximate the Earth's shape and the relationship between the coordinate system and location on the Earth's surface; it also describes the origin of a coordinate system.
+
+- There are two types of datum: geocentric and local
+
+&lt;center&gt;&lt;img src=./img/datum.jpg width='43%' title=''&gt;&lt;/center&gt;
+
+.center[Source: Lovelace, Nowosad, and Muenchow (2019), Section 2.4.]
+
+---
+# PCRS [1]
+
+- Projected CRS are based on a GCRS and rely on map projections to convert the three-dimensional surface of the Earth into `\(x\)` and `\(y\)` values.
+
+- The transition leads to some distortions: there is not one best projection. Some projections can be used for a map of the whole world; other projections are appropriate for small areas only.
+
+- There are three main projection types: conic, cylindrical, and planar:
+
+&lt;center&gt;&lt;img src=./img/Proj_CRS.jpg width='40%' title=''&gt;&lt;/center&gt;
+
+&lt;span style="display:block; margin-top: 15px ;"&gt;&lt;/span&gt;
+
+.center[Source: https://www.earthdatascience.org/courses/earth-analytics/spatial-data-r/geographic-vs-projected-coordinate-reference-systems-UTM/]
+
+---
+
+# PCRS [2]
+
+- Projected CRS is optimized to best represent the shape, and/or
+the rotation, and/or the area of features in a data set.
+
+- There is not a single system that does a great job at optimizing all
+these elements: shape, rotation and area.
+
+&lt;center&gt;&lt;img src=./img/PCRS.jpg width='50%' title=''&gt;&lt;/center&gt;
+
+.center[Source: https://ihatecoordinatesystems.com/]
+
+&lt;span style="display:block; margin-top: 35px ;"&gt;&lt;/span&gt;
+
+A funny and explanatory YouTube video on the trade off between GCRS and PCRS is at this link: https://www.youtube.com/watch?v=kIID5FDi2JQ
+
+---
+# Re-projecting
+
+Re-projecting is the process of changing the representation of locations from one CRS to another. When should data be transformed?
+
+- The projections of locations on the Earth into a two-dimensional plane are distortions, the projection that is best for an application may be different from the projection associated with the data we import. In these cases, data can be re-projected.
+
+- Another case is when two objects with different CRSs must be compared or combined. Thus, in the case of dealing with multiple data, re-projection permits to transform all data to a common CRS.
+
+- In R, to transform data to a different projection, we can use
+  `st_transform()` function of the `sf` package.
+
+---
+# CRS in R (before 2020)
+
+- Spatial R packages support a wide range of CRSs and they use the `PROJ` library to perform conversions between cartographic projections. 
+
+
+- Before 2020, there are two ways of defining a CRS:
+
+  - the .blue[proj4string] definition, which specifies attributes such as the projection, the ellipsoid and the datum, for example the WGS84 longitude and latitude projection is specified as:
+`\(+proj=longlat +ellps=WGS84 +datum=WGS84 +no\_defs\)`
+ 
+  - the .blue[EPSG] numeric code (EPSG stands for European Petroleum Survey Group). The code refers to only one, well-defined coordinate reference system, for example the EPSG code of the WGS84 projection is 4326 (Note that the EPSG code could not be available for a particular coordinate system; https://spatialreference.org/ref/epsg/)
+
+
+---
+# CRS in R (after 2020)
+
+- There are new developments at level of `PROJ` (https://proj.org/), and shift from `proj4string` to the `OGC WKT2` representation (OGC stands for Open Geospatial Consortium, and WKT stands for Well-known Text formats) 
+
+
+- The CRS is represented by:
+ 
+   - a set of mathematical rules for specifying how coordinates are to be assigned to points;
+ 
+   - a set of parameters defining the position of the origin, the scale, and the orientation of a coordinate system (datum)
+
+- There is capability of direct transformations from CRS to CRS
+
+- There is capability of time-dependent transformations (previously, static reference frames with no support for time-dependent datum, but on Earth, everything is moving, up to 80 mm/year!)
+
+- The use of `proj4string` is discouraged (some `proj4string` string elements are not longer supported; also only three ellipsoids can be used). `proj4string` still can be used for coordinate operations (transformations between CRS).
+
+- In `sf`, we can retrieve the CRS of an object using `st_crs()`
+
+---
+# Example
+
+```r
+&gt; library(spData)
+&gt; library(sf)
+&gt; # Extract the CRS information from the sf object nz (New Zealand)
+&gt; st_crs(nz) # here EPSG:2193
+&gt; 
+&gt; # Re-project
+&gt; nz_wgs = st_transform(nz, 4326)
+&gt; st_crs(nz_wgs) # now EPSG:4326
+&gt; # Extract the CRS information from the sf object world
+&gt; st_crs(world) #EPSG:4326
+&gt; 
+&gt; # Re-project using the CRS of the sf object world
+&gt; nz_wgs = st_transform(nz, st_crs(world))
+&gt; st_crs(nz_wgs)
+&gt; 
+&gt; # Remove the CRS from nz_wgs and plot the result
+&gt; nz_wgs_NULL_crs = st_set_crs(nz_wgs, NA)
+&gt; 
+&gt; # Plots
+&gt; par(mfrow = c(1, 3))
+&gt; plot(st_geometry(nz))
+&gt; plot(st_geometry(nz_wgs))
+&gt; plot(st_geometry(nz_wgs_NULL_crs))
+```
+
+---
+# Example
+
+&lt;span style="display:block; margin-top: 30px ;"&gt;&lt;/span&gt;
+
+&lt;center&gt;&lt;img src=./img/NZ.jpg width='70%' title=''&gt;&lt;/center&gt;
+
+---
+# References
+
+Cressie, N. (1993). _Statistics for Spatial Data_. John Wiley &amp; Sons, Inc.
+
+Lovelace, R., J. Nowosad, and J. Muenchow (2019). _Geocomputation with R_. Chapman and Hall/CRC.
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script src="assets/remark-zoom.js"></script>
+<script src="https://platform.twitter.com/widgets.js"></script>
+<script>var slideshow = remark.create({
+"navigation": {
+"scroll": false
+},
+"highlightStyle": "github",
+"highlightLines": true,
+"countIncrementalSlides": false,
+"ratio": "16:9"
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+// add `data-at-shortcutkeys` attribute to <body> to resolve conflicts with JAWS
+// screen reader (see PR #262)
+(function(d) {
+  let res = {};
+  d.querySelectorAll('.remark-help-content table tr').forEach(tr => {
+    const t = tr.querySelector('td:nth-child(2)').innerText;
+    tr.querySelectorAll('td:first-child .key').forEach(key => {
+      const k = key.innerText;
+      if (/^[a-z]$/.test(k)) res[k] = t;  // must be a single letter (key)
+    });
+  });
+  d.body.setAttribute('data-at-shortcutkeys', JSON.stringify(res));
+})(document);
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+// adds .remark-code-has-line-highlighted class to <pre> parent elements
+// of code chunks containing highlighted lines with class .remark-code-line-highlighted
+(function(d) {
+  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
+  const preParents = [];
+  const findPreParent = function(line, p = 0) {
+    if (p > 1) return null; // traverse up no further than grandparent
+    const el = line.parentElement;
+    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
+  };
+
+  for (let line of hlines) {
+    let pre = findPreParent(line);
+    if (pre && !preParents.includes(pre)) preParents.push(pre);
+  }
+  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
+})(document);</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>

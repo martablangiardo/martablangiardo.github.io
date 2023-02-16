@@ -87,3 +87,21 @@ Lunch
 Solutions of practical 5 are [here](Practical5/Practical5_Solutions.html)
 
 - Independent paper reading: "Benefit of woodland and other natural environments for adolescents’ cognition and mental health" [link here](https://www.nature.com/articles/s41893-021-00751-1) 
+
+### Day 6 - Mon 20th Fe 2023
+
+- Group Discussion on the paper: "Benefit of woodland and other natural environments for adolescents’ cognition and mental health" [link here](https://www.nature.com/articles/s41893-021-00751-1) Hierarchical models for longitudinal data
+
+Break
+
+- [Session 6](Session6): Intro to geospatial data
+
+Lunch
+
+- [Practical 6a](Practical6a): How to calculate expected values
+
+Solutions of practical 6a are [here](Practical6a/Practical6a.html)
+
+- [Practical 6b](Practical6b): Disease mapping with R-INLA: models and visualisation
+
+Solutions of practical 6b are [here](Practical6b/Practical6b.html)

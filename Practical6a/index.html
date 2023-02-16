@@ -9,10 +9,10 @@
 <meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
 
 
-<meta name="author" content="Spatial and Spatio-Temporal Bayesian Models with R-INLA" />
+<meta name="author" content="Bayesian modelling for spatial and spatio-temporal data" />
 
 
-<title>Practical 2a - Indirect standardization</title>
+<title>Practical 6a - Indirect standardization</title>
 
 <script>// Pandoc 2.9 adds attributes on both header and div. We remove the former (to
 // be compatible with the behavior of Pandoc < 2.8).
@@ -1644,10 +1644,10 @@ border-radius: 0px;
 
 
 
-<h1 class="title toc-ignore">Practical 2a - Indirect
+<h1 class="title toc-ignore">Practical 6a - Indirect
 standardization</h1>
-<h4 class="author">Spatial and Spatio-Temporal Bayesian Models with
-<code>R-INLA</code></h4>
+<h4 class="author">Bayesian modelling for spatial and spatio-temporal
+data</h4>
 
 </div>
 
@@ -1656,7 +1656,9 @@ standardization</h1>
   addClassKlippyTo("pre.r, pre.markdown");
   addKlippy('right', 'top', '#8B0000', '1', 'Click to copy', 'Done');
 </script>
-<p>In this practical, we will learn step by step how to calculate the
+<p>In this lab, we will familiarize with the manipulation of a
+shapefile, which is is a geospatial vector data format for geographic
+information systems, and we will learn step by step how to calculate the
 expected cases in <code>R</code>. This is commonly done with indirect
 standardization and the adjustment is typically by age and sex,
 nevertheless you can use other covariates.</p>
@@ -1679,7 +1681,7 @@ epidemiology,</li>
 <li><code>RColorBrewer</code> that provides color palettes for maps and
 plots.</li>
 </ul>
-<p>The data set that we are using in this practical is called
+<p>The data set that we are using in this lab is called
 <code>HaemMal.csv</code> and includes the number of cases of
 haematological malignancies and population counts for the 628 wards of
 Greater London, stratified by sex and age groups (the data are partially
@@ -1781,7 +1783,7 @@ included as part of base R</li>
 <pre class="r klippy"><code>HaemMal = read_csv(&quot;HaemMal.csv&quot;) # the structure is a tibble
 
 # or
-#HaemMal &lt;- read.csv(&quot;HaemMal.csv&quot;, header=TRUE) # the structure is here data.frame</code></pre>
+#HaemMal = read.csv(&quot;HaemMal.csv&quot;, header=TRUE) # the structure is here data.frame</code></pre>
 <ul>
 <li>Print only the first rows of the data</li>
 </ul>
@@ -1855,7 +1857,7 @@ but remember this note for future applications).</p>
 to set the number of strata to 2 x 22 = 44</p>
 <pre class="r klippy"><code>HaemByWard$E = expected(population=HaemMal$POPULATION, 
                          cases=HaemMal$CASES, n.strata=44)</code></pre>
-<ol start="3" style="list-style-type: decimal">
+<ol start="4" style="list-style-type: decimal">
 <li>Check if everything is OK:</li>
 </ol>
 <ul>
