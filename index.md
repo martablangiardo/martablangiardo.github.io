@@ -105,3 +105,17 @@ Solutions of practical 6a are [here](Practical6a/Practical6a.html)
 - [Practical 6b](Practical6b): Disease mapping with R-INLA: models and visualisation
 
 Solutions of practical 6b are [here](Practical6b/Practical6b.html)
+
+
+### Day 7 - Mon 27th Feb 2023
+
+- [Session 7](Session7): Spatial models for small area data - disease mapping and ecological regression (there will be a 10 minute break halfway through it))
+
+Lunch
+
+- [Practical 7](Practical7): COVID-19 Vaccination uptake in space. This practical is based on the paper: https://link.springer.com/article/10.1007/s10654-022-00905-1
+
+Data for the practical are [here](Practical7/WK7_Practical.zip)
+
+Solution of practical 6b are [here](Practical7/Practical7_solutions.html)
+
