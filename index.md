@@ -117,5 +117,5 @@ Lunch
 
 Data for the practical are [here](Practical7/WK7_Practical.zip)
 
-Solution of practical 6b are [here](Practical7/Practical7_solutions.html)
+Solution of practical 7 are [here](Practical7/Practical7_solutions.html)
 
