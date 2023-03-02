@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="" xml:lang="">
   <head>
-    <title>Session 8.2: Geostatistical modelling: Stochastic Partial Differential Equations Using R and R-INLA</title>
+    <title>Session 8.2: Introduction to SPDE model with R-INLA</title>
     <meta charset="utf-8" />
     <script src="libs/header-attrs/header-attrs.js"></script>
     <link href="libs/panelset/panelset.css" rel="stylesheet" />
@@ -68,20 +68,6 @@
       }
     });
     </script>
-
-
-    <script type="text/x-mathjax-config">
-      MathJax.Hub.Config({
-        TeX: { equationNumbers: { autoNumber: "AMS" } },
-      });
-    </script>
-    <style>
-    .mjx-mrow a {
-      color: black;
-      pointer-events: none;
-      cursor: default;
-    }
-    </style>
     <link rel="stylesheet" href="assets/beamer.css" type="text/css" />
   </head>
   <body>
@@ -90,21 +76,23 @@
 
 
 
+
+
 class: title-slide
 
-# Session 8.2: Geostatistical modelling: Stochastic Partial Differential Equations Using R and R-INLA&lt;span style="display:block; margin-top: 10px ;"&gt;&lt;/span&gt; 
+# Session 8.2:  Introduction to SPDE model with R-INLA&lt;span style="display:block; margin-top: 10px ;"&gt;&lt;/span&gt; 
 
 ## 
 
 ###     
 
-### Bayesian modelling for Spatial and Spatio-temporal data, Imperial College 
+### Bayesian modelling for Spatial and Spatio-temporal data, Imperial College London 
 
 &lt;!-- Can also separate the various components of the extra argument 'params', eg as in 
-### Bayesian modelling for Spatial and Spatio-temporal data, Imperial College, Jenuary-March 2023, MSc in Epidemiology
+### Bayesian modelling for Spatial and Spatio-temporal data, Imperial College London, , MSc Epidemiology
 --&gt;
 
-Jenuary-March 2023
+
 
 ---
 
@@ -115,7 +103,7 @@ layout: true
 &amp;nbsp; &amp;copy; Marta Blangiardo | Monica Pirani
 ]
 .aligncenter[
-MSc in Epidemiology 
+MSc Epidemiology 
 ]
 .alignright[
 Bayesian modelling for Spatial and Spatio-temporal data, NA 
@@ -138,23 +126,26 @@ At the end of this session you should be able to:
 
 &lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
 
-- know the common models used for **geostatistical data**, i.e. Gaussian fields (GF);
-
-&lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
-
-
 - understand the basics of the Stochastic Partial Differential Equation (**SPDE**) approach;
 
 &lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
 
 
-- implement the SPDE approach using the `R-INLA` package. 
+- implement the SPDE approach using the `R-INLA` package; 
 
+
+&lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
+
+- perform spatial prediction and mapping.
 
 &lt;span style="display:block; margin-top: 30px ;"&gt;&lt;/span&gt;
 
+The topics treated in this lecture can be found in:
 
-The topics treated in this lecture can be found in **Section 6.4 -- 6.7** of the book Blangiardo M. and Cameletti M. "Spatial and Spatio-temporal Bayesian Models with R - INLA", Wiley 2015
+- Sections 6.5:6.8 of the book **Spatial and Spatio-Temporal Bayesian models with R-INLA**
+
+- Chapters 8 and 9 of the book **Geospatial Health Data: Modeling and Visualization with R-INLA and Shiny**  https://www.paulamoraga.com/book-geospatial/index.html
+
 
 ---
 
@@ -162,60 +153,24 @@ The topics treated in this lecture can be found in **Section 6.4 -- 6.7** of the
 
 &lt;span style="display:block; margin-top: 30px ;"&gt;&lt;/span&gt;
 
-1\. [Introduction to spatial modeling for geostatistical data (based on GF)](#introduction)
+1\. [Basics of the SPDE approach](#spdeapproach)
 
 &lt;span style="display:block; margin-top: 30px ;"&gt;&lt;/span&gt;
 
-2\. [Basics of the SPDE approach](#spdeapproach)
+2\. [The SPDE approach with `R-INLA`](#spdeinla)
 
 &lt;span style="display:block; margin-top: 30px ;"&gt;&lt;/span&gt;
 
-3\. [The SPDE approach with `R-INLA`](#spdeinla)
+3\. [Spatial prediction using SPDE approach](#predi)
 
 ---
 
-name: introduction
+name: spdeapproach
   
 &lt;span style="display:block; margin-top: 250px ;"&gt;&lt;/span&gt;
 
 .myblue[.center[.huge[
-**Introduction to spatial modeling for geostatistical data (based on GF)**]]]
-
----
-# Gaussian fields
-
-- The common methodological framework to geostatistical models is that of .red[**Gaussian  fields**] (or processes) which are based on the multivariate Normal  distribution.
-
-- A spatial process `\(y(\bm{s})\)` is a .red[**Gaussian field**] (GF) if for any `\(n \geq 1\)` and for each set of locations `\((\bm{s}_{1},\ldots,\bm{s}_{n})\)`, the vector `\((y(\bm{s}_1),\ldots, y(\bm{s}_n))\)` follows a multivariate Normal distribution with mean `\(\bm{\mu}=(\mu(\bm{s}_{1}), \ldots, \mu(\bm{s}_{n}))\)` and spatially structured covariance matrix `\(\bm{\Sigma}\)`.
-
-&lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
-
-- The  generic element of `\(\bm{\Sigma}\)` is defined by a  **spatial covariance function** `\(\mathcal C(\cdot,\cdot)\)`
- such that `\(\Sigma_{ij}=\mbox{Cov}\left(y(\bm{s}_{i}),y(\bm{s}_{j})\right)=\mathcal C(y(\bm{s}_{i}),y(\bm{s}_{j}))\)`.
-
-&lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
-
---
-
-In Session 8.1 we have introduced the concepts of stationarity and isotropy. To recall:
-
-- The spatial process is called .red[**second-order stationary**] if
-&lt;span style="display:block; margin-top: 10px ;"&gt;&lt;/span&gt;
-  - `\(\bm{\mu}\)`  is constant (i.e., `\(\mu(\bm{s}_{i}) = \mu\)` for each `\(i\)`) 
-&lt;span style="display:block; margin-top: 10px ;"&gt;&lt;/span&gt;
-  - the spatial covariance function depends only on the distance vector `\((\bm{s}_{i}-\bm{s}_{j}) \in \mathbb{R}^2\)`, i.e. `\(\mbox{Cov}\left(y(\bm{s}_{i}),y(\bm{s}_{j})\right)=\mathcal C(\bm{s}_{i}-\bm{s}_{j})\)`. 
-
-&lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
-  
---
-
-- Moreover, a stationary process is .red[**isotropic**] if the covariance does not depend on the direction but just on the Euclidean distance  `\(||\bm{s}_{i}-\bm{s}_{j}|| \in \mathbb{R}\)`.
-
-&lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
-
---
-
-- Several functions are available for the **spatial covariance function** (e.g. exponential, Mat&amp;eacute;rn, spherical, etc.) parameterized by some parameters, e.g. spatial variance, range (Banerjee, Carlin, and Gelfand, 2015).
+**The SPDE approach**]]]
 
 ---
 
@@ -224,15 +179,15 @@ In Session 8.1 we have introduced the concepts of stationarity and isotropy. To 
 - Usually the following (mixed-effects) model is assumed
 
 `$$\color{blue}{y(\bm{s}) = \mu(\bm{s}) + \xi(\bm{s}) +\epsilon(\bm{s})}$$`
-&lt;span style="display:block; margin-top: 30px ;"&gt;&lt;/span&gt;
+&lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
 where
 
-&lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
+&lt;span style="display:block; margin-top: 15px ;"&gt;&lt;/span&gt;
 - `\(\mu(\bm{s})\)` is the so-called .red[**large scale**] component, including linear or non linear of covariates.
 
-&lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
+&lt;span style="display:block; margin-top: 15px ;"&gt;&lt;/span&gt;
 - `\(\xi(\bm{s})\)` is a zero mean latent .red[**Gaussian spatial process**] commonly assumed to be stationary and isotropic with covariance function `\(Cov(\xi(\bm{s_i}),\xi(\bm{s_j}))\)` which depends only on the distance between the locations.
-&lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
+&lt;span style="display:block; margin-top: 15px ;"&gt;&lt;/span&gt;
 - `\(\epsilon(\bm{s})\)` represents the Gaussian .red[**measurement error**] (independent from `\(\xi(\bm{s})\)`) and its variance `\((\sigma^2_{\epsilon})\)` is usually known as **nugget effect**.
 
 --
@@ -247,6 +202,8 @@ y(s_i)\mid\mu(\bm{s}_i),\xi(\bm{s}_i),\sigma^2_{\epsilon} &amp; \sim \text{Norma
 
 where `\(\bm\Sigma\)` is a **dense** matrix defined by a spatial covariance function `\(\mathcal C(||\bm{s}_{i}-\bm{s}_{j}||)\)`.
 
+
+- Several functions are available for the **spatial covariance function** (e.g. exponential, Mat&amp;eacute;rn, spherical, etc.) parameterized by some parameters, e.g. spatial variance, range (Banerjee, Carlin, and Gelfand, 2014).
 
 ---
 
@@ -292,15 +249,12 @@ Simulation of different GFs with `\(\sigma=1\)` and different ranges:
 - In the Bayesian framework, the classical approach for model estimation is Markov chain Monte Carlo methods (MCMC) considering that the likelihood function is a multivariate Gaussian distribution (see for example the `spBayes` and `spTimer` `R` packages).
 
 &lt;span style="display:block; margin-top: 30px ;"&gt;&lt;/span&gt;
-- This requires to compute the Cholesky factorization of the dense covariance matrix `\(\bm \Sigma\)` which is an operation of order `\(n^3\)`. This is known as **big `\(n\)` problem** (Banerjee, Carlin, and Gelfand, 2015).
+- This requires to compute the Cholesky factorization of the dense covariance matrix `\(\bm \Sigma\)` which is computationally very expensive. This is known as **big `\(n\)` problem** .
 &lt;span style="display:block; margin-top: 30px ;"&gt;&lt;/span&gt;
 
-- The .red[**stochastic partial differential equation (SPDE) approach**] (Lindgren, Rue, and Lindström, 2011) is an alternative to the use of MCMC: it represents the continuous spatial process `\(\xi(\bm{s})\)` with Mat&amp;eacute;rn covariance function using a discretely indexed spatial random process (i.e., a GMRF),  which is characterized by a sparse precision matrix and enjoys computational benefits in terms of fast inference (the cost is typically of the order `\(n^{3/2}\)` in `\(\mathbb{R}^2\)`).
-
-
+- The .red[**stochastic partial differential equation (SPDE) approach**] (Lindgren, Rue, and Lindström, 2011) is an alternative to the use of MCMC: it represents the continuous spatial process `\(\xi(\bm{s})\)` with Mat&amp;eacute;rn covariance function using a discretely indexed spatial random process (i.e., a Gaussian Markov Random Field - GMRF),  which is characterized by a sparse precision matrix and enjoys computational benefits in terms of fast inference.
 
 ---
-
 
 name: spdeapproach
   
@@ -356,8 +310,6 @@ Spatial Statistics, Volume 50, 2022, https://doi.org/10.1016/j.spasta.2022.10059
 ]
 ]
 
-
-
 ---
 
 # The SPDE approach for Mat&amp;eacute;rn GF
@@ -385,7 +337,7 @@ where `\(\bm{s} \in \mathbb{R}^d\)`, `\(\Delta\)` is the Laplacian operator,  `\
 
 -  In `R-INLA` the default value for the smoothness parameter is `\(\alpha=2\)` `\(\rightarrow\)` `\(\lambda=1\)`. Consequently 
 
-`$$r=\sqrt{8\lambda}/\kappa= \sqrt{8}/\kappa \text{ (see slide 9)} \qquad\qquad \sigma^2=1/(4\pi\kappa^2\tau^2)$$`
+`$$r=\sqrt{8\lambda}/\kappa= \sqrt{8}/\kappa \text{ (see slide 6)} \qquad\qquad \sigma^2=1/(4\pi\kappa^2\tau^2)$$`
 
 
 
@@ -425,7 +377,7 @@ where `\(G\)` is the total number of triangulation vertices, `\(\{\varphi_{g}\}\
 
 
 &lt;span style="display:block; margin-top: 30px ;"&gt;&lt;/span&gt;
--  Using Neumann boundary conditions, it follows that the precision matrix `\(\bm Q\)` for the Gaussian weight vector `\(\tilde {\bm \xi}=\{\tilde\xi_{1},\ldots,\tilde\xi_{G}\}\)` is given by
+-  The precision matrix `\(\bm Q\)` for the Gaussian weight vector `\(\tilde {\bm \xi}=\{\tilde\xi_{1},\ldots,\tilde\xi_{G}\}\)` is given by
 
 
 `$$\color{blue}{\bm Q=\tau^2\left(\kappa^4 \bm C+2\kappa^2 \bm G +\bm G\bm C^{-1}\bm G\right)}$$`
@@ -478,8 +430,6 @@ We use the `SPDEtoy`  dataset , consisting in 200 simulated values for the varia
 
 ```r
 &gt; library(INLA)
-&gt; #inla.setOption(inla.mode="experimental") # use the most recent computational methodology
-&gt; 
 &gt; data(SPDEtoy)
 &gt; dim(SPDEtoy)
 ```
@@ -518,6 +468,7 @@ We use the `SPDEtoy`  dataset , consisting in 200 simulated values for the varia
 
 ```r
 &gt; library(tidyverse)
+&gt; library(INLA)
 &gt; 
 &gt; SPDEtoy %&gt;% 
 +   ggplot() +
@@ -611,8 +562,8 @@ with `\(A_{ig}=\varphi_g(\bm s_i)\)` being the generic element of the sparse mat
 .pull-left[
 
 ```r
-&gt; coords &lt;- as.matrix(SPDEtoy[,1:2])
-&gt; mesh0 &lt;- inla.mesh.2d(loc = coords,
+&gt; coords = as.matrix(SPDEtoy[,1:2])
+&gt; mesh0 = inla.mesh.2d(loc = coords,
 +                       max.edge = 0.1)
 ```
 
@@ -632,8 +583,8 @@ with `\(A_{ig}=\varphi_g(\bm s_i)\)` being the generic element of the sparse mat
 .pull-left[
 
 ```r
-&gt; coords &lt;- as.matrix(SPDEtoy[,1:2])
-&gt; mesh0 &lt;- inla.mesh.2d(loc = coords,
+&gt; coords = as.matrix(SPDEtoy[,1:2])
+&gt; mesh0 = inla.mesh.2d(loc = coords,
 +                       max.edge = 0.1) 
 ```
 
@@ -656,7 +607,7 @@ with `\(A_{ig}=\varphi_g(\bm s_i)\)` being the generic element of the sparse mat
 .pull-left[
 
 ```r
-&gt; mesh1 &lt;- inla.mesh.2d(loc = coords,
+&gt; mesh1 = inla.mesh.2d(loc = coords,
 *+                       max.edge = c(0.1, 0.1))
 ```
 
@@ -678,7 +629,7 @@ with `\(A_{ig}=\varphi_g(\bm s_i)\)` being the generic element of the sparse mat
 .pull-left[
 
 ```r
-&gt; mesh2 &lt;- inla.mesh.2d(loc = coords,
+&gt; mesh2 = inla.mesh.2d(loc = coords,
 *+                       max.edge = c(0.1, 0.2))
 ```
 
@@ -709,7 +660,7 @@ The option `offset` of the `inla.mesh.2d` function can be used to define how muc
 
 
 ```r
-&gt; mesh3 &lt;- inla.mesh.2d(loc = coords,
+&gt; mesh3 = inla.mesh.2d(loc = coords,
 +                       max.edge = c(0.1, 0.2),
 *+                       offset = c(0.4,0.1))
 ```
@@ -732,7 +683,7 @@ The option `offset` of the `inla.mesh.2d` function can be used to define how muc
 .pull-left[
 
 ```r
-&gt; mesh4 &lt;- inla.mesh.2d(loc = coords,
+&gt; mesh4 = inla.mesh.2d(loc = coords,
 +                       max.edge = c(0.1, 0.2),
 *+                       offset = c(0.1,0.4))
 ```
@@ -764,9 +715,9 @@ Instead of the point coordinates, it is possible to use other point locations us
 
 
 ```r
-&gt; domain &lt;- matrix(cbind(c(0,1,1,0.7,0),
-+                        c(0,0,0.7,1,1)), ncol=2)
-*&gt; mesh5domain &lt;- inla.mesh.2d(loc.domain = domain,
+&gt; domain=matrix(cbind(c(0,1,1,0.7,0),
++                   c(0,0,0.7,1,1)), ncol=2)
+*&gt; mesh5domain=inla.mesh.2d(loc.domain = domain,
 +                       max.edge = c(0.04, 0.2), 
 +                       offset = c(0.1, 0.4))
 ```
@@ -775,9 +726,11 @@ Instead of the point coordinates, it is possible to use other point locations us
 ```r
 &gt; ggplot() + 
 +   gg(mesh5domain) +
-+   geom_point(data = data.frame(domain), aes(X1, X2)) +
++   geom_point(data = data.frame(domain), 
++              aes(X1, X2)) +
 +     geom_point(data = data.frame(coords),
-+              aes(s1, s2), col = "red", alpha = 0.5)
++              aes(s1, s2), col = "red", 
++              alpha = 0.5)
 ```
 ]
 
@@ -791,18 +744,21 @@ Instead of the point coordinates, it is possible to use other point locations us
 The option `cutoff` can be used to avoid building too many small triangles around clustered data locations (the default value is equal to 0).
 
 ```r
-&gt; mesh5 &lt;- inla.mesh.2d(loc.domain = domain, 
+&gt; mesh5 = inla.mesh.2d(loc.domain = domain, 
 +                       max.edge = c(0.04, 0.2), 
 *+                       cutoff = 0.5,
 +                       offset = c(0.1, 0.4))
 ```
 
+
 ```r
 &gt; ggplot() + 
 +   gg(mesh5) +
-+   geom_point(data = data.frame(domain),aes(X1, X2)) +
++   geom_point(data = data.frame(domain),
++              aes(X1, X2)) +
 +     geom_point(data = data.frame(coords),
-+              aes(s1, s2), col = "red", alpha = 0.5)
++              aes(s1, s2), col = "red", 
++              alpha = 0.5)
 ```
 ]
 .pull-right[
@@ -814,9 +770,9 @@ The option `cutoff` can be used to avoid building too many small triangles aroun
 .pull-left[
 
 ```r
-&gt; mesh6 &lt;- inla.mesh.2d(loc.domain = domain,
+&gt; mesh6 = inla.mesh.2d(loc.domain = domain,
 +                       max.edge = c(0.04, 0.2),
-*+                       cutoff = 0.05,
++                       cutoff = 0.05,
 +                       offset = c(0.1, 0.4))
 ```
 
@@ -827,7 +783,8 @@ The option `cutoff` can be used to avoid building too many small triangles aroun
 +   geom_point(data = data.frame(domain),
 +              aes(X1, X2)) +
 +     geom_point(data = data.frame(coords),
-+              aes(s1, s2), col = "red", alpha = 0.5)
++              aes(s1, s2), col = "red", 
++              alpha = 0.5)
 ```
 ]
 
@@ -851,10 +808,11 @@ A feature in `R-INLA` named `inla.nonconvex.hull`  makes it possible to compute 
 &gt; 
 &gt; boundary = inla.nonconvex.hull(loc,
 *+                                convex=0.2)
-&gt; meshNC &lt;- inla.mesh.2d(loc = loc,
+&gt; meshNC = inla.mesh.2d(loc = loc,
 *+                       boundary = boundary,
 +                       max.edge = c(0.04, 0.2))
 ```
+
 
 ```r
 &gt; ggplot() + 
@@ -869,14 +827,18 @@ A feature in `R-INLA` named `inla.nonconvex.hull`  makes it possible to compute 
 &lt;img src="./img/explore_plot_out7-1.png" &gt;
 ]
 
-
 ---
 
 # Projector matrix for `mesh6`
+
+- Now, we create a .red[projection matrix], which maps the GMRF from the mesh nodes to the `\(n\)` observation locations
+
+- The projector matrix is build using the `inla.spde.make.A()` function
+
 .pull-left[
 
 ```r
-&gt; A.est6 &lt;- inla.spde.make.A(mesh = mesh6,
+&gt; A.est6 = inla.spde.make.A(mesh = mesh6,
 +                            loc = coords)
 &gt; dim(A.est6)
 ```
@@ -884,10 +846,13 @@ A feature in `R-INLA` named `inla.nonconvex.hull`  makes it possible to compute 
 ```
 [1] 200 549
 ```
+The matrix has the number of rows equal to the number of observations and the number of columns equal to the number of vertices of the triangulation.
 
-No more than 3 elements in each line are non-zero:
+
+The points are not necessarily on the vertices and thus each point will be associated with up to three non-zero weights (that collectively add up to 1)
 
 ```r
+&gt; #No more than 3 elements in each line are non-zero
 &gt; table(rowSums(A.est6&gt;0))
 ```
 
@@ -925,149 +890,23 @@ FALSE  TRUE
 
 ---
 
-# Model fitting
+# Creation of the Mat&amp;eacute;rn SPDE model for `mesh6`
 
-- The vector of parameters is defined as  `\(\bm \theta = \{\tilde {\bm \xi}, b_0\}\)`  with  hyper-parameter vector  `\(\bm \psi=(\sigma^{2}_{e},r,\tau)\)`, where `\(\tau=1/\sigma\)`  and `\(r\)` (depending on `\(\kappa\)`) are the Mat&amp;eacute;rn covariance function parameters. 
-&lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
-- In `R-INLA` the default **internal representation** for the SPDE parameters is  `\(\log(\tau)=\theta_1\)`  and  `\(\log(\kappa)=\theta_2\)`,  with  `\(\theta_1\)`  and  `\(\theta_2\)`  being given two independent Normal prior distributions.
+- Now, we create the Mat&amp;eacute;rn **SPDE model object** with the function `inla.spde2.matern`. By default the smoothness term is 2
 
 
-&lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
-1\. Create the Mat&amp;eacute;rn **SPDE model object** (by default `\(\alpha=2\)`):
+- Here we create the SPDE object using the `mesh6` triangulation:
+
 
 ```r
 &gt; spde = inla.spde2.matern(mesh = mesh6)
-&gt; spde$n.spde
+&gt; spde$n.spde # number of vertices in the mesh
 ```
 
 ```
 [1] 549
 ```
 
-2\. In `R-INLA` the Mat&amp;eacute;rn GF is part of the linear predictor and is specified in the `formula`  environment using a proper specification for `f()`. Define the **linear predictor** through the `formula`:
-
-```r
-&gt; formula = y ~ 0 + intercept + f(spatial.field, model = spde)
-```
-where `spatial.field` is a proper index variable and `spde` is the model created previously with `inla.spde2.matern`. Note that the intercept is removed and is added manually in the linear predictor. The reason for this way of coding an intercept is numerical stability of the software.
-
----
-
-# Model fitting
-
-3\. **Fit the model** as usual using the `inla` function:
-
-```r
-&gt; N &lt;- nrow(SPDEtoy)
-&gt; priors = list(mean.intercept = 0, prec.intercept = 1)
-&gt; 
-&gt; output6 &lt;- inla(formula,
-+                 data = list(y = SPDEtoy$y, intercept = rep(1,spde$n.spde),
-+                           # intercept = rep(1,N),
-+                             spatial.field = 1:spde$n.spde), # the spatial effect
-+                 control.predictor = list(A = A.est6, compute = TRUE),
-+                 control.fixed = priors,
-*+                 control.inla = list(strategy = "gaussian", int.strategy = "eb"))
-```
-
-Note that the projector matrix is passed to `inla` through `control.predictor`. Moreover, with the option `compute = TRUE` we ask for the computation of the marginals of the linear predictor. 
-
----
-
-# Exploring the output: fixed effects and hyperparameters
-
-
-```r
-&gt; output6$summary.fixed[,c("mean","0.025quant","0.975quant")]
-```
-
-```
-              mean 0.025quant 0.975quant
-intercept 9.518054   8.335899   10.69922
-```
-
-```r
-&gt; output6$summary.hyperpar[,c("mean","0.025quant","0.975quant")]
-```
-
-```
-                                             mean 0.025quant 0.975quant
-Precision for the Gaussian observations  2.860439   2.043224   3.872210
-Theta1 for spatial.field                -4.030758  -4.327848  -3.716335
-Theta2 for spatial.field                 2.090759   1.611770   2.538421
-```
-
-
----
-
-# Exploring the output: spatial parameters 
-
-If we are interested in the posterior summaries of the spatial parameters  on the scale of the variance `\(\sigma^2=1/\tau\)`  and range  `\(r\)`  (instead of the internal scale regarding `\(\theta_1=\log(\tau)\)` and `\(\theta_2=\log(\kappa)\)`) we use
-
-
-```r
-&gt; output6.field &lt;- inla.spde2.result(inla = output6, 
-+                                    name = "spatial.field",
-+                                    spde = spde)
-```
-
-
-The resulting list contains the following elements:
-
-```r
-&gt; names(output6.field)
-```
-
-```
- [1] "summary.values"                 "marginals.values"              
- [3] "summary.hyperpar"               "summary.theta"                 
- [5] "summary.log.tau"                "summary.log.kappa"             
- [7] "summary.log.variance.nominal"   "summary.log.range.nominal"     
- [9] "marginals.theta"                "marginals.log.tau"             
-[11] "marginals.log.kappa"            "marginals.log.variance.nominal"
-[13] "marginals.log.range.nominal"    "marginals.tau"                 
-[15] "marginals.kappa"                "marginals.variance.nominal"    
-[17] "marginals.range.nominal"       
-```
-
----
-
-# Exploring the output 
-
-The posterior mean of  `\(\sigma^2\)` and the range `\(r\)`  can be obtained by typing
-
-
-```r
-&gt; inla.emarginal(function(x) x, output6.field$marginals.variance.nominal[[1]])
-```
-
-```
-[1] 4.003838
-```
-
-```r
-&gt; inla.emarginal(function(x) x, output6.field$marginals.range.nominal[[1]])
-```
-
-```
-[1] 0.3593861
-```
-
-Also the other standard INLA functions can be applied to the marginal posteriors:
-
-```r
-&gt; inla.zmarginal(output6.field$marginals.range.nominal[[1]])
-```
-
-```
-Mean            0.359386 
-Stdev           0.0865496 
-Quantile  0.025 0.224174 
-Quantile  0.25  0.297262 
-Quantile  0.5   0.347064 
-Quantile  0.75  0.408497 
-Quantile  0.975 0.562115 
-```
 
 ---
 
@@ -1102,28 +941,455 @@ For example:
 
 ---
 
+# Creation of the indexes for the SPDE model
+
+- We also create a list of named index vectors for the SPDE model with the function `inla.spde.make.index`. It will be useful in the stack preparation (see next slides)
+
+
+```r
+&gt; s.index = inla.spde.make.index(name = "spatial.field", n.spde = spde$n.spde)
+```
+
+Here the `name` represents the name of the effect which will be used in the `formula`
+
+
+- The index set for the latent field does not depend on the data set locations. It only depends on the SPDE model size
+---
+
+# The `inla.stack()` function 
+
+- A function named `inla.stack()` has been introduced in `R-INLA` for an optimal and easy management of the SPDE objects (data, covariates, indices and projector matrices) and for the construction of the linear predictor (Lindgren and Rue, 2015).
+
+
+
+&lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
+- In the `SPDEtoy` example the .red[**linear predictor**] is given by 
+`$$\eta_i = b_0 +\xi_i = b_0 + \sum_{g=1}^{G}A_{ig} \tilde {\xi_g}$$`
+and can be written as
+`$$\bm\eta = \bm 1 b_0+\bm A\tilde{\bm \xi}$$`
+where the first term refers to the intercept and the second to the spatial effect. Note that each term in the linear predictor is represented as the product of a projector matrix and an effect.
+
+&lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
+- The main arguments of the `inla.stack()` function are:
+  - `data`: a vector list with the data
+  - `A`: a list of projector matrices 
+  - `effects`: the list of effects
+  - `tag` (optional): a label for the data stack
+  
+  
+---
+
+# The `inla.stack()` function for model fitting with the `SPDEtoy` data
+
+We define the `inla.stack` object for model fitting as follows:
+
+
+```r
+&gt; stack.est = inla.stack(
++   data = list(y = SPDEtoy$y),
++   A = list(1, A.est6),
++   effects = list(intercept = rep(1,nrow(SPDEtoy)),
++                  s.index),
++   tag="est") 
+```
+
+Note that the function `inla.stack()` will take care of eliminating any column in the projector matrix which is full of zeros. 
+
+---
+
+# Model fitting
+
+- The vector of parameters is defined as  `\(\bm \theta = \{\tilde {\bm \xi}, b_0\}\)`  with  hyper-parameter vector  `\(\bm \psi=(\sigma^{2}_{e},r,\tau)\)`, where `\(\tau=1/\sigma\)`  and `\(r\)` (depending on `\(\kappa\)`) are the Mat&amp;eacute;rn covariance function parameters. 
+&lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
+- In `R-INLA` the default **internal representation** for the SPDE parameters is  `\(\log(\tau)=\theta_1\)`  and  `\(\log(\kappa)=\theta_2\)`,  with  `\(\theta_1\)`  and  `\(\theta_2\)`  being given two independent Normal prior distributions.
+
+- Steps: (1) Define the formula, then (2) Run INLA
+
+&lt;span style="display:block; margin-top: 30px ;"&gt;&lt;/span&gt;
+
+.blue[1\. Define the **linear predictor**] through the `formula`. In `R-INLA` the Mat&amp;eacute;rn GF is part of the linear predictor and is specified in the `formula`  environment using a proper specification for `f()`. 
+
+
+```r
+&gt; formula = y ~ -1 + intercept + f(spatial.field, model = spde)
+```
+
+where `spatial.field` is a proper index variable (from `inla.spde.make.index` function), and `spde` is the model created previously with `inla.spde2.matern`. Note that the intercept is removed and is added manually in the linear predictor.
+
+---
+
+&lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
+.blue[2\. Run `inla`!] The function `inla.stack.data()` and `inla.stack.A()` are used for extracting the data and the projector matrix from the `stack.est` object:
+
+
+```r
+&gt; output6 = inla(formula,
+*+                 data = inla.stack.data(stack.est),
+*+                 control.predictor = list(A = inla.stack.A(stack.est), compute = TRUE))
+```
+
+Note that the projector matrix is passed to `inla` through `control.predictor`. Moreover, with the option `compute = TRUE` we ask for the computation of the marginals of the linear predictor. 
+
+---
+
+# Exploring the output: fixed effects and hyperparameters
+
+
+```r
+&gt; output6$summary.fixed[,c("mean","0.025quant","0.975quant")]
+```
+
+```
+              mean 0.025quant 0.975quant
+intercept 9.504753   8.036181   10.86548
+```
+
+```r
+&gt; output6$summary.hyperpar[,c("mean","0.025quant","0.975quant")]
+```
+
+```
+                                             mean 0.025quant 0.975quant
+Precision for the Gaussian observations  2.865273   2.038041   3.880469
+Theta1 for spatial.field                -4.029797  -4.324775  -3.716293
+Theta2 for spatial.field                 2.085501   1.600862   2.534648
+```
+
+
+---
+
+# Exploring the output: spatial parameters 
+
+If we are interested in the posterior summaries of the spatial parameters  on the scale of the variance `\(\sigma^2=1/\tau\)`  and range  `\(r\)`  (instead of the internal scale regarding `\(\theta_1=\log(\tau)\)` and `\(\theta_2=\log(\kappa)\)`) we use
+
+
+```r
+&gt; output6.field = inla.spde2.result(inla = output6, 
++                                    name = "spatial.field",
++                                    spde = spde)
+```
+
+
+The resulting list contains the following elements:
+
+```r
+&gt; names(output6.field)
+```
+&lt;center&gt;&lt;img src=./img/names_output.jpg width='57%' title=''&gt;&lt;/center&gt;
+
+---
+
+# Exploring the output 
+
+The posterior mean of  `\(\sigma^2\)` and the range `\(r\)`  can be obtained by typing
+
+
+```r
+&gt; inla.emarginal(function(x) x, output6.field$marginals.variance.nominal[[1]])
+```
+
+```
+[1] 4.032827
+```
+
+```r
+&gt; inla.emarginal(function(x) x, output6.field$marginals.range.nominal[[1]])
+```
+
+```
+[1] 0.3613597
+```
+
+
+Also the other standard INLA functions can be applied to the marginal posteriors:
+
+```r
+&gt; inla.zmarginal(output6.field$marginals.range.nominal[[1]])
+```
+
+```
+Mean            0.36136 
+Stdev           0.0877111 
+Quantile  0.025 0.225099 
+Quantile  0.25  0.298391 
+Quantile  0.5   0.348569 
+Quantile  0.75  0.410873 
+Quantile  0.975 0.567593 
+```
+
+---
+
+name: predi
+  
+&lt;span style="display:block; margin-top: 250px ;"&gt;&lt;/span&gt;
+
+.myblue[.center[.huge[
+**Spatial prediction using SPDE approach**]]]
+
+---
+
+# Spatial prediction with the `inla.stack()` approach
+
+- In geostatistics we are interested in predicting the (latent) spatial field (i.e. the linear predictor) at new spatial locations where we do not have data. 
+
+&lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
+- It is possible to perform the spatial prediction jointly with the estimation by using the  `inla.stack` approach.
+
+&lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
+- Consider the response variable distribution
+$$
+\bm y\sim\text{Normal}(\bm\eta=\bm 1 b_0+\bm A\tilde{\bm \xi},\sigma^2_e \bm I)
+$$
+we are interested in the posterior distribution of the linear predictor `\(\bm\eta\)` everywhere in space, especially where we don't have observed data and `y=NA`.
+
+&lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
+- With regard to spatial prediction, it is worth noting that the INLA-SPDE algorithm provides the posterior conditional distribution of `\(\bm\eta\)` for all the triangulation vertices.
+By using the SPDE approximation, it is then immediate to get a prediction for `\(\bm\eta\)` for any location in the triangulated domain (i.e. the posterior predictive distribution).
+
+---
+
+# Grid for spatial prediction
+
+
+.pull-left[
+Consider the following regular grid of points:
+
+```r
+&gt; grid.x = 20
+&gt; grid.y = 20
+&gt; pred.grid = expand.grid(
++             x = seq(0, 1, length.out = grid.x),
++             y = seq(0, 1, length.out = grid.y))
+```
+
+It is necessary to define a new projector matrix:
+
+```r
+&gt; A.pred6 = inla.spde.make.A(mesh = mesh6,
++               loc = as.matrix(pred.grid))
+&gt; dim(A.pred6)
+```
+
+```
+[1] 400 549
+```
+]
+.pull-right[
+&lt;img src="./img/predgrid-1.png" &gt;
+]
+
+---
+
+# Model fitting jointly with spatial prediction
+For performing **jointly** the estimation and the prediction, we create a new `inla.stack` object:
+
+```r
+*&gt; stack.pred = inla.stack(data = list(y = NA),
++          A = list(1, A.pred6),
++          effects = list(intercept = rep(1, nrow(pred.grid)),
++                         spatial.field = 1:spde$n.spde),
++          tag = "pred") 
+```
+and then we join it to the `inla.stack` object created previously for the estimation (`stack.est`):
+
+```r
+&gt; join.stack = inla.stack(stack.est, stack.pred) #full stack object
+```
+
+And finally, we run `INLA` again:
+
+```r
+&gt; output6pred = inla(formula,
+*+                 data = inla.stack.data(join.stack),
++                 control.compute = list(return.marginals=TRUE),
+*+                 control.predictor = list(A = inla.stack.A(join.stack), compute = TRUE)
++                 )
+```
+
+The option `return.marginals.predictor=TRUE` is necessary to obtain the marginals for the linear predictor. 
+---
+
+# Retrieve the predictions
+
+To access the predictions (posterior summary stats or marginal distribution) at the target grid locations, we extract with the `inla.stack.index()` function the corresponding indexes from the full stack object using the corresponding tag set before (`pred`):
+
+```r
+&gt; index.pred = inla.stack.index(join.stack, tag = "pred")$data
+&gt; length(index.pred)
+```
+
+```
+[1] 400
+```
+
+We then extract the prediction posterior mean and sd at the first 3 grid points:
+
+```r
+&gt; output6pred$summary.linear.predictor[index.pred[1:3],c("mean","sd")]
+```
+
+```
+                   mean        sd
+APredictor.201 12.24728 0.2609542
+APredictor.202 12.06214 0.4240041
+APredictor.203 10.58517 0.4330569
+```
+
+In this case (identity link) `output6pred$summary.fitted.values` would return the same output.
+
+---
+
+# Manipulate the posterior predictive distribution 
+
+As described in Week 1, it is possible to manipulate marginal distributions. 
+
+.pull-left[
+Consider for example the first grid point and its posterior predictive distribution:
+
+```r
+&gt; distr.point1 = output6pred$marginals.linear.predictor[index.pred[1]][[1]]
+&gt; distr.point1.smooth = inla.smarginal(distr.point1)
+```
+
+
+```r
+&gt; ggplot(data.frame(distr.point1.smooth)) + 
++   geom_line(aes(x,y))
+```
+
+
+We can be also interested in computing the posterior probability of getting a value bigger than 13:
+
+```r
+&gt; 1 - inla.pmarginal(13, distr.point1)
+```
+
+]
+
+
+.pull-right[
+
+&lt;center&gt;&lt;img src=./img/out_point1.jpg width='90%' title=''&gt;&lt;/center&gt;
+
+]
+
+
+---
+
+# Mapping the linear predictor: posterior mean [1]
+
+- We plot now the posterior mean of the linear predictor at the grid level.
+
+&lt;span style="display:block; margin-top: 15px ;"&gt;&lt;/span&gt; 
+
+- We can take advantage of `inlabru`, a `R` package for Bayesian spatial modelling, originally developed for ecological applications (Bachl, Lindgren, Borchers, and Illian, 2019). 
+
+&lt;span style="display:block; margin-top: 15px ;"&gt;&lt;/span&gt; 
+
+- `inlabru` is a wrapper around `INLA` tailored towards spatial data. It makes fitting spatial models with INLA
+easier as there is no more need to deal with projector matrices and stack objects. 
+
+&lt;span style="display:block; margin-top: 15px ;"&gt;&lt;/span&gt; 
+
+- The `inlabru` package works with spatial objects from the `sp` package (e.g. `SpatialPointsDataFrame`, `SpatialGridDataFrame`, `SpatialPixelsDataFrame`): https://cran.r-project.org/web/packages/sp/index.html
+
+&lt;span style="display:block; margin-top: 15px ;"&gt;&lt;/span&gt; 
+- The function `gg()` is an extension of the `ggplot()` function for generating geometries from spatial fitted object. 
+
+
+&lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
+See: 
+  - **Website**: https://sites.google.com/inlabru.org/inlabru
+  &lt;span style="display:block; margin-top: 5px ;"&gt;&lt;/span&gt;
+  - **Github**: https://github.com/inlabru-org/inlabru
+
+---
+
+# Mapping the linear predictor: posterior mean [2]
+
+
+```r
+&gt; library(inlabru)
+&gt; post.mean.pred = output6pred$summary.linear.predictor[index.pred,"mean"]
+&gt; post.mean.df = SpatialPixelsDataFrame(SpatialPoints(pred.grid),
++                                       data = data.frame(post.mean.pred))
+&gt; 
+&gt; library(viridis)
+&gt; ggplot() +
++   gg(post.mean.df, aes(x, y, post.mean.pred)) +
++   ggtitle("Posterior mean") + 
++   coord_fixed() + #x and y axis with the same length in the plot
++   scale_fill_viridis()
+```
+
+---
+
+&lt;img src="./img/mapmeanout-1.png" &gt;
+
+
+---
+
+# Mapping the linear predictor: posterior standard deviation 
+  
+
+We plot now the posterior standard deviation of the linear predictor at the grid level
+
+
+```r
+&gt; post.sd.pred = output6pred$summary.linear.predictor[index.pred,"sd"]
+&gt; 
+&gt; post.sd.df = SpatialPixelsDataFrame(SpatialPoints(pred.grid),
++                                     data = data.frame(post.sd.pred))
+&gt; ggplot()+
++   gg(post.sd.df, aes(x, y, post.sd.pred)) +
++   ggtitle("Posterior standard deviation") + 
++   coord_fixed() +
++  scale_fill_viridis()
+```
+---
+
+&lt;img src="./img/mapsdout-1.png" &gt;
+
+---
+
+# Wrap-up: fitting a geostatistical model using SPDE approach
+
+
+- Construct the mesh to obtain a triangulation of the domain using the function .red[`inla.mesh.2d`]
+
+- Construct the SPDE model using the function .red[`inla.spde2.matern`] or .red[`inla.spde2.pcmatern`]
+
+- Construct the index set using the function .red[`inla.spde.make.index`]
+
+- Construct the projection matrix to link the observation locations to the mesh using the function .red[`inla.spde.make.A`] 
+
+- Put everything together in a stack object using the function .red[`inla.stack`]
+
+- Run the model
+
+
+
+
+---
+
 # References
 
-Banerjee, S., B. Carlin, and A. Gelfand (2015). _Hierarchical Modeling
-and Analysis for Spatial Data_. Monographs on Statistics and Applied
-Probability. New York: Chapman and Hall.
+Bachl, F. E., F. Lindgren, D. L. Borchers, et al. (2019). "inlabru: an R package for Bayesian spatial modelling from ecological survey data". In: _Methods in Ecology and Evolution_ 10.6, pp. 760-766.
 
-Lindgren, F., H. Rue, and J. Lindström (2011). "An explicit link
-between Gaussian fields and Gaussian Markov random fields: the
-stochastic partial differential equation approach (with discussion)".
-In: _J. R. Statist. Soc. B_ 73.4, pp. 423-498.
+Banerjee, S., B. P. Carlin, and A. E. Gelfand (2014). _Hierarchical modeling and analysis for spatial data_. Chapman and Hall/CRC.
 
-Simpson, D., H. Rue, A. Riebler, et al. (2017). "Penalising Model
-Component Complexity: A Principled, Practical Approach to Constructing
-Priors". In: _Statistical Science_ 32.1, pp. 1 - 28. DOI:
-[10.1214/16-STS576](https://doi.org/10.1214%2F16-STS576). URL:
-[https://doi.org/10.1214/16-STS576](https://doi.org/10.1214/16-STS576).
+Lindgren, F. and H. Rue (2015). "Bayesian Spatial Modelling with R-INLA". In: _Journal of Statistical Software_ 63.19, pp. 1-25.
+
+Lindgren, F., H. Rue, and J. Lindström (2011). "An explicit link between Gaussian fields and Gaussian Markov random fields: the stochastic partial differential equation approach (with discussion)". In: _J. R. Statist. Soc. B_ 73.4, pp. 423-498.
+
+Simpson, D., H. Rue, A. Riebler, et al. (2017). "Penalising Model Component Complexity: A Principled, Practical Approach to Constructing Priors". In: _Statistical Science_ 32.1, pp. 1-28.
 
 
 
     </textarea>
 <style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
 <script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script src="assets/remark-zoom.js"></script>
 <script src="https://platform.twitter.com/widgets.js"></script>
 <script>var slideshow = remark.create({
 "navigation": {

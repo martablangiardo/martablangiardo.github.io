@@ -119,3 +119,25 @@ Data for the practical are [here](Practical7/WK7_Practical.zip)
 
 Solution of practical 7 are [here](Practical7/Practical7_solutions.html)
 
+
+### Day 8 - Mon 6th Mar 2023
+
+- [Session 8.1](Session8.1): Introduction to geostatistics
+
+Break
+
+- [Session 8.2](Session8.2): Introduction to SPDE model with R-INLA
+
+Lunch
+
+- [Practical 8a](Practical8a): Geostatistical Modelling for Childhood Malaria in the Gambia
+
+Data for the practical 8a are [here](Practical8a/Practical8a.zip)
+Solution of practical 8a are [here](Practical8a/Practical8a_Solutions.html)
+
+- [Practical 8b](Practical8b): INLA-SPDE for Geostatistical Data: Temperature in Croatia
+
+Data for the practical 8b are [here](Practical8a/temperature.croatia.RData)
+Solution of practical 8b are [here](Practical8a/Practical8b_Solutions.html)
+
+
