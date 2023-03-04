@@ -138,6 +138,5 @@ Solution of practical 8a are [here](Practical8a/Practical8a_Solutions.html)
 - [Practical 8b](Practical8b): INLA-SPDE for Geostatistical Data: Temperature in Croatia
 
 Data for the practical 8b are [here](Practical8a/temperature.croatia.RData)
-Solution of practical 8b are [here](Practical8a/Practical8b_Solutions.html)
-
+Solution of practical 8b are [here](Practical8b/Practical8b_Solutions.html)
 
