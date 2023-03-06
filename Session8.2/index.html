@@ -999,7 +999,7 @@ Note that the function `inla.stack()` will take care of eliminating any column i
 
 # Model fitting
 
-- The vector of parameters is defined as  `\(\bm \theta = \{\tilde {\bm \xi}, b_0\}\)`  with  hyper-parameter vector  `\(\bm \psi=(\sigma^{2}_{e},r,\tau)\)`, where `\(\tau=1/\sigma\)`  and `\(r\)` (depending on `\(\kappa\)`) are the Mat&amp;eacute;rn covariance function parameters. 
+- The vector of parameters is defined as  `\(\bm \theta = \{\tilde {\bm \xi}, b_0\}\)`  with  hyper-parameter vector  `\(\bm \psi=(\sigma^{2}_{e},r,\tau)\)`, where `\(\tau=1/\sigma^2\)`  and `\(r\)` (depending on `\(\kappa\)`) are the Mat&amp;eacute;rn covariance function parameters. 
 &lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
 - In `R-INLA` the default **internal representation** for the SPDE parameters is  `\(\log(\tau)=\theta_1\)`  and  `\(\log(\kappa)=\theta_2\)`,  with  `\(\theta_1\)`  and  `\(\theta_2\)`  being given two independent Normal prior distributions.
 
@@ -1241,7 +1241,7 @@ In this case (identity link) `output6pred$summary.fitted.values` would return th
 
 # Manipulate the posterior predictive distribution 
 
-As described in Week 1, it is possible to manipulate marginal distributions. 
+As described in the previous weeks, it is possible to manipulate marginal distributions. 
 
 .pull-left[
 Consider for example the first grid point and its posterior predictive distribution:
