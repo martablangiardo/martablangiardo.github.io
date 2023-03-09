@@ -1554,15 +1554,9 @@ belong to Primary Health Care system</p>
 (between 1 and 65) called <code>village</code> indicating which village
 the children belong to.</li>
 </ul>
-<p>In this practical we will assess if sleeping under bed nets reduce
-risk of malaria. Also we are interested in evaluating if other child- or
-village-level covariates help explain risk of malaria and if there is
-evidence of spatial structure in the between-village variation which
-would indicate partly an environmental explanation.</p>
-<ul>
-<li>To start with, create a separate subdirectory to save your files
-created during this tutorial (e.g. setwd(“~/Labs/Lab_3a”)).</li>
-</ul>
+<p>In this practical we will import an additional variable,
+i.e. <strong>altitude</strong>, and we will assess if altitude affects
+the risk of malaria. Then we will perform predictions.</p>
 <div id="install-and-load-packages" class="section level1">
 <h1>1. Install and load packages</h1>
 <p>This lab requires the following packages to be installed and
@@ -1754,7 +1748,7 @@ this object as <em>GMB</em>:</li>
 </ol>
 <pre class="r klippy"><code>GMB = st_read(&quot;gmb_adm_ndma_20220901_shp/gmb_admbnda_adm2_ndma_20220901.shp&quot;)</code></pre>
 <pre><code>## Reading layer `gmb_admbnda_adm2_ndma_20220901&#39; from data source 
-##   `C:\Users\Monica\Dropbox\TEACHING\YEAR_2023\Bayes_Spatial_2023\Material\Practical8a\gmb_adm_ndma_20220901_shp\gmb_admbnda_adm2_ndma_20220901.shp&#39; 
+##   `C:\Users\Monica\Dropbox\TEACHING\YEAR_2023\workingFolder_BayesSpat\Practical8a\gmb_adm_ndma_20220901_shp\gmb_admbnda_adm2_ndma_20220901.shp&#39; 
 ##   using driver `ESRI Shapefile&#39;
 ## Simple feature collection with 49 features and 15 fields
 ## Geometry type: POLYGON
@@ -2046,7 +2040,7 @@ tm_shape(GMB) + tm_borders(lty=&quot;solid&quot;, col=&quot;black&quot;) +
 </ul>
 <pre class="r klippy"><code>mapview(pred.rast, zcol = &quot;pred.mean&quot;)</code></pre>
 <ol start="4" style="list-style-type: lower-alpha">
-<li>Similarily, we can also plot the upper and lower bounds of the 95%
+<li>Similarly, we can also plot the upper and lower bounds of the 95%
 confidence interval in <code>mapview</code></li>
 </ol>
 <ul>
@@ -2058,6 +2052,9 @@ additional layers:</li>
   mapview(pred.rast, zcol = &quot;CI.high&quot;, layer.name = &quot;CI Upper Bound&quot;)</code></pre>
 <p>See <a href="https://r-spatial.github.io/mapview/index.html" class="uri">https://r-spatial.github.io/mapview/index.html</a> for more
 information and examples using the <code>mapview</code> package.</p>
+</div>
+<div id="references" class="section level1 unnumbered">
+<h1 class="unnumbered">References</h1>
 <div id="refs" class="references csl-bib-body hanging-indent">
 <div id="ref-Diggle2002" class="csl-entry">
 Diggle, P., R. Moyeed, B. Rowlingson, and M. Thomson. 2018.

@@ -140,3 +140,19 @@ Solution of practical 8a are [here](Practical8a/Practical8a_Solutions.html)
 Data for the practical 8b are [here](Practical8b/temperature.croatia.RData)
 Solution of practical 8b are [here](Practical8b/Practical8b_Solutions.html)
 
+
+### Day 9 - Mon 13th Mar 2023
+
+- [Session 9.1](Session9.1): Introduction to temporal modelling
+
+Break
+
+- [Session 9.2](Session9.2): Spatio-temporal modelling for area data
+
+Lunch
+
+- [Practical 9](Practical9): Hospital admissions for respiratory conditions in Greater Glasgow and Clyde (2007-2011)
+
+Data for the practical 9 are [here](Practical9/DataPractical.zip)
+Solution of practical 9 are [here](Practical9/Practical9_Solutions.html)
+
