@@ -156,3 +156,15 @@ Lunch
 Data for the practical 9 are [here](Practical9/DataPractical.zip)
 Solution of practical 9 are [here](Practical9/Practical9_Solutions.html)
 
+
+### Day 10 - Mon 20th Mar 2023
+
+- [Session 10](Session10): Spatio-temporal modelling in a geostatistical framework
+
+
+Lunch
+
+- [Practical 10](Practical10): Spatio-temporal estimation and prediction of ozone concentrations in New York
+
+Solution of practical 10 are [here](Practical10/Practical10_Solutions.html)
+
