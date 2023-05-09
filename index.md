@@ -20,6 +20,7 @@ remotes::install_cran(pkg_list)
 
 The html version of the slides and the practical material will be posted here before each week session
 
+<!--
 ## Timetable
 ### Day 1 - Mon 16th Jan 2023
 
@@ -167,4 +168,5 @@ Lunch
 - [Practical 10](Practical10): Spatio-temporal estimation and prediction of ozone concentrations in New York
 
 Solution of practical 10 are [here](Practical10/Practical10_Solutions.html)
+-->
 
