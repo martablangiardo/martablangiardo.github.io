@@ -222,7 +222,6 @@ concentration over a spatially continuous domain.
 
 - Develop a statistical model to estimate viral concentration in wastewater at fine spatio-temporal resolutions covering the whole of England
 
-&lt;!-- - Collaboration between UKHSA, RSS, Alan Turing Institute --&gt;
 
 ---
 
@@ -429,73 +428,7 @@ Given observed data `\(\boldsymbol{y}\)` we sample `\(\boldsymbol{y}^\prime\)`, 
 The posterior predictive distribution at the LSOA centroids can be combined to return corresponding predictions at coarser geographical scales, as required. 
 
   - Here we consider all the Lower Tier Local Authorities in England and average the corresponding LSOA values, weighted by the population in each LSOA.
-  
-&lt;!-- - Implemented in R-INLA 
 
----
-
-
-# INLA &amp;ndash; in a nutshell...
-
-.pull-left[
-.medium[
-&lt;ol style="counter-reset: my-counter 0;"&gt;
-&lt;li&gt;Select a grid of \(H\) points \(\{\bm\psi_h^*\}\) and area weights \(\{\Delta_h\}\); interpolate the density to approximate to the posterior&lt;/li&gt;
-&lt;/ol&gt;
-]
-
-&lt;span style="display:block; margin-top: 18px ;"&gt;&lt;/span&gt;
-&lt;center&gt;&lt;img src=./img/inla1-1.png width='80%' title=''&gt;&lt;/center&gt;
-]
-
---
-
-.pull-right[
-.medium[
-&lt;ol style="counter-reset: my-counter 1;"&gt;
-&lt;li&gt; Approximates the conditional posterior of each \(\theta_j\), given \(\bm\psi, \bm{y}\) on the \(H−\)dimensional grid&lt;/li&gt;
-&lt;/ol&gt;
-]
-
-&lt;span style="display:block; margin-top: 50px ;"&gt;&lt;/span&gt;
-&lt;center&gt;&lt;img src=./img/inla2-1.png width='85%' title=''&gt;&lt;/center&gt;
-]
-
----
-
-count: false
-# INLA &amp;ndash; in a nutshell...
-
-.pull-left[
-.medium[
-&lt;ol style="counter-reset: my-counter 2;"&gt;
-&lt;li&gt; Weight the conditional marginal posteriors by the density associated with each \(\psi_h^*\)
-&lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
-&lt;/li&gt;
-&lt;/ol&gt;
-]
-
-&lt;span style="display:block; margin-top: 10px ;"&gt;&lt;/span&gt;
-
-&lt;center&gt;&lt;img src=./img/inla3-1.png width='85%' title=''&gt;&lt;/center&gt;
-]
-
---
-
-.pull-right[
-.medium[
-&lt;ol style="counter-reset: my-counter 3;"&gt;
-&lt;li&gt; (Numerically) sum over all the conditional densities to obtain the marginal posterior for \(\theta_j\)
-&lt;span style="display:block; margin-top: 50px ;"&gt;&lt;/span&gt;
-&lt;/li&gt;
-&lt;/ol&gt;
-]
-
-&lt;span style="display:block; margin-top: -10px ;"&gt;&lt;/span&gt;
-&lt;center&gt;&lt;img src=./img/inla4-1.png width='85%' title=''&gt;&lt;/center&gt;
-]
-
---&gt;
 
 ---
 
@@ -591,34 +524,6 @@ COVID-19 prevalence, with a lead time of four to five days.
 - We evaluated *in a descriptive way* the accordance between the predicted wastewater concentration and COVID-19 debiased disease prevalence.
 
 ---
-&lt;!--
-# COVID-19 debiased prevalence
-
-- Debiased prevalence was estimated combining testing data and the REal-time Assessment of Community Transmission (REACT) randomised survey Riley, et al. (2020) using the method proposed by Nicholson, et al. (2022)
-
-- Test positivity rates in Pillar 2 data are strongly biased upwards relative to the population prevalence proportion as the testing is directed
-at the higher risk population
-
-- From the randomised survey we get the estimated number of infected `\(I\)`
-
-- From the targeted tests we define:
-`\begin{align*}
-P(n \text{ of } N \mid I, \delta, \nu) &amp;= Binomial(n \mid I, P(\text{Tested} | \text{Infected})) \times \\
-&amp; Binomial(N-n \mid M-I, P(\text{Tested} \mid \text{Not Infected}))
-\end{align*}`
-
-  - `\(N\)` tests and `\(n\)` positive ones.
-
-  - `\(\delta = log\left(Odds(\text{Tested} | \text{Infected})/Odds(\text{Tested} | \text{Not Infected})\right)\)`  
-
-  - `\(\nu=\log Odds(Tested \mid Not Infected)\)`, easy to get from `\(logit[(N − n)/M ]\)`
-
-- Specifying a `\(Beta\)` prior on `\(P(Tested | Infected)\)` and using a Gaussian approximation we can use some conjugacy property and obtain posterior estimates of `\(\delta\)`
-
-- Extensive cross-validation performed
-
----
---&gt;
 
 # Wastewater viral concentration and COVID-19 prevalence
 
@@ -755,17 +660,17 @@ where
 1\. No wastewater
 
 &lt;span style="display:block; margin-top: 10px ;"&gt;&lt;/span&gt;
-`\(\rightarrow\)` temporal trend for the coarse level model
+`\(\rightarrow\)` temporal trend for the coarse level model `\(\tilde{\mu}_{t} = \alpha + b_t + d_t\)`
 &lt;span style="display:block; margin-top: 10px ;"&gt;&lt;/span&gt;
-`\(\rightarrow\)` spatial and temporal trend for the local level model
+`\(\rightarrow\)` spatial and temporal trend for the local level model `\(\mu_{lt} = (\alpha + u_l) + (b_t + v_{lt})\)`
 
 &lt;span style="display:block; margin-top: 30px ;"&gt;&lt;/span&gt;
 
 2\. No temporal varying coefficients
 &lt;span style="display:block; margin-top: 10px ;"&gt;&lt;/span&gt;
-`\(\rightarrow\)` temporal trend for the course level model; linear relationship with wastewater
+`\(\rightarrow\)` linear relationship with wastewater `\(\tilde{\mu}_{t} = \alpha + b_t + d \tilde{y}^{\prime}_{t}\)`
 &lt;span style="display:block; margin-top: 10px ;"&gt;&lt;/span&gt;
-`\(\rightarrow\)` spatial and temporal trend for the local level model; spatial-varying coefficient for wastewater
+`\(\rightarrow\)` spatial-varying coefficient for wastewater `\(\mu_{lt} = (\alpha + u_l) + (b_t + v_{lt}) + (d + m_l)y^{\prime}_{lt}\)`
 
 --
 
@@ -773,11 +678,12 @@ where
 
 - *Study period*: 40 weeks
 
-- *Training window*: first 20 weeks (LTLA + national weekly prevalence + LTLA + national weekly wastewater)
+- **Training window**: first 20 weeks (.red[LTLA + national weekly prevalence] + .blue[LTLA + national weekly wastewater])
 
-- *Disaggregation window*: subsequent 5/10/15/20 weeks (national weekly prevalence + LTLA + national weekly wastewater)
+- **Disaggregation window**: subsequent 5/10/15/20 weeks (.red[national weekly prevalence] + .blue[LTLA + national weekly wastewater])
 
 ---
+
 
 # Results
 
