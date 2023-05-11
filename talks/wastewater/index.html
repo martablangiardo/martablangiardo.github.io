@@ -398,7 +398,7 @@ with `\(\rho\)` as the temporal autoregressive coefficient.
 
 --
 
-The  `\(\Sigma_{z}\)` matrix represents the spatial structure and is defined using a Matern covariance function.
+The  `\(\Sigma_{z}\)` matrix represents the spatial structure and is defined using a Mat&amp;eacute;rn covariance function.
 
 &lt;!--$$\text{Cov}(\bm{z}_i,\bm{z}_s)\ = \frac{\sigma^2_{z}}{\Gamma(\lambda)2^{\lambda-1}}(\kappa ||\bm{z}_i - \bm{z}_s||)^{\lambda}K_{\lambda}(\kappa ||\bm{z}_i - \bm{z}_s||)$$
 
@@ -603,7 +603,35 @@ a finer spatial scale?
 
 # Modelling framework
 
-- Local (LTLA) and coarse (national) models jointly fitted
+- Coarse (national) and local (LTLA) models jointly fitted
+
+- Wastewater predictions available from the geostatistical model
+
+- Posterior distribution of COVID-19 prevalence obtained through Nicholson, et al. (2022) 
+
+--
+
+### Coarse (national)
+`\begin{align*}
+\tilde{P}_{t} &amp;\sim \mbox{N}(\tilde{\mu}_{t},\tilde{\sigma}^2_{t})\\
+\tilde{\mu}_{t} &amp;= \alpha + b_t + d_t \tilde{y}^{\prime}_{t}
+\end{align*}`
+
+where 
+
+- `\(\tilde{P}_{t}\)` and `\(\tilde{\sigma}^2_{t}\)` are posterior mean and variance of the national aggregation of the prevalence (population weighted)
+- `\(\tilde{y}^{\prime}_{t}\)` is a similar aggregation for wastewater concentration
+
+&lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
+
+- `\(b_t\)` is modelled using a RW1
+- `\(d_t\)` is modelled using a RW2
+
+---
+
+# Modelling framework
+
+- Coarse (national) and local (LTLA) models jointly fitted
 
 - Wastewater predictions available from the geostatistical model
 
@@ -623,31 +651,7 @@ where
 - `\(p_{lt}\)` and `\(\sigma^2_{lt}\)` are posterior mean and variance of the COVID-19 prevalence 
 - `\(\bm{g}_t\)` and `\(\bm{S}_t\)` are the posterior mean and covariance matrix from the wastewater model
 - `\(u_{l}\)`, `\(v_{lt}, m_l\)` are modelled as exchangeable
-- `\(b_t\)` is modelled using a RW1
-- `\(d_t\)` is modelled using a RW2
 
----
-
-# Modelling framework
-
-- Local (LTLA) and coarse (national) models jointly fitted
-
-- Wastewater predictions available from the geostatistical model
-
-- Posterior distribution of COVID-19 prevalence obtained through Nicholson, et al. (2022) 
-
---
-
-### Coarse (national)
-`\begin{align*}
-P_{t} &amp;\sim \mbox{N}(\tilde{\mu}_{t},\tilde{\sigma}^2_{t})\\
-\tilde{\mu}_{t} &amp;= \alpha + b_t + d_t \tilde{y}^{\prime}_{t}
-\end{align*}`
-
-where 
-
-- `\(P_{t}\)` and `\(\tilde{\sigma}^2_{t}\)` are posterior mean and variance of the national aggregation of the prevalence (population weighted)
-- `\(\tilde{y}^{\prime}_{t}\)` is a similar aggregation for wastewater concentration
 
 ---
 
@@ -690,35 +694,35 @@ where
 .pull-left[&lt;center&gt;&lt;img src=./img/Results.png width='150%' title='INCLUDE TEXT HERE'&gt;&lt;/center&gt;
 ]
 
-.pull-right[&lt;center&gt;&lt;img src=./img/RMSE_LTLA.png width='65%' title='INCLUDE TEXT HERE'&gt;&lt;/center&gt;
-]
-
-&lt;span style="display:block; margin-top: -180px ;"&gt;&lt;/span&gt;
+.pull-right[
 - Using wastewater data helps to improve the quality of the disaggregated LTLA prevalence (lower RMSE and better coverage) consistently across all disaggregation horizons.
 
 - Not large difference between the model 2 and model 3
 
 - Some geographical variation
 
+]
+
+&lt;span style="display:block; margin-top: -20px ;"&gt;&lt;/span&gt;
+&lt;center&gt;&lt;img src=./img/Boxplot.png width='80%' title='INCLUDE TEXT HERE'&gt;&lt;/center&gt;
+
+
 ---
 
 # Results
 
-.pull-left[&lt;center&gt;&lt;img src=./img/Heatmap.png width='80%' title='INCLUDE TEXT HERE'&gt;&lt;/center&gt;
+.pull-left[&lt;span style="display:block; margin-top: 40px ;"&gt;&lt;/span&gt;
+&lt;center&gt;&lt;img src=./img/Heatmap.png width='100%' title='INCLUDE TEXT HERE'&gt;&lt;/center&gt;
 ]
 
 
-.pull-right[&lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
+.pull-right[&lt;span style="display:block; margin-top: 5px ;"&gt;&lt;/span&gt;
 &lt;center&gt;&lt;img src=./img/Scatterplot.png width='80%' title='INCLUDE TEXT HERE'&gt;&lt;/center&gt;
 ]
 
-- Good agreement overall
-
-- Heatmap shows some spatio-temporal variability
-
 `\(\rightarrow\)` Some periods (e.g. Christmas are showing larger differences)
 
-`\(\rightarrow\)` Some areas are consistently underestimated/overestimated (e.g. ??)
+`\(\rightarrow\)` Some areas are consistently underestimated/overestimated
 
 ---
 # What's next
