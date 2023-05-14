@@ -85,13 +85,13 @@ class: title-slide
 
 ### [MRC Centre for Environment and Health](https://environment-health.ac.uk/) | Imperial College London    
 
-### LSE, Department of Statistics, London 
+### Sylvia Richardson's Festschrift, MRC Biostatistics Unit, Cambridge 
 
 &lt;!-- Can also separate the various components of the extra argument 'params', eg as in 
-### LSE, Department of Statistics, London, 15th May 2023, Modelling wastewater concentration during the COVID-19 pandemic
+### Sylvia Richardson's Festschrift, MRC Biostatistics Unit, Cambridge, 12th May 2023, Modelling wastewater concentration during the COVID-19 pandemic
 --&gt;
 
-15th May 2023
+12th May 2023
 
 ---
 
@@ -105,7 +105,7 @@ layout: true
 Modelling wastewater concentration during the COVID-19 pandemic 
 ]
 .alignright[
-LSE, Department of Statistics, NA 
+Sylvia Richardson's Festschrift, NA 
 ]
 ] 
 
@@ -125,15 +125,14 @@ pre code {
 
 &lt;!-- I have known Sylvia for many years, since 2005, actually 2004 when i met her at a conference as a PhD student and you know when you meet your scientific hero, read the papers, very close to ask her for an autograph. Then I moved to London as she asked me to apply for a postdoc and I was "really, me?", well I did, I got the job after an interview over the phone when I was petrified of not understanding the questions (no zoom back then) and I move to London. I really love Sylvia, she has been a great, supportive boss, a wonderful friend, we shared a lot over the years, and I am really lucky that I met her and so happy to celebrate her today with you all. --&gt;
 
-&lt;!--&lt;center&gt;&lt;img src=./img/SylviaMarta2.jpeg width='30%' title='INCLUDE TEXT HERE'&gt;&lt;/center&gt;
+&lt;center&gt;&lt;img src=./img/SylviaMarta2.jpeg width='30%' title='INCLUDE TEXT HERE'&gt;&lt;/center&gt;
 
 .pull-left[&lt;center&gt;&lt;img src=./img/SylviaMarta.jpeg width='50%' title='INCLUDE TEXT HERE'&gt;&lt;/center&gt;
 ]
 
 .pull-right[&lt;center&gt;&lt;img src=./img/Office2012.jpg width='40%' title='INCLUDE TEXT HERE'&gt;&lt;/center&gt;]
 
---&gt;
-
+---
 
 # The Lab
 
@@ -222,144 +221,6 @@ concentration over a spatially continuous domain.
 ## Aim
 
 - Develop a statistical model to estimate viral concentration in wastewater at fine spatio-temporal resolutions covering the whole of England
-
-&lt;!-- - Collaboration between UKHSA, RSS, Alan Turing Institute --&gt;
-
-
----
-
-# Modelling spatial data
-
-- **Point-referenced data**: the exact location of the occurrences is known
-  -  can be collected through specialized survey / monitoring network...
-  - if locations are **fixed** (monitoring stations, postcodes in an area) and the variable of interest is measured at each location (e.g. presence/absence of cases, pollution concentrations)
-  
-  `\(\Rightarrow\)` .red[geostatistical framework.]
-
---
-
-.center[.content-box-blue[
-**First law of geography** (W. Tobler, 1970): everything is related to everything else, but near things are more related than distant things 
-]
-]
-
---
-
-- We want to .red[reconstruct a latent spatial (temporal) surface] `\(\class{red}{\mathbf{S}}\)` .red[from a finite set of noisy observations and their spatial (temporal) location.]
-
-&lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
-
-- Use the spatial dependence to **predict** values of the spatial
-surface (together with associated uncertainty) at locations where
-there are no observations.
-
---
-
-&lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
-
-.center[The common framework to geostatistical models is that of .red[**Gaussian
-random fields**.]]
-
-
----
-
-# Gaussian fields
-
-- A spatial process is a Gaussian field if `\(\left(y(\bm s_1),\ldots, y(\bm s_n)\right)\)` follows a multivariate Normal distribution with mean `\(\bm \mu=\left(\mu(\bm s_{1}), \ldots, \mu(\bm s_{n})\right)\)` and spatially structured covariance matrix `\(\bm \Sigma\)`. 
-
---
-
-&lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
-
-- The spatial process is called .red[second-order stationary] if 
-&lt;span style="display:block; margin-top: 10px ;"&gt;&lt;/span&gt;
-(i) `\(\bm \mu\)` is constant (i.e. `\(\mu(\bm s_{i}) = \mu\)` for each `\(i\)`) 
-&lt;span style="display:block; margin-top: 10px ;"&gt;&lt;/span&gt;
-(ii) the spatial covariance function depends only on the distance vector `\((\bm s_{i}-\bm s_{j})\)`. 
-
---
-
-&lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
-
-- A stationary process is .red[isotropic] if the covariance does not depend on the direction but just on the Euclidean distance  `\(||\bm s_{i}-\bm s_{j}|| \in \mathbb{R}\)`.
-
---
-
-&lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
-
-- Several functions are available for the spatial covariance function (eg exponential, Mat\'ern, spherical, etc.) parameterized by some parameters (eg spatial variance, range, etc.).
-
----
-
-
-
-# Model for geostatistical data
-Data are measured (possibly with error) at `\(n\)` spatial locations `\((\bm s_{1},\ldots,\bm s_{n})\)` and are denoted by `\(\bm y=\left(y(\bm s_1),\ldots, y(\bm s_n)\right)=(y_1,\ldots,y_n)\)`.
-
-Usually the following model is assumed
-
-`\begin{align*}
-y_s &amp;\sim N(\mu_s, \sigma^2_y)\\
-\mu_s &amp;= \alpha + \bm{x}_s\boldsymbol{\beta} + \xi_s
-\end{align*}`
-
---
-
- where
-
-- `\(\bm{x}\boldsymbol{\beta}\)`  is the so-called large scale component, defined by some covariates.
-&lt;span style="display:block; margin-top: 10px ;"&gt;&lt;/span&gt;
-- `\(\boldsymbol{\xi}\)`  is a zero mean Gaussian spatial process commonly assumed to be stationary and isotropic with covariance function `\(Cov(\xi_s,\xi_j)\)`  which depends only on the distance between the locations.
-&lt;span style="display:block; margin-top: 10px ;"&gt;&lt;/span&gt;
-- `\(\sigma^2_y\)`  represents the measurement error variance (known as nugget effect).
-&lt;span style="display:block; margin-top: 10px ;"&gt;&lt;/span&gt;
-- `\(Cov(\xi_s,\xi_j)\)` is a function of the range, which tells us how much the correlation decays with the distance
-
----
-
-# Matern covariance function
-
-`$$\text{Cov}(\xi(\bm s_i),\xi(\bm s_j))= \text{Cov}(\xi_i,\xi_j)=\frac{\sigma^2}{\Gamma(\lambda)2^{\lambda-1}}\left(\kappa ||\bm s_i - \bm s_j||\right)^\lambda K_\lambda\left(\kappa ||\bm s_i - \bm s_j||\right)$$`
-where
--  `\(||\bm s_i - \bm s_j||\)`  is the Euclidean distance between two generic locations `\(\bm s_i, \bm s_j \in \mathbb{R}^d\)`
-- `\(\sigma^2\)`  is the .red[variance]
-- `\(K_\lambda\)`  denotes the modified Bessel function of second kind and order `\(\lambda&gt;0\)`, which measures the degree of .red[smoothness] of the process. 
-- `\(\kappa&gt;0\)`  is a .red[scale] parameter related to the range `\(r\)`, i.e. the distance at which the spatial correlation becomes almost null. 
-- Typically, the empirically derived definition for the range is `\(r=\frac{\sqrt{8 \lambda}}{\kappa}\)`, with `\(r\)`  corresponding to the distance at which the spatial correlation is close to 0.1, for each `\(\lambda\geq 1/2\)`.
-
---
-
-The Matern family is a very flexible class of covariance functions able to cover a wide range of
-spatial fields.
-
-
-.pull-left[
-&lt;center&gt;&lt;img src=./img/Matern1.png width='40%' title='INCLUDE TEXT HERE'&gt;&lt;/center&gt;
-]
-
-.pull-right[&lt;center&gt;&lt;img src=./img/Matern2.png width='40%' title='INCLUDE TEXT HERE'&gt;&lt;/center&gt;
-]
-
-
----
-
-
-# Possible approaches for estimation
-- .red[Classical geostatistical approach]: the empirical variogram is used as an exploratory tool and the mean and the covariance function parameters are estimated through  least square methods usually adopting a two step procedure
-
-`\(\rightarrow\)`  very simple and not computationally intensive;
-
-`\(\rightarrow\)`  two-step approach to prediction;
-
-`\(\rightarrow\)`  difficult to account for uncertainty. 
-
-- .red[(Bayesian) Model-based  approach]:  hierarchical model specification and posterior predictive distribution for prediction;
-
-`\(\rightarrow\)`  easy to allow for uncertainty;
-
-`\(\rightarrow\)`  flexible in accounting for any type of distribution;
-
-`\(\rightarrow\)` high computationally costs.
 
 
 ---
@@ -537,7 +398,7 @@ with `\(\rho\)` as the temporal autoregressive coefficient.
 
 --
 
-The  `\(\Sigma_{z}\)` matrix represents the spatial structure and is defined using a Matern covariance function.
+The  `\(\Sigma_{z}\)` matrix represents the spatial structure and is defined using a Mat&amp;eacute;rn covariance function.
 
 &lt;!--$$\text{Cov}(\bm{z}_i,\bm{z}_s)\ = \frac{\sigma^2_{z}}{\Gamma(\lambda)2^{\lambda-1}}(\kappa ||\bm{z}_i - \bm{z}_s||)^{\lambda}K_{\lambda}(\kappa ||\bm{z}_i - \bm{z}_s||)$$
 
@@ -568,71 +429,6 @@ The posterior predictive distribution at the LSOA centroids can be combined to r
 
   - Here we consider all the Lower Tier Local Authorities in England and average the corresponding LSOA values, weighted by the population in each LSOA.
 
-
-- Implemented in R-INLA 
-
----
-
-
-# INLA &amp;ndash; in a nutshell...
-
-.pull-left[
-.medium[
-&lt;ol style="counter-reset: my-counter 0;"&gt;
-&lt;li&gt;Select a grid of \(H\) points \(\{\bm\psi_h^*\}\) and area weights \(\{\Delta_h\}\); interpolate the density to approximate to the posterior&lt;/li&gt;
-&lt;/ol&gt;
-]
-
-&lt;span style="display:block; margin-top: 18px ;"&gt;&lt;/span&gt;
-&lt;center&gt;&lt;img src=./img/inla1-1.png width='80%' title=''&gt;&lt;/center&gt;
-]
-
---
-
-.pull-right[
-.medium[
-&lt;ol style="counter-reset: my-counter 1;"&gt;
-&lt;li&gt; Approximates the conditional posterior of each \(\theta_j\), given \(\bm\psi, \bm{y}\) on the \(H−\)dimensional grid&lt;/li&gt;
-&lt;/ol&gt;
-]
-
-&lt;span style="display:block; margin-top: 50px ;"&gt;&lt;/span&gt;
-&lt;center&gt;&lt;img src=./img/inla2-1.png width='85%' title=''&gt;&lt;/center&gt;
-]
-
----
-
-count: false
-# INLA &amp;ndash; in a nutshell...
-
-.pull-left[
-.medium[
-&lt;ol style="counter-reset: my-counter 2;"&gt;
-&lt;li&gt; Weight the conditional marginal posteriors by the density associated with each \(\psi_h^*\)
-&lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
-&lt;/li&gt;
-&lt;/ol&gt;
-]
-
-&lt;span style="display:block; margin-top: 10px ;"&gt;&lt;/span&gt;
-
-&lt;center&gt;&lt;img src=./img/inla3-1.png width='85%' title=''&gt;&lt;/center&gt;
-]
-
---
-
-.pull-right[
-.medium[
-&lt;ol style="counter-reset: my-counter 3;"&gt;
-&lt;li&gt; (Numerically) sum over all the conditional densities to obtain the marginal posterior for \(\theta_j\)
-&lt;span style="display:block; margin-top: 50px ;"&gt;&lt;/span&gt;
-&lt;/li&gt;
-&lt;/ol&gt;
-]
-
-&lt;span style="display:block; margin-top: -10px ;"&gt;&lt;/span&gt;
-&lt;center&gt;&lt;img src=./img/inla4-1.png width='85%' title=''&gt;&lt;/center&gt;
-]
 
 ---
 
@@ -729,39 +525,9 @@ COVID-19 prevalence, with a lead time of four to five days.
 
 ---
 
-# COVID-19 debiased prevalence
-
-- Debiased prevalence was estimated combining testing data and the REal-time Assessment of Community Transmission (REACT) randomised survey Riley, et al. (2020) using the method proposed by Nicholson, et al. (2022)
-
-- Test positivity rates in Pillar 2 data are strongly biased upwards relative to the population prevalence proportion as the testing is directed
-at the higher risk population
-
-- From the randomised survey we get the estimated number of infected `\(I\)`
-
-- From the targeted tests we define:
-`\begin{align*}
-P(n \text{ of } N | I, \delta, \nu) &amp;= \text{Binomial}(n | I, P(\text{Tested} | \text{Infected})) \times \\
-&amp; \text{Binomial}(N-n | M-I, P(\text{Tested} | \text{Not Infected}))
-\end{align*}`
-
-  - `\(N\)` tests and `\(n\)` positive ones.
-
-  - `\(\delta = log\left(\text{Odds}(\text{Tested} | \text{Infected})/\text{Odds}(\text{Tested} | \text{Not Infected})\right)\)`  
-
-  - `\(\nu=\log \text{Odds}(\text{Tested} | \text{Not Infected})\)`, easy to get from `\(\logit[(N − n)/M ]\)`
-
-- Specifying a Beta prior on `\(P(\text{Tested} | \text{Infected})\)` and using a Gaussian approximation we can use some conjugacy property and obtain posterior estimates of `\(\delta\)`
-
-&lt;span style="display:block; margin-top: 10px ;"&gt;&lt;/span&gt;
-
-- Extensive cross-validation performed
-
----
-
 # Wastewater viral concentration and COVID-19 prevalence
 
-&lt;!-- - Debiased prevalence was estimated combining testing data and the REal-time Assessment of Community Transmission (REACT) randomised survey Riley, et al. (2020) using the method proposed by Nicholson, et al. (2022)
---&gt;
+- Debiased prevalence was estimated combining testing data and the REal-time Assessment of Community Transmission (REACT) randomised survey Riley, et al. (2020) using the method proposed by Nicholson, et al. (2022)
 
 &lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
 
@@ -922,6 +688,7 @@ where
 
 ---
 
+
 # Results
 
 .pull-left[&lt;center&gt;&lt;img src=./img/Results.png width='150%' title='INCLUDE TEXT HERE'&gt;&lt;/center&gt;
@@ -958,16 +725,6 @@ where
 `\(\rightarrow\)` Some areas are consistently underestimated/overestimated
 
 ---
-# What's next
-
-How can wastewater be incorporated into a real-time, multiplex public health surveillance system?
-
-&lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
-
-&lt;center&gt;&lt;img src=./img/Surveillance_representation.png width='60%' title='INCLUDE TEXT HERE'&gt;&lt;/center&gt;
-
----
-
 # What's next
 
 How can wastewater be incorporated into a real-time, multiplex public health surveillance system?
