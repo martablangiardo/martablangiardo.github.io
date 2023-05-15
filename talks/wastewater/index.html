@@ -317,7 +317,7 @@ y_s &amp;\sim N(\mu_s, \sigma^2_y)\\
 
 ---
 
-# Matern covariance function
+# Mat&amp;eacute;rn covariance function
 
 `$$\text{Cov}(\xi(\bm s_i),\xi(\bm s_j))= \text{Cov}(\xi_i,\xi_j)=\frac{\sigma^2}{\Gamma(\lambda)2^{\lambda-1}}\left(\kappa ||\bm s_i - \bm s_j||\right)^\lambda K_\lambda\left(\kappa ||\bm s_i - \bm s_j||\right)$$`
 where
@@ -329,7 +329,7 @@ where
 
 --
 
-The Matern family is a very flexible class of covariance functions able to cover a wide range of
+The Mat&amp;eacute;rn family is a very flexible class of covariance functions able to cover a wide range of
 spatial fields.
 
 
@@ -537,7 +537,7 @@ with `\(\rho\)` as the temporal autoregressive coefficient.
 
 --
 
-The  `\(\Sigma_{z}\)` matrix represents the spatial structure and is defined using a Matern covariance function.
+The  `\(\Sigma_{z}\)` matrix represents the spatial structure and is defined using a Mat&amp;eacute;rn covariance function.
 
 &lt;!--$$\text{Cov}(\bm{z}_i,\bm{z}_s)\ = \frac{\sigma^2_{z}}{\Gamma(\lambda)2^{\lambda-1}}(\kappa ||\bm{z}_i - \bm{z}_s||)^{\lambda}K_{\lambda}(\kappa ||\bm{z}_i - \bm{z}_s||)$$
 
@@ -570,6 +570,84 @@ The posterior predictive distribution at the LSOA centroids can be combined to r
 
 
 - Implemented in R-INLA 
+
+---
+
+# Latent Gaussian models (LGMs)
+- The general problem of (parametric) inference is posited by assuming a probability model for the observed data `\(\boldsymbol y=\left(y_1,\ldots, y_n\right)\)`, as a function of some relevant parameters
+
+&lt;span style="display:block; margin-top: -10px ;"&gt;&lt;/span&gt;
+
+.myblue[$$\boldsymbol{y} \mid \boldsymbol{\theta},\boldsymbol\psi \sim p(\boldsymbol{y} \mid \boldsymbol{\theta},\boldsymbol\psi) = \prod_{i=1}^n p(y_i \mid \boldsymbol{\theta},\boldsymbol\psi)$$]
+--
+
+&lt;span style="display:block; margin-top: -10px ;"&gt;&lt;/span&gt;
+
+- Often (in fact for a surprisingly large range of models!), we can assume that the parameters are described by a .red[**Gaussian Markov Random Field** (GMRF)]
+
+
+.myblue[
+`$$\boldsymbol{\theta} \mid \boldsymbol\psi \sim \text{Normal}(\boldsymbol 0,\boldsymbol{Q^{-1}}(\boldsymbol\psi))$$`]
+
+.myblue[
+`$$\theta_i \perp\!\!\!\perp \theta_j \mid \boldsymbol\theta_{-i,j}   \Longleftrightarrow Q_{ij}(\boldsymbol\psi)=0$$`
+]
+
+&lt;span style="display:block; margin-top: -20px ;"&gt;&lt;/span&gt;
+
+where 
+- The precision matrix `\(\bm Q\)` depends on some hyperparameters `\(\bm\psi\)` .
+- The notation `\(-i,j\)` indicates all the other elements of the parameters vector, excluding elements `\(i\)` and `\(j\)`
+- The components of `\(\bm \theta\)` are supposed to be *conditionally independent* with the consequence that `\(\bm Q\)` is a sparse precision matrix.
+
+- This kind of models is often referred to as .olive[**Latent Gaussian models**].
+
+---
+
+# LGMs as a general framework
+
+- In general
+
+.myblue[
+`\begin{align*}
+\bm y \mid \bm \theta,\bm\psi  &amp;\sim  \prod_i p(y_i\mid\bm\theta,\bm\psi)\class{black}{\mbox{  (Data model)}}\\
+\bm\theta \mid \bm\psi &amp;\sim  p(\bm\theta\mid\bm\psi) = \mbox{Normal}(0,\bm Q^{-1}(\bm\psi)) \class{black}{\mbox{  (Latent Gaussian Field)}}\\
+\bm\psi &amp;\sim p(\bm\psi) \class{black}{\mbox{ (Hyperprior)}}
+\end{align*}`
+]
+
+--
+
+&lt;span style="display:block; margin-top: 30px ;"&gt;&lt;/span&gt;
+
+- The dimension of `\(\class{myblue}{\bm\theta}\)` can be very large (eg 10 `\(^2\)`-10 `\(^5\)`).
+
+&lt;span style="display:block; margin-top: 10px ;"&gt;&lt;/span&gt;
+
+- Conversely,  the dimension of `\(\class{myblue}{\bm\psi}\)` must be relatively small (less than 20 is recommended) to avoid an exponential increase in the computational costs of the model.
+
+---
+
+# LGMs as a general framework
+
+- A very general way of specifying the problem is specifying a distribution for `\(\class{myblue}{y_i}\)` characterized by a parameter  `\(\class{myblue}{\phi_i}\)` (usually the mean) defined as a function of a structured additive predictor `\(\class{myblue}{\eta_i}\)`, defined on a suitable scale, such that  `\(\class{myblue}{g(\phi_i)=\eta_i}\)` (e.g. logistic for binomial data):
+
+.myblue[
+`$$\eta_i = \beta_0 + \sum_{m=1}^M \beta_m x_{mi} + \sum_{l=1}^L f_l(z_{li})$$`
+]
+
+where
+- `\(\beta_0\)` is the intercept; 
+- `\(\bm\beta=\{\beta_1,\ldots,\beta_M\}\)` quantify the effect of the covariates `\(\bm{x}=(\bm{x_1},\ldots, \bm{x_M})\)` on the response; 
+- `\(\bm{f}=\{f_1(\cdot),\ldots,f_L(\cdot)\}\)` is a set of functions defined in terms of some covariates `\(\bm{z}=(\bm z_1,\ldots, \bm z_L)\)`
+
+and then assume 
+
+`$$\class{red}{\bm\theta=\{\beta_0,\bm \beta,\bm f \} \sim \mbox{Normal}(\bm 0,\bm Q^{-1}(\bm\psi)) = \mbox{GMRF}(\bm\psi)}$$`
+
+--
+
+- **NB**: This of course implies some form of Normally-distributed marginals for `\(\beta_0,\bm{\beta}\)` and `\(\bm{f}\)`
 
 ---
 
@@ -727,9 +805,8 @@ COVID-19 prevalence, with a lead time of four to five days.
 
 - We evaluated *in a descriptive way* the accordance between the predicted wastewater concentration and COVID-19 debiased disease prevalence.
 
----
 
-# COVID-19 debiased prevalence
+&lt;!-- # COVID-19 debiased prevalence
 
 - Debiased prevalence was estimated combining testing data and the REal-time Assessment of Community Transmission (REACT) randomised survey Riley, et al. (2020) using the method proposed by Nicholson, et al. (2022)
 
@@ -755,13 +832,14 @@ P(n \text{ of } N | I, \delta, \nu) &amp;= \text{Binomial}(n | I, P(\text{Tested
 &lt;span style="display:block; margin-top: 10px ;"&gt;&lt;/span&gt;
 
 - Extensive cross-validation performed
+--&gt;
 
 ---
 
 # Wastewater viral concentration and COVID-19 prevalence
 
-&lt;!-- - Debiased prevalence was estimated combining testing data and the REal-time Assessment of Community Transmission (REACT) randomised survey Riley, et al. (2020) using the method proposed by Nicholson, et al. (2022)
---&gt;
+- Debiased prevalence was estimated combining testing data and the REal-time Assessment of Community Transmission (REACT) randomised survey Riley, et al. (2020) using the method proposed by Nicholson, et al. (2022)
+
 
 &lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
 
