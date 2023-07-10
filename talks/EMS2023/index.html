@@ -7,6 +7,8 @@
     <script src="libs/header-attrs/header-attrs.js"></script>
     <link href="libs/panelset/panelset.css" rel="stylesheet" />
     <script src="libs/panelset/panelset.js"></script>
+    <script src="libs/kePrint/kePrint.js"></script>
+    <link href="libs/lightable/lightable.css" rel="stylesheet" />
     <!-- (Re)Defines a bunch of LaTeX commands that can then be used directly in the .Rmd file as '\command{...}' -->
     <script type="text/x-mathjax-config">
     MathJax.Hub.Config({
@@ -88,10 +90,10 @@ class: title-slide
 ### EMS 2023, Warsaw University 
 
 &lt;!-- Can also separate the various components of the extra argument 'params', eg as in 
-### EMS 2023, Warsaw University, 7 July 2023, Spatio-temporal Bayesian models for environmental epidemiology
+### EMS 2023, Warsaw University, 7th July 2023, Spatio-temporal Bayesian models for environmental epidemiology
 --&gt;
 
-7 July 2023
+7th July 2023
 
 &lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
 
@@ -109,7 +111,7 @@ layout: true
 Spatio-temporal Bayesian models for environmental epidemiology 
 ]
 .alignright[
-EMS 2023,  7 Jul 2023 
+EMS 2023, NA 
 ]
 ] 
 
@@ -124,8 +126,9 @@ pre code {
 }
 &lt;/style&gt;
 
-
 ---
+
+
 
 # Environmental Epidemiology
 
@@ -141,13 +144,13 @@ pre code {
 
 Two main ingredients
 
-&lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
+&lt;span style="display:block; margin-top: 10px ;"&gt;&lt;/span&gt;
 
   - Environmental exposure
   
   `\(\Rightarrow\)` a continuous field over the study area.
 
-&lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
+&lt;span style="display:block; margin-top: 10px ;"&gt;&lt;/span&gt;
 
   - Health outcomes
 
@@ -157,17 +160,17 @@ Two main ingredients
 
 &lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
 
-- Study designs typically used:
-&lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
+Study designs typically used:
+&lt;span style="display:block; margin-top: 10px ;"&gt;&lt;/span&gt;
   1. Cohort studies - Focus on long-term effects (individual data)
-&lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
+&lt;span style="display:block; margin-top: 10px ;"&gt;&lt;/span&gt;
   2. Small area studies - Focus on long-term effects (aggregated data)
-&lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
+&lt;span style="display:block; margin-top: 10px ;"&gt;&lt;/span&gt;
   3. Time-series studies - Focus on short-term effects (aggregated data)
 
 --
 
-&lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
+&lt;span style="display:block; margin-top: 10px ;"&gt;&lt;/span&gt;
 
 .center[.red[.large[Spatial and temporal dependencies are key.]]]
 
@@ -184,6 +187,8 @@ Two main ingredients
 
 When are we interested in the spatial and temporal components?
 
+--
+
 &lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
 
 - Hypothesis generating perspective 
@@ -197,6 +202,7 @@ When are we interested in the spatial and temporal components?
 &lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
 
 - Is the spatial clustering and/or temporal trend a nuisance quantity that we wish to take into account but are not explicitly interested in?
+
 `\(\rightarrow\)` Spatial / time series regression.
 
 ---
@@ -206,252 +212,14 @@ When are we interested in the spatial and temporal components?
 
 &lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
 
+--
+
 In this talk
-
-  - Source apportionment of air pollution and health (times series + risk assessment)
-&lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
-  - Wastewater modelling (space-time modelling)
-&lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
-  - Temperature and COPD (non linear relationship + risk assessment)
-
----
-
-name: SA
-
-&lt;span style="display:block; margin-top: 250px ;"&gt;&lt;/span&gt;
-
-.myblue[.center[.huge[
-**Time series analysis: source apportionment**]]]
-
-
----
-
-# Air pollution and health
-
-- Outdoor air pollution is carcinogenic to humans (IARC 2013);
 &lt;span style="display:block; margin-top: 10px ;"&gt;&lt;/span&gt;
--  Air pollution causes over 6.5 million deaths each year globally, and this number is increasing (Fuller et al. 2022).
+  - Wastewater modelling and COVID-19 prevalence (space-time geostatistical model; uncertainty propagation; data integration)
 &lt;span style="display:block; margin-top: 10px ;"&gt;&lt;/span&gt;
-- Outdoor  PM causes a reduction in life expectancy of average population by approximately a year in Europe (WHO 2006);
-&lt;span style="display:block; margin-top: 10px ;"&gt;&lt;/span&gt;
-- Fossil fuel air pollution is responsible for 1 in 5 deaths worldwide (Vohra et al. 2021).
-&lt;span style="display:block; margin-top: 10px ;"&gt;&lt;/span&gt;
-- Synergistic effects between heat and air pollution exposure for all-causes as well as cardio-respiratory mortality/hospital admissions (Anenberg et al. 2020).
-&lt;span style="display:block; margin-top: 10px ;"&gt;&lt;/span&gt;
-- The triad of pollution, climate change, and biodiversity loss are the key global environmental issues of our time (Fuller et al. 2022). 
-
-&lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
-
-.center[.content-box-blue[
-Particulate matter - PM and gasses such as nitrogen oxide/dioxide and ozone are among the most studied pollutants in environmental epidemiology  
-]
-]
-
----
-
-# Source apportionment
-
-- Particulate matter (PM) is made up of different components coming
-from several sources, which might have different level of toxicity 
-
-- Identifying these sources, known as **Source Apportionment** (SA), is a key element in order to implement effective policies to improve air quality and population health.
-
-&lt;center&gt;&lt;img src=./img/Mixture.jpg width='50%' title='INCLUDE TEXT HERE'&gt;&lt;/center&gt;
-
-&lt;center&gt;
-.content-box-green[.center[.large[*Aim*: to apportion particle number size distributions (PNSD) and
-investigate the short-term health effects of the identified sources]]]
-&lt;/center&gt;
-
----
-
-# Data
-
-- Particle size distributions, collected at the background monitor station of North Kensington in central London. The particle size range is between 16.5-604.3 nm
-&lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
-- Meteorological conditions (temperature, humidity)
-&lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
-- Respiratory hospital admissions in children (0-16 years old), and
-cardiovascular hospital admissions in elderly (+64 years old) in Greater London for the period 2014-2016
-
-### Time series framework
-- Typically used for investigating the short-term associations between exposures such as air pollution or weather variables, and health outcomes such as cardiovascular and respiratory morbidity and mortality.
-
-- Data available at regular time intervals and with a natural order
-
-&lt;center&gt;&lt;img src=./img/Airpoll-health.jpg width='40%' title='INCLUDE TEXT HERE'&gt;&lt;/center&gt;
-
-.tiny[source: Samoli, Touloumi, Zanobetti, Le Tertre, Schindler, Atkinson, Vonk, Rossi, Saez, Rabczenko, and others (2003)]
-
----
-
-## What are the challenges?
-.pull-left[
-&lt;span style="display:block; margin-top: 50px ;"&gt;&lt;/span&gt;
-- High dimensionality
-
-&lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
-
-- Correlation 
-
-&lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
-
-- Link with health
-]
-
-.pull-right[
-&lt;center&gt;&lt;img src=./img/correlation-matrix-bin_1.jpg width='120%' title='INCLUDE TEXT HERE'&gt;&lt;/center&gt;
-]
-
----
-
-# Factor analysis
-
-.pull-left[
-Positive Matrix Factorisation commonly used for dimension reduction
-
-`\(Y_{P \times T} = \Lambda_{P \times K}F_{K \times T}+ \epsilon_{P \times T}\)`
-where 
-
-- `\(\Lambda_{P \times K}\)` are source profile densities;
-
-- `\(F_{K \times T}\)` are the contribution from the `\(k\)` source to the total particle concentration.
-
-Limitations:
-- Number of sources defined a priori;
-&lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
-- Uncertainty on the allocation not included;
-&lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
-- Dependence in time/space not considered in the allocation.
-
-]
-
-.pull-right[
-
-&lt;center&gt;&lt;img src=./img/SourceOutdoorPoll.jpg width='80%' title='INCLUDE TEXT HERE'&gt;&lt;/center&gt;
-.center[.tiny[Source: .url[shan.org]]]
-]
-
-
----
-# Proposed approach 
-
-- Bayesian non-parametric 
-&lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
-- High degree of flexibility;
-&lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
-  `\(\rightarrow\)` number of sources estimated from the data;
-&lt;span style="display:block; margin-top: 10px ;"&gt;&lt;/span&gt;
-  `\(\rightarrow\)` uncertainty fully propagated in the source allocation.
-
-Following (Griffiths and Ghahramani, 2011), (Ghahramani and Griffiths, 2005)
-.pull-left[
-`\begin{align}
-\textbf{X}_t &amp;\sim N_D( (\textbf{Z}_t \circ \textbf{W}_t)\Phi,\sigma^2 I) \nonumber,\\
-\textbf{W}_t &amp;\sim N_K(0,I) \nonumber,\\
-\phi_d &amp;\sim N_K(\mu_\phi,\Sigma_\phi)\nonumber,\\
-Z &amp;\sim IBP(\alpha)\nonumber,\\
-\alpha &amp;\sim \text{Gamma}(\alpha_0,\beta_0),\nonumber\\
-\sigma^2 &amp;\sim \text{Gamma}^{-1}(b_0,b_1)
-\end{align}`
-]
-
-.pull-right[
-DAG
-]
-
----
-
-# Characteristics of the model
-
-- time is accounted for in the allocation 
-
-- `\(\alpha\)` governs the number of components
-
---
-
-### Implementation
-
-- The model is implemented in R-Nimble
-
-- 2 chains, 100,000 iterations
-
-### Sensitivity analysis
-
-- Change the prior for `\(\alpha\)`
-
----
-
-# Results: source profiles
-
-.pull-left[
-&lt;center&gt;&lt;img src=./img/Profiles.png width='100%' title='INCLUDE TEXT HERE'&gt;&lt;/center&gt;
-]
-
-
-.pull-right[
-&lt;center&gt;&lt;img src=./img/Heatmap.png width='100%' title='INCLUDE TEXT HERE'&gt;&lt;/center&gt;
-]
-
-*Nucleation*: diesel peaks with associated traffic temporal
-patterns
-
-*Secondary*: Aged particles that have grown due to
-the condensation of volatile gaseous compounds on
-their surface
-
-*Urban*: Aged traffic emissions, including also a mix
-of other urban emissions such as biomass burning,
-heating, cooking
-
-*Traffic 1*: Particles associated with spark-ignition vehicles
-
-*Traffic 2*: Particles associated with diesel vehicle emissions
-
----
-
-# Link with health
-
-We assessed the relative risk (RR) for hospitalization for respiratory diseases in children by including the SA posterior estimates into the health model
-
-
-`\begin{align*}
-y_t &amp;\sim \text{Poisson}(\mu_t E)\\
-\log(\mu_{t})&amp;= \beta_0 + \sum_k \beta_k f_{k(t-\ell)} + \sum_i s(v_{ti}, \psi_i) + \delta_{I_t} + \epsilon_t
-\end{align*}`
-
---
-
-where `\(f_{k(t-\ell)}\)` are the factors with specified lags
-
-- Additionally, temporal long term components are included through `\(\epsilon\)`
-
-- Confounders are accounted for in a non-linear flexible way through splines
----
-
-# Results: health effects
-
-.pull-left[
-&lt;center&gt;&lt;img src=./img/Children_Resp.jpg width='50%' title='INCLUDE TEXT HERE'&gt;&lt;/center&gt;
-]
-
-.pull-right[
-
-- Clear differential impact of the different sources
-
-`\(\rightarrow\)` Nucleation and urban show evidence of a negative impact on health 
-
-]
----
-
-# Moving forward
-
-- Understanding the impact of a two-stage vs joint model for sources and health
-
-- Several lags might need to be considered
-
-- Additional spatial component might be beneficial to understand the different impact of these sources
-
+  - Temperature and COPD hospitalisations (space-time areal model; dose-response)
+  
 ---
 
 name: WBE
@@ -459,7 +227,7 @@ name: WBE
 &lt;span style="display:block; margin-top: 250px ;"&gt;&lt;/span&gt;
 
 .myblue[.center[.huge[
-**Space-Time modelling: wastewater based epidemiology**]]]
+**Space-time modelling: wastewater based epidemiology**]]]
 
 ---
 
@@ -529,17 +297,10 @@ concentration over a spatially continuous domain.
 # Modelling spatial data
 
 - **Point-referenced data**: the exact location of the occurrences is known
-  -  can be collected through specialized survey / monitoring network...
+  -  can be collected through specialized survey / monitoring network
   - if locations are **fixed** (monitoring stations, postcodes in an area) and the variable of interest is measured at each location (e.g. presence/absence of cases, pollution concentrations)
   
   `\(\Rightarrow\)` .red[geostatistical framework.]
-
---
-
-.center[.content-box-blue[
-**First law of geography** (W. Tobler, 1970): everything is related to everything else, but near things are more related than distant things 
-]
-]
 
 --
 
@@ -558,6 +319,29 @@ there are no observations.
 .center[The common framework to geostatistical models is that of .red[**Gaussian
 random fields**.]]
 
+&lt;span style="display:block; margin-top: 70px ;"&gt;&lt;/span&gt;
+
+---
+
+# Gaussian random fields
+
+- A spatial process is a Gaussian field if `\(\left(y(\bm s_1),\ldots, y(\bm s_n)\right)\)` follows a multivariate Normal distribution with mean `\(\bm \mu=\left(\mu(\bm s_{1}), \ldots, \mu(\bm s_{n})\right)\)` and spatially structured covariance matrix `\(\bm \Sigma\)`. 
+
+--
+
+- The spatial process is called .red[second-order stationary] if 
+
+(i) `\(\bm \mu\)` is constant (i.e. `\(\mu(\bm s_{i}) = \mu\)` for each `\(i\)`) 
+
+(ii) the spatial covariance function depends only on the distance vector `\((\bm s_{i}-\bm s_{j})\)`. 
+
+--
+
+- A stationary process is .red[isotropic] if the covariance does not depend on the direction but just on the Euclidean distance  `\(||\bm s_{i}-\bm s_{j}|| \in \mathbb{R}\)`.
+
+--
+
+- Several functions are available for the spatial covariance function (eg exponential,Mat&amp;eacute;rn, spherical, etc.) parameterized by some parameters (eg spatial variance, range, etc.).
 
 ---
 
@@ -621,7 +405,10 @@ The log-transformed number of gene copies per liter at catchment area `\(i=1, \l
 with `\(\sigma^2_y\)` as the measurement error variance. For the latent mean concentration `\(\mu_{it}\)` we specify a linear model:
 
 `$$\mu_{it} = \alpha_{region_{g_i}} + \bm{x}_i \bm{\beta} +  u_i + v_t + z_{it}$$`
- 
+
+&lt;span style="display:block; margin-top: 60px ;"&gt;&lt;/span&gt;
+
+.small[Li et al. A spatio-temporal framework for modelling wastewater concentration during the COVID-19 pandemic, Env Int 172 (2023)]
 ---
 
 count:false
@@ -645,6 +432,11 @@ with `\(\sigma^2_y\)` as the measurement error variance. For the latent mean con
 `$$\mu_{it} ={\color{red}{\alpha_{region_{g_i}}}} + \bm{x}_i \bm{\beta} +  u_i + v_t + z_{it}$$`
 
 - `\(\color{red}{\alpha_{region_{g_i}}}\)`: region specific intercept, modelled as exchangeable
+
+
+&lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
+
+.small[Li et al. A spatio-temporal framework for modelling wastewater concentration during the COVID-19 pandemic, Env Int 172 (2023)]
 
 ---
 
@@ -670,6 +462,11 @@ with `\(\sigma^2_y\)` as the measurement error variance. For the latent mean con
 
 - `\(\color{red}{\bm{x}_i \bm{\beta}}\)`: vector of covariates and their effects
 
+
+&lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
+
+.small[Li et al. A spatio-temporal framework for modelling wastewater concentration during the COVID-19 pandemic, Env Int 172 (2023)]
+
 ---
 
 count: false
@@ -693,6 +490,11 @@ with `\(\sigma^2_y\)` as the measurement error variance. For the latent mean con
 `$$\mu_{it} = \alpha_{region_{g_i}} + \bm{x}_i \bm{\beta} +  {\color{red}u_i} + v_t + z_{it}$$`
 
 - `\(\color{red}{u_i}\)`: spatial random effect with an exchangeable prior 
+
+
+&lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
+
+.small[Li et al. A spatio-temporal framework for modelling wastewater concentration during the COVID-19 pandemic, Env Int 172 (2023)]
 
 ---
 
@@ -719,6 +521,11 @@ with `\(\sigma^2_y\)` as the measurement error variance. For the latent mean con
 
 - `\(\color{red}{v_t}\)`: temporal random effect modelled with first order random walk
 
+
+&lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
+
+.small[Li et al. A spatio-temporal framework for modelling wastewater concentration during the COVID-19 pandemic, Env Int 172 (2023)]
+
 ---
 
 # Spatio-temporal random effect
@@ -726,10 +533,10 @@ with `\(\sigma^2_y\)` as the measurement error variance. For the latent mean con
 `$$\mu_{it} = \alpha_{region_{g_i}} + \bm{x}_i \bm{\beta} +  u_i + v_t + {\color{red}z_{it}}$$`
 
 - `\(\color{red}{z_{it}}\)`: spatio-temporal random effect, modelled as a temporal autoregressive structure with spatially correlated innovations, similar to :
-`\begin{align*}
+`\begin{align}
 t = 1 \qquad \boldsymbol{z}_t &amp;\sim \text{Normal}(0,\Sigma_{z})\\
 t &gt; 1 \qquad \boldsymbol{z}_t &amp;\sim \text{Normal}(\rho\boldsymbol{z}_{t-1},\Sigma_{z})
-\end{align*}`
+\end{align}`
 with `\(\rho\)` as the temporal autoregressive coefficient. 
 
 --
@@ -738,8 +545,10 @@ The  `\(\Sigma_{z}\)` matrix represents the spatial structure and is defined usi
 
 `$$\text{Cov}(\bm{z}_i,\bm{z}_s)\ = \frac{\sigma^2_{z}}{\Gamma(\lambda)2^{\lambda-1}}(\kappa ||\bm{z}_i - \bm{z}_s||)^{\lambda}K_{\lambda}(\kappa ||\bm{z}_i - \bm{z}_s||)$$`
 
-where `\(\Gamma(\lambda)\)` is the gamma function, `\(K_{\lambda}\)` is the modified Bessel function of second kind with order `\(\lambda\)`. The parameter `\(\kappa&gt;0\)` controls the range `\(\rho=\sqrt{8\lambda}/\kappa\)` and indicate the distance where the spatial correlation is close to 0.1. 
+where `\(\Gamma(\lambda)\)` is the gamma function, `\(K_{\lambda}\)` is the modified Bessel function of second kind with order `\(\lambda\)`. The parameter `\(\kappa&gt;0\)` controls the range `\(r=\sqrt{8\lambda}/\kappa\)` and indicate the distance where the spatial correlation is close to 0.1. 
 
+&lt;!-- k is scaling parameter, while lambda is the parameter of the Bessel function which governs the degree of smoothing (typically fixed)
+--&gt;
 ---
 
 # Spatial prediction
@@ -764,15 +573,15 @@ The posterior predictive distribution at the LSOA centroids can be combined to r
   - Here we consider all the Lower Tier Local Authorities in England and average the corresponding LSOA values, weighted by the population in each LSOA.
 
 
+&lt;!--
 - Implemented in R-INLA 
+--&gt;
 
 ---
 
 
 # Detection of areas at increased risk of outbreaks
 
-.panelset[
-.panel[.panel-name[Detection]
 We used the posterior predictive distribution to detect increases in the wastewater viral concentration. For each LTLA `\((l=1,\ldots,L)\)` an increase in viral concentration over two consecutive weeks is the event (E):
 `\begin{eqnarray}
 E = I(\mu_{lt} &gt; \mu_{l(t-1)} &gt; \mu_{l(t-2)})
@@ -780,15 +589,16 @@ E = I(\mu_{lt} &gt; \mu_{l(t-1)} &gt; \mu_{l(t-2)})
 where `\(I(\cdot)\)` is the indicator function.
 
 &lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
-A high predictive probability, `\({\rm Prob}(E)&gt;c\)` for a pre-specified threshold `\(c\)`, would then trigger a warning of a potential outbreak. This approach has been used for public health surveillance in both high-income  and low-to-middle-income  countries. 
-]
+A high predictive probability, `\({\rm Prob}(E)&gt;c\)` for a pre-specified threshold `\(c\)`, would then trigger a warning of a potential outbreak. This approach has been used for public health surveillance in both high-income (Diggle et al, 2005) and low-to-middle-income (Diggle et al., 2007) countries. 
 
-.panel[.panel-name[Mapping]
+&lt;span style="display:block; margin-top: 250px ;"&gt;&lt;/span&gt;
 
-&lt;center&gt;&lt;img src=./img/Detection.png width='50%' title='INCLUDE TEXT HERE'&gt;&lt;/center&gt;
-]
-]
+.small[
+Diggle et al. Point process methodology for on-line spatio-temporal disease surveillance, Environmetrics, 16 (2005): 423-434
 
+Diggle et al. Spatial modelling and prediction of loa loa risk: decision making under uncertainty, Ann. Trop. Med. Parasitol., 101 (2007): 499-509
+
+]
 ---
 
 #Interactive dashboard
@@ -802,9 +612,24 @@ To visualise these rich model outputs, we have created a dynamic and interactive
 
 # Wastewater viral concentration and COVID-19 prevalence
 
-.pull-left[The relationship between viral concentration in
-wastewater and COVID-19 prevalence appears to be .red[complex
-and varying over both space and time.]]
+.pull-left[
+- Several studies have evaluated the relationship between viral load in
+wastewater and prevalence of COVID-19 disease (e.g. Shah et al. 2022, Proverbio et al. 2022)
+
+&lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
+- The relationship between viral concentration in
+wastewater and COVID-19 prevalence appears to be **complex
+and varying over both space and time.**
+
+&lt;span style="display:block; margin-top: 200px ;"&gt;&lt;/span&gt;
+.small[
+Shah et al. Wastewater surveillance to infer COVID-19 transmission: A systematic review. Science of The Total Environment 804 (2022): 150060;
+
+&lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
+
+Proverbio et al. Model-based assessment of COVID-19 epidemic dynamics by wastewater analysis. Science of the Total Environment 827 (2022): 154235.]
+]
+
 
 
 .pull-right[&lt;center&gt;&lt;img src=./img/fig6.jpg width='50%' title='INCLUDE TEXT HERE'&gt;&lt;/center&gt;]
@@ -851,7 +676,7 @@ a finer spatial scale?
 
 - Wastewater predictions available from the geostatistical model
 
-- Posterior distribution of COVID-19 prevalence obtained through  
+- Posterior distribution of COVID-19 prevalence obtained through Nicholson et al. (2022) 
 
 --
 
@@ -871,6 +696,10 @@ where
 - `\(b_t\)` is modelled using a RW1
 - `\(d_t\)` is modelled using a RW2
 
+&lt;span style="display:block; margin-top: 80px ;"&gt;&lt;/span&gt;
+
+.small[Nicholson et al. Local prevalence of transmissible SARS-CoV-2 infection: an integrative causal model for debiasing fine-scale targeted testing data, Nature Microbiology 7 (2022): 97–107.]
+
 ---
 
 # Modelling framework
@@ -879,7 +708,7 @@ where
 
 - Wastewater predictions available from the geostatistical model
 
-- Posterior distribution of COVID-19 prevalence obtained through  
+- Posterior distribution of COVID-19 prevalence oobtained through Nicholson et al. (2022) 
 
 --
 
@@ -896,6 +725,9 @@ where
 - `\(\bm{g}_t\)` and `\(\bm{S}_t\)` are the posterior mean and covariance matrix from the wastewater model
 - `\(u_{l}\)`, `\(v_{lt}, m_l\)` are modelled as exchangeable
 
+&lt;span style="display:block; margin-top: 80px ;"&gt;&lt;/span&gt;
+
+.small[Nicholson et al. Local prevalence of transmissible SARS-CoV-2 infection: an integrative causal model for debiasing fine-scale targeted testing data, Nature Microbiology 7 (2022): 97–107.]
 
 ---
 
@@ -934,7 +766,7 @@ where
 
 # Results
 
-.pull-left[&lt;center&gt;&lt;img src=./img/Results.png width='150%' title='INCLUDE TEXT HERE'&gt;&lt;/center&gt;
+.pull-left[&lt;center&gt;&lt;img src=./img/Results.png width='200%' title='INCLUDE TEXT HERE'&gt;&lt;/center&gt;
 ]
 
 .pull-right[
@@ -969,13 +801,37 @@ where
 
 ---
 
-# What's next
+# Discussion
 
-How can wastewater be incorporated into a real-time, multiplex public health surveillance system?
+- Relationship with disease is not trivial. In a descriptive way we found a spatial and temporal dynamicity and evidence of non-linearity. It could depend on several factors like vaccination, variants and metereology.
+
+--
 
 &lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
 
-&lt;center&gt;&lt;img src=./img/Surveillance_representation.png width='60%' title='INCLUDE TEXT HERE'&gt;&lt;/center&gt;
+- The proposed framework for disaggregation demonstrates the added-value of wastewater data to inform local prevalence
+
+`\(\rightarrow\)` Continuous running of randomised surveys at a reduced capacity to provide coarse prevalence estimates remains a key pillar in COVID monitoring, anchoring the disaggregation and the relationship
+
+--
+
+&lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
+
+- The wastewater-prevalence relationship seems stable in time over the study period but will likely need to be recalibrated over longer times
+
+`\(\rightarrow\)` occasional running of randomised surveys at a fine spatial scale is required
+
+&lt;span style="display:block; margin-top: 10px ;"&gt;&lt;/span&gt;
+
+`\(\rightarrow\)` impact on the results will need to be evaluated
+
+--
+
+&lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
+
+- Starting point but a long way to go
+
+`\(\rightarrow\)` should be extended to include other data sources, such as syndromic and secondary care data, to enable quantitatively accurate monitoring of disease evolution across a population.
 
 ---
 
@@ -984,7 +840,7 @@ name: COPD
 &lt;span style="display:block; margin-top: 250px ;"&gt;&lt;/span&gt;
 
 .myblue[.center[.huge[
-**Space-Time modelling: Temperature and Health**]]]
+**Space-time modelling: Temperature and Health**]]]
 
 
 
@@ -992,11 +848,25 @@ name: COPD
 
 # COPD and temperature
 .panelset[
+.panel[.panel-name[COPD]
+
+&lt;center&gt;&lt;img src=./img/COPD_lung.png width='60%' title='INCLUDE TEXT HERE'&gt;&lt;/center&gt;
+
+- In England, 115,000 emergency admissions and 24,000 deaths per year.
+&lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
+- COPD exacerbations: Bacteria, viruses and air-pollution.
+&lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
+- The role of temperature is unclear. 
+
+]
+
 .panel[.panel-name[Temperature and Health]
 
 .pull-left[
-- Typically U-shaped relationship between temperature and health.
+- Typically U-shaped relationship between temperature and mortality.
+&lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
 - Cold, dry air or hot air can trigger a flare-up.
+&lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
 - Different confounding, different lags across different temperatures.
 ]
 
@@ -1006,23 +876,14 @@ name: COPD
 ]
 
 ]
-
-.panel[.panel-name[COPD]
-
-&lt;center&gt;&lt;img src=./img/COPD_lung.png width='60%' title='INCLUDE TEXT HERE'&gt;&lt;/center&gt;
-
-- In England, 115,000 emergency admissions and 24,000 deaths per year.
-- COPD exacerbations: Bacteria, viruses and air-pollution.
-- The role of temperature is unclear. 
-
-]
 ]
 
 ---
 
 # Aim
 
-.content-box-green[Examine the effect of warm temperatures on COPD hospitalizations.]
+&lt;span style="display:block; margin-top: 30px ;"&gt;&lt;/span&gt;
+.center[.content-box-green[Examine the effect of warm temperatures on COPD hospitalizations.]]
 
 &lt;span style="display:block; margin-top: 30px ;"&gt;&lt;/span&gt;
 
@@ -1039,18 +900,18 @@ Secondary objectives:
 # Outcome and exposure
 
 .pull-left[
+### Outcome
 - COPD hospitalization (ICD10 J40-44) 2007-2018 (NHS digital).
 - Individual data/ 100m grid spatial resolution.
 - Summer months.
 
---
-
+### Exposure
 - Daily maximum temperature 2007-2018 at 1km grid from MetOffice.
 - lag0-2.
 ]
 
 .pull-right[
-&lt;center&gt;&lt;img src=./img/temperatureLTLA.png width='100%' title='INCLUDE TEXT HERE'&gt;&lt;/center&gt;
+&lt;center&gt;&lt;img src=./img/temperatureLTLA.png width='80%' title='INCLUDE TEXT HERE'&gt;&lt;/center&gt;
 ]
 
 ---
@@ -1063,15 +924,17 @@ Secondary objectives:
 &lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;    
 - Exposure period 0-2 days before the hospital episode (mean temperature)
 
-&lt;center&gt;&lt;img src=./img/FigCaseCrossOver.png width='60%' title='INCLUDE TEXT HERE'&gt;&lt;/center&gt;
+&lt;center&gt;&lt;img src=./img/FigCaseCrossOver.png width='70%' title='INCLUDE TEXT HERE'&gt;&lt;/center&gt;
 
+- Adding a spatial dimension to account for modifiers
 ---
 
 # Confouders and spatial effect modifiers
 
-.panel-set[.panel[
-panel-name[Confounders]
-&lt;table&gt;
+.panelset[
+.panel[.panel-name[Confounders]
+
+&lt;table class=" lightable-material lightable-striped lightable-hover" style='font-family: "Source Sans Pro", helvetica, sans-serif; margin-left: auto; margin-right: auto;'&gt;
  &lt;thead&gt;
   &lt;tr&gt;
    &lt;th style="text-align:left;"&gt; Confounder &lt;/th&gt;
@@ -1114,33 +977,244 @@ panel-name[Confounders]
 &lt;/table&gt;
 ]
 
-.panel[panel-name[Effect modifiers]
+.panel[.panel-name[Effect modifiers]
 
-&lt;center&gt;&lt;img src=./img/SpatEffMod.png width='100%' title='INCLUDE TEXT HERE'&gt;&lt;/center&gt;
+&lt;center&gt;&lt;img src=./img/SpatEffMod.png width='70%' title='INCLUDE TEXT HERE'&gt;&lt;/center&gt;
 ]
 ]
 
 ---
 
+# Step 1: Find the linear threshold
 
-# Acknowledgments
+Let `\(Y_{tj}\)` be the case-control identifier for the COPD hospitalisation for the event (case or control) at time `\(t\)`, in the `\(j-th\)` case-control group:
+  
+`\begin{align}
+Y_{tj} &amp;\sim \mbox{Poisson}(\mu_{tj})\\
+\log(\mu_{tj}) &amp;= \alpha_1 I(X_{1t} &lt; c) X_{1t} + \alpha_2 I(X_{1t} \geq c) X_{1t} + \sum_{m=1}^4\beta_mZ_{mt} + u_{j}\\
+u_j &amp;\sim N(0, 100)\\
+\alpha_1, \alpha_2, \beta_1, \dots \beta_4 &amp; \sim N(0, 1)\\
+\end{align}`
+
+`\(c\)` is the temperature threshold,  `\(50-\)`th, `\(55-\)`th, ...,  `\(90-\)`th,  `\(95-\)`th percentile. 
+
+--
+
+&lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
+
+We ran the above model for the different temperature thresholds and chose the one which minimises the WAIC.
+
+---
+
+# Step 2a: Effect modification by age and sex
+  
+Similarly we fitted the previous model for the different sex-age groups (male/female and `\(&lt;65\)`, `\(65-85\)`, `\(&gt;85\)` ). Consider `\(g\)` the index for the age-sex groups:
+
+`\begin{align*}
+Y_{tjg} &amp;\sim \text{Poisson}(\mu_{tjg})\\
+\log(\mu_{tjg}) &amp;= \alpha_1 I(X_{1tg} &lt; c^{\star}) X_{1tg} + \alpha_2 I(X_{1tg}\geq c^{\star})X_{1tg} + \sum_{m=1}^4\beta_mZ_{mtg} + u_{j}\\
+u_j &amp;\sim N(0, 100)\\
+\alpha_1, \alpha_2, \beta_1, \dots \beta_4 &amp; \sim N(0, 1)\\
+\end{align*}`
+
+---
+
+# Step 2b. Spatial Effect modification
+.pull-left[    
+`\begin{align*}
+Y_{tj} &amp; \sim \text{Poisson}(\mu_{tj})\\
+\log(\mu_{tj}) &amp; = \alpha_1 I(X_{1t}&lt; c^{\star})X_{1t} + \alpha_{2s_j} I(X_{1t}\geq c^{\star})X_{1t} +\\ 
+&amp; \sum_{m=1}^4\beta_mZ_{mt} + u_{j}\\
+\alpha_{2s} &amp;= \alpha_2 + \sum_{m=1}^8 \gamma_q H_{sq} + v_s + b_s\\
+v_s &amp;\sim N(0, \sigma_2)\\
+b_s|b_{-s} &amp;\sim N\left(\frac{\sum_{s \sim r} w_{rs} b_s}{\sum_{s \sim r} w_{rs}},        \frac{\sigma^2}{\sum_{s \sim r} w_{rs}}\right)\\
+\end{align*}`
+
+where `\(\bm{H}_s\)` is a vector of the following covariates at the Lower Tier Local Authority level (LTLA):
+
+1\. Quintiles of deprivation
+2\. Proportion of green space
+3\. Urbanicity index
+4\. Average temperature
+]
+
+.pull-right[
+  &lt;center&gt;&lt;img src=./img/London.jpg width='100%' title='INCLUDE TEXT HERE'&gt;&lt;/center&gt;
+]
+
+&lt;span style="display:block; margin-top: 30px ;"&gt;&lt;/span&gt;
+.small[
+Konstantinoudis et al., Asthma hospitalisations and heat exposure in England: a case–crossover study during 2002–2019, Thorax (2023), in press.
+]
+
+---
+
+# Results
+
+.panelset[.panel[.panel-name[Threshold selection and effect modification]
+
+- In the adjusted model, the 80th percentile of the temperature (23.2C) was the threshold minimising the WAIC
+
+- The increase in the COPD hospitalisation risk for every 1°C increase in temperatures above 23.2C was 0.47% (95% CrI 0.16% to 0.75%) 
+
+
 .pull-left[
-.red[Source apportionment]:
 
-&lt;center&gt;&lt;img src=./img/MRClogo.png width='60%' title='INCLUDE TEXT HERE'&gt;&lt;/center&gt;
+&lt;span style="display:block; margin-top: 30px ;"&gt;&lt;/span&gt;
+Effect modification by age and sex: 
 
-**Monica Pirani**, **Georges Bucyibaruta** (ICL, EBS)
+- unadjusted models show increased risk which substantially reduces when the confounders are included
+&lt;span style="display:block; margin-top: 15px ;"&gt;&lt;/span&gt;
+- Evidence of an increased risk for females above 65 years old
+]
 
-**Gary Fuller**, **Anya Tremper**, **Dave Green** (IC-ERG)
+.pull-right[
+&lt;center&gt;&lt;img src=./img/ConfoundersRR.jpg width='100%' title='INCLUDE TEXT HERE'&gt;&lt;/center&gt;
+]
+]
 
-**Christina Mitsakou** (UKHSA)
+.panel[.panel-name[Spatial effect modifiers]
+
+.pull-left[
+&lt;center&gt;&lt;img src=./img/SVC.png width='100%' title='INCLUDE TEXT HERE'&gt;&lt;/center&gt;
+
+&lt;center&gt;&lt;img src=./img/SVC_adj.png width='100%' title='INCLUDE TEXT HERE'&gt;&lt;/center&gt;
 
 ]
 
 .pull-right[
-.red[Wastewater based epidemiology]:
 
-&lt;center&gt;&lt;img src=./img/Turing.png width='60%' title='INCLUDE TEXT HERE'&gt;&lt;/center&gt;
+- Evidence of spatial variation
+&lt;span style="display:block; margin-top: 30px ;"&gt;&lt;/span&gt;
+- Not enough evidence of effects of the covariates in explaining the spatial variation
+
+&lt;table class=" lightable-material lightable-striped lightable-hover" style='font-family: "Source Sans Pro", helvetica, sans-serif; margin-left: auto; margin-right: auto;'&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;"&gt; Modifier &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; PercentChange &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Probability &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Urban &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; −1.57 (−4.16 to 0.96) &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.12 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Avg Temp &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; −0.41 (−1.49 to 0.71) &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.22 &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+]
+]
+]
+
+---
+
+# Population Attributable Fraction (PAF)
+
+- Typically used in epidemiological studies to evaluate the number of health end points which happened due to the exposure/risk factor.
+
+.pull-left[
+- Generally estimated over the entire study region
+
+- Here we used the model with spatially-varying coefficients to estimate a local PAF using the following three steps
+
+1. Obtain the cumulative exposure-outcome relative risk `\(\text{RR}_s = \exp\big(\alpha_{2s}(X_{1, s, \text{max}} - c^*)\big)\)`
+2. Calculate `\(\text{AF}_s = (\text{RR}_s - 1)/\text{RR}_s\)`
+
+3. Then `\(\text{PAF}_s = \text{AF}_s (n_s/N_s)\)`
+
+where `\(N_s\)` and `\(n_s\)` are the total number of hospitalisations and those at days above 23.2C 
+]
+
+.pull-right[
+
+&lt;center&gt;&lt;img src=./img/PAF.jpg width='70%' title='INCLUDE TEXT HERE'&gt;&lt;/center&gt;
+
+- Overall 7.8% (95% CrI 6.7% to 8.8%) of the total COPD hospitalisations in summer (2007-2019) are due to temperature above 23.2C
+- Clear spatial structure (more than 8% in East Midlands, East of England, London and South East, while it is below 5% in the South West).
+
+]
+
+---
+
+# Discussion
+
+- Spatial case-crossover model allows to take advantage of individual level data when the individual level confounders are not available (as long as they do not change quickly in time)
+
+&lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
+
+- Extended to investigate spatially effect modifiers (could be done for temporal effect modifiers too)
+
+&lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
+
+- Computationally intensive
+
+&lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
+
+- Evidence that COPD hospitalisations increase with warmer temperatures and as temperatures consistently increase, public health systems should be alerted and prepared to challenge the increased COPD hospitalisation burden. 
+
+---
+# General remarks
+
+- Spatial and temporal dependencies are crucial to account for in environmental epidemiology
+
+&lt;span style="display:block; margin-top: 10px ;"&gt;&lt;/span&gt;
+
+`\(\rightarrow\)` they add a level of understanding on the phenomenon under study and help reduce biases
+
+&lt;span style="display:block; margin-top: 10px ;"&gt;&lt;/span&gt;
+
+`\(\rightarrow\)` using the spatio-temporal structure (and potentially covariates) the model can predict at any location in the study region
+
+&lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
+
+- Increased flexibility, but also additional statistical challenges
+
+&lt;span style="display:block; margin-top: 10px ;"&gt;&lt;/span&gt;
+
+`\(\rightarrow\)` parameter structure
+
+&lt;span style="display:block; margin-top: 10px ;"&gt;&lt;/span&gt;
+
+`\(\rightarrow\)` computationally intensive
+
+&lt;span style="display:block; margin-top: 10px ;"&gt;&lt;/span&gt;
+
+`\(\rightarrow\)` transferability
+
+&lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
+
+- Reporting is challenging, particularly when dealing with stakeholders
+
+---
+
+# Acknowledgments
+
+.pull-left[
+.red[Temperature and COPD:]
+
+&lt;center&gt;&lt;img src=./img/MRClogo.png width='60%' title='INCLUDE TEXT HERE'&gt;&lt;/center&gt;
+
+**Garyfallos Konstantinoudis**, **Cosetta Minelli** (ICL)
+
+**Antonio Gasparrini** (LSHTM)
+
+**Ana Maria Vicedo Cabrera** (University of Bern)
+
+**Joan Ballester** (ISGlobal)
+
+]
+
+.pull-right[
+.red[Wastewater based epidemiology:]
+
+&lt;center&gt;&lt;img src=./img/Turing.png width='70%' title='INCLUDE TEXT HERE'&gt;&lt;/center&gt;
 
 **Guangquan Li** (Northumbria University)
 
@@ -1157,8 +1231,6 @@ panel-name[Confounders]
 **Matt Wade**, **Hubert Denise**, **William Rowe**, **Daniel James**, **Jasmine Grimsley** (UKHSA)
 
 ]
-
----
     </textarea>
 <style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
 <script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
