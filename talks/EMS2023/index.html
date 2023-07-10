@@ -1,0 +1,1299 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>Spatio-temporal Bayesian models for environmental epidemiology</title>
+    <meta charset="utf-8" />
+    <meta name="author" content="Marta Blangiardo" />
+    <script src="libs/header-attrs/header-attrs.js"></script>
+    <link href="libs/panelset/panelset.css" rel="stylesheet" />
+    <script src="libs/panelset/panelset.js"></script>
+    <!-- (Re)Defines a bunch of LaTeX commands that can then be used directly in the .Rmd file as '\command{...}' -->
+    <script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+      TeX: {
+        /* This enables color macros */
+        extensions: ["color.js"],
+        Macros: {
+          /* Probability & mathematical symbols */
+          Pr: "{\\style{font-family:inherit; font-size: 110%;}{\\text{Pr}}}",
+          exp: "{\\style{font-family:inherit; font-size: 105%;}{\\text{exp}}}",
+          log: "{\\style{font-family:inherit; font-size: 105%;}{\\text{log}}}",
+          ln: "{\\style{font-family:inherit; font-size: 105%;}{\\text{ln}}}",
+          logit: "{\\style{font-family:inherit; font-size: 100%;}{\\text{logit}}}",
+          HR: "{\\style{font-family:inherit; font-size: 105%;}{\\text{HR}}}",
+          OR: "{\\style{font-family:inherit; font-size: 105%;}{\\text{OR}}}",
+          E: "{\\style{font-family:inherit; font-size: 105%;}{\\text{E}}}",
+          Var: "{\\style{font-family:inherit; font-size: 105%;}{\\text{Var}}}",
+          Cov: "{\\style{font-family:inherit; font-size: 105%;}{\\text{Cov}}}",
+          Corr: "{\\style{font-family:inherit; font-size: 105%;}{\\text{Corr}}}",
+          DIC: "{\\style{font-family:inherit; font-size: 105%;}{\\text{DIC}}}",
+          se: "{\\style{font-family:inherit; font-size: 100%;}{\\text{se}}}",
+          sd: "{\\style{font-family:inherit; font-size: 100%;}{\\text{sd}}}",
+          kld: "{\\style{font-family:inherit; font-size: 100%;}{\\text{kld}}}",
+          /* Distributions */
+          dnorm: "{\\style{font-family:inherit;}{\\text{Normal}}}",
+          dt: "{\\style{font-family:inherit;}{\\text{t}}}",
+          ddirch: "{\\style{font-family:inherit;}{\\text{Dirichlet}}}",
+          dmulti: "{\\style{font-family:inherit;}{\\text{Multinomial}}}",
+          dbeta: "{\\style{font-family:inherit;}{\\text{Beta}}}",
+          dgamma: "{\\style{font-family:inherit;}{\\text{Gamma}}}",
+          dbern: "{\\style{font-family:inherit;}{\\text{Bernoulli}}}",
+          dbin: "{\\style{font-family:inherit;}{\\text{Binomial}}}",
+          dpois: "{\\style{font-family:inherit;}{\\text{Poisson}}}",
+          dweib: "{\\style{font-family:inherit;}{\\text{Weibull}}}",
+          dexp: "{\\style{font-family:inherit;}{\\text{Exponential}}}",
+          dlnorm: "{\\style{font-family:inherit;}{\\text{logNormal}}}",
+          dunif: "{\\style{font-family:inherit;}{\\text{Uniform}}}",
+          /* LaTeX formatting */
+          bm: ["{\\boldsymbol #1}",1],
+          /* These create macros to typeset numbers in maths with the basic font */
+          0: "{\\style{font-family:inherit; font-size: 105%;}{\\text{0}}}",
+          1: "{\\style{font-family:inherit; font-size: 105%;}{\\text{1}}}",
+          2: "{\\style{font-family:inherit; font-size: 105%;}{\\text{2}}}",
+          3: "{\\style{font-family:inherit; font-size: 105%;}{\\text{3}}}",
+          4: "{\\style{font-family:inherit; font-size: 105%;}{\\text{4}}}",
+          5: "{\\style{font-family:inherit; font-size: 105%;}{\\text{5}}}",
+          6: "{\\style{font-family:inherit; font-size: 105%;}{\\text{6}}}",
+          7: "{\\style{font-family:inherit; font-size: 105%;}{\\text{7}}}",
+          8: "{\\style{font-family:inherit; font-size: 105%;}{\\text{8}}}",
+          9: "{\\style{font-family:inherit; font-size: 105%;}{\\text{9}}}",
+          /* Health economics quantities */
+          icer: "{\\style{font-family:inherit; font-size: 100%;}{\\text{ICER}}}",
+          nb: "{\\style{font-family:inherit; font-size: 100%;}{\\text{NB}}}",
+          ol: "{\\style{font-family:inherit; font-size: 100%;}{\\text{OL}}}",
+          ceac: "{\\style{font-family:inherit; font-size: 100%;}{\\text{CEAC}}}",
+          evpi: "{\\style{font-family:inherit; font-size: 100%;}{\\text{EVPI}}}",
+          evppi: "{\\style{font-family:inherit; font-size: 100%;}{\\text{EVPPI}}}",
+          evsi: "{\\style{font-family:inherit; font-size: 100%;}{\\text{EVSI}}}"
+        }
+      }
+    });
+    </script>
+    <link rel="stylesheet" href="assets/beamer.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+
+
+
+
+class: title-slide
+
+# Spatio-temporal Bayesian models for environmental epidemiology&lt;span style="display:block; margin-top: 10px ;"&gt;&lt;/span&gt; Methods and examples
+
+## Marta Blangiardo
+
+### [Environment and Health Statistics group](https://www.envstats.org/) | Imperial College London    
+
+### EMS 2023, Warsaw University 
+
+&lt;!-- Can also separate the various components of the extra argument 'params', eg as in 
+### EMS 2023, Warsaw University, 7 July 2023, Spatio-temporal Bayesian models for environmental epidemiology
+--&gt;
+
+7 July 2023
+
+&lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
+
+&lt;center&gt;&lt;img src=./img/LogoMRC.png width='100%' title='INCLUDE TEXT HERE'&gt;&lt;/center&gt;
+
+---
+
+layout: true  
+
+.my-footer[ 
+.alignleft[ 
+&amp;nbsp; &amp;copy; Marta Blangiardo
+]
+.aligncenter[
+Spatio-temporal Bayesian models for environmental epidemiology 
+]
+.alignright[
+EMS 2023,  7 Jul 2023 
+]
+] 
+
+
+&lt;style&gt;
+pre {
+  overflow-x: auto;
+}
+pre code {
+  word-wrap: normal;
+  white-space: pre;
+}
+&lt;/style&gt;
+
+
+---
+
+# Environmental Epidemiology
+
+- **Epidemiology**: The study of the distribution, causes and control of diseases in human population.
+&lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
+-  Disease risk depends on the classic epidemiological trio of person (in terms of genetics and behaviour), place and time.
+&lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
+- Environmental epidemiology focuses on linking .red[environmental hazards (exposures) to health outcomes]. 
+
+&lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
+
+--
+
+Two main ingredients
+
+&lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
+
+  - Environmental exposure
+  
+  `\(\Rightarrow\)` a continuous field over the study area.
+
+&lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
+
+  - Health outcomes
+
+  `\(\Rightarrow\)` cohort / administrative data.
+
+--
+
+&lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
+
+- Study designs typically used:
+&lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
+  1. Cohort studies - Focus on long-term effects (individual data)
+&lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
+  2. Small area studies - Focus on long-term effects (aggregated data)
+&lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
+  3. Time-series studies - Focus on short-term effects (aggregated data)
+
+--
+
+&lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
+
+.center[.red[.large[Spatial and temporal dependencies are key.]]]
+
+---
+
+# Why accounting for spatial and temporal dependencies is important
+
+.center[.content-box-blue[
+**First law of geography** (W. Tobler, 1970): everything is related to everything else, but near things are more related than distant things
+]
+]
+
+&lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
+
+When are we interested in the spatial and temporal components?
+
+&lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
+
+- Hypothesis generating perspective 
+
+`\(\rightarrow\)` Are we explicitly interested in the spatial pattern of disease risk?
+
+`\(\rightarrow\)` Do we want to evaluate temporal trends for each area?
+
+--
+
+&lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
+
+- Is the spatial clustering and/or temporal trend a nuisance quantity that we wish to take into account but are not explicitly interested in?
+`\(\rightarrow\)` Spatial / time series regression.
+
+---
+# Data/modelling/challenges in environmental epidemiology
+
+&lt;center&gt;&lt;img src=./img/Areas.png width='60%' title='INCLUDE TEXT HERE'&gt;&lt;/center&gt;
+
+&lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
+
+In this talk
+
+  - Source apportionment of air pollution and health (times series + risk assessment)
+&lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
+  - Wastewater modelling (space-time modelling)
+&lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
+  - Temperature and COPD (non linear relationship + risk assessment)
+
+---
+
+name: SA
+
+&lt;span style="display:block; margin-top: 250px ;"&gt;&lt;/span&gt;
+
+.myblue[.center[.huge[
+**Time series analysis: source apportionment**]]]
+
+
+---
+
+# Air pollution and health
+
+- Outdoor air pollution is carcinogenic to humans (IARC 2013);
+&lt;span style="display:block; margin-top: 10px ;"&gt;&lt;/span&gt;
+-  Air pollution causes over 6.5 million deaths each year globally, and this number is increasing (Fuller et al. 2022).
+&lt;span style="display:block; margin-top: 10px ;"&gt;&lt;/span&gt;
+- Outdoor  PM causes a reduction in life expectancy of average population by approximately a year in Europe (WHO 2006);
+&lt;span style="display:block; margin-top: 10px ;"&gt;&lt;/span&gt;
+- Fossil fuel air pollution is responsible for 1 in 5 deaths worldwide (Vohra et al. 2021).
+&lt;span style="display:block; margin-top: 10px ;"&gt;&lt;/span&gt;
+- Synergistic effects between heat and air pollution exposure for all-causes as well as cardio-respiratory mortality/hospital admissions (Anenberg et al. 2020).
+&lt;span style="display:block; margin-top: 10px ;"&gt;&lt;/span&gt;
+- The triad of pollution, climate change, and biodiversity loss are the key global environmental issues of our time (Fuller et al. 2022). 
+
+&lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
+
+.center[.content-box-blue[
+Particulate matter - PM and gasses such as nitrogen oxide/dioxide and ozone are among the most studied pollutants in environmental epidemiology  
+]
+]
+
+---
+
+# Source apportionment
+
+- Particulate matter (PM) is made up of different components coming
+from several sources, which might have different level of toxicity 
+
+- Identifying these sources, known as **Source Apportionment** (SA), is a key element in order to implement effective policies to improve air quality and population health.
+
+&lt;center&gt;&lt;img src=./img/Mixture.jpg width='50%' title='INCLUDE TEXT HERE'&gt;&lt;/center&gt;
+
+&lt;center&gt;
+.content-box-green[.center[.large[*Aim*: to apportion particle number size distributions (PNSD) and
+investigate the short-term health effects of the identified sources]]]
+&lt;/center&gt;
+
+---
+
+# Data
+
+- Particle size distributions, collected at the background monitor station of North Kensington in central London. The particle size range is between 16.5-604.3 nm
+&lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
+- Meteorological conditions (temperature, humidity)
+&lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
+- Respiratory hospital admissions in children (0-16 years old), and
+cardiovascular hospital admissions in elderly (+64 years old) in Greater London for the period 2014-2016
+
+### Time series framework
+- Typically used for investigating the short-term associations between exposures such as air pollution or weather variables, and health outcomes such as cardiovascular and respiratory morbidity and mortality.
+
+- Data available at regular time intervals and with a natural order
+
+&lt;center&gt;&lt;img src=./img/Airpoll-health.jpg width='40%' title='INCLUDE TEXT HERE'&gt;&lt;/center&gt;
+
+.tiny[source: Samoli, Touloumi, Zanobetti, Le Tertre, Schindler, Atkinson, Vonk, Rossi, Saez, Rabczenko, and others (2003)]
+
+---
+
+## What are the challenges?
+.pull-left[
+&lt;span style="display:block; margin-top: 50px ;"&gt;&lt;/span&gt;
+- High dimensionality
+
+&lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
+
+- Correlation 
+
+&lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
+
+- Link with health
+]
+
+.pull-right[
+&lt;center&gt;&lt;img src=./img/correlation-matrix-bin_1.jpg width='120%' title='INCLUDE TEXT HERE'&gt;&lt;/center&gt;
+]
+
+---
+
+# Factor analysis
+
+.pull-left[
+Positive Matrix Factorisation commonly used for dimension reduction
+
+`\(Y_{P \times T} = \Lambda_{P \times K}F_{K \times T}+ \epsilon_{P \times T}\)`
+where 
+
+- `\(\Lambda_{P \times K}\)` are source profile densities;
+
+- `\(F_{K \times T}\)` are the contribution from the `\(k\)` source to the total particle concentration.
+
+Limitations:
+- Number of sources defined a priori;
+&lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
+- Uncertainty on the allocation not included;
+&lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
+- Dependence in time/space not considered in the allocation.
+
+]
+
+.pull-right[
+
+&lt;center&gt;&lt;img src=./img/SourceOutdoorPoll.jpg width='80%' title='INCLUDE TEXT HERE'&gt;&lt;/center&gt;
+.center[.tiny[Source: .url[shan.org]]]
+]
+
+
+---
+# Proposed approach 
+
+- Bayesian non-parametric 
+&lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
+- High degree of flexibility;
+&lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
+  `\(\rightarrow\)` number of sources estimated from the data;
+&lt;span style="display:block; margin-top: 10px ;"&gt;&lt;/span&gt;
+  `\(\rightarrow\)` uncertainty fully propagated in the source allocation.
+
+Following (Griffiths and Ghahramani, 2011), (Ghahramani and Griffiths, 2005)
+.pull-left[
+`\begin{align}
+\textbf{X}_t &amp;\sim N_D( (\textbf{Z}_t \circ \textbf{W}_t)\Phi,\sigma^2 I) \nonumber,\\
+\textbf{W}_t &amp;\sim N_K(0,I) \nonumber,\\
+\phi_d &amp;\sim N_K(\mu_\phi,\Sigma_\phi)\nonumber,\\
+Z &amp;\sim IBP(\alpha)\nonumber,\\
+\alpha &amp;\sim \text{Gamma}(\alpha_0,\beta_0),\nonumber\\
+\sigma^2 &amp;\sim \text{Gamma}^{-1}(b_0,b_1)
+\end{align}`
+]
+
+.pull-right[
+DAG
+]
+
+---
+
+# Characteristics of the model
+
+- time is accounted for in the allocation 
+
+- `\(\alpha\)` governs the number of components
+
+--
+
+### Implementation
+
+- The model is implemented in R-Nimble
+
+- 2 chains, 100,000 iterations
+
+### Sensitivity analysis
+
+- Change the prior for `\(\alpha\)`
+
+---
+
+# Results: source profiles
+
+.pull-left[
+&lt;center&gt;&lt;img src=./img/Profiles.png width='100%' title='INCLUDE TEXT HERE'&gt;&lt;/center&gt;
+]
+
+
+.pull-right[
+&lt;center&gt;&lt;img src=./img/Heatmap.png width='100%' title='INCLUDE TEXT HERE'&gt;&lt;/center&gt;
+]
+
+*Nucleation*: diesel peaks with associated traffic temporal
+patterns
+
+*Secondary*: Aged particles that have grown due to
+the condensation of volatile gaseous compounds on
+their surface
+
+*Urban*: Aged traffic emissions, including also a mix
+of other urban emissions such as biomass burning,
+heating, cooking
+
+*Traffic 1*: Particles associated with spark-ignition vehicles
+
+*Traffic 2*: Particles associated with diesel vehicle emissions
+
+---
+
+# Link with health
+
+We assessed the relative risk (RR) for hospitalization for respiratory diseases in children by including the SA posterior estimates into the health model
+
+
+`\begin{align*}
+y_t &amp;\sim \text{Poisson}(\mu_t E)\\
+\log(\mu_{t})&amp;= \beta_0 + \sum_k \beta_k f_{k(t-\ell)} + \sum_i s(v_{ti}, \psi_i) + \delta_{I_t} + \epsilon_t
+\end{align*}`
+
+--
+
+where `\(f_{k(t-\ell)}\)` are the factors with specified lags
+
+- Additionally, temporal long term components are included through `\(\epsilon\)`
+
+- Confounders are accounted for in a non-linear flexible way through splines
+---
+
+# Results: health effects
+
+.pull-left[
+&lt;center&gt;&lt;img src=./img/Children_Resp.jpg width='50%' title='INCLUDE TEXT HERE'&gt;&lt;/center&gt;
+]
+
+.pull-right[
+
+- Clear differential impact of the different sources
+
+`\(\rightarrow\)` Nucleation and urban show evidence of a negative impact on health 
+
+]
+---
+
+# Moving forward
+
+- Understanding the impact of a two-stage vs joint model for sources and health
+
+- Several lags might need to be considered
+
+- Additional spatial component might be beneficial to understand the different impact of these sources
+
+---
+
+name: WBE
+
+&lt;span style="display:block; margin-top: 250px ;"&gt;&lt;/span&gt;
+
+.myblue[.center[.huge[
+**Space-Time modelling: wastewater based epidemiology**]]]
+
+---
+
+#Wastewater-based epidemiology
+
+&lt;span style="display:block; margin-top: 50px ;"&gt;&lt;/span&gt;
+&lt;center&gt;
+.content-box-green[.center[.large[A collection of tools
+and methods for surveillance and monitoring disease outbreaks using bio-
+chemical analysis of wastewater samples as the primary outcome measure]]]
+&lt;/center&gt;
+
+--
+
+&lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
+
+- Wastewater has been used over the years as an epidemiological tool
+  - no selection bias
+  - cheap
+
+- Wastewater based epidemiology started as a way to use wastewater to estimate exposure to chemicals in the population
+
+  - Illicit drugs, psychoactive substances
+  - Pesticides and other endocrine disruptors
+  - Bacteria, viruses, fungi
+  
+Success stories:
+
+  - retrospective prediction of outbreaks like hepatitis A and norovirus
+  - polio - WHO guidelines for monitoring polio includes wastewater
+  
+
+---
+
+# How does it work 
+
+&lt;span style="display:block; margin-top: 50px ;"&gt;&lt;/span&gt;
+
+&lt;center&gt;&lt;img src=./img/WW.png width='100%' title=''&gt;&lt;/center&gt;
+
+---
+
+
+# Wastewater during the COVID-19 pandemic
+
+- WBE has been recognised as an economically efficient approach for disease surveillance 
+
+- Methods to detect the presence of SARS-CoV-2 RNA in wastewater have
+been developed in a number of countries 
+
+- Scientific contributions to date have focused on the level of the sewage treatment works (STWs) where the
+measurements of SARS-CoV-2 RNA from wastewater are obtained.
+
+- No attempt has previously been made to develop a
+spatially resolved model to estimate wastewater viral
+concentration over a spatially continuous domain.
+
+&lt;span style="display:block; margin-top: 40px ;"&gt;&lt;/span&gt;
+--
+
+## Aim
+
+- Develop a statistical model to estimate viral concentration in wastewater at fine spatio-temporal resolutions covering the whole of England
+
+---
+
+# Modelling spatial data
+
+- **Point-referenced data**: the exact location of the occurrences is known
+  -  can be collected through specialized survey / monitoring network...
+  - if locations are **fixed** (monitoring stations, postcodes in an area) and the variable of interest is measured at each location (e.g. presence/absence of cases, pollution concentrations)
+  
+  `\(\Rightarrow\)` .red[geostatistical framework.]
+
+--
+
+.center[.content-box-blue[
+**First law of geography** (W. Tobler, 1970): everything is related to everything else, but near things are more related than distant things 
+]
+]
+
+--
+
+- We want to .red[reconstruct a latent spatial (temporal) surface] `\(\class{red}{\mathbf{S}}\)` .red[from a finite set of noisy observations and their spatial (temporal) location.]
+
+&lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
+
+- Use the spatial dependence to **predict** values of the spatial
+surface (together with associated uncertainty) at locations where
+there are no observations.
+
+--
+
+&lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
+
+.center[The common framework to geostatistical models is that of .red[**Gaussian
+random fields**.]]
+
+
+---
+
+# Data
+
+- SARS-CoV-2 viral concentrations obtained from the 303 Sewage Treatment Works (STWs) for which the data were publicly available from the Environmental Monitoring for Health Protection (EMHP) wastewater surveillance programme.
+
+
+.pull-left[
+&lt;center&gt;&lt;img src=./img/PopCoverage.png width='100%' title='% pop coverage'&gt;&lt;/center&gt;
+.center[Percentage population coverage]
+]
+
+.pull-right[
+&lt;center&gt;&lt;img src=./img/STW.png width='61%' title='Location of STWs and their catchment areas'&gt;&lt;/center&gt;
+.center[Location of STWs and their catchment areas]
+]
+
+---
+
+# Data
+
+- At each site three to four samples were collected per week between 1 June 2021 to 30 March 2022. 
+
+--
+&lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
+
+- We consider the weekly average of flow-normalised viral concentration measurements reported as the number of SARS-CoV-2 N1 gene copies per litre of wastewater (gc/L), obtained through reverse transcriptase quantitative polymerase chain reaction (RT-qPCR) analysis of the wastewater samples.
+
+--
+&lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
+
+- We also include socio-demographic, land use covariates and wastewater genomic data:
+
+&lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
+
+  1. Index of Multiple Deprivation (2019)
+  2. Black, Asian and Minority Ethnic (BAME) proportion (Census, 2011)
+  3. Land cover (Copernicus, 2018)
+  4. Population density (ONS, 2019)
+  5. Age structure (ONS, 2019)
+  6. Percentage coverage of the SARS-CoV-2 genome in the sample
+  7. Single-Nucleotide Polymorphism (SNP) data in the sample
+
+---
+
+# Statistical model
+
+.content-box-green[The model should 
+- quantify the relationship between the weekly viral concentration in wastewater samples at the STW catchment area level and the set of covariates 
+- predict weekly viral concentration at any chosen spatial resolution, together with the associated predictive uncertainty.]
+
+&lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
+
+### Model structure
+
+The log-transformed number of gene copies per liter at catchment area `\(i=1, \ldots, 303\)` and week `\(t=1,\ldots, 44\)` is modelled as:
+
+`$$y_{it} \sim \text{Normal}(\mu_{it}, \sigma^2_y)$$`
+
+with `\(\sigma^2_y\)` as the measurement error variance. For the latent mean concentration `\(\mu_{it}\)` we specify a linear model:
+
+`$$\mu_{it} = \alpha_{region_{g_i}} + \bm{x}_i \bm{\beta} +  u_i + v_t + z_{it}$$`
+ 
+---
+
+count:false
+
+# Statistical model
+
+.content-box-green[The model should 
+- quantify the relationship between the weekly viral concentration in wastewater samples at the STW catchment area level and the set of covariates 
+- predict weekly viral concentration at any chosen spatial resolution, together with the associated predictive uncertainty.]
+
+&lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
+
+### Model structure
+
+The log-transformed number of gene copies per liter at catchment area `\(i=1, \ldots, 303\)` and week `\(t=1,\ldots, 44\)` is modelled as:
+
+`$$y_{it} \sim \text{Normal}(\mu_{it}, \sigma^2_y)$$`
+
+with `\(\sigma^2_y\)` as the measurement error variance. For the latent mean concentration `\(\mu_{it}\)` we specify a linear model:
+
+`$$\mu_{it} ={\color{red}{\alpha_{region_{g_i}}}} + \bm{x}_i \bm{\beta} +  u_i + v_t + z_{it}$$`
+
+- `\(\color{red}{\alpha_{region_{g_i}}}\)`: region specific intercept, modelled as exchangeable
+
+---
+
+count: false
+
+# Statistical model
+
+.content-box-green[The model should 
+- quantify the relationship between the weekly viral concentration in wastewater samples at the STW catchment area level and the set of covariates 
+- predict weekly viral concentration at any chosen spatial resolution, together with the associated predictive uncertainty.]
+
+&lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
+
+### Model structure
+
+The log-transformed number of gene copies per liter at catchment area `\(i=1, \ldots, 303\)` and week `\(t=1,\ldots, 44\)` is modelled as:
+
+`$$y_{it} \sim \text{Normal}(\mu_{it}, \sigma^2_y)$$`
+
+with `\(\sigma^2_y\)` as the measurement error variance. For the latent mean concentration `\(\mu_{it}\)` we specify a linear model:
+
+`$$\mu_{it} = \alpha_{region_{g_i}} + {\color{red}\bm{x}_i \bm{\beta}} +  u_i + v_t + z_{it}$$`
+
+- `\(\color{red}{\bm{x}_i \bm{\beta}}\)`: vector of covariates and their effects
+
+---
+
+count: false
+
+# Statistical model
+
+.content-box-green[The model should 
+- quantify the relationship between the weekly viral concentration in wastewater samples at the STW catchment area level and the set of covariates 
+- predict weekly viral concentration at any chosen spatial resolution, together with the associated predictive uncertainty.]
+
+&lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
+
+### Model structure
+
+The log-transformed number of gene copies per liter at catchment area `\(i=1, \ldots, 303\)` and week `\(t=1,\ldots, 44\)` is modelled as:
+
+`$$y_{it} \sim \text{Normal}(\mu_{it}, \sigma^2_y)$$`
+
+with `\(\sigma^2_y\)` as the measurement error variance. For the latent mean concentration `\(\mu_{it}\)` we specify a linear model:
+
+`$$\mu_{it} = \alpha_{region_{g_i}} + \bm{x}_i \bm{\beta} +  {\color{red}u_i} + v_t + z_{it}$$`
+
+- `\(\color{red}{u_i}\)`: spatial random effect with an exchangeable prior 
+
+---
+
+
+count: false
+
+# Statistical model
+
+.content-box-green[The model should 
+- quantify the relationship between the weekly viral concentration in wastewater samples at the STW catchment area level and the set of covariates 
+- predict weekly viral concentration at any chosen spatial resolution, together with the associated predictive uncertainty.]
+
+&lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
+
+### Model structure
+
+The log-transformed number of gene copies per liter at catchment area `\(i=1, \ldots, 303\)` and week `\(t=1,\ldots, 44\)` is modelled as:
+
+`$$y_{it} \sim \text{Normal}(\mu_{it}, \sigma^2_y)$$`
+
+with `\(\sigma^2_y\)` as the measurement error variance. For the latent mean concentration `\(\mu_{it}\)` we specify a linear model:
+
+`$$\mu_{it} = \alpha_{region_{g_i}} + \bm{x}_i \bm{\beta} +  u_i + {\color{red}v_t} + z_{it}$$`
+
+- `\(\color{red}{v_t}\)`: temporal random effect modelled with first order random walk
+
+---
+
+# Spatio-temporal random effect
+
+`$$\mu_{it} = \alpha_{region_{g_i}} + \bm{x}_i \bm{\beta} +  u_i + v_t + {\color{red}z_{it}}$$`
+
+- `\(\color{red}{z_{it}}\)`: spatio-temporal random effect, modelled as a temporal autoregressive structure with spatially correlated innovations, similar to :
+`\begin{align*}
+t = 1 \qquad \boldsymbol{z}_t &amp;\sim \text{Normal}(0,\Sigma_{z})\\
+t &gt; 1 \qquad \boldsymbol{z}_t &amp;\sim \text{Normal}(\rho\boldsymbol{z}_{t-1},\Sigma_{z})
+\end{align*}`
+with `\(\rho\)` as the temporal autoregressive coefficient. 
+
+--
+
+The  `\(\Sigma_{z}\)` matrix represents the spatial structure and is defined using a Mat&amp;eacute;rn covariance function.
+
+`$$\text{Cov}(\bm{z}_i,\bm{z}_s)\ = \frac{\sigma^2_{z}}{\Gamma(\lambda)2^{\lambda-1}}(\kappa ||\bm{z}_i - \bm{z}_s||)^{\lambda}K_{\lambda}(\kappa ||\bm{z}_i - \bm{z}_s||)$$`
+
+where `\(\Gamma(\lambda)\)` is the gamma function, `\(K_{\lambda}\)` is the modified Bessel function of second kind with order `\(\lambda\)`. The parameter `\(\kappa&gt;0\)` controls the range `\(\rho=\sqrt{8\lambda}/\kappa\)` and indicate the distance where the spatial correlation is close to 0.1. 
+
+---
+
+# Spatial prediction
+
+- We consider the population-weighted centroids of all the 32,844 Lower Super Output Areas (LSOAs) in England, these being the smallest areas 
+for which all the covariates are available. 
+
+Given observed data `\(\boldsymbol{y}\)` we sample `\(\boldsymbol{y}^\prime\)`, the viral concentrations at the LSOA centroids over 44 weeks, from the posterior predictive distribution:
+`\begin{align}
+\pi(\boldsymbol{y}^\prime \mid \boldsymbol{y}) &amp;= \int p(\boldsymbol{y}^\prime \mid \boldsymbol{\theta}) p(\boldsymbol{\theta} \mid \boldsymbol{y}) d\boldsymbol{\theta}\\
+\boldsymbol{\theta} &amp;= (\alpha, \boldsymbol{\beta}, \boldsymbol{v}, \boldsymbol{g}, \boldsymbol{u}, \boldsymbol{z}, \sigma^2_y)\ .
+\end{align}`
+
+
+--
+
+&lt;span style="display:block; margin-top: 30px ;"&gt;&lt;/span&gt;
+
+
+The posterior predictive distribution at the LSOA centroids can be combined to return corresponding predictions at coarser geographical scales, as required. 
+
+  - Here we consider all the Lower Tier Local Authorities in England and average the corresponding LSOA values, weighted by the population in each LSOA.
+
+
+- Implemented in R-INLA 
+
+---
+
+
+# Detection of areas at increased risk of outbreaks
+
+.panelset[
+.panel[.panel-name[Detection]
+We used the posterior predictive distribution to detect increases in the wastewater viral concentration. For each LTLA `\((l=1,\ldots,L)\)` an increase in viral concentration over two consecutive weeks is the event (E):
+`\begin{eqnarray}
+E = I(\mu_{lt} &gt; \mu_{l(t-1)} &gt; \mu_{l(t-2)})
+\end{eqnarray}`
+where `\(I(\cdot)\)` is the indicator function.
+
+&lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
+A high predictive probability, `\({\rm Prob}(E)&gt;c\)` for a pre-specified threshold `\(c\)`, would then trigger a warning of a potential outbreak. This approach has been used for public health surveillance in both high-income  and low-to-middle-income  countries. 
+]
+
+.panel[.panel-name[Mapping]
+
+&lt;center&gt;&lt;img src=./img/Detection.png width='50%' title='INCLUDE TEXT HERE'&gt;&lt;/center&gt;
+]
+]
+
+---
+
+#Interactive dashboard
+To visualise these rich model outputs, we have created a dynamic and interactive dashboard
+
+&lt;span style="display:block; margin-top: -50px ;"&gt;&lt;/span&gt;
+
+&lt;iframe src="https://b-rowlingson.gitlab.io/wwatlas/" width="140%" height="100%" data-external="1" style="transform: scale(.8);border:none"&gt;&lt;/iframe&gt;
+
+---
+
+# Wastewater viral concentration and COVID-19 prevalence
+
+.pull-left[The relationship between viral concentration in
+wastewater and COVID-19 prevalence appears to be .red[complex
+and varying over both space and time.]]
+
+
+.pull-right[&lt;center&gt;&lt;img src=./img/fig6.jpg width='50%' title='INCLUDE TEXT HERE'&gt;&lt;/center&gt;]
+
+---
+
+# Wastewater in the post-pandemic era to monitor COVID
+
+- Data on randomised surveys and testing become more sparse
+&lt;span style="display:block; margin-top: -5px ;"&gt;&lt;/span&gt;
+`\(\rightarrow\)` Provide information on coarse geographical resolution (e.g. regional or national)
+
+&lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
+
+- Wastewater can track prevalence well and is cheaper to measure
+&lt;span style="display:block; margin-top: -5px ;"&gt;&lt;/span&gt;
+`\(\rightarrow\)` A monitoring system needs to be maintained 
+
+
+--
+
+&lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
+
+What data do we have (in the context of England)?
+
+&lt;!--a. Assuming we have wastewater viral concentrations regularly measured at STWs across the country
+
+`\(\rightarrow\)` we can use the geostatistical model to predict the LTLA weekly concentration.
+
+b. .red[LTLA weekly prevalence] estimates are only available up to a certain time point, but estimates at the weekly-coarse level remain available --&gt;
+
+
+&lt;center&gt;&lt;img src=./img/WWCovid.png width='60%' title='INCLUDE TEXT HERE'&gt;&lt;/center&gt;
+
+.content-box-green[Can wastewater data help disaggregate coarse level prevalence to
+a finer spatial scale?
+]
+
+---
+
+# Modelling framework
+
+- Coarse (national) and local (LTLA) models jointly fitted
+
+- Wastewater predictions available from the geostatistical model
+
+- Posterior distribution of COVID-19 prevalence obtained through  
+
+--
+
+### Coarse (national)
+`\begin{align*}
+\tilde{P}_{t} &amp;\sim \mbox{N}(\tilde{\mu}_{t},\tilde{\sigma}^2_{t})\\
+\tilde{\mu}_{t} &amp;= \alpha + b_t + d_t \tilde{y}^{\prime}_{t}
+\end{align*}`
+
+where 
+
+- `\(\tilde{P}_{t}\)` and `\(\tilde{\sigma}^2_{t}\)` are posterior mean and variance of the national aggregation of the prevalence (population weighted)
+- `\(\tilde{y}^{\prime}_{t}\)` is a similar aggregation for wastewater concentration
+
+&lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
+
+- `\(b_t\)` is modelled using a RW1
+- `\(d_t\)` is modelled using a RW2
+
+---
+
+# Modelling framework
+
+- Coarse (national) and local (LTLA) models jointly fitted
+
+- Wastewater predictions available from the geostatistical model
+
+- Posterior distribution of COVID-19 prevalence obtained through  
+
+--
+
+### Local
+`\begin{align*}
+p_{lt} &amp;\sim \mbox{N}(\mu_{lt},\sigma^2_{lt})\\
+\mu_{lt} &amp;= (\alpha + u_l) + (b_t + v_{lt}) + (d_t + m_l)y^{\prime}_{lt}\\
+\bm{y}^{\prime}_{t} &amp;\sim \mbox{MVN}(\bm{g}_t, \bm{S}_t)
+\end{align*}`
+
+where 
+
+- `\(p_{lt}\)` and `\(\sigma^2_{lt}\)` are posterior mean and variance of the COVID-19 prevalence 
+- `\(\bm{g}_t\)` and `\(\bm{S}_t\)` are the posterior mean and covariance matrix from the wastewater model
+- `\(u_{l}\)`, `\(v_{lt}, m_l\)` are modelled as exchangeable
+
+
+---
+
+# Implementation
+
+- Both the local and national components are jointly fitted
+
+- Alternative models: 
+
+1\. No wastewater
+
+&lt;span style="display:block; margin-top: 10px ;"&gt;&lt;/span&gt;
+`\(\rightarrow\)` temporal trend for the coarse level model `\(\tilde{\mu}_{t} = \alpha + b_t + d_t\)`
+&lt;span style="display:block; margin-top: 10px ;"&gt;&lt;/span&gt;
+`\(\rightarrow\)` spatial and temporal trend for the local level model `\(\mu_{lt} = (\alpha + u_l) + (b_t + v_{lt})\)`
+
+&lt;span style="display:block; margin-top: 30px ;"&gt;&lt;/span&gt;
+
+2\. No temporal varying coefficients
+&lt;span style="display:block; margin-top: 10px ;"&gt;&lt;/span&gt;
+`\(\rightarrow\)` linear relationship with wastewater `\(\tilde{\mu}_{t} = \alpha + b_t + d \tilde{y}^{\prime}_{t}\)`
+&lt;span style="display:block; margin-top: 10px ;"&gt;&lt;/span&gt;
+`\(\rightarrow\)` spatial-varying coefficient for wastewater `\(\mu_{lt} = (\alpha + u_l) + (b_t + v_{lt}) + (d + m_l)y^{\prime}_{lt}\)`
+
+--
+
+&lt;span style="display:block; margin-top: 30px ;"&gt;&lt;/span&gt;
+
+- *Study period*: 40 weeks
+
+- **Training window**: first 20 weeks (.red[LTLA + national weekly prevalence] + .blue[LTLA + national weekly wastewater])
+
+- **Disaggregation window**: subsequent 5/10/15/20 weeks (.red[national weekly prevalence] + .blue[LTLA + national weekly wastewater])
+
+---
+
+# Results
+
+.pull-left[&lt;center&gt;&lt;img src=./img/Results.png width='150%' title='INCLUDE TEXT HERE'&gt;&lt;/center&gt;
+]
+
+.pull-right[
+- Using wastewater data helps to improve the quality of the disaggregated LTLA prevalence (lower RMSE and better coverage) consistently across all disaggregation horizons.
+
+- Not large difference between the model 2 and model 3
+
+- Some geographical variation
+
+]
+
+&lt;span style="display:block; margin-top: -20px ;"&gt;&lt;/span&gt;
+&lt;center&gt;&lt;img src=./img/Boxplot.png width='80%' title='INCLUDE TEXT HERE'&gt;&lt;/center&gt;
+
+
+---
+
+# Results
+
+.pull-left[&lt;span style="display:block; margin-top: 40px ;"&gt;&lt;/span&gt;
+&lt;center&gt;&lt;img src=./img/Heatmap.png width='100%' title='INCLUDE TEXT HERE'&gt;&lt;/center&gt;
+]
+
+
+.pull-right[&lt;span style="display:block; margin-top: 5px ;"&gt;&lt;/span&gt;
+&lt;center&gt;&lt;img src=./img/Scatterplot.png width='80%' title='INCLUDE TEXT HERE'&gt;&lt;/center&gt;
+]
+
+`\(\rightarrow\)` Some periods (e.g. Christmas are showing larger differences)
+
+`\(\rightarrow\)` Some areas are consistently underestimated/overestimated
+
+---
+
+# What's next
+
+How can wastewater be incorporated into a real-time, multiplex public health surveillance system?
+
+&lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
+
+&lt;center&gt;&lt;img src=./img/Surveillance_representation.png width='60%' title='INCLUDE TEXT HERE'&gt;&lt;/center&gt;
+
+---
+
+name: COPD
+
+&lt;span style="display:block; margin-top: 250px ;"&gt;&lt;/span&gt;
+
+.myblue[.center[.huge[
+**Space-Time modelling: Temperature and Health**]]]
+
+
+
+---
+
+# COPD and temperature
+.panelset[
+.panel[.panel-name[Temperature and Health]
+
+.pull-left[
+- Typically U-shaped relationship between temperature and health.
+- Cold, dry air or hot air can trigger a flare-up.
+- Different confounding, different lags across different temperatures.
+]
+
+.pull-right[
+
+&lt;center&gt;&lt;img src=./img/TemperatureHealth.png width='100%' title='INCLUDE TEXT HERE'&gt;&lt;/center&gt;
+]
+
+]
+
+.panel[.panel-name[COPD]
+
+&lt;center&gt;&lt;img src=./img/COPD_lung.png width='60%' title='INCLUDE TEXT HERE'&gt;&lt;/center&gt;
+
+- In England, 115,000 emergency admissions and 24,000 deaths per year.
+- COPD exacerbations: Bacteria, viruses and air-pollution.
+- The role of temperature is unclear. 
+
+]
+]
+
+---
+
+# Aim
+
+.content-box-green[Examine the effect of warm temperatures on COPD hospitalizations.]
+
+&lt;span style="display:block; margin-top: 30px ;"&gt;&lt;/span&gt;
+
+Secondary objectives:
+&lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
+- Examine effect modification by age, sex and space.
+&lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
+- Assess how contextual characteristics, such as green space, average temperature, deprivation and urbanicity affect population vulnerability. 
+&lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
+- Calculate the number of COPD cases attributable to temperature.
+
+---
+
+# Outcome and exposure
+
+.pull-left[
+- COPD hospitalization (ICD10 J40-44) 2007-2018 (NHS digital).
+- Individual data/ 100m grid spatial resolution.
+- Summer months.
+
+--
+
+- Daily maximum temperature 2007-2018 at 1km grid from MetOffice.
+- lag0-2.
+]
+
+.pull-right[
+&lt;center&gt;&lt;img src=./img/temperatureLTLA.png width='100%' title='INCLUDE TEXT HERE'&gt;&lt;/center&gt;
+]
+
+---
+
+# Case-crossover design
+
+- Epidemiological study design for transient environmental exposures
+&lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;    
+- Sample from same month and days
+&lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;    
+- Exposure period 0-2 days before the hospital episode (mean temperature)
+
+&lt;center&gt;&lt;img src=./img/FigCaseCrossOver.png width='60%' title='INCLUDE TEXT HERE'&gt;&lt;/center&gt;
+
+---
+
+# Confouders and spatial effect modifiers
+
+.panel-set[.panel[
+panel-name[Confounders]
+&lt;table&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;"&gt; Confounder &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; Source &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; Space &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; Time &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; Year &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; PM2.5 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; MetOffice &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 1Km &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; daily &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 2007-2018 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; O3 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; MetOffice &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 1Km &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; daily &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 2007-2018 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Relative Humidity &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; MetOffice &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 10Km &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; daily &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 2007-2018 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Holidays &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; ONS &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; nationwide &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; daily &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 2007-2018 &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+]
+
+.panel[panel-name[Effect modifiers]
+
+&lt;center&gt;&lt;img src=./img/SpatEffMod.png width='100%' title='INCLUDE TEXT HERE'&gt;&lt;/center&gt;
+]
+]
+
+---
+
+
+# Acknowledgments
+.pull-left[
+.red[Source apportionment]:
+
+&lt;center&gt;&lt;img src=./img/MRClogo.png width='60%' title='INCLUDE TEXT HERE'&gt;&lt;/center&gt;
+
+**Monica Pirani**, **Georges Bucyibaruta** (ICL, EBS)
+
+**Gary Fuller**, **Anya Tremper**, **Dave Green** (IC-ERG)
+
+**Christina Mitsakou** (UKHSA)
+
+]
+
+.pull-right[
+.red[Wastewater based epidemiology]:
+
+&lt;center&gt;&lt;img src=./img/Turing.png width='60%' title='INCLUDE TEXT HERE'&gt;&lt;/center&gt;
+
+**Guangquan Li** (Northumbria University)
+
+**Radka Jersakova**, **Callum Mole**, **Camila Rangel Smith**  (Alan Turing Institute)
+
+**Barry Rowlingson**, **Peter Diggle** (Lancaster University)
+
+**Sylvia Richardson** (MRC Biostatistics Unit, Cambridge)
+
+**George Nicholson**, **Chris Holmes** (Oxford University)
+
+**Fatemeh Torabi** (Swansea University)
+
+**Matt Wade**, **Hubert Denise**, **William Rowe**, **Daniel James**, **Jasmine Grimsley** (UKHSA)
+
+]
+
+---
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script src="https://platform.twitter.com/widgets.js"></script>
+<script>var slideshow = remark.create({
+"highlightStyle": "github",
+"highlightLines": true,
+"countIncrementalSlides": false,
+"ratio": "16:9"
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+// add `data-at-shortcutkeys` attribute to <body> to resolve conflicts with JAWS
+// screen reader (see PR #262)
+(function(d) {
+  let res = {};
+  d.querySelectorAll('.remark-help-content table tr').forEach(tr => {
+    const t = tr.querySelector('td:nth-child(2)').innerText;
+    tr.querySelectorAll('td:first-child .key').forEach(key => {
+      const k = key.innerText;
+      if (/^[a-z]$/.test(k)) res[k] = t;  // must be a single letter (key)
+    });
+  });
+  d.body.setAttribute('data-at-shortcutkeys', JSON.stringify(res));
+})(document);
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+// adds .remark-code-has-line-highlighted class to <pre> parent elements
+// of code chunks containing highlighted lines with class .remark-code-line-highlighted
+(function(d) {
+  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
+  const preParents = [];
+  const findPreParent = function(line, p = 0) {
+    if (p > 1) return null; // traverse up no further than grandparent
+    const el = line.parentElement;
+    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
+  };
+
+  for (let line of hlines) {
+    let pre = findPreParent(line);
+    if (pre && !preParents.includes(pre)) preParents.push(pre);
+  }
+  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
+})(document);</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>
