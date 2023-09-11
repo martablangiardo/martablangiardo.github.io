@@ -225,11 +225,12 @@ concentration over a spatially continuous domain.
   
   `\(\Rightarrow\)` .red[geostatistical framework.]
 
---
 
-.center[.content-box-blue[
+&lt;!-- .center[.content-box-blue[
 **First law of geography** (W. Tobler, 1970): everything is related to everything else, but near things are more related than distant things]
 ]
+
+--&gt;
 
 --
 
@@ -241,12 +242,6 @@ concentration over a spatially continuous domain.
 surface (together with associated uncertainty) at locations where
 there are no observations.
 
---
-
-&lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
-
-.center[The common framework to geostatistical models is that of .red[**Gaussian
-random fields**.]]
 
 
 ---
@@ -295,7 +290,7 @@ y_s &amp;\sim N(\mu_s, \sigma^2_y)\\
 
  where
 
-- `\(\bm{x}\boldsymbol{\beta}\)`  is the so-called large scale component, defined by some covariates.
+- `\(\bm{x}\boldsymbol{\beta}\)`  is the large scale component, defined by some covariates.
 &lt;span style="display:block; margin-top: 10px ;"&gt;&lt;/span&gt;
 - `\(\boldsymbol{\xi}\)`  is a zero mean Gaussian spatial process commonly assumed to be stationary and isotropic with covariance function `\(Cov(\xi_s,\xi_j)\)`  which depends only on the distance between the locations.
 &lt;span style="display:block; margin-top: 10px ;"&gt;&lt;/span&gt;
@@ -314,19 +309,6 @@ where
 - `\(K_\lambda\)`  denotes the modified Bessel function of second kind and order `\(\lambda&gt;0\)`, which measures the degree of .red[smoothness] of the process. 
 - `\(\kappa&gt;0\)`  is a .red[scale] parameter related to the range `\(r\)`, i.e. the distance at which the spatial correlation becomes almost null. 
 - Typically, the empirically derived definition for the range is `\(r=\frac{\sqrt{8 \lambda}}{\kappa}\)`, with `\(r\)`  corresponding to the distance at which the spatial correlation is close to 0.1, for each `\(\lambda\geq 1/2\)`.
-
---
-
-The Mat&amp;eacute;rn family is a very flexible class of covariance functions able to cover a wide range of
-spatial fields.
-
-
-.pull-left[
-&lt;center&gt;&lt;img src=./img/Matern1.png width='40%' title='INCLUDE TEXT HERE'&gt;&lt;/center&gt;
-]
-
-.pull-right[&lt;center&gt;&lt;img src=./img/Matern2.png width='40%' title='INCLUDE TEXT HERE'&gt;&lt;/center&gt;
-]
 
 
 ---
