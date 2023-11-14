@@ -1,4 +1,3 @@
-
 Welcome to the course "Geospatial Analytics using R and R-INLA".
 
  This short course will provide a comprehensive introduction to concepts, methods, and R tools for geospatial data analytics, which involves collecting, exploring, modelling, and visualising data that exhibit dependencies in space and/or time. Specific focus will be given to Bayesian inference through the Integrated Nested Laplace Approximation (INLA) approach. 
