@@ -1,0 +1,1 @@
+https://pages.cms.hu-berlin.de/EOL/gcg_quantitative-methods/Lab14_Kriging.html#refs

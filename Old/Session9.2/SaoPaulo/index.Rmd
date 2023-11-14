@@ -1,0 +1,1233 @@
+---
+title: "Session 3.2: Spatio-temporal modelling for area data"
+params: 
+   conference: "Spatial and Spatio-Temporal Bayesian Models with `R-INLA`"
+   location: "University of São Paulo"
+   date: 28 September 2022
+   short_title: "Spatial and Spatio-Temporal Bayesian Models with `R-INLA`"
+output:
+  xaringan::moon_reader: 
+    includes: 
+       # This line adds a logo based on the format selected in the file 'assets/include_logo.html'
+       in_header: "assets/latex_macros.html" 
+       # NB: the actual options (eg placement of the logo and actual logo file) can be changed there
+       after_body: "assets/insert-logo.html"
+    seal: false
+    yolo: no
+    lib_dir: libs
+    nature:
+      beforeInit: ["https://platform.twitter.com/widgets.js"]
+      highlightStyle: github
+      highlightLines: yes
+      countIncrementalSlides: no
+      ratio: '16:9'
+      titleSlideClass:
+      - center
+      - middle
+    self_contained: false 
+    css:
+    - "assets/beamer.css"
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r echo=F,message=FALSE,warning=FALSE,comment=NA}
+# Sources the R file with all the relevant setup and commands
+source("assets/setup.R")
+
+# Stuff from 'xaringanExtra' (https://pkg.garrickadenbuie.com/xaringanExtra)
+# This allows the use of panels (from 'xaringanExtra')
+xaringanExtra::use_panelset()
+# This allows to copy code from the slides directly
+#xaringanExtra::use_clipboard()
+# This freezes the frame for when there's a gif included
+#xaringanExtra::use_freezeframe()
+
+# Defines the path to the file with the .bib entries (in case there are references)
+bibfile=ReadBib("~/Dropbox/Books/INLABook/ShortCourse/VIBASS/Biblio.bib",check = FALSE)
+```
+
+class: title-slide
+
+# `r rmarkdown::metadata$title``r vspace("10px")` `r rmarkdown::metadata$subtitle`
+
+## `r rmarkdown::metadata$author`
+
+### `r rmarkdown::metadata$institute`    
+
+### `r rmarkdown::metadata$params$conference`, `r rmarkdown::metadata$params$location` 
+
+<!-- Can also separate the various components of the extra argument 'params', eg as in 
+### `r paste(rmarkdown::metadata$params, collapse=", ")`
+-->
+
+`r ifelse(is.null(rmarkdown::metadata$params$date),format(Sys.Date(),"%e %B %Y"),rmarkdown::metadata$params$date)`
+
+---
+
+layout: true  
+
+.my-footer[ 
+.alignleft[ 
+&nbsp; &copy; Marta Blangiardo | Monica Pirani 
+]
+.aligncenter[
+`r rmarkdown::metadata$params$short_title` 
+]
+.alignright[
+`r rmarkdown::metadata$params$conference`, `r short_date` 
+]
+] 
+
+```{css,echo=FALSE, eval=FALSE}
+.red {
+  color: red;
+}
+.blue {
+  color: 0.14 0.34 0.55;
+}
+
+.content-box-blue { background-color: #F0F8FF; }
+
+}
+```
+
+---
+
+# Learning Objectives
+
+At the end of this session you should be able to:
+
+`r vspace("10px")`
+
+- List and describe different types of temporal dependence
+
+`r vspace("10px")`
+
+
+- Explain how to extend spatial or temporal models to spatio-temporal models 
+
+`r vspace("10px")`
+
+
+- Distinguish the different types of structures for space time interactions and be able to search for unusual space time patterns
+
+`r vspace("10px")`
+
+
+- Fit Bayesian space time models in INLA
+
+
+`r vspace("20px")`
+
+
+The topics treated in this lecture can be found in Chapter 7 of the book Spatial and **Spatio-Temporal Bayesian Models with `R-INLA`**.  
+
+---
+
+# Outline 
+
+`r vspace("30px")`
+
+1\. [Temporal dependence](#temporal-structure)
+
+`r vspace("30px")`
+
+2\. [From space to space-time](#space-to-time)
+
+`r vspace("30px")`
+
+3\. [Type of interactions](#interactions)
+
+---
+
+name: temporal-structure
+  
+`r vspace("250px")`
+
+.myblue[.center[.huge[
+**Temporal dependence**]]]
+
+---
+
+# Temporal dependence
+
+- Similarly to spatial dependence, it is sometimes necessary to
+model temporal dependence of data or of parameters:
+
+`r vspace("20px")`
+
+  - the weekly or monthly number of cases of many diseases exhibit often a seasonal pattern as well as short term dependence
+
+`r vspace("10px")`
+
+  - the underlying daily level of atmospheric pollutants, e.g. PM $_{10}$, will show strong correlation over consecutive days
+    because their lifetime lasts over several days
+
+`r vspace("20px")`
+
+- To the contrary of spatial models, there is a natural order to any time series data which is used in specifying the
+  models.
+
+---
+
+# Spatial patterns
+
+1\. Data
+  - Disease counts $y_{ik}$ in area $i$ and stratum $k$, aggregated over a time period, $i=1,\ldots,N$, $k=1,\ldots,K$
+  `r vspace("10px")`
+  - Population counts $n_{ik}$ in area $i$ and stratum $k$, aggregated over a time period
+  `r vspace("10px")`
+  - Expected numbers $E_i = \sum_k n_{ik} r_k$, where $r_k$ reference rate for stratum (age, gender,...)
+
+
+2\. Spatial smoothing using BYM model
+
+\begin{align*}
+\hbox{y}_i & \sim  \hbox{Poisson}(E_i \rho_i); \;\;\; i=1,...,N\\
+\log \rho_i & =  b_0 + v_i + u_i\\
+v_i &\sim  \hbox{Normal}(0, \sigma^2_v)\\
+{\bm u} & \sim   \hbox{ICAR}({\bm W}, \sigma_u^2) \rightarrow  u_i | u_{j, \;\; j\ne i}  \sim  \hbox{Normal}\left(\frac{\sum_{j} w_{ij} u_j}{\sum_{j} w_{ij}}, \sigma^2_u/n_i\right)
+\end{align*}
+
+with $w_{ij}=1$ if areas $i$ and $j$ are neighbours, 0 otherwise
+
+---
+
+# Temporal trends
+
+1\. Data
+
+  - Disease counts $y_{tk}$ in time period $t$ and stratum $k$, aggregated over space,  $t=1,\ldots,T$ (equally-spaced time intervals), $k=1,\ldots,K$ `r vspace("10px")`
+  - Population counts $n_{tk}$ in time period $t$ and stratum $k$, aggregated over space 
+`r vspace("10px")`
+  - Expected numbers $E_t = \sum_k n_{tk} r_k$, where $r_k$ reference rate for stratum (age, gender,...)
+
+2\. Temporal trends
+
+\begin{align*}
+\hbox{y}_t & \sim  \hbox{Poisson}(E_t \rho_t); \;\;\; t=1,...,T\\
+\log \rho_t & =  ???
+\end{align*}
+
+---
+
+count:false
+
+# Temporal trends
+
+1\. Data
+
+  - Disease counts $y_{tk}$ in time period $t$ and stratum $k$, aggregated over space,  $t=1,\ldots,T$ (equally-spaced time intervals), $k=1,\ldots,K$ `r vspace("10px")`
+  - Population counts $n_{tk}$ in time period $t$ and stratum $k$, aggregated over space 
+`r vspace("10px")`
+  - Expected numbers $E_t = \sum_k n_{tk} r_k$, where $r_k$ reference rate for stratum (age, gender,...)
+
+2\. Temporal trends
+
+\begin{align*}
+\hbox{y}_t & \sim  \hbox{Poisson}(E_t \rho_t); \;\;\; t=1,...,T\\
+\log \rho_t & =  b_0 + \beta t \quad \hbox{ simple linear regression}\\
+\end{align*}
+
+---
+
+count:false
+
+# Temporal trends
+
+1\. Data
+
+  - Disease counts $y_{tk}$ in time period $t$ and stratum $k$, aggregated over space,  $t=1,\ldots,T$ (equally-spaced time intervals), $k=1,\ldots,K$ `r vspace("10px")`
+  - Population counts $n_{tk}$ in time period $t$ and stratum $k$, aggregated over space 
+`r vspace("10px")`
+  - Expected numbers $E_t = \sum_k n_{tk} r_k$, where $r_k$ reference rate for stratum (age, gender,...)
+
+2\. Temporal trends
+
+\begin{align*}
+\hbox{y}_t & \sim  \hbox{Poisson}(E_t \rho_t); \;\;\; t=1,...,T\\
+\log \rho_t & =  b_0 + \beta t \quad \hbox{ simple linear regression}\\
+& =   b_0 + \psi_t \quad \hbox{ global temporal smoothing}\\
+& \psi_t \sim \hbox{Normal}(0, \sigma^2_{\psi})\\
+\end{align*}
+
+
+---
+
+count:false
+
+# Temporal trends
+
+1\. Data
+
+  - Disease counts $y_{tk}$ in time period $t$ and stratum $k$, aggregated over space,  $t=1,\ldots,T$ (equally-spaced time intervals), $k=1,\ldots,K$ `r vspace("10px")`
+  - Population counts $n_{tk}$ in time period $t$ and stratum $k$, aggregated over space 
+`r vspace("10px")`
+  - Expected numbers $E_t = \sum_k n_{tk} r_k$, where $r_k$ reference rate for stratum (age, gender,...)
+
+2\. Temporal trends
+
+\begin{align*}
+\hbox{y}_t & \sim  \hbox{Poisson}(E_t \rho_t); \;\;\; t=1,...,T\\
+\log \rho_t & =  b_0 + \beta t \quad \hbox{ simple linear regression}\\
+& =   b_0 + \psi_t \quad \hbox{ global temporal smoothing}\\
+& \psi_t \sim \hbox{Normal}(0, \sigma^2_{\psi})\\
+& =   b_0 + \gamma_t \quad \hbox{ local temporal smoothing}\\
+&    \gamma_t \sim \hbox{distribution ?}\\
+\end{align*}
+
+---
+
+count:false
+
+# Temporal trends
+
+1\. Data
+
+  - Disease counts $y_{tk}$ in time period $t$ and stratum $k$, aggregated over space,  $t=1,\ldots,T$ (equally-spaced time intervals), $k=1,\ldots,K$ `r vspace("10px")`
+  - Population counts $n_{tk}$ in time period $t$ and stratum $k$, aggregated over space 
+`r vspace("10px")`
+  - Expected numbers $E_t = \sum_k n_{tk} r_k$, where $r_k$ reference rate for stratum (age, gender,...)
+
+2\. Temporal trends
+
+\begin{align*}
+\hbox{y}_t & \sim  \hbox{Poisson}(E_t \rho_t); \;\;\; t=1,...,T\\
+\log \rho_t & =  b_0 + \beta t \quad \hbox{ simple linear regression}\\
+& =   b_0 + \psi_t \quad \hbox{ global temporal smoothing}\\
+& \psi_t \sim \hbox{Normal}(0, \sigma^2_{\psi})\\
+& =   b_0 + \gamma_t \quad \hbox{ local temporal smoothing}\\
+&    \gamma_t \sim \hbox{distribution ?}\\
+& =   b_0 + \gamma_t + \psi_t \quad \hbox{ global and local temporal smoothing}\\
+\end{align*}
+
+---
+
+# Conditional distributions for a RW(1) 
+
+- Recalling from the previous lecture, the conditional distribution $p(\gamma_t |\bm \gamma_{-t})$, where
+$\bm \gamma_{-t}$ represent the  vector of $\gamma$s with
+$\gamma_t$ removed, can be derived.
+
+- **RW1**: The conditional distribution of $\gamma_t$ involves
+$\gamma_{t-1}$:
+
+\begin{align*}
+p(\gamma_t |\bm \gamma_{-t},\sigma^2_{\epsilon}) & =
+N(\gamma_{t-1},\sigma^2_{\epsilon})
+\end{align*}
+
+
+- Similar form with the spatial autoregression case (ICAR) 
+$$\hbox{Recall: } p(X_i | X_{-i}) = \hbox{Normal}\left(\frac{\sum_{j} w_{ij} X_j}{\sum_{j} w_{ij}}, \frac{\sigma^2_u}{\sum_{j}  w_{ij}}\right)$$
+  - time neighbours of $t$ are $t-1$ and $t+1$
+  - if $t=1$ or $t=T$, only 1 neighbour: $t_2$ and $t_{T-1}$
+  - weights: 1
+
+## In `INLA`
+
+`f(ID.time, model="rw1")`
+
+---
+
+# Conditional distributions for a RW(2) 
+
+- A different parametrisation can be specified similarly to the spatial ICAR, so that 
+
+\begin{align*}
+t=1 & \qquad\qquad\gamma_{t+1},\gamma_{t+2}  \qquad\qquad\qquad \text{weights}= 2, -1 \\ 
+t=2 & \qquad\qquad \gamma_{t-1},\gamma_{t+1},\gamma_{t+2} \qquad\qquad \text{weights}= 2, 4, -1 \\ 
+t=3,..., T-2 & \qquad\qquad \gamma_{t-2},\gamma_{t-1},\gamma_{t+1},\gamma_{t+2} \qquad \text{weights}= -1, 4, 4, -1 \\ 
+t=T-1 & \qquad\qquad \gamma_{t-2},\gamma_{t-1}, \gamma_T ;;\qquad\qquad \text{weights}=-1, 4, 2 \\ 
+t=T & \qquad\qquad \gamma_{t-2}, \gamma_{t-1} ;\qquad\qquad\qquad \text{weights}=  -1, 2 \\ 
+\end{align*}
+
+which can be re-written as
+
+\begin{align*}
+p(\gamma_t |
+    \bm\gamma_{-t},\sigma^2_{\epsilon}) & =
+       N(2\gamma_{t-1}- \gamma_{t-2} ,\sigma^2_{\epsilon})
+\end{align*}
+
+## In `INLA`
+
+`f(ID.time, model="rw2")`
+
+---
+
+# Ohio Lung cancer data
+- Data on lung cancer in 88 counties of Ohio, 1968-1988
+- Annual rates by gender and race
+
+```{r ohio_data, echo=FALSE, eval=TRUE, include=TRUE, fig.height = 2.5, fig.width = 3, fig.align = "center"}
+library(sf)
+library(dplyr)
+library(ggplot2)
+library(SpatialEpi)
+ohio.gen <- read_sf("~/Dropbox/Books/INLABook/ShortCourse/VIBASS/Datasets/Ohio Lung Cancer/tl_2010_39_county00.shp")
+ohio.data <- read.table("~/Dropbox/Books/INLABook/ShortCourse/VIBASS/Datasets/Ohio Lung Cancer/Data.txt", header=T)
+ohio.data <- as_tibble(ohio.data)
+#Expected calculation
+E=list()
+for(i in 1:21){
+E[[i]] <- expected(ohio.data$n[ohio.data$year==i],ohio.data$y[ohio.data$year==i],4)
+}
+E <- as_tibble(unlist(E))
+ohio.data <- ohio.data %>% group_by(county, year) %>%  summarise(y=sum(y),n=sum(n)) 
+ohio.data = data.frame(ohio.data, E=E)
+
+ohio.data <- ohio.data %>%  mutate(E=value, SMR=y/E) %>% select(-value)
+
+ohio.data %>% group_by(year) %>%  summarise(sum.y=sum(y), sum.E=sum(E)) %>% mutate(mean.SMR=sum.y/sum.E) %>%  ggplot(aes(year,mean.SMR)) + 
+  geom_line() + labs(y = "Lung Cancer SMR", x = "Year")
+```
+---
+
+# Ohio Lung cancer data: modelled temporal trend
+
+- Smoothed temporal trend using RW1 and RW2 models (posterior mean)
+
+```{r ohio-rw, echo=FALSE, eval=TRUE, include=TRUE, fig.height = 2.5, fig.width = 3, fig.align = "center"}
+formula.rw1 <- sum.y~1 + f(year, model="ar1")
+formula.rw2 <- sum.y~1 + f(year, model="rw2")
+data.fit <- ohio.data %>% group_by(year) %>%  summarise(sum.y=sum(y), sum.E=sum(E)) %>% mutate(mean.SMR=sum.y/sum.E)
+
+library(INLA)
+mod.rw1 <- inla(formula.rw1, data=data.fit, E=sum.E, family="poisson", control.predictor = list(compute = TRUE))
+mod.rw2 <- inla(formula.rw2, data=data.fit, E=sum.E, family="poisson", control.predictor = list(compute = TRUE))
+
+data.fit %>% mutate(rw1=mod.rw1$summary.fitted.values[,1], rw2=mod.rw2$summary.fitted.values[,1]) %>% ggplot(aes(year, log(rw1)))  + geom_line(aes(year, log(rw2)), linetype = "dashed") + geom_point(aes(year, log(mean.SMR)), size=0.3) + theme(legend.position = "none") + labs(y = "Lung Cancer Rate", x = "Year")
+```
+
+---
+
+# Ohio Lung cancer spatial pattern (no temporal dimension)
+
+```{r ohio-space, echo=FALSE, eval=TRUE, include=TRUE, fig.height = 2.8, fig.width = 6, fig.align = "center"}
+formula.bym <- sum.y~1 + f(county, model="bym2", graph="~/Dropbox/Books/INLABook/Datasets/Ohio Lung Cancer/Ohio.graph")
+data.fit2 <- ohio.data %>% group_by(county) %>%  summarise(sum.y=sum(y),sum.E=sum(E)) %>% mutate(mean.SMR= sum.y/sum.E)
+mod.bym <- inla(formula.bym, data=data.fit2, E=sum.E, family="poisson", control.predictor = list(compute = TRUE))
+
+data.out <- data.fit2 %>% mutate(bym=mod.bym$summary.fitted.values[,1], COUNTYFP00=ohio.gen$COUNTYFP00)
+
+out_map <- left_join(ohio.gen,data.out, by="COUNTYFP00")
+
+map1 <- ggplot() + geom_sf(data = out_map, 
+                   aes(fill = mean.SMR)) + 
+            scale_fill_viridis_c(direction=-1) + theme(legend.position = "bottom") +
+            guides(fill=guide_legend(title="SMR")) +
+          theme(axis.text.x=element_blank(), axis.ticks.x=element_blank(), 
+          axis.text.y=element_blank(),  axis.ticks.y=element_blank(),
+          legend.key.size = unit(0.4, 'cm'), legend.text = element_text(size=6),
+          legend.title = element_text(size=6))
+
+
+map2 <- ggplot() + geom_sf(data = out_map, 
+                   aes(fill = bym)) + 
+            scale_fill_viridis_c(direction=-1) + theme(legend.position = "bottom") +
+            guides(fill=guide_legend(title=expression(rho[i]))) +
+          theme(axis.text.x=element_blank(), axis.ticks.x=element_blank(), 
+          axis.text.y=element_blank(),  axis.ticks.y=element_blank(),
+          legend.key.size = unit(0.4, 'cm'), legend.text = element_text(size=6),
+          legend.title = element_text(size=6))
+
+library(gridExtra)
+grid.arrange(map1,map2,ncol=2)
+```
+---
+
+name: space-to-time
+  
+`r vspace("250px")`
+
+.myblue[.center[.huge[
+**From space to space-time**]]]
+
+---
+
+
+
+# Disease mapping: Extending space to space-time
+
+- Disease mapping is usually carried out on aggregated data over a time period
+
+`r vspace("10px")`
+
+- Rather than suppressing the time dimension, it can be interesting to use models that combine the space and time dimension
+
+`r vspace("10px")`
+
+- The stability (or not) of the spatial pattern can aid interpretation
+
+`r vspace("10px")`
+
+- The specific space-time components of the model can potentially pinpoint
+unusual/emerging hazards
+
+`r vspace("10px")`
+
+- Data:
+
+  - $\hbox{y}_{it}$ and
+  - $\hbox{E}_{it}$: the observed and expected number of cases in area $i$ at time $t$ calculated as $E_{it} = \sum_k n_{itk} r_k$, where $r_k$ reference rate for stratum (age, gender,...)
+
+---
+
+# Schematic representation I
+
+`r include_fig("representation_ST1.jpg")`
+
+---
+
+# Linear spatio-temporal model
+
+- A simple parametric model assumes a linear effect of time:
+
+$$\log\rho_{it} = b_0 + u_i + v_i + \beta \times t$$
+
+  - Main spatial effect $u_i + v_i$
+  - Main linear trend $\beta$ (global time effect) 
+
+
+- A differential effect $\delta_i$ can be added
+
+$$\log\rho_{it} = b_0 + u_i + v_i + (\beta + \delta_i) \times t$$
+
+  - If $\delta_i < 0$ then the area-specific trend is less steep than the mean trend, whilst $\delta_i > 0$ implies that the area-specific trend is steeper than the mean trend. 
+
+
+---
+
+# Dynamic spatio-temporal model
+
+`r include_fig("representation_ST.jpg", width="80%")`
+
+---
+
+# Ohio Lung cancer - temporal SMRs
+
+Log SMR time trends in each county
+
+  - Slightly increasing trend but lots of variation across the counties
+  
+```{r ohio-ST, echo=FALSE, eval=TRUE, include=TRUE, fig.height = 2.5, fig.width = 6, fig.align = "center"}
+ggplot()  +  geom_line(data=ohio.data,aes(year, log(SMR), group=county)) + geom_line(data=data.fit,aes(year, log(mean.SMR), colour="red")) + theme(legend.position = "none") + labs(y = "Lung Cancer Rate", x = "Year")
+```
+
+---
+
+# Simple linear spatio-temporal model (Model 1)
+
+\begin{align*}
+\hbox{y}_{it} & \sim  \hbox{Poisson}(\hbox{E}_{it} \rho_{it}) \\
+\log\rho_{it} & =  b_0 + \beta*t + u_i + v_i\\
+\end{align*}
+where
+
+- $b_0$ overall log RR in Ohio over the 21-year period
+
+- $v_i \sim \hbox{Normal}(0, \sigma^2_v)$ spatially unstructured RE
+
+- $\mathbf{u} \sim \hbox{ICAR}(\mathbf{W}, \sigma^2_u)$ spatially structured RE
+
+- $\exp(\beta)$ is the change in the RR associated with a 1-year increase in time
+
+```{r formula_mod1, echo=TRUE, eval=TRUE}
+formula.mod1 <- y ~ 1 + f(county,model="bym",
+                   graph=Ohio.adj, constr=TRUE) + year
+```
+
+---
+
+# Log-linear temporal model with unstructured temporal RE (Model 2)
+
+\begin{align*}
+\hbox{y}_{it} & \sim  \hbox{Poisson}(\hbox{E}_{it} \rho_{it}) \\
+\log\rho_{it} & =  b_0 + \beta*t + u_i + v_i + \color{red}{\psi_t}\\
+\end{align*}
+
+where
+
+- $b_0$ overall log RR in Ohio over the 21-year period
+
+- $v_i \sim \hbox{Normal}(0, \sigma^2_v)$ spatially unstructured RE
+
+- $\mathbf{u} \sim \hbox{ICAR}(\mathbf{W}, \sigma^2_u)$ spatially structured RE
+
+- $\exp(\beta)$ is the change in the RR associated with a 1-year increase in time
+
+- $\color{red}{\psi_t  \sim \hbox{Normal}(0, \sigma^2_{\psi})}$ .red[temporally unstructured RE]
+
+```{r formula_mod2, echo=TRUE, eval=TRUE}
+year2 <- ohio.data$year
+formula.mod2<- y ~ 1 + f(county,model="bym",
+                  graph=Ohio.adj, constr=TRUE) + 
+                  f(year2,model="iid", constr=TRUE) + 
+                  year
+```
+---
+
+# Ohio lung cancer - comparison models 1 and 2
+
+```{r echo=FALSE, eval=TRUE}
+Ohio.adj="~/Dropbox/Books/INLABook/Datasets/Ohio Lung Cancer/Ohio.graph"
+```
+
+```{r echo=TRUE, eval=TRUE}
+mod1<- inla(data=ohio.data,formula=formula.mod1, E=E, family="poisson")
+mod2<- inla(data=ohio.data,formula=formula.mod2, E=E, family="poisson")
+# Posterior mean and  95% CI for Model 1
+mod1$summary.fixed
+
+#Posterior mean and 95% CI for Model 2
+mod2$summary.fixed
+```
+
+---
+
+# Ohio lung cancer - comparison models 1 and 2
+
+Let's look at the temporal random effect in model 2
+```{r echo=FALSE, eval=TRUE, fig.height= 2, fig.width=5}
+ggplot() + geom_line(aes(x=seq(1968,1988),y=mod2$summary.random$year2$mean)) + 
+  theme(axis.title.x = element_blank()) + ylab(expression(log(psi[t]))) 
+
+```
+
+Some temporal structure which suggests that the linear term is not capturing the temporal trend well
+
+---
+
+# Simple additive space-time structure version 1 (Model 3)
+
+This model assumes that the space time variations can be captured
+by the superimposition of a BYM spatial model and a structured time
+trend
+
+\begin{align*}
+\hbox{y}_{it} & \sim  \hbox{Poisson}(\hbox{E}_{it} \rho_{it})\\
+\log\rho_{it} & =  b_0 + b_i + \class{red}{\gamma_t}\\
+\end{align*}
+
+- $b_i = v_i + u_i$ 
+- $v_i \sim \hbox{Normal}(0, \sigma^2_v)$ spatially unstructured RE
+- $\mathbf{u} \sim \hbox{ICAR}(\mathbf{W}, \sigma^2_u)$ spatially structured RE
+- $\class{red}{\gamma_t  \sim \hbox{RW}(1)}$ temporally structured RE with variance parameter $\sigma^2_{\gamma}$
+- Assuming a BYM2 specification, there are 3 hyperparameters
+
+  - $\tau_b$, the marginal precision of $b_i$
+  - $\phi$, the proportion of spatial variability explained by the spatially structured component 
+  - $\sigma^2_\gamma$, the conditional variance of the RW(1) modelling the time trend
+
+```{r formula_mod3, echo=TRUE, eval=TRUE}
+formula.mod3 <- y ~ 1 + f(county,model="bym",
+                  graph=Ohio.adj, constr=TRUE) + 
+                  f(year,model="rw1", constr=TRUE) 
+```
+
+```{r mod3, echo=TRUE, eval=TRUE}
+mod3<- inla(data=ohio.data,formula=formula.mod3, E=E, family="poisson")
+```
+---
+
+# Simple additive space-time structure version 2 (Model 4)
+
+\begin{align*}
+\hbox{y}_{it} & \sim  \hbox{Poisson}(\hbox{E}_{it} \rho_{it}) \\
+\log\rho_{it} & =  b_0 + u_i + v_i + \class{red}{\psi_t} + \class{red}{\gamma_t}\\
+\end{align*}
+
+where
+- $b_0$ overall log RR in Ohio over the 21-year period
+- $v_i \sim \hbox{Normal}(0, \sigma^2_v)$ spatially unstructured RE
+- $\mathbf{u} \sim \hbox{ICAR}(\mathbf{W}, \sigma^2_u)$ spatially structured RE
+- $\class{red}{\gamma_t  \sim \hbox{RW}(1)}$ temporally structured RE with variance parameter $\sigma^2_{\gamma}$
+- $\class{red}{\psi_t  \sim \hbox{Normal}(0, \sigma^2_{\psi})}$ temporally unstructured RE
+
+```{r formula_mod4, echo=TRUE, eval=TRUE}
+formula.mod4 <- y ~ 1 + f(county,model="bym",
+                   graph=Ohio.adj, constr=TRUE) + 
+                   f(year,model="rw1", constr=TRUE) +   
+                   f(year2,model="iid", constr=TRUE)
+```
+```{r mod4, echo=TRUE, eval=TRUE}
+mod4<- inla(data=ohio.data,formula=formula.mod4, E=E, family="poisson")
+```
+
+---
+
+# Ohio lung cancer - comparison models 3 and 4
+
+Posterior means of the temporal RE
+
+Model 3 = $\gamma_t$ 
+
+Model 4 = $\psi_t + \gamma_t$
+
+`r include_fig("ohio11.jpeg",width="40%")`
+
+
+---
+
+# Ohio lung cancer - area-specific temporal RR
+
+Posterior means of the temporal RE $\gamma_t$ (model 3)
+
+`r include_fig("ohio10.jpeg", width="50%")`
+
+---
+
+# Ohio lung cancer - spatial patterns (all models)
+
+Posterior means of the spatial RE ( u + v ) for the 4 different models
+
+```{r echo=FALSE, eval=TRUE, fig.width=6, fig.height=2.5, fig.align="center"}
+ohio.out <- data.frame(county=seq(1,88),mod1=mod1$summary.random$county$mean[1:88],mod2=mod1$summary.random$county$mean[1:88],
+mod3=mod3$summary.random$county$mean[1:88],mod4=mod4$summary.random$county$mean[1:88])
+ohio.out <- as_tibble(ohio.out)
+breaks =c(-4,-1,-0.1,0.1,1,4)
+ohio.out <- ohio.out %>% mutate(mod1_cat = cut(mod1,breaks, include.lowest=TRUE),
+                                mod2_cat = cut(mod2,breaks, include.lowest=TRUE),
+                                mod3_cat = cut(mod3,breaks, include.lowest=TRUE),
+                                mod4_cat = cut(mod4,breaks, include.lowest=TRUE)
+)
+
+ohio.gen$county <- seq(1,88)
+out_map <- left_join(ohio.gen,ohio.out, by="county")
+
+
+map1 <- ggplot() + geom_sf(data = out_map, 
+                   aes(fill = mod1_cat)) + 
+            theme_bw() + scale_fill_brewer(palette = "OrRd") +             guides(fill=guide_legend(title="model 1")) +
+          theme(axis.text.x=element_blank(), axis.ticks.x=element_blank(), 
+          axis.text.y=element_blank(),  axis.ticks.y=element_blank(),
+          legend.key.size = unit(0.4, 'cm'), legend.text = element_text(size=6),
+          legend.title = element_text(size=6))
+
+map2 <- ggplot() + geom_sf(data = out_map, 
+                   aes(fill = mod2_cat)) + 
+            theme_bw() + scale_fill_brewer(palette = "OrRd") +             guides(fill=guide_legend(title="model 2")) +
+          theme(axis.text.x=element_blank(), axis.ticks.x=element_blank(), 
+          axis.text.y=element_blank(),  axis.ticks.y=element_blank(),
+          legend.key.size = unit(0.4, 'cm'), legend.text = element_text(size=6),
+          legend.title = element_text(size=6))
+
+map3 <- ggplot() + geom_sf(data = out_map, 
+                   aes(fill = mod3_cat)) + 
+            theme_bw() + scale_fill_brewer(palette = "OrRd") +             guides(fill=guide_legend(title="model 3")) +
+          theme(axis.text.x=element_blank(), axis.ticks.x=element_blank(), 
+          axis.text.y=element_blank(),  axis.ticks.y=element_blank(),
+          legend.key.size = unit(0.4, 'cm'), legend.text = element_text(size=6),
+          legend.title = element_text(size=6))
+
+map4 <- ggplot() + geom_sf(data = out_map, 
+                   aes(fill = mod4_cat)) + 
+            theme_bw() + scale_fill_brewer(palette = "OrRd") + 
+            guides(fill=guide_legend(title="model 4")) +
+          theme(axis.text.x=element_blank(), axis.ticks.x=element_blank(), 
+          axis.text.y=element_blank(),  axis.ticks.y=element_blank(),
+          legend.key.size = unit(0.4, 'cm'), legend.text = element_text(size=6),
+          legend.title = element_text(size=6))
+
+library(gridExtra)
+grid.arrange(map1,map2,map3, map4, ncol=2)
+```
+
+Similar patterns with the 4 models
+---
+
+# Space-time model with exchangeable interactions (Model 5)
+
+\begin{align*}
+\hbox{y}_{it} & \sim  \hbox{Poisson}(\hbox{E}_{it} \rho_{it}) \\
+\log\rho_{it} & =  b_0 + \theta_i + \;\gamma_t + \psi_t + \color{blue}{\delta_{it}}\\
+\theta_i & =  v_i + u_i \; \hbox{(BYM = ICAR + HET)}\\
+\gamma_t & \sim  \hbox{RW(1)}\\
+\psi_t & \sim  \hbox{N}(0,\sigma^2_{\psi})\\
+\color{blue}{\delta_{it}} & \sim  \hbox{Normal}(0, \sigma^2_{\delta})
+\end{align*}
+
+The simple additive model 4 can be extended by including **space-time interactions parameters**, $\delta_{it}$, modelled as
+exchangeable random effects, that capture departure from the
+additive structure
+---
+
+# Interpretation of the interactions in model 5
+- The interactions $\delta_{it}$ allow to highlight unusual temporal trends
+
+- Rules based on the posterior probabilities $p(\delta_{it} > 0)$ for at least 1 time $t$
+
+- Ohio lung cancer:  6 counties with unusual temporal trends
+
+.pull-left[
+"usual" temporal trends
+
+`r include_fig("ohio14.jpeg", width="70%")`
+]
+
+.pull-right[
+unusual temporal trends
+`r include_fig("ohio13.jpeg", width="70%")`
+]
+
+
+---
+
+# INLA code for model with interaction (Model 5)
+
+- In INLA is very easy to include the interaction in the `formula` environment
+
+- We need to specify an index for the interaction, i.e. for each combination of area/time  
+
+\begin{align*}
+\log\rho_{it} & =  b_0 + \xi_i + \gamma_t + \delta_{it}\\
+\xi_i & =  v_i + u_i \; \hbox{(BYM = ICAR + HET)}\\
+\gamma_t & \sim  \hbox{RW(1)}\\
+\psi_t & \sim  N(0,\sigma^2_{\psi})\\
+\delta_{it}  \sim & \hbox{Normal}(0, \sigma^2_{\nu})
+\end{align*}
+
+```{r st_mod, echo=TRUE, eval=FALSE}
+formula.intI<- y ~ + f(county,model="bym",
+                       graph=Ohio.adj) +
+                      f(year,model="rw1") +
+                      f(year2,model="iid") +
+                      f(area.year,model="iid")
+```
+
+
+---
+
+name: interactions
+  
+`r vspace("250px")`
+
+.myblue[.center[.huge[
+**Types of interactions**]]]
+
+---
+
+
+
+
+
+# Another example: Birth weight in Georgia
+
+- Count of babies weigthing less than 2500g in 159 counties in Georgia (US)
+- Period 2000 – 2010
+
+```{r Georgia_SMR, echo=FALSE, eval=TRUE, out.width="55%", opts=list(width="55%")}
+library(tidyverse)
+Georgia_map <- read_sf("~/Dropbox/Books/INLABook/ShortCourse/VIBASS/Datasets/LBW in Georgia/co13_d00.shp")
+Georgia_map1<-subset(Georgia_map,AREA>0.02)
+
+#Georgia_map[Georgia_map$CO13_D00_I %in% c(100,105,98,137),]$NAME==c("Macon1","Taylor1","Taylor2","Lee1")
+Georgia_data <- as_tibble(read.csv("~/Dropbox/Books/INLABook/ShortCourse/VIBASS/Datasets/LBW in Georgia/data.final.csv"))
+#add_duplicates <- Georgia_data[Georgia_data$X %in% c("Taylor", "Lee" ,   "Macon"),]
+#Georgia_data <- Georgia_data %>%  add_row(add_duplicates)
+
+Georgia_data <- Georgia_data %>% mutate(NAME=X,ID.area=seq(1,159), SMR2000=obs2000/Exp2000,SMR2001=obs2001/Exp2001,SMR2002=obs2002/Exp2002,
+                        SMR2003=obs2003/Exp2003,SMR2004=obs2004/Exp2004,SMR2005=obs2005/Exp2005,
+                        SMR2006=obs2006/Exp2006,SMR2007=obs2007/Exp2007,SMR2008=obs2008/Exp2008,
+                        SMR2009=obs2009/Exp2009,SMR2010=obs2010/Exp2010)
+out_map <- inner_join(Georgia_map1,Georgia_data,by="NAME")
+out_map <- out_map %>%  mutate(ID=seq(1,159))
+yearly_SMR <- out_map %>%
+  pivot_longer(cols = starts_with("SMR"),
+               values_to = "SMR",
+               names_to = "year_SMR") %>%
+select(NAME, ID, SMR, year_SMR, geometry) %>% mutate(ID.area = ID, ID.year=as.numeric(as.factor(year_SMR)),ID.area.year=seq(1,1749))
+
+library(scales)
+ggplot() +
+  geom_sf(data = yearly_SMR , aes(fill = SMR), color = "black", size = 0.25) + 
+  scale_fill_distiller(name="SMR", palette = "BrBG", breaks = pretty_breaks(5))+
+  facet_wrap(~ year_SMR, ncol = 4) +
+  labs(title="")
+```
+
+---
+
+# Different types of interactions `r Cite(bibfile, "knorr2000bayesian")`
+
+\begin{align*}
+\hbox{y}_{it} & \sim  \hbox{Poisson}(\hbox{E}_{it} \rho_{it}) \\
+\log \rho_{it} & =  b_0 + v_i + u_i  + \gamma_t + \psi_t + \color{blue}{\delta_{it}}\\
+v_i + u_i & =  \; \hbox{(BYM = HET + ICAR)}\\
+\gamma_t & \sim  \hbox{RW(1)}\\
+\psi_t & \sim  N(0,\sigma^2_{\psi})\\
+\end{align*}
+
+```{r, results = "asis", echo = FALSE, message = FALSE, eval=TRUE}
+Interaction <- c("I", "II", "III", "IV")
+Parameters <- c(paste("\\(v\\)", "and", "\\(\\psi\\)"),
+         paste("\\(v\\)", "and", "\\(\\gamma\\)"),
+         paste("\\(u\\)", "and", "\\(\\psi\\)"),
+         paste("\\(u\\)", "and", "\\(\\gamma\\)"))
+Rank <- c("nT","n(T-1) for RW1, n(T-2) for RW2", "(n-1)T","(n-1)(T-1) for RW1, (n-1)(T-2) for RW2")
+DF<- as_tibble(cbind(Interaction, Parameters, Rank))
+kable(DF, col.names = c("Interaction", "Parameters","Rank"),escape=F, caption = "Characteristics of ST interaction") %>%
+  kable_styling(latex_options = "hold_position")
+```
+
+
+---
+
+# How to model interactions
+
+- Data in R format
+```{r dataGeorgia, echo=FALSE, eval=TRUE} 
+data_obs <- Georgia_data %>%
+  pivot_longer(cols = starts_with("obs"),
+               values_to = c("Obs"),
+               names_to = c("year_obs")) %>%   
+select(NAME, ID.area, year_obs, Obs) %>% mutate(ID.year=as.numeric(as.factor(year_obs)))
+
+data_exp <- Georgia_data %>%
+  pivot_longer(cols = starts_with("Exp"),
+               values_to = c("Exp"),
+               names_to = c("year_exp")) %>%   
+select(NAME, ID.area, year_exp, Exp) %>% mutate(ID.year=as.numeric(as.factor(year_exp)))
+
+data_INLA <- left_join(data_obs,data_exp,by=c("ID.area","ID.year"))
+
+data_INLA <- data_INLA %>% mutate(y=Obs,E=Exp,NAME=NAME.x,ID.area.year=seq(1,dim(data_INLA)[1])) %>%  select(!c(NAME.x,NAME.y, year_obs, year_exp))
+
+data_INLA
+```
+
+`r vspace("-10px")`
+
+- We need to make sure to have an index for area (`ID.area`), one for time (`ID.year`) and one for the interaction (`ID.area.year`)
+
+---
+
+# Type I interaction in INLA
+
+Let's start with the Type I interaction, which assumes that the two unstructured effects $v_i$ and $\psi_t$ interact
+
+`r vspace("-10px")`
+
+
+```{r echo=FALSE, eval=TRUE}
+Georgia.adj <- "~/Dropbox/Books/INLABook/ShortCourse/VIBASS/Datasets/LBW in Georgia/Georgia.graph"
+ID.year2 <- data_INLA$ID.year
+formula.intI<- y ~ + f(ID.area,model="bym2",
+                       graph=Georgia.adj) +
+                     f(ID.year,model="rw1") +
+                    f(ID.year2,model="iid") +                                    f(ID.area.year,model="iid")
+```
+
+```{r INLA_ST1, echo=TRUE, eval=FALSE}
+Georgia.adj <- "~/LBW in Georgia/Georgia.graph"
+ID.year2 <- data_INLA$ID.year
+formula.intI<- y ~ + f(ID.area,model="bym2",
+                       graph=Georgia.adj) +
+                     f(ID.year,model="rw1") +
+                     f(ID.year2,model="iid") +
+                     f(ID.area.year,model="iid")
+```
+
+`r include_fig("INLA_ST1_mod-1.png", width="45%")`
+
+```{r INLA_ST1_mod, echo=FALSE, eval=FALSE}
+mod.intI <- inla(formula.intI, data=data_INLA, E=E, family="poisson", control.predictor = list(compute = TRUE), control.compute=list(dic=TRUE, waic=TRUE))
+res_intI<-tibble(ID.area.year=mod.intI$summary.random$ID.area.year$ID,interaction=mod.intI$summary.random$ID.area.year$mean)
+res_intI <- left_join(yearly_SMR,res_intI, by="ID.area.year")
+res_intI$int_cat <- cut(res_intI$interaction,  breaks=c(-0.1,-0.05, -0.01,
+                  0.01, 0.05, 0.1),include.lowest = T)
+ggplot() +
+geom_sf(data = res_intI, aes(fill = int_cat))  + theme_bw() +  scale_fill_brewer(palette = "PuOr") +
+            guides(fill=guide_legend(title=NULL)) +
+            theme(text = element_text(size=20),
+                  axis.text.x = element_blank(),
+                  axis.text.y = element_blank()) +
+facet_wrap(~ ID.year, ncol = 4, labeller=labeller(ID.year=c("1"="2000","2"="2001","3"="2002","4"="2003","5"="2004","6"="2005","7"="2006","8"="2007","9"="2008","10"="2009","11"="2010"))) +
+  labs("")
+```
+---
+
+# Kronecker product
+
+- For the interactions of tipe II-IV we will need to use the **Kronecker product** to specify the dependencies. It is a matrix multiplication which returns a block matrix.
+
+For instance
+$$\left[\begin{array}{cc}
+1 & 2 \\ 3 & 4
+\end{array}\right] \otimes
+\left[ \begin{array}{cc}
+ 0 & 5 \\ 6 & 7
+ \end{array} \right] = \left[
+\begin{array}{cc}
+1 \left[\begin{array}{cc}
+0 & 5\\
+6 & 7
+\end{array}\right] & 2 \left[\begin{array}{cc}
+0 & 5\\
+6 & 7
+\end{array}\right] \\
+3 \left[\begin{array}{cc}
+0 & 5\\
+6 & 7
+\end{array}\right] & 4 \left[\begin{array}{cc}
+0 & 5\\
+6 & 7
+\end{array}\right]
+\end{array}\right]$$
+
+There is a function in `R` which does exactly that: `kronecker(a,b)`
+
+We will now see how to use this for obtaining the structure matrix for the different types of interactions
+
+If you are interested in knowing more how to set interactions using the Kronecker product in `INLA` see `r Citet(bibfile,"goicoa2018spatio")`
+---
+
+# Type II interaction: in INLA
+
+- Type II combines the structured temporal main effect $\gamma_t$ and the unstructured
+spatial effect $v_i$.
+
+- We use first create the structure matrix for the time component assuming a random walk of order 1
+```{r eval=TRUE}
+#RW1
+D1 <- diff(diag(11),differences=1)
+Q.gammaRW1 <- t(D1)%*%D1
+#Let's look at it
+Q.gammaRW1[1:5,1:5]
+```
+
+---
+
+# Type II interaction: in INLA
+
+- Then we create the Kronecker product  $v \otimes$ $\gamma$ and note from the table in slide 35 that the rank deficiency is n (159 in our case)
+```{r eval=TRUE}
+#Kronecker product (for RW1)
+R <- kronecker(diag(159),Q.gammaRW1)
+R[1:5,1:5]
+```
+
+---
+
+# Type II interaction: in INLA
+
+- Finally we need to impose some more constraints as the matrix have spatio-temporal interaction matrix has a rank deficiency
+
+- We calculate the eigenvalues of the structure matrix of the interaction term and the extra constraints are those where the eigenvalues are zero
+
+```{r eval=TRUE}
+eigenQ <- eigen(R)
+ids <- which(eigenQ$values < 0.00001)
+cMat <- t(eigenQ$vectors[,ids])
+```
+
+The `formula` environment needs to be changed to
+```{r eval=TRUE}
+formula.intII<- y ~ f(ID.area,model="bym2",graph=Georgia.adj) +
+                    f(ID.year,model="rw1") +
+                    f(ID.year2,model="iid") +
+                    f(ID.area.year, model="generic0", Cmatrix=R, rankdef = nrow(cMat),
+                    extraconstr = list(A = cMat, e = rep(0, nrow(cMat))))
+```
+
+---
+
+# Type II interaction: in INLA
+
+`r include_fig("INLA_ST2_mod-1.png", width="60%")`
+
+```{r INLA_ST2_mod, echo=FALSE, eval=FALSE}
+mod.intII <- inla(formula.intII, data=data_INLA, E=E, family="poisson", control.predictor = list(compute = TRUE), control.compute=list(dic=TRUE, waic=TRUE))
+res_intII<-tibble(ID=data_INLA$ID.area,ID.year= data_INLA$ID.year,ID.area.year=mod.intII$summary.random$ID.area.year$ID,interaction=mod.intII$summary.random$ID.area.year$mean)
+
+#res_intII<-tibble(ID=ID.area.int,ID.year= ID.year.int,ID.area.year=mod.intII$summary.random$ID.area.int$ID,interaction=mod.intII$summary.random$ID.area.int$mean)
+res_intII <- left_join(out_map,res_intII, by="ID")
+res_intII$int_cat <- cut(res_intII$interaction,  breaks=c(-0.2,-0.05, -0.01,
+                  0.01, 0.05, 0.2),include.lowest = T)
+
+ggplot() +
+  geom_sf(data = res_intII, aes(fill = int_cat)) + theme_bw() +  scale_fill_brewer(palette = "PuOr") +
+            guides(fill=guide_legend(title=NULL)) +
+            theme(text = element_text(size=20),
+                  axis.text.x = element_blank(),
+                  axis.text.y = element_blank()) +
+facet_wrap(~ ID.year, ncol = 4, labeller=labeller(ID.year=c("1"="2000","2"="2001","3"="2002","4"="2003","5"="2004","6"="2005","7"="2006","8"="2007","9"="2008","10"="2009","11"="2010"))) +
+  labs("")
+```
+
+---
+
+# Type III interaction in INLA
+
+- Type III combines the spatially structured main effect $u_i$ and the unstructured temporal effect $\psi_t$.
+
+- We use first create the structure matrix for the spatial component using the neighborhood graph
+```{r eval=TRUE}
+g <- inla.read.graph(Georgia.adj)
+Q.xi <- matrix(0, g$n, g$n)
+for (i in 1:g$n){
+  Q.xi[i,i]=g$nnbs[[i]]
+  Q.xi[i,g$nbs[[i]]]=-1
+}
+Q.xi[1:5,1:5]
+```
+
+---
+
+# Type III interaction in INLA
+
+- Then we create the Kronecker product $u$ $\otimes$ $\psi$ and note from the table in slide 35 that the rank deficiency is T (11 in our case)
+```{r eval=TRUE}
+#Kronecker product (for RW1)
+R <- kronecker(Q.xi,diag(11))
+R[1:5,1:15]
+```
+---
+
+# Type III interaction in INLA
+
+- Finally we need to impose some more constraints (on the eigenvalues equal to 0)
+
+```{r eval=TRUE}
+eigenQ <- eigen(R)
+ids <- which(eigenQ$values < 0.00001)
+cMat <- t(eigenQ$vectors[,ids])
+```
+
+The `formula` environment becomes
+```{r eval=TRUE}
+formula.intIII<- y ~ f(ID.area,model="bym2",graph=Georgia.adj) +
+                    f(ID.year,model="rw1") +
+                    f(ID.year2,model="iid") +
+                    f(ID.area.year, model="generic0", Cmatrix=R, rankdef = nrow(cMat),
+                     extraconstr = list(A = cMat, e = rep(0, nrow(cMat))))
+```
+---
+
+# Type III interaction: in INLA
+
+`r include_fig("INLA_ST3_mod-1.png", width="60%")`
+
+```{r INLA_ST3_mod, echo=FALSE, eval=FALSE}
+mod.intIII <- inla(formula.intIII, data=data_INLA, E=E, family="poisson", control.predictor = list(compute = TRUE), control.compute = list(dic=TRUE, waic=TRUE))
+res_intIII<-tibble(ID=data_INLA$ID.area,ID.year= data_INLA$ID.year,ID.area.year=mod.intIII$summary.random$ID.area.year$ID,interaction=mod.intIII$summary.random$ID.area.year$mean)
+
+#res_intII<-tibble(ID=ID.area.int,ID.year= ID.year.int,ID.area.year=mod.intII$summary.random$ID.area.int$ID,interaction=mod.intII$summary.random$ID.area.int$mean)
+res_intIII <- left_join(out_map,res_intIII, by="ID")
+res_intIII$int_cat <- cut(res_intIII$interaction,  breaks=c(-0.02,-0.005, -0.001,
+                  0.001, 0.005, 0.02),include.lowest = T)
+ggplot() +
+  geom_sf(data = res_intIII, aes(fill = int_cat)) + theme_bw() +  scale_fill_brewer(palette = "PuOr") +
+            guides(fill=guide_legend(title=NULL)) +
+            theme(text = element_text(size=20),
+                  axis.text.x = element_blank(),
+                  axis.text.y = element_blank()) +
+facet_wrap(~ ID.year, ncol = 4, labeller=labeller(ID.year=c("1"="2000","2"="2001","3"="2002","4"="2003","5"="2004","6"="2005","7"="2006","8"="2007","9"="2008","10"="2009","11"="2010"))) +
+  labs("")
+```
+
+---
+
+# Type IV interaction in INLA
+
+- Type IV is the most complex type of interaction, assuming that the spatially and temporally structured effects $u_i$ and $\gamma_t$ interact
+-  We assume that the temporal dependency structure for each area is not independent from all the other areas anymore, but depends on the temporal pattern of the neighboring areas as well
+
+
+- We create the Kronecker product $u$ $\otimes$ $\gamma$ and note from the table in slide 35 that the rank deficiency is n+T-1 (169 in our case)
+```{r eval=TRUE}
+#Kronecker product (for RW1)
+R <- kronecker(Q.xi,Q.gammaRW1)
+eigenQ <- eigen(R)
+ids <- which(eigenQ$values < 0.00001)
+cMat <- t(eigenQ$vectors[,ids])
+```
+
+The `formula` environment becomes
+```{r eval=TRUE}
+formula.intIV<- y ~ f(ID.area,model="bym2",graph=Georgia.adj) +
+                    f(ID.year,model="rw1") +
+                    f(ID.year,model="iid") +
+                    f(ID.area.year, model="generic0", Cmatrix=R, rankdef = nrow(cMat),
+                    extraconstr = list(A = cMat, e = rep(0, nrow(cMat))))
+```
+---
+
+# Type IV interaction: in INLA
+
+`r include_fig("INLA_ST4_mod-1.png", width="60%")`
+
+```{r INLA_ST4_mod, echo=FALSE, eval=FALSE}
+mod.intIV <- inla(formula.intIV, data=data_INLA, E=E, family="poisson", control.predictor = list(compute = TRUE), control.compute = list(dic=TRUE, waic=TRUE))
+res_intIV<-tibble(ID=data_INLA$ID.area,ID.year= data_INLA$ID.year,ID.area.year=mod.intIV$summary.random$ID.area.year$ID,interaction=mod.intIV$summary.random$ID.area.year$mean)
+
+#res_intII<-tibble(ID=ID.area.int,ID.year= ID.year.int,ID.area.year=mod.intII$summary.random$ID.area.int$ID,interaction=mod.intII$summary.random$ID.area.int$mean)
+res_intIV <- left_join(out_map,res_intIV, by="ID")
+res_intIV$int_cat <- cut(res_intIV$interaction,  breaks=c(-0.2,-0.05, -0.01,
+                  0.01, 0.05, 0.2),include.lowest = T)
+ggplot() +
+  geom_sf(data = res_intIV, aes(fill = int_cat)) + theme_bw() +  scale_fill_brewer(palette = "PuOr") +
+            guides(fill=guide_legend(title=NULL)) +
+            theme(text = element_text(size=20),
+                  axis.text.x = element_blank(),
+                  axis.text.y = element_blank()) +
+facet_wrap(~ ID.year, ncol = 4, labeller=labeller(ID.year=c("1"="2000","2"="2001","3"="2002","4"="2003","5"="2004","6"="2005","7"="2006","8"="2007","9"="2008","10"="2009","11"="2010"))) +
+  labs("")
+```
+
+---
+
+# Model selection
+
+It might be useful to employ indexes like DIC and WAIC to decide which model is the most appropriate for the problem at hand
+
+In this example:
+
+```{r eval=TRUE, echo=FALSE}
+DIC <- c(11570,11536,11615,11570)
+WAIC <-c(11602,11569,11659,11612)
+DF$DIC<- DIC
+DF$WAIC <- WAIC
+kable(DF, col.names = c("Interaction", "Parameters","Rank", "DIC","WAIC"),escape=F, caption = "Model fitting for the different ST models") %>%
+  kable_styling(latex_options = "hold_position")
+```
+
+So we conclude that the model with the interaction of order II is the most appropriate for this data.
+
+---
+
+
+# Summary
+
+`r vspace("20px")`
+
+- Increase quality of datasets that are both spatially and temporally indexed
+
+`r vspace("20px")`
+
+- Advanced methods to deal with this type of data
+
+`r vspace("20px")`
+
+- Allow to interpret the stability (or not) of the spatial patterns
+
+`r vspace("20px")`
+
+--
+
+- Model selection tools are useful to choose which interaction to use 
+
+`r vspace("20px")`
+
+- Careful with interactions of order above I as they can take a **very long** time to run
+
+---
+
+# References
+
+```{r refs, echo=FALSE, results="asis"}
+PrintBibliography(bibfile,.opts=list(max.names=3))
+```
+

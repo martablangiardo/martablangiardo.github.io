@@ -1,0 +1,305 @@
+"","IndicatorID","IndicatorName","AreaCode","AreaName","AreaType","Sex","Age","Timeperiod","Value","IMDscore","decile"
+"1",90362,"Healthy life expe...","E06000001","Hartlepool","Counties & UAs (pre Apr 2019)","Male","All ages","2014 - 16",57.64418,33.178,2
+"2",90362,"Healthy life expe...","E06000002","Middlesbrough","Counties & UAs (pre Apr 2019)","Male","All ages","2014 - 16",57.81606,40.216,1
+"3",90362,"Healthy life expe...","E06000003","Redcar and Cleveland","Counties & UAs (pre Apr 2019)","Male","All ages","2014 - 16",58.75677,28.567,3
+"4",90362,"Healthy life expe...","E06000004","Stockton-on-Tees","Counties & UAs (pre Apr 2019)","Male","All ages","2014 - 16",59.49502,24.625,5
+"5",90362,"Healthy life expe...","E06000005","Darlington","Counties & UAs (pre Apr 2019)","Male","All ages","2014 - 16",61.05154,23.639,5
+"6",90362,"Healthy life expe...","E06000006","Halton","Counties & UAs (pre Apr 2019)","Male","All ages","2014 - 16",59.96567,31.943,2
+"7",90362,"Healthy life expe...","E06000007","Warrington","Counties & UAs (pre Apr 2019)","Male","All ages","2014 - 16",64.08911,19.312,7
+"8",90362,"Healthy life expe...","E06000008","Blackburn with Da...","Counties & UAs (pre Apr 2019)","Male","All ages","2014 - 16",57.26213,34.189,1
+"9",90362,"Healthy life expe...","E06000009","Blackpool","Counties & UAs (pre Apr 2019)","Male","All ages","2014 - 16",55.21166,41.997,1
+"10",90362,"Healthy life expe...","E06000010","Kingston upon Hull","Counties & UAs (pre Apr 2019)","Male","All ages","2014 - 16",56.38593,41.235,1
+"11",90362,"Healthy life expe...","E06000011","East Riding of Yo...","Counties & UAs (pre Apr 2019)","Male","All ages","2014 - 16",61.89398,15.792,8
+"12",90362,"Healthy life expe...","E06000012","North East Lincol...","Counties & UAs (pre Apr 2019)","Male","All ages","2014 - 16",59.90807,30.898,2
+"13",90362,"Healthy life expe...","E06000013","North Lincolnshire","Counties & UAs (pre Apr 2019)","Male","All ages","2014 - 16",59.39724,21.363,6
+"14",90362,"Healthy life expe...","E06000014","York","Counties & UAs (pre Apr 2019)","Male","All ages","2014 - 16",66.16682,12.219,9
+"15",90362,"Healthy life expe...","E06000015","Derby","Counties & UAs (pre Apr 2019)","Male","All ages","2014 - 16",60.14216,27.79,3
+"16",90362,"Healthy life expe...","E06000016","Leicester","Counties & UAs (pre Apr 2019)","Male","All ages","2014 - 16",60.3537,33.065,2
+"17",90362,"Healthy life expe...","E06000017","Rutland","Counties & UAs (pre Apr 2019)","Male","All ages","2014 - 16",68.73167,9.621,10
+"18",90362,"Healthy life expe...","E06000018","Nottingham","Counties & UAs (pre Apr 2019)","Male","All ages","2014 - 16",57.39481,36.927,1
+"19",90362,"Healthy life expe...","E06000019","Herefordshire","Counties & UAs (pre Apr 2019)","Male","All ages","2014 - 16",67.40834,19.737,7
+"20",90362,"Healthy life expe...","E06000020","Telford and Wrekin","Counties & UAs (pre Apr 2019)","Male","All ages","2014 - 16",61.80439,24.852,5
+"21",90362,"Healthy life expe...","E06000021","Stoke-on-Trent","Counties & UAs (pre Apr 2019)","Male","All ages","2014 - 16",58.71885,34.36,1
+"22",90362,"Healthy life expe...","E06000022","Bath and North Ea...","Counties & UAs (pre Apr 2019)","Male","All ages","2014 - 16",62.48637,12.094,10
+"23",90362,"Healthy life expe...","E06000023","Bristol","Counties & UAs (pre Apr 2019)","Male","All ages","2014 - 16",58.96036,27.161,4
+"24",90362,"Healthy life expe...","E06000024","North Somerset","Counties & UAs (pre Apr 2019)","Male","All ages","2014 - 16",66.15664,15.783,8
+"25",90362,"Healthy life expe...","E06000025","South Gloucesters...","Counties & UAs (pre Apr 2019)","Male","All ages","2014 - 16",65.4175,11.358,10
+"26",90362,"Healthy life expe...","E06000026","Plymouth","Counties & UAs (pre Apr 2019)","Male","All ages","2014 - 16",60.6195,26.643,4
+"27",90362,"Healthy life expe...","E06000027","Torbay","Counties & UAs (pre Apr 2019)","Male","All ages","2014 - 16",62.71125,28.788,3
+"28",90362,"Healthy life expe...","E06000028","Bournemouth","Counties & UAs (pre Apr 2019)","Male","All ages","2014 - 16",63.65702,21.847,6
+"29",90362,"Healthy life expe...","E06000029","Poole","Counties & UAs (pre Apr 2019)","Male","All ages","2014 - 16",64.23531,15.219,9
+"30",90362,"Healthy life expe...","E06000030","Swindon","Counties & UAs (pre Apr 2019)","Male","All ages","2014 - 16",64.49266,17.857,8
+"31",90362,"Healthy life expe...","E06000031","Peterborough","Counties & UAs (pre Apr 2019)","Male","All ages","2014 - 16",63.59225,27.659,4
+"32",90362,"Healthy life expe...","E06000032","Luton","Counties & UAs (pre Apr 2019)","Male","All ages","2014 - 16",61.50537,27.577,4
+"33",90362,"Healthy life expe...","E06000033","Southend-on-Sea","Counties & UAs (pre Apr 2019)","Male","All ages","2014 - 16",60.74229,24.516,5
+"34",90362,"Healthy life expe...","E06000034","Thurrock","Counties & UAs (pre Apr 2019)","Male","All ages","2014 - 16",63.84701,21.603,6
+"35",90362,"Healthy life expe...","E06000035","Medway","Counties & UAs (pre Apr 2019)","Male","All ages","2014 - 16",62.13215,22.332,6
+"36",90362,"Healthy life expe...","E06000036","Bracknell Forest","Counties & UAs (pre Apr 2019)","Male","All ages","2014 - 16",68.34268,10.462,10
+"37",90362,"Healthy life expe...","E06000037","West Berkshire","Counties & UAs (pre Apr 2019)","Male","All ages","2014 - 16",66.50679,10.242,10
+"38",90362,"Healthy life expe...","E06000038","Reading","Counties & UAs (pre Apr 2019)","Male","All ages","2014 - 16",67.0921,19.319,7
+"39",90362,"Healthy life expe...","E06000039","Slough","Counties & UAs (pre Apr 2019)","Male","All ages","2014 - 16",59.57583,22.873,6
+"40",90362,"Healthy life expe...","E06000040","Windsor and Maide...","Counties & UAs (pre Apr 2019)","Male","All ages","2014 - 16",69.64037,8.857,10
+"41",90362,"Healthy life expe...","E06000041","Wokingham","Counties & UAs (pre Apr 2019)","Male","All ages","2014 - 16",69.66352,5.652,10
+"42",90362,"Healthy life expe...","E06000042","Milton Keynes","Counties & UAs (pre Apr 2019)","Male","All ages","2014 - 16",66.16667,18.029,8
+"43",90362,"Healthy life expe...","E06000043","Brighton and Hove","Counties & UAs (pre Apr 2019)","Male","All ages","2014 - 16",61.6084,23.441,5
+"44",90362,"Healthy life expe...","E06000044","Portsmouth","Counties & UAs (pre Apr 2019)","Male","All ages","2014 - 16",61.27572,27.054,4
+"45",90362,"Healthy life expe...","E06000045","Southampton","Counties & UAs (pre Apr 2019)","Male","All ages","2014 - 16",61.85457,26.878,4
+"46",90362,"Healthy life expe...","E06000046","Isle of Wight","Counties & UAs (pre Apr 2019)","Male","All ages","2014 - 16",62.08139,23.087,6
+"47",90362,"Healthy life expe...","E06000047","County Durham","Counties & UAs (pre Apr 2019)","Male","All ages","2014 - 16",59.11503,25.741,4
+"48",90362,"Healthy life expe...","E06000049","Cheshire East","Counties & UAs (pre Apr 2019)","Male","All ages","2014 - 16",64.63951,14.132,9
+"49",90362,"Healthy life expe...","E06000050","Cheshire West and...","Counties & UAs (pre Apr 2019)","Male","All ages","2014 - 16",66.15616,18.086,7
+"50",90362,"Healthy life expe...","E06000051","Shropshire","Counties & UAs (pre Apr 2019)","Male","All ages","2014 - 16",65.39029,16.689,8
+"51",90362,"Healthy life expe...","E06000052","Cornwall","Counties & UAs (pre Apr 2019)","Male","All ages","2014 - 16",64.22328,23.833,5
+"52",90362,"Healthy life expe...","E06000053","Isles of Scilly","Counties & UAs (pre Apr 2019)","Male","All ages","2014 - 16",NA,12.013,10
+"53",90362,"Healthy life expe...","E06000054","Wiltshire","Counties & UAs (pre Apr 2019)","Male","All ages","2014 - 16",65.14367,13.466,9
+"54",90362,"Healthy life expe...","E06000055","Bedford","Counties & UAs (pre Apr 2019)","Male","All ages","2014 - 16",63.8842,19.238,7
+"55",90362,"Healthy life expe...","E06000056","Central Bedfordshire","Counties & UAs (pre Apr 2019)","Male","All ages","2014 - 16",67.31892,12.201,10
+"56",90362,"Healthy life expe...","E06000057","Northumberland","Counties & UAs (pre Apr 2019)","Male","All ages","2014 - 16",63.15441,20.525,6
+"57",90362,"Healthy life expe...","E08000001","Bolton","Counties & UAs (pre Apr 2019)","Male","All ages","2014 - 16",61.25896,28.42,3
+"58",90362,"Healthy life expe...","E08000002","Bury","Counties & UAs (pre Apr 2019)","Male","All ages","2014 - 16",58.46067,21.769,6
+"59",90362,"Healthy life expe...","E08000003","Manchester","Counties & UAs (pre Apr 2019)","Male","All ages","2014 - 16",54.29213,40.512,1
+"60",90362,"Healthy life expe...","E08000004","Oldham","Counties & UAs (pre Apr 2019)","Male","All ages","2014 - 16",59.05928,30.291,2
+"61",90362,"Healthy life expe...","E08000005","Rochdale","Counties & UAs (pre Apr 2019)","Male","All ages","2014 - 16",57.67485,33.684,1
+"62",90362,"Healthy life expe...","E08000006","Salford","Counties & UAs (pre Apr 2019)","Male","All ages","2014 - 16",58.21551,32.959,2
+"63",90362,"Healthy life expe...","E08000007","Stockport","Counties & UAs (pre Apr 2019)","Male","All ages","2014 - 16",63.56836,19.108,7
+"64",90362,"Healthy life expe...","E08000008","Tameside","Counties & UAs (pre Apr 2019)","Male","All ages","2014 - 16",57.5714,29.38,3
+"65",90362,"Healthy life expe...","E08000009","Trafford","Counties & UAs (pre Apr 2019)","Male","All ages","2014 - 16",62.71889,15.388,8
+"66",90362,"Healthy life expe...","E08000010","Wigan","Counties & UAs (pre Apr 2019)","Male","All ages","2014 - 16",61.01279,24.857,5
+"67",90362,"Healthy life expe...","E08000011","Knowsley","Counties & UAs (pre Apr 2019)","Male","All ages","2014 - 16",59.12732,41.387,1
+"68",90362,"Healthy life expe...","E08000012","Liverpool","Counties & UAs (pre Apr 2019)","Male","All ages","2014 - 16",57.72832,41.126,1
+"69",90362,"Healthy life expe...","E08000013","St. Helens","Counties & UAs (pre Apr 2019)","Male","All ages","2014 - 16",58.45031,29.809,2
+"70",90362,"Healthy life expe...","E08000014","Sefton","Counties & UAs (pre Apr 2019)","Male","All ages","2014 - 16",60.66678,25.732,4
+"71",90362,"Healthy life expe...","E08000015","Wirral","Counties & UAs (pre Apr 2019)","Male","All ages","2014 - 16",61.31337,26.892,4
+"72",90362,"Healthy life expe...","E08000016","Barnsley","Counties & UAs (pre Apr 2019)","Male","All ages","2014 - 16",58.5797,29.568,3
+"73",90362,"Healthy life expe...","E08000017","Doncaster","Counties & UAs (pre Apr 2019)","Male","All ages","2014 - 16",59.55284,29.051,3
+"74",90362,"Healthy life expe...","E08000018","Rotherham","Counties & UAs (pre Apr 2019)","Male","All ages","2014 - 16",59.79283,28.279,3
+"75",90362,"Healthy life expe...","E08000019","Sheffield","Counties & UAs (pre Apr 2019)","Male","All ages","2014 - 16",60.40895,27.568,4
+"76",90362,"Healthy life expe...","E08000021","Newcastle upon Tyne","Counties & UAs (pre Apr 2019)","Male","All ages","2014 - 16",59.14459,28.264,3
+"77",90362,"Healthy life expe...","E08000022","North Tyneside","Counties & UAs (pre Apr 2019)","Male","All ages","2014 - 16",61.76788,21.279,6
+"78",90362,"Healthy life expe...","E08000023","South Tyneside","Counties & UAs (pre Apr 2019)","Male","All ages","2014 - 16",57.34775,30.608,2
+"79",90362,"Healthy life expe...","E08000024","Sunderland","Counties & UAs (pre Apr 2019)","Male","All ages","2014 - 16",58.67194,29.725,3
+"80",90362,"Healthy life expe...","E08000025","Birmingham","Counties & UAs (pre Apr 2019)","Male","All ages","2014 - 16",59.71582,37.768,1
+"81",90362,"Healthy life expe...","E08000026","Coventry","Counties & UAs (pre Apr 2019)","Male","All ages","2014 - 16",62.17326,28.107,3
+"82",90362,"Healthy life expe...","E08000027","Dudley","Counties & UAs (pre Apr 2019)","Male","All ages","2014 - 16",59.88776,22.958,6
+"83",90362,"Healthy life expe...","E08000028","Sandwell","Counties & UAs (pre Apr 2019)","Male","All ages","2014 - 16",57.08004,34.614,1
+"84",90362,"Healthy life expe...","E08000029","Solihull","Counties & UAs (pre Apr 2019)","Male","All ages","2014 - 16",64.65115,17.238,8
+"85",90362,"Healthy life expe...","E08000030","Walsall","Counties & UAs (pre Apr 2019)","Male","All ages","2014 - 16",57.77595,30.37,2
+"86",90362,"Healthy life expe...","E08000031","Wolverhampton","Counties & UAs (pre Apr 2019)","Male","All ages","2014 - 16",56.59898,33.183,2
+"87",90362,"Healthy life expe...","E08000032","Bradford","Counties & UAs (pre Apr 2019)","Male","All ages","2014 - 16",61.799,33.168,2
+"88",90362,"Healthy life expe...","E08000033","Calderdale","Counties & UAs (pre Apr 2019)","Male","All ages","2014 - 16",63.42728,24.607,5
+"89",90362,"Healthy life expe...","E08000034","Kirklees","Counties & UAs (pre Apr 2019)","Male","All ages","2014 - 16",61.61843,23.964,5
+"90",90362,"Healthy life expe...","E08000035","Leeds","Counties & UAs (pre Apr 2019)","Male","All ages","2014 - 16",60.31516,26.623,4
+"91",90362,"Healthy life expe...","E08000036","Wakefield","Counties & UAs (pre Apr 2019)","Male","All ages","2014 - 16",57.31627,26.892,4
+"92",90362,"Healthy life expe...","E08000037","Gateshead","Counties & UAs (pre Apr 2019)","Male","All ages","2014 - 16",59.09419,25.932,4
+"93",90362,"Healthy life expe...","E09000001","City of London","Counties & UAs (pre Apr 2019)","Male","All ages","2014 - 16",NA,13.602,9
+"94",90362,"Healthy life expe...","E09000002","Barking and Dagenham","Counties & UAs (pre Apr 2019)","Male","All ages","2014 - 16",58.20521,34.635,1
+"95",90362,"Healthy life expe...","E09000003","Barnet","Counties & UAs (pre Apr 2019)","Male","All ages","2014 - 16",64.63026,17.813,8
+"96",90362,"Healthy life expe...","E09000004","Bexley","Counties & UAs (pre Apr 2019)","Male","All ages","2014 - 16",65.78781,16.17,8
+"97",90362,"Healthy life expe...","E09000005","Brent","Counties & UAs (pre Apr 2019)","Male","All ages","2014 - 16",64.85478,26.655,4
+"98",90362,"Healthy life expe...","E09000006","Bromley","Counties & UAs (pre Apr 2019)","Male","All ages","2014 - 16",66.85862,15.164,9
+"99",90362,"Healthy life expe...","E09000007","Camden","Counties & UAs (pre Apr 2019)","Male","All ages","2014 - 16",64.2427,24.959,5
+"100",90362,"Healthy life expe...","E09000008","Croydon","Counties & UAs (pre Apr 2019)","Male","All ages","2014 - 16",61.99021,23.643,5
+"101",90362,"Healthy life expe...","E09000009","Ealing","Counties & UAs (pre Apr 2019)","Male","All ages","2014 - 16",62.62673,23.585,5
+"102",90362,"Healthy life expe...","E09000010","Enfield","Counties & UAs (pre Apr 2019)","Male","All ages","2014 - 16",64.27152,26.994,4
+"103",90362,"Healthy life expe...","E09000011","Greenwich","Counties & UAs (pre Apr 2019)","Male","All ages","2014 - 16",60.71923,25.544,5
+"104",90362,"Healthy life expe...","E09000012","Hackney","Counties & UAs (pre Apr 2019)","Male","All ages","2014 - 16",59.12059,35.28,1
+"105",90362,"Healthy life expe...","E09000013","Hammersmith and F...","Counties & UAs (pre Apr 2019)","Male","All ages","2014 - 16",63.76227,24.362,5
+"106",90362,"Healthy life expe...","E09000014","Haringey","Counties & UAs (pre Apr 2019)","Male","All ages","2014 - 16",65.15907,31.043,2
+"107",90362,"Healthy life expe...","E09000015","Harrow","Counties & UAs (pre Apr 2019)","Male","All ages","2014 - 16",66.44853,14.302,9
+"108",90362,"Healthy life expe...","E09000016","Havering","Counties & UAs (pre Apr 2019)","Male","All ages","2014 - 16",65.84032,17.876,8
+"109",90362,"Healthy life expe...","E09000017","Hillingdon","Counties & UAs (pre Apr 2019)","Male","All ages","2014 - 16",64.33169,18.108,7
+"110",90362,"Healthy life expe...","E09000018","Hounslow","Counties & UAs (pre Apr 2019)","Male","All ages","2014 - 16",62.71096,22.469,6
+"111",90362,"Healthy life expe...","E09000019","Islington","Counties & UAs (pre Apr 2019)","Male","All ages","2014 - 16",60.87769,32.534,2
+"112",90362,"Healthy life expe...","E09000020","Kensington and Ch...","Counties & UAs (pre Apr 2019)","Male","All ages","2014 - 16",66.30535,23.376,5
+"113",90362,"Healthy life expe...","E09000021","Kingston upon Thames","Counties & UAs (pre Apr 2019)","Male","All ages","2014 - 16",69.08232,11.125,10
+"114",90362,"Healthy life expe...","E09000022","Lambeth","Counties & UAs (pre Apr 2019)","Male","All ages","2014 - 16",58.53188,28.913,3
+"115",90362,"Healthy life expe...","E09000023","Lewisham","Counties & UAs (pre Apr 2019)","Male","All ages","2014 - 16",62.94805,28.591,3
+"116",90362,"Healthy life expe...","E09000024","Merton","Counties & UAs (pre Apr 2019)","Male","All ages","2014 - 16",63.07275,14.93,9
+"117",90362,"Healthy life expe...","E09000025","Newham","Counties & UAs (pre Apr 2019)","Male","All ages","2014 - 16",65.34326,32.939,2
+"118",90362,"Healthy life expe...","E09000026","Redbridge","Counties & UAs (pre Apr 2019)","Male","All ages","2014 - 16",62.86376,20.242,7
+"119",90362,"Healthy life expe...","E09000027","Richmond upon Thames","Counties & UAs (pre Apr 2019)","Male","All ages","2014 - 16",69.78671,10.037,10
+"120",90362,"Healthy life expe...","E09000028","Southwark","Counties & UAs (pre Apr 2019)","Male","All ages","2014 - 16",61.1687,29.489,3
+"121",90362,"Healthy life expe...","E09000029","Sutton","Counties & UAs (pre Apr 2019)","Male","All ages","2014 - 16",64.0133,14.579,9
+"122",90362,"Healthy life expe...","E09000030","Tower Hamlets","Counties & UAs (pre Apr 2019)","Male","All ages","2014 - 16",61.35739,35.657,1
+"123",90362,"Healthy life expe...","E09000031","Waltham Forest","Counties & UAs (pre Apr 2019)","Male","All ages","2014 - 16",62.249,30.19,2
+"124",90362,"Healthy life expe...","E09000032","Wandsworth","Counties & UAs (pre Apr 2019)","Male","All ages","2014 - 16",61.54189,18.295,7
+"125",90362,"Healthy life expe...","E09000033","Westminster","Counties & UAs (pre Apr 2019)","Male","All ages","2014 - 16",62.03487,27.686,3
+"126",90362,"Healthy life expe...","E10000002","Buckinghamshire","Counties & UAs (pre Apr 2019)","Male","All ages","2014 - 16",69.31498,9.757,10
+"127",90362,"Healthy life expe...","E10000003","Cambridgeshire","Counties & UAs (pre Apr 2019)","Male","All ages","2014 - 16",65.23696,13.393,9
+"128",90362,"Healthy life expe...","E10000006","Cumbria","Counties & UAs (pre Apr 2019)","Male","All ages","2014 - 16",63.20154,21.331,6
+"129",90362,"Healthy life expe...","E10000007","Derbyshire","Counties & UAs (pre Apr 2019)","Male","All ages","2014 - 16",63.77238,18.515,7
+"130",90362,"Healthy life expe...","E10000008","Devon","Counties & UAs (pre Apr 2019)","Male","All ages","2014 - 16",66.67112,17.086,8
+"131",90362,"Healthy life expe...","E10000009","Dorset (Cty)","Counties & UAs (pre Apr 2019)","Male","All ages","2014 - 16",64.75197,14.336,9
+"132",90362,"Healthy life expe...","E10000011","East Sussex","Counties & UAs (pre Apr 2019)","Male","All ages","2014 - 16",65.05384,18.825,7
+"133",90362,"Healthy life expe...","E10000012","Essex","Counties & UAs (pre Apr 2019)","Male","All ages","2014 - 16",64.55936,17.163,8
+"134",90362,"Healthy life expe...","E10000013","Gloucestershire","Counties & UAs (pre Apr 2019)","Male","All ages","2014 - 16",66.10423,15.014,9
+"135",90362,"Healthy life expe...","E10000014","Hampshire","Counties & UAs (pre Apr 2019)","Male","All ages","2014 - 16",67.51525,11.917,10
+"136",90362,"Healthy life expe...","E10000015","Hertfordshire","Counties & UAs (pre Apr 2019)","Male","All ages","2014 - 16",66.11721,12.192,10
+"137",90362,"Healthy life expe...","E10000016","Kent","Counties & UAs (pre Apr 2019)","Male","All ages","2014 - 16",64.14828,18.805,7
+"138",90362,"Healthy life expe...","E10000017","Lancashire","Counties & UAs (pre Apr 2019)","Male","All ages","2014 - 16",62.43862,22.495,6
+"139",90362,"Healthy life expe...","E10000018","Leicestershire","Counties & UAs (pre Apr 2019)","Male","All ages","2014 - 16",65.15338,12.457,9
+"140",90362,"Healthy life expe...","E10000019","Lincolnshire","Counties & UAs (pre Apr 2019)","Male","All ages","2014 - 16",61.06167,20.609,6
+"141",90362,"Healthy life expe...","E10000020","Norfolk","Counties & UAs (pre Apr 2019)","Male","All ages","2014 - 16",64.59865,21.158,6
+"142",90362,"Healthy life expe...","E10000021","Northamptonshire","Counties & UAs (pre Apr 2019)","Male","All ages","2014 - 16",64.72791,18.936,7
+"143",90362,"Healthy life expe...","E10000023","North Yorkshire","Counties & UAs (pre Apr 2019)","Male","All ages","2014 - 16",66.89352,14.646,9
+"144",90362,"Healthy life expe...","E10000024","Nottinghamshire","Counties & UAs (pre Apr 2019)","Male","All ages","2014 - 16",61.69408,18.85,7
+"145",90362,"Healthy life expe...","E10000025","Oxfordshire","Counties & UAs (pre Apr 2019)","Male","All ages","2014 - 16",67.06627,11.513,10
+"146",90362,"Healthy life expe...","E10000027","Somerset","Counties & UAs (pre Apr 2019)","Male","All ages","2014 - 16",64.81202,17.783,8
+"147",90362,"Healthy life expe...","E10000028","Staffordshire","Counties & UAs (pre Apr 2019)","Male","All ages","2014 - 16",64.77083,16.38,8
+"148",90362,"Healthy life expe...","E10000029","Suffolk","Counties & UAs (pre Apr 2019)","Male","All ages","2014 - 16",63.45242,18.314,7
+"149",90362,"Healthy life expe...","E10000030","Surrey","Counties & UAs (pre Apr 2019)","Male","All ages","2014 - 16",68.82988,9.386,10
+"150",90362,"Healthy life expe...","E10000031","Warwickshire","Counties & UAs (pre Apr 2019)","Male","All ages","2014 - 16",66.23725,15.006,9
+"151",90362,"Healthy life expe...","E10000032","West Sussex","Counties & UAs (pre Apr 2019)","Male","All ages","2014 - 16",65.35288,14.027,9
+"152",90362,"Healthy life expe...","E10000034","Worcestershire","Counties & UAs (pre Apr 2019)","Male","All ages","2014 - 16",66.56509,17.704,8
+"153",90362,"Healthy life expe...","E06000001","Hartlepool","Counties & UAs (pre Apr 2019)","Female","All ages","2014 - 16",57.38159,33.178,2
+"154",90362,"Healthy life expe...","E06000002","Middlesbrough","Counties & UAs (pre Apr 2019)","Female","All ages","2014 - 16",58.72068,40.216,1
+"155",90362,"Healthy life expe...","E06000003","Redcar and Cleveland","Counties & UAs (pre Apr 2019)","Female","All ages","2014 - 16",60.47125,28.567,3
+"156",90362,"Healthy life expe...","E06000004","Stockton-on-Tees","Counties & UAs (pre Apr 2019)","Female","All ages","2014 - 16",62.24884,24.625,5
+"157",90362,"Healthy life expe...","E06000005","Darlington","Counties & UAs (pre Apr 2019)","Female","All ages","2014 - 16",63.4321,23.639,5
+"158",90362,"Healthy life expe...","E06000006","Halton","Counties & UAs (pre Apr 2019)","Female","All ages","2014 - 16",59.62327,31.943,2
+"159",90362,"Healthy life expe...","E06000007","Warrington","Counties & UAs (pre Apr 2019)","Female","All ages","2014 - 16",63.43934,19.312,7
+"160",90362,"Healthy life expe...","E06000008","Blackburn with Da...","Counties & UAs (pre Apr 2019)","Female","All ages","2014 - 16",59.95919,34.189,1
+"161",90362,"Healthy life expe...","E06000009","Blackpool","Counties & UAs (pre Apr 2019)","Female","All ages","2014 - 16",57.63857,41.997,1
+"162",90362,"Healthy life expe...","E06000010","Kingston upon Hull","Counties & UAs (pre Apr 2019)","Female","All ages","2014 - 16",56.01792,41.235,1
+"163",90362,"Healthy life expe...","E06000011","East Riding of Yo...","Counties & UAs (pre Apr 2019)","Female","All ages","2014 - 16",65.37862,15.792,8
+"164",90362,"Healthy life expe...","E06000012","North East Lincol...","Counties & UAs (pre Apr 2019)","Female","All ages","2014 - 16",57.49225,30.898,2
+"165",90362,"Healthy life expe...","E06000013","North Lincolnshire","Counties & UAs (pre Apr 2019)","Female","All ages","2014 - 16",63.02267,21.363,6
+"166",90362,"Healthy life expe...","E06000014","York","Counties & UAs (pre Apr 2019)","Female","All ages","2014 - 16",65.85186,12.219,9
+"167",90362,"Healthy life expe...","E06000015","Derby","Counties & UAs (pre Apr 2019)","Female","All ages","2014 - 16",58.42621,27.79,3
+"168",90362,"Healthy life expe...","E06000016","Leicester","Counties & UAs (pre Apr 2019)","Female","All ages","2014 - 16",59.33669,33.065,2
+"169",90362,"Healthy life expe...","E06000017","Rutland","Counties & UAs (pre Apr 2019)","Female","All ages","2014 - 16",70.24925,9.621,10
+"170",90362,"Healthy life expe...","E06000018","Nottingham","Counties & UAs (pre Apr 2019)","Female","All ages","2014 - 16",55.14781,36.927,1
+"171",90362,"Healthy life expe...","E06000019","Herefordshire","Counties & UAs (pre Apr 2019)","Female","All ages","2014 - 16",66.46973,19.737,7
+"172",90362,"Healthy life expe...","E06000020","Telford and Wrekin","Counties & UAs (pre Apr 2019)","Female","All ages","2014 - 16",60.60541,24.852,5
+"173",90362,"Healthy life expe...","E06000021","Stoke-on-Trent","Counties & UAs (pre Apr 2019)","Female","All ages","2014 - 16",58.12132,34.36,1
+"174",90362,"Healthy life expe...","E06000022","Bath and North Ea...","Counties & UAs (pre Apr 2019)","Female","All ages","2014 - 16",65.3751,12.094,10
+"175",90362,"Healthy life expe...","E06000023","Bristol","Counties & UAs (pre Apr 2019)","Female","All ages","2014 - 16",62.98169,27.161,4
+"176",90362,"Healthy life expe...","E06000024","North Somerset","Counties & UAs (pre Apr 2019)","Female","All ages","2014 - 16",67.4187,15.783,8
+"177",90362,"Healthy life expe...","E06000025","South Gloucesters...","Counties & UAs (pre Apr 2019)","Female","All ages","2014 - 16",65.17214,11.358,10
+"178",90362,"Healthy life expe...","E06000026","Plymouth","Counties & UAs (pre Apr 2019)","Female","All ages","2014 - 16",57.91911,26.643,4
+"179",90362,"Healthy life expe...","E06000027","Torbay","Counties & UAs (pre Apr 2019)","Female","All ages","2014 - 16",61.93808,28.788,3
+"180",90362,"Healthy life expe...","E06000028","Bournemouth","Counties & UAs (pre Apr 2019)","Female","All ages","2014 - 16",65.89568,21.847,6
+"181",90362,"Healthy life expe...","E06000029","Poole","Counties & UAs (pre Apr 2019)","Female","All ages","2014 - 16",66.88116,15.219,9
+"182",90362,"Healthy life expe...","E06000030","Swindon","Counties & UAs (pre Apr 2019)","Female","All ages","2014 - 16",60.87859,17.857,8
+"183",90362,"Healthy life expe...","E06000031","Peterborough","Counties & UAs (pre Apr 2019)","Female","All ages","2014 - 16",62.21009,27.659,4
+"184",90362,"Healthy life expe...","E06000032","Luton","Counties & UAs (pre Apr 2019)","Female","All ages","2014 - 16",61.4239,27.577,4
+"185",90362,"Healthy life expe...","E06000033","Southend-on-Sea","Counties & UAs (pre Apr 2019)","Female","All ages","2014 - 16",64.81086,24.516,5
+"186",90362,"Healthy life expe...","E06000034","Thurrock","Counties & UAs (pre Apr 2019)","Female","All ages","2014 - 16",60.75123,21.603,6
+"187",90362,"Healthy life expe...","E06000035","Medway","Counties & UAs (pre Apr 2019)","Female","All ages","2014 - 16",59.67169,22.332,6
+"188",90362,"Healthy life expe...","E06000036","Bracknell Forest","Counties & UAs (pre Apr 2019)","Female","All ages","2014 - 16",70.12129,10.462,10
+"189",90362,"Healthy life expe...","E06000037","West Berkshire","Counties & UAs (pre Apr 2019)","Female","All ages","2014 - 16",70.04059,10.242,10
+"190",90362,"Healthy life expe...","E06000038","Reading","Counties & UAs (pre Apr 2019)","Female","All ages","2014 - 16",64.58662,19.319,7
+"191",90362,"Healthy life expe...","E06000039","Slough","Counties & UAs (pre Apr 2019)","Female","All ages","2014 - 16",59.4344,22.873,6
+"192",90362,"Healthy life expe...","E06000040","Windsor and Maide...","Counties & UAs (pre Apr 2019)","Female","All ages","2014 - 16",70.76896,8.857,10
+"193",90362,"Healthy life expe...","E06000041","Wokingham","Counties & UAs (pre Apr 2019)","Female","All ages","2014 - 16",71.0958,5.652,10
+"194",90362,"Healthy life expe...","E06000042","Milton Keynes","Counties & UAs (pre Apr 2019)","Female","All ages","2014 - 16",66.28402,18.029,8
+"195",90362,"Healthy life expe...","E06000043","Brighton and Hove","Counties & UAs (pre Apr 2019)","Female","All ages","2014 - 16",62.1781,23.441,5
+"196",90362,"Healthy life expe...","E06000044","Portsmouth","Counties & UAs (pre Apr 2019)","Female","All ages","2014 - 16",60.99811,27.054,4
+"197",90362,"Healthy life expe...","E06000045","Southampton","Counties & UAs (pre Apr 2019)","Female","All ages","2014 - 16",63.07217,26.878,4
+"198",90362,"Healthy life expe...","E06000046","Isle of Wight","Counties & UAs (pre Apr 2019)","Female","All ages","2014 - 16",64.26997,23.087,6
+"199",90362,"Healthy life expe...","E06000047","County Durham","Counties & UAs (pre Apr 2019)","Female","All ages","2014 - 16",58.93527,25.741,4
+"200",90362,"Healthy life expe...","E06000049","Cheshire East","Counties & UAs (pre Apr 2019)","Female","All ages","2014 - 16",66.62718,14.132,9
+"201",90362,"Healthy life expe...","E06000050","Cheshire West and...","Counties & UAs (pre Apr 2019)","Female","All ages","2014 - 16",65.38853,18.086,7
+"202",90362,"Healthy life expe...","E06000051","Shropshire","Counties & UAs (pre Apr 2019)","Female","All ages","2014 - 16",67.48644,16.689,8
+"203",90362,"Healthy life expe...","E06000052","Cornwall","Counties & UAs (pre Apr 2019)","Female","All ages","2014 - 16",62.39806,23.833,5
+"204",90362,"Healthy life expe...","E06000053","Isles of Scilly","Counties & UAs (pre Apr 2019)","Female","All ages","2014 - 16",NA,12.013,10
+"205",90362,"Healthy life expe...","E06000054","Wiltshire","Counties & UAs (pre Apr 2019)","Female","All ages","2014 - 16",67.03378,13.466,9
+"206",90362,"Healthy life expe...","E06000055","Bedford","Counties & UAs (pre Apr 2019)","Female","All ages","2014 - 16",64.54053,19.238,7
+"207",90362,"Healthy life expe...","E06000056","Central Bedfordshire","Counties & UAs (pre Apr 2019)","Female","All ages","2014 - 16",64.34056,12.201,10
+"208",90362,"Healthy life expe...","E06000057","Northumberland","Counties & UAs (pre Apr 2019)","Female","All ages","2014 - 16",64.90875,20.525,6
+"209",90362,"Healthy life expe...","E08000001","Bolton","Counties & UAs (pre Apr 2019)","Female","All ages","2014 - 16",58.81075,28.42,3
+"210",90362,"Healthy life expe...","E08000002","Bury","Counties & UAs (pre Apr 2019)","Female","All ages","2014 - 16",62.11008,21.769,6
+"211",90362,"Healthy life expe...","E08000003","Manchester","Counties & UAs (pre Apr 2019)","Female","All ages","2014 - 16",54.71292,40.512,1
+"212",90362,"Healthy life expe...","E08000004","Oldham","Counties & UAs (pre Apr 2019)","Female","All ages","2014 - 16",60.6437,30.291,2
+"213",90362,"Healthy life expe...","E08000005","Rochdale","Counties & UAs (pre Apr 2019)","Female","All ages","2014 - 16",58.66014,33.684,1
+"214",90362,"Healthy life expe...","E08000006","Salford","Counties & UAs (pre Apr 2019)","Female","All ages","2014 - 16",59.79463,32.959,2
+"215",90362,"Healthy life expe...","E08000007","Stockport","Counties & UAs (pre Apr 2019)","Female","All ages","2014 - 16",66.03413,19.108,7
+"216",90362,"Healthy life expe...","E08000008","Tameside","Counties & UAs (pre Apr 2019)","Female","All ages","2014 - 16",58.14483,29.38,3
+"217",90362,"Healthy life expe...","E08000009","Trafford","Counties & UAs (pre Apr 2019)","Female","All ages","2014 - 16",66.22589,15.388,8
+"218",90362,"Healthy life expe...","E08000010","Wigan","Counties & UAs (pre Apr 2019)","Female","All ages","2014 - 16",61.85774,24.857,5
+"219",90362,"Healthy life expe...","E08000011","Knowsley","Counties & UAs (pre Apr 2019)","Female","All ages","2014 - 16",58.64438,41.387,1
+"220",90362,"Healthy life expe...","E08000012","Liverpool","Counties & UAs (pre Apr 2019)","Female","All ages","2014 - 16",58.12552,41.126,1
+"221",90362,"Healthy life expe...","E08000013","St. Helens","Counties & UAs (pre Apr 2019)","Female","All ages","2014 - 16",59.35405,29.809,2
+"222",90362,"Healthy life expe...","E08000014","Sefton","Counties & UAs (pre Apr 2019)","Female","All ages","2014 - 16",61.90562,25.732,4
+"223",90362,"Healthy life expe...","E08000015","Wirral","Counties & UAs (pre Apr 2019)","Female","All ages","2014 - 16",60.181,26.892,4
+"224",90362,"Healthy life expe...","E08000016","Barnsley","Counties & UAs (pre Apr 2019)","Female","All ages","2014 - 16",59.68016,29.568,3
+"225",90362,"Healthy life expe...","E08000017","Doncaster","Counties & UAs (pre Apr 2019)","Female","All ages","2014 - 16",61.83202,29.051,3
+"226",90362,"Healthy life expe...","E08000018","Rotherham","Counties & UAs (pre Apr 2019)","Female","All ages","2014 - 16",55.59969,28.279,3
+"227",90362,"Healthy life expe...","E08000019","Sheffield","Counties & UAs (pre Apr 2019)","Female","All ages","2014 - 16",57.50244,27.568,4
+"228",90362,"Healthy life expe...","E08000021","Newcastle upon Tyne","Counties & UAs (pre Apr 2019)","Female","All ages","2014 - 16",59.94379,28.264,3
+"229",90362,"Healthy life expe...","E08000022","North Tyneside","Counties & UAs (pre Apr 2019)","Female","All ages","2014 - 16",61.98875,21.279,6
+"230",90362,"Healthy life expe...","E08000023","South Tyneside","Counties & UAs (pre Apr 2019)","Female","All ages","2014 - 16",57.86417,30.608,2
+"231",90362,"Healthy life expe...","E08000024","Sunderland","Counties & UAs (pre Apr 2019)","Female","All ages","2014 - 16",59.22379,29.725,3
+"232",90362,"Healthy life expe...","E08000025","Birmingham","Counties & UAs (pre Apr 2019)","Female","All ages","2014 - 16",59.25402,37.768,1
+"233",90362,"Healthy life expe...","E08000026","Coventry","Counties & UAs (pre Apr 2019)","Female","All ages","2014 - 16",62.81529,28.107,3
+"234",90362,"Healthy life expe...","E08000027","Dudley","Counties & UAs (pre Apr 2019)","Female","All ages","2014 - 16",61.84072,22.958,6
+"235",90362,"Healthy life expe...","E08000028","Sandwell","Counties & UAs (pre Apr 2019)","Female","All ages","2014 - 16",59.41914,34.614,1
+"236",90362,"Healthy life expe...","E08000029","Solihull","Counties & UAs (pre Apr 2019)","Female","All ages","2014 - 16",66.01348,17.238,8
+"237",90362,"Healthy life expe...","E08000030","Walsall","Counties & UAs (pre Apr 2019)","Female","All ages","2014 - 16",57.1498,30.37,2
+"238",90362,"Healthy life expe...","E08000031","Wolverhampton","Counties & UAs (pre Apr 2019)","Female","All ages","2014 - 16",58.5884,33.183,2
+"239",90362,"Healthy life expe...","E08000032","Bradford","Counties & UAs (pre Apr 2019)","Female","All ages","2014 - 16",61.04357,33.168,2
+"240",90362,"Healthy life expe...","E08000033","Calderdale","Counties & UAs (pre Apr 2019)","Female","All ages","2014 - 16",63.67632,24.607,5
+"241",90362,"Healthy life expe...","E08000034","Kirklees","Counties & UAs (pre Apr 2019)","Female","All ages","2014 - 16",59.36941,23.964,5
+"242",90362,"Healthy life expe...","E08000035","Leeds","Counties & UAs (pre Apr 2019)","Female","All ages","2014 - 16",62.98609,26.623,4
+"243",90362,"Healthy life expe...","E08000036","Wakefield","Counties & UAs (pre Apr 2019)","Female","All ages","2014 - 16",60.28727,26.892,4
+"244",90362,"Healthy life expe...","E08000037","Gateshead","Counties & UAs (pre Apr 2019)","Female","All ages","2014 - 16",60.61182,25.932,4
+"245",90362,"Healthy life expe...","E09000001","City of London","Counties & UAs (pre Apr 2019)","Female","All ages","2014 - 16",NA,13.602,9
+"246",90362,"Healthy life expe...","E09000002","Barking and Dagenham","Counties & UAs (pre Apr 2019)","Female","All ages","2014 - 16",60.59962,34.635,1
+"247",90362,"Healthy life expe...","E09000003","Barnet","Counties & UAs (pre Apr 2019)","Female","All ages","2014 - 16",67.05301,17.813,8
+"248",90362,"Healthy life expe...","E09000004","Bexley","Counties & UAs (pre Apr 2019)","Female","All ages","2014 - 16",65.71033,16.17,8
+"249",90362,"Healthy life expe...","E09000005","Brent","Counties & UAs (pre Apr 2019)","Female","All ages","2014 - 16",66.52631,26.655,4
+"250",90362,"Healthy life expe...","E09000006","Bromley","Counties & UAs (pre Apr 2019)","Female","All ages","2014 - 16",69.51226,15.164,9
+"251",90362,"Healthy life expe...","E09000007","Camden","Counties & UAs (pre Apr 2019)","Female","All ages","2014 - 16",65.17923,24.959,5
+"252",90362,"Healthy life expe...","E09000008","Croydon","Counties & UAs (pre Apr 2019)","Female","All ages","2014 - 16",62.78688,23.643,5
+"253",90362,"Healthy life expe...","E09000009","Ealing","Counties & UAs (pre Apr 2019)","Female","All ages","2014 - 16",60.93961,23.585,5
+"254",90362,"Healthy life expe...","E09000010","Enfield","Counties & UAs (pre Apr 2019)","Female","All ages","2014 - 16",63.75472,26.994,4
+"255",90362,"Healthy life expe...","E09000011","Greenwich","Counties & UAs (pre Apr 2019)","Female","All ages","2014 - 16",58.51067,25.544,5
+"256",90362,"Healthy life expe...","E09000012","Hackney","Counties & UAs (pre Apr 2019)","Female","All ages","2014 - 16",61.24089,35.28,1
+"257",90362,"Healthy life expe...","E09000013","Hammersmith and F...","Counties & UAs (pre Apr 2019)","Female","All ages","2014 - 16",64.50874,24.362,5
+"258",90362,"Healthy life expe...","E09000014","Haringey","Counties & UAs (pre Apr 2019)","Female","All ages","2014 - 16",63.27363,31.043,2
+"259",90362,"Healthy life expe...","E09000015","Harrow","Counties & UAs (pre Apr 2019)","Female","All ages","2014 - 16",66.60743,14.302,9
+"260",90362,"Healthy life expe...","E09000016","Havering","Counties & UAs (pre Apr 2019)","Female","All ages","2014 - 16",64.09979,17.876,8
+"261",90362,"Healthy life expe...","E09000017","Hillingdon","Counties & UAs (pre Apr 2019)","Female","All ages","2014 - 16",64.20733,18.108,7
+"262",90362,"Healthy life expe...","E09000018","Hounslow","Counties & UAs (pre Apr 2019)","Female","All ages","2014 - 16",61.7805,22.469,6
+"263",90362,"Healthy life expe...","E09000019","Islington","Counties & UAs (pre Apr 2019)","Female","All ages","2014 - 16",62.76116,32.534,2
+"264",90362,"Healthy life expe...","E09000020","Kensington and Ch...","Counties & UAs (pre Apr 2019)","Female","All ages","2014 - 16",66.75226,23.376,5
+"265",90362,"Healthy life expe...","E09000021","Kingston upon Thames","Counties & UAs (pre Apr 2019)","Female","All ages","2014 - 16",69.68915,11.125,10
+"266",90362,"Healthy life expe...","E09000022","Lambeth","Counties & UAs (pre Apr 2019)","Female","All ages","2014 - 16",63.43702,28.913,3
+"267",90362,"Healthy life expe...","E09000023","Lewisham","Counties & UAs (pre Apr 2019)","Female","All ages","2014 - 16",63.75179,28.591,3
+"268",90362,"Healthy life expe...","E09000024","Merton","Counties & UAs (pre Apr 2019)","Female","All ages","2014 - 16",66.61941,14.93,9
+"269",90362,"Healthy life expe...","E09000025","Newham","Counties & UAs (pre Apr 2019)","Female","All ages","2014 - 16",60.65296,32.939,2
+"270",90362,"Healthy life expe...","E09000026","Redbridge","Counties & UAs (pre Apr 2019)","Female","All ages","2014 - 16",63.10338,20.242,7
+"271",90362,"Healthy life expe...","E09000027","Richmond upon Thames","Counties & UAs (pre Apr 2019)","Female","All ages","2014 - 16",69.86736,10.037,10
+"272",90362,"Healthy life expe...","E09000028","Southwark","Counties & UAs (pre Apr 2019)","Female","All ages","2014 - 16",62.5816,29.489,3
+"273",90362,"Healthy life expe...","E09000029","Sutton","Counties & UAs (pre Apr 2019)","Female","All ages","2014 - 16",66.10085,14.579,9
+"274",90362,"Healthy life expe...","E09000030","Tower Hamlets","Counties & UAs (pre Apr 2019)","Female","All ages","2014 - 16",55.75732,35.657,1
+"275",90362,"Healthy life expe...","E09000031","Waltham Forest","Counties & UAs (pre Apr 2019)","Female","All ages","2014 - 16",66.32054,30.19,2
+"276",90362,"Healthy life expe...","E09000032","Wandsworth","Counties & UAs (pre Apr 2019)","Female","All ages","2014 - 16",62.49877,18.295,7
+"277",90362,"Healthy life expe...","E09000033","Westminster","Counties & UAs (pre Apr 2019)","Female","All ages","2014 - 16",66.84274,27.686,3
+"278",90362,"Healthy life expe...","E10000002","Buckinghamshire","Counties & UAs (pre Apr 2019)","Female","All ages","2014 - 16",70.1884,9.757,10
+"279",90362,"Healthy life expe...","E10000003","Cambridgeshire","Counties & UAs (pre Apr 2019)","Female","All ages","2014 - 16",65.64443,13.393,9
+"280",90362,"Healthy life expe...","E10000006","Cumbria","Counties & UAs (pre Apr 2019)","Female","All ages","2014 - 16",66.21912,21.331,6
+"281",90362,"Healthy life expe...","E10000007","Derbyshire","Counties & UAs (pre Apr 2019)","Female","All ages","2014 - 16",63.54311,18.515,7
+"282",90362,"Healthy life expe...","E10000008","Devon","Counties & UAs (pre Apr 2019)","Female","All ages","2014 - 16",65.83912,17.086,8
+"283",90362,"Healthy life expe...","E10000009","Dorset (Cty)","Counties & UAs (pre Apr 2019)","Female","All ages","2014 - 16",66.58075,14.336,9
+"284",90362,"Healthy life expe...","E10000011","East Sussex","Counties & UAs (pre Apr 2019)","Female","All ages","2014 - 16",63.20948,18.825,7
+"285",90362,"Healthy life expe...","E10000012","Essex","Counties & UAs (pre Apr 2019)","Female","All ages","2014 - 16",63.47389,17.163,8
+"286",90362,"Healthy life expe...","E10000013","Gloucestershire","Counties & UAs (pre Apr 2019)","Female","All ages","2014 - 16",65.64645,15.014,9
+"287",90362,"Healthy life expe...","E10000014","Hampshire","Counties & UAs (pre Apr 2019)","Female","All ages","2014 - 16",68.61514,11.917,10
+"288",90362,"Healthy life expe...","E10000015","Hertfordshire","Counties & UAs (pre Apr 2019)","Female","All ages","2014 - 16",66.06331,12.192,10
+"289",90362,"Healthy life expe...","E10000016","Kent","Counties & UAs (pre Apr 2019)","Female","All ages","2014 - 16",65.06239,18.805,7
+"290",90362,"Healthy life expe...","E10000017","Lancashire","Counties & UAs (pre Apr 2019)","Female","All ages","2014 - 16",63.33351,22.495,6
+"291",90362,"Healthy life expe...","E10000018","Leicestershire","Counties & UAs (pre Apr 2019)","Female","All ages","2014 - 16",65.80101,12.457,9
+"292",90362,"Healthy life expe...","E10000019","Lincolnshire","Counties & UAs (pre Apr 2019)","Female","All ages","2014 - 16",62.20012,20.609,6
+"293",90362,"Healthy life expe...","E10000020","Norfolk","Counties & UAs (pre Apr 2019)","Female","All ages","2014 - 16",64.39391,21.158,6
+"294",90362,"Healthy life expe...","E10000021","Northamptonshire","Counties & UAs (pre Apr 2019)","Female","All ages","2014 - 16",64.29625,18.936,7
+"295",90362,"Healthy life expe...","E10000023","North Yorkshire","Counties & UAs (pre Apr 2019)","Female","All ages","2014 - 16",66.75677,14.646,9
+"296",90362,"Healthy life expe...","E10000024","Nottinghamshire","Counties & UAs (pre Apr 2019)","Female","All ages","2014 - 16",62.20291,18.85,7
+"297",90362,"Healthy life expe...","E10000025","Oxfordshire","Counties & UAs (pre Apr 2019)","Female","All ages","2014 - 16",68.445,11.513,10
+"298",90362,"Healthy life expe...","E10000027","Somerset","Counties & UAs (pre Apr 2019)","Female","All ages","2014 - 16",68.37851,17.783,8
+"299",90362,"Healthy life expe...","E10000028","Staffordshire","Counties & UAs (pre Apr 2019)","Female","All ages","2014 - 16",65.35195,16.38,8
+"300",90362,"Healthy life expe...","E10000029","Suffolk","Counties & UAs (pre Apr 2019)","Female","All ages","2014 - 16",65.40382,18.314,7
+"301",90362,"Healthy life expe...","E10000030","Surrey","Counties & UAs (pre Apr 2019)","Female","All ages","2014 - 16",67.9859,9.386,10
+"302",90362,"Healthy life expe...","E10000031","Warwickshire","Counties & UAs (pre Apr 2019)","Female","All ages","2014 - 16",66.15503,15.006,9
+"303",90362,"Healthy life expe...","E10000032","West Sussex","Counties & UAs (pre Apr 2019)","Female","All ages","2014 - 16",64.1183,14.027,9
+"304",90362,"Healthy life expe...","E10000034","Worcestershire","Counties & UAs (pre Apr 2019)","Female","All ages","2014 - 16",67.91185,17.704,8

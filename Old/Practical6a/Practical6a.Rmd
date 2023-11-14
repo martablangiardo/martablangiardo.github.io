@@ -1,0 +1,255 @@
+---
+title: "Practical 6a - Indirect standardization"
+author: "Bayesian modelling for spatial and spatio-temporal data"
+output: 
+  html_document:
+    toc: true
+    toc_float: true
+editor_options: 
+  chunk_output_type: console
+---
+
+\pagenumbering{gobble} 
+\pagenumbering{arabic} 
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, message=FALSE, warning=FALSE, fig.align = "center", class.source='klippy')
+```
+```{r klippy, echo=FALSE, include=TRUE}
+klippy::klippy(position = c('top', 'right'),color = 'darkred',
+               tooltip_message = 'Click to copy', tooltip_success = 'Done')
+```
+
+In this lab, we will familiarize with the manipulation of a shapefile, which is is a geospatial vector data format for geographic information systems, and we will learn step by step how to calculate the expected cases in `R`. This is commonly done with indirect standardization and the adjustment is typically by age and sex, nevertheless you can use other covariates.
+
+We will practice with the `R` package `tidyverse`, which will install and load all the packages that constitute the `tidyverse` (for details, visit https://tidyverse.tidyverse.org/). Here, we will work with:
+
+* `readr` for reading data, 
+* `ggplot2` for plotting (it implements the grammar of graphics, which is a term used to break up graphs into semantic components, such as geometries and layers), 
+* `dplyr` for data manipulation.
+
+Additionally, we will use the R packages:
+
+* `sf` Simple feature for R,
+* `SpatialEpi` that provides methods for spatial epidemiology,
+* `RColorBrewer` that provides color palettes for maps and plots.
+
+
+The data set that we are using in this lab is called `HaemMal.csv` and includes the number of cases of haematological malignancies and population counts for the 628 wards of Greater London, stratified by sex and age groups (the data are partially simulated for confidentiality reasons).
+
+
+# 1. Install and load packages 
+
+* To start with, create a separate sub-directory in your home directory to store code and data
+
+* Then, copy all the files into your sub-directory (created just above)
+
+* Load the packages `tidyverse`, `sf`, `SpatialEpi` and `RColorBrewer`.
+To check whether a package is installed you can use the following query
+```{r echo=TRUE, eval=FALSE}
+is.element("tidyverse", installed.packages())
+```
+
+If FALSE is returned, then install the package using the function `install.packages()`, e.g.
+```{r eval = FALSE,  results="hide"}
+install.packages("tidyverse")
+``` 
+
+```{r eval = TRUE, results="hide", message=FALSE, warning=FALSE}
+library(tidyverse)
+library(sf)           
+library(SpatialEpi)   
+library(RColorBrewer)
+```
+
+# 2. Visualize spatial areal data
+
+We will start by reading in the shapefile of Greater London. The shapefile is the most commonly used file format for vector data. It is a collection of files with the same stem and different extensions, where the suffix for the main file is .shp. In particular:
+
+(i)   GreaterLondon_ward_river.shp contains the geometry of the object to represent
+(ii)  GreaterLondon_ward_river.shx contains the spatial index
+(iii) GreaterLondon_ward_river.dbf contains the attribute data (dBASE table)
+(iv)  GreaterLondon_ward_river.prj contains information on the CRS and the projection used to represent the geometry
+
+* Read the shapefile of Greater London at ward level (628 areas) using the function `st_read()` of the package `sf`. Call this object as London
+
+```{r eval=TRUE}
+London = st_read("GreaterLondon_ward_river.shp")
+```
+
+* Now, retrieve the coordinate reference system (CRS) of the `sf` object London using the command `st_crs`
+
+```{r eval=FALSE}
+st_crs(London) 
+# You can see that:
+# the data are encoded using a Transverse Mercator Projection. 
+# the airy ellipsoid is used  
+# the units are meters 
+```
+
+* View all of the metadata and attributes for this `sf` object simply  typing London
+
+```{r eval=FALSE}
+London
+```
+
+* Create basic maps of sf object London using the `plot()` function
+
+```{r eval=FALSE}
+# the default plot of an sf object is a multi-plot of all attributes
+
+plot(London)          # plot all the attributes
+plot(London[,c(1,2)]) # plot selected attributes
+```
+
+* Plot the map of London using the package `ggplot2` that is part of the core `tidyverse`
+
+```{r eval=TRUE, fig.cap =""}
+ggplot() + 
+      geom_sf(data = London, color = "red", fill = "white") + 
+      ggtitle("Map of London") + 
+      coord_sf() +    # axis limits and CRS
+      labs(x = "Longitude", y = "Latitude", fill = "") +
+      theme_bw() +    # dark-on-light theme
+      theme(axis.title = element_text(size = 16),
+            axis.text = element_text(size = 14))
+```
+
+
+# 3. Import and explore the data
+
+* Import the health data using the command `read_csv` from the R package `readr`. It reads comma delimited files. The `readr` package is part of the core `tidyverse`. Alternatively, you could use the command `read.csv()` that is included as part of base R
+
+```{r eval=TRUE}
+HaemMal = read_csv("HaemMal.csv") # the structure is a tibble
+
+# or
+#HaemMal = read.csv("HaemMal.csv", header=TRUE) # the structure is here data.frame
+```
+
+* Print only the first rows of the data
+
+```{r eval=TRUE}
+head(HaemMal)
+```
+
+* Display the names of the variables (columns)
+
+```{r eval=TRUE}
+names(HaemMal)
+```
+
+* Compute the total number of cases of the disease in Greater London
+
+```{r eval=TRUE}
+sum(HaemMal$CASES) 
+```
+
+
+# 4. Compute the expected cases
+
+Now we calculate the expected number of cases in each ward.  Let $q_{k,j}$ be the nationwide haematological malignancies incidence rate and $P_{k,j, i}$ the population counts with subscript referring to the k-th sex group, j-th age group, and i-th ward. Then the expected number of cases in the k-th wards is:
+
+$$E_i = \sum_k\sum_jq_{k,j}P_{k,j, i}$$
+We use the package `SpatialEpi` to calculate expected cases. Here the steps:
+
+1. Sum the number of cases of the disease and population counts by polygon (i.e. STwardcode and POLY_ID), then orders the rows of a data frame by POLY_ID. Name the new file as HaemByWard
+
+```{r eval=TRUE}
+HaemByWard = HaemMal %>% group_by(STwardcode, POLY_ID) %>% 
+            summarise(cases = sum(CASES), population = sum(POPULATION)) %>% 
+            arrange(POLY_ID)
+```
+NOTE: `%>%` is the 'pipe' operator. It enables expressive code: the output of a previous function becomes the first argument of the next function, enabling chaining.
+
+2. Sort the data set HaemMal, so that the strata (i.e. SEX and AGE_GROUP) are the same in each ward. To do so, sort the object HaemByWard by POLY_ID and then by SEX and AGE_GROUP using  the `arrange` command seen in the previous code chunk
+
+```{r eval=TRUE}
+HaemMal = arrange(HaemMal, POLY_ID, SEX, AGE_GROUP)
+```
+
+3. Calculate the expected numbers of cases using the function `expected` of the package `SpatialEpi`.
+The function `expected` has three arguments:
+
+- `population`: vector of population counts for each strata in each area,
+- `cases`: vector with the number of cases for each strata in each area,
+- `n.strata`: number of strata.
+
+Note that all the strata need to be included in the vectors, including strata with 0 cases (this is not relevant for this practical, but remember this note for future applications).
+
+Here there are 2 genders and 22 age groups for each area, so you need to set the number of strata to 2 x 22 = 44
+
+```{r eval=TRUE}
+HaemByWard$E = expected(population=HaemMal$POPULATION, 
+                         cases=HaemMal$CASES, n.strata=44)
+
+```
+
+4. Check if everything is OK:
+
+* sum of the *expected* numbers of cases = sum of the *observed* numbers of cases
+
+```{r eval=TRUE}
+sum(HaemByWard$E)
+sum(HaemByWard$cases)
+```
+
+* number of rows = number of wards (remember that the number of wards is 628)
+
+```{r eval=TRUE}
+dim(HaemByWard)
+```
+
+
+# 5. Compute the Standardized Morbidity Ratios (SMRs) and map the SMRs
+
+* Compute the SMR for each ward $i$. It is given by: 
+$SMR_i = \frac{\text{observed cases }O_i}{\text{expected cases }E_i}$
+
+```{r eval=TRUE}
+HaemByWard$SMR = HaemByWard$cases/HaemByWard$E
+```
+
+* To create a map of the SMRs, we need to join the health data with the `sf` object. To do so, take advantage of shared key variables (STwardcode and POLY_ID)
+
+```{r eval=TRUE}
+names(London)
+names(HaemByWard)
+
+London_SMR = left_join(London, HaemByWard)
+```
+Note: Because the input data sets share the 'key variables' (STwardcode and POLY_ID) the join works without using the `by` argument.
+
+* Display the SMRs on a map using `ggplot2`, taking advantage of `RColorBrewer`. This is an useful package for mapping spatial objects. When using color, we should consider that a number of individuals is color vision impaired or color blind. To identify `RColorBrewer`'s palettes of colors to cope with this fact, we can specify `display.brewer.all(colorblindFriendly = TRUE)` (see below code chunk). Therefore, for this map, use a color friendly palette.
+
+```{r eval=FALSE}
+# display all the palettes
+ display.brewer.all()
+
+# display colorblind-friendly brewer palettes
+display.brewer.all(colorblindFriendly = TRUE)
+
+# display single RColorBrewer palette by specifying its name 
+display.brewer.pal(n = 5, name = "OrRd")
+
+# display hexadecimal color
+brewer.pal(n = 5, name = "OrRd")
+```
+
+
+```{r eval=TRUE}
+breaks =  c(0,0.5,1,1.5,2,2.5)
+London_SMR = mutate(London_SMR, SMR_cat = cut(SMR, breaks)) 
+# mutate() adds new variable 
+# and preserves existing ones
+
+# pick a palette you like and plot the SMRs
+MapSMR = ggplot() + geom_sf(data = London_SMR) + aes(fill = SMR_cat) +
+  theme_bw() +     # plot white background and black gridlines
+  scale_fill_brewer(palette = "OrRd") + 
+  guides(fill=guide_legend(title="SMR"))
+
+MapSMR
+```
+
+

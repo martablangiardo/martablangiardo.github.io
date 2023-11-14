@@ -1,0 +1,408 @@
+---
+title: "Practical 5 - A space-time model with `inlabru`"
+author: "Spatial and Spatio-Temporal Bayesian Models using `R` and `R-INLA`"
+header-includes:
+    - \usepackage{bm}
+output:
+  html_document:
+    toc: true
+    toc_float: true
+bibliography: biblio.bib
+---
+  
+\pagenumbering{gobble} 
+\pagenumbering{arabic} 
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, message=FALSE, warning=FALSE, fig.align = "center", class.source='klippy')
+```
+```{r klippy, echo=FALSE, include=TRUE}
+klippy::klippy(position = c('top', 'right'),color = 'darkred',
+               tooltip_message = 'Click to copy', tooltip_success = 'Done')
+```
+## 1. Introduction
+In this tutorial we use a dataset that comprises daily maximum
+8-hour average ground level ozone ($O_3$, ppb) concentrations for the period July 1 and August 31 in 2006, measured at 28 monitoring sites in the state of New York, USA. 
+The stations are part of the Environmental Protection Agency (EPA) monitoring network.
+Ozone  occurs naturally in the upper atmosphere and protects the Earth from the sun's rays. However, at ground level it can be harmful for population health, as it can lead to adverse respiratory effects. Ozone is most likely to reach worrisome levels on hot sunny days in urban environments (even if it can still reach high levels during colder months). 
+
+The dataset used for this tutorial is included in the package `spTimer` by @Bakar2015. The data available are as follows:
+
+* `s.index`: index of the monitoring station in the NY state
+
+* `Longitude` and `Latitude`: spatial coordinates of the monitoring stations
+
+* `Year`, `Month` and `Day`: temporal coordinates of the measurements
+
+* `o8hrmax`: daily 8-hour maximum average ozone concentrations (parts per billion) 
+
+* `cMAXTMP`: daily maximum temperature (in degree Celsius) 
+
+* `WDSP`: wind speed (knots), 
+
+* `RH`: relative humidity 
+
+Of the 1,736 possible observations, i.e., n=28 locations times T=62 daily `o8hrmax` measurements, 24 are missing. 
+
+
+We use `o8hrmax` concentrations as outcome and `cMAXTMP`, `WDSP`, and `RH` as predictors.
+
+The following packages are required:
+```{r, class.source='klippy'}
+library(tidyverse)
+library(spTimer)
+library(mapview) 
+library(lubridate)
+library(mvtsplot)
+library(INLA)
+library(inlabru)
+library(viridis)
+```
+
+## 2. The New York dataset: explore the data
+
+The data are obtained from 28 monitoring sites, between July 1 and August 31 in 2006. 
+
+* Load the data in `R` 
+
+```{r eval=TRUE, echo=TRUE, message=FALSE}
+data(NYdata)
+dim(NYdata)
+```
+
+
+* Now, we print the data, formatting these in a table.
+
+```{r eval=TRUE, echo=TRUE, message=FALSE}
+head(NYdata)
+```
+
+
+* We provide a map of the monitoring station using `mapview` package.  Here we plot the longitude and latitude using the World Geographic System 1984 (WGS84) projection, which is referenced as European Petroleum Survey Group (EPSG) 4326.
+
+```{r eval=TRUE, echo=TRUE, message=FALSE, fig.cap = "Map of the monitoring stations in New York State"}
+stations <- cbind(unique(NYdata[,1]), unique(NYdata[,2:3]))
+
+# set the map projection to a common projection standard such as WGS84 via the argument crs = 4326
+mapview(stations, xcol = "Longitude", ycol = "Latitude", crs = 4326, grid = FALSE)
+```
+
+* We create a variable `date` using the package `lubridate` joining together the information about the year, the month and the day.
+
+```{r eval=TRUE, echo=TRUE, message=FALSE}
+NYdata <- NYdata %>%
+  mutate(date = make_date(Year, Month, Day))
+glimpse(NYdata)
+```
+
+
+* We now plot the concentrations of ozone for each monitoring station using the package `mvtsplot`, which allows the visualization of Multivariate time Series (Link: http://www.biostat.jhsph.edu/~rpeng/RR/mvtsplot/). To be able to use it, we need to convert the data from long to wide format.
+
+```{r eval=TRUE, echo=TRUE, message=FALSE}
+# select ozone data
+O3 <- NYdata %>% select(s.index, o8hrmax, date)
+dim(O3) 
+
+O3_wide = O3 %>% spread(s.index, o8hrmax)
+dim(O3_wide) 
+
+O3_wide <- O3_wide[,-1] # remove date
+O3_wide <- data.matrix(O3_wide)
+dim(O3_wide)
+
+colnames(O3_wide) <- unique(O3[,1])
+
+```
+
+And now plot the ozone concentrations for the 28 monitoring stations using the package `mvtsplot`
+
+```{r eval=TRUE, echo=TRUE, fig.cap = "Daily ozone levels for 28 monitoring stations, Jul 1– Aug 31, 2006"}
+
+# Daily ozone levels for 28 monitoring stations, Jul 1– Aug 31, 2006.
+mvtsplot(O3_wide, group = NULL, xtime = NULL, norm = c("global"),
+         levels = 3, smooth.df = NULL, margin = TRUE, sort =NULL,
+         main = "", palette = "PRGn", rowstat = "median", xlim,
+         bottom.ylim = NULL, right.xlim=NULL, gcol = 3)
+
+```
+In the plot we use as color `PRGn` (default) from the `RColorBrewer` palettes. Here green indicates high values and purple indicates low values. Missing data are denoted by the color white. The bottom panel shows the overall median.  Finally, on the right hand side panel, we can see the boxplots of the data in each time series.
+
+
+* Moreover, we can check the basic statistics for ozone concentrations and make the histogram:
+
+```{r eval=TRUE, echo=TRUE, message=FALSE, fig.cap = "Histgram of ozone concentrations"}
+summary(NYdata$o8hrmax)
+NYdata %>% 
+  ggplot()+
+  geom_histogram(aes(o8hrmax), col="orange")
+```
+
+
+* We can visualize the relationships between the data using `ggpairs()` in the  `GGally` package : 
+
+```{r eval=TRUE, echo=TRUE, message=FALSE, fig.cap = "Figure 4. Plot of the correlation between variables in analysis", fig.height=6, fig.width = 11}
+library(GGally)
+ggpairs(NYdata[,7:10]) # print correlations between variables
+```
+
+* We print the table of the correlations between ozone and the three predictors using the package `corrr`:
+
+```{r eval=TRUE, echo=TRUE, message=FALSE}
+library(corrr)
+tab_cor = NYdata %>%
+  select(o8hrmax, cMAXTMP, WDSP, RH) %>%
+  correlate() %>%
+  shave(upper = TRUE) %>%
+  fashion(decimals = 2, na_print = "—") 
+
+tab_cor
+```
+
+
+* We create now a variable named `time` which is an index for time (this will be used later for implementing the space-time model with `inlabru`):
+```{r}
+NYdata$time = rep(1:n_distinct(NYdata$date),
+                   n_distinct(NYdata$s.index))
+```
+and we consider, for reducing the computational costs, only the first 30 time points:
+```{r}
+NYdata = NYdata %>% filter(time <= 30)
+```
+
+* In order to approximately normally distributed data for the response variable, we compute the square root transformation of `o8hrmax` and create a new variable named `sqrto8hrmax`:
+```{r}
+NYdata$sqrto8hrmax = sqrt(NYdata$o8hrmax)
+NYdata %>% 
+  ggplot()+
+  geom_histogram(aes(sqrto8hrmax), col="orange")
+```
+
+* We finally prepare two different datasets: the first, containing data for 8 stations, will be used for model validation, the second, with the data referring to the remaining stations, will be used for model training:
+```{r}
+# validation sites
+s <- c(8, 11, 12, 14, 18, 21, 24, 28) # 8 validation stations
+
+# Training data
+DataFit = NYdata %>% 
+  filter(!(s.index %in% s))
+dim(DataFit)
+# Dim = 600 (20stations*30days) * 12
+
+# Validation data
+DataValPred =  NYdata %>% 
+  filter(s.index %in% s)
+dim(DataValPred)
+# dim = 240 (8stations*30days) * 12
+```
+
+## 3. Geostatistical spatio-temporal model
+
+Now, we implement the spatio-temporal model for ozone concentrations: 
+
+* $\boldsymbol{Y}_t =(Y(\mathbf{s}_1,t), \dots, Y(\mathbf{s}_n,t))'$ be the observed data at location $\mathbf{s}$ in day $t$
+
+* $\boldsymbol{O}_t =(O(\mathbf{s}_1,t), \dots, O(\mathbf{s}_n,t))'$ be the true value corresponding to $\boldsymbol{Y}_t$.
+
+We use a hierarchical structure and we fit the following Bayesian model, with nugget effect model together with an independent Gaussian Process (GP) model at each time point:
+
+\begin{equation*}
+\begin{split}
+ \boldsymbol{Y}_t &= \boldsymbol{O}_t +\boldsymbol{\epsilon}_t\\
+  \boldsymbol{O}_t &= \boldsymbol{X}_t \boldsymbol{\beta} + \boldsymbol{\eta}_t
+\end{split}
+\end{equation*}
+
+where:
+
++ $\boldsymbol{X}_t$ are the covariate values and $\boldsymbol{\beta}$ are the regression coefficients
+
++ $\boldsymbol{\eta}_t=(\eta(\mathbf{s}_1,t), \dots, \eta(\mathbf{s}_n,t))'$ are the spatio-temporal random effects, assumed to follow $N(\mathbf{0}, \Sigma_{\eta})$  independently in time, where $\Sigma_{\eta}=\sigma_{\eta}^{2} S_{\eta}$, here $\sigma_{\eta}^2$ is the site invariant spatial variance  and $S_{\eta}$ is the spatial correlation matrix.
+
++ $\boldsymbol{\epsilon}_t=(\epsilon(\mathbf{s}_1,t), \dots, \epsilon(\mathbf{s}_n,t))'$ is the nugget effect or the pure error term, independent in space and time.
+
+## 4. Create the mesh and the SPDE model
+* For computational reason, we consider a rough mesh. We use the option `max.n.strict` of the `inla.mesh.2d()` function which allows to specify the maximum number of vertices allowed (the first value refers to the inner part of the mesh, while the second to the extension):
+```{r}
+bnd = inla.nonconvex.hull(cbind(DataFit$Longitude, DataFit$Latitude),
+                            convex = 1)
+
+mesh = inla.mesh.2d(loc = cbind(DataFit$Longitude, DataFit$Latitude),
+                    max.n.strict = c(100, 20))
+```
+
+We use the `gg()` function from the `inlaspde` package to plot the mesh:
+```{r}
+ggplot() +
+  gg(mesh) +
+  geom_point(data = DataFit, aes(Longitude, Latitude)) 
+```
+
+
+Given the mesh it is now possible to create the SPDE model using the `inla.spde2.matern` function. Remember that if you have any prior information about the range and the spatial variability you can use the function `nla.spde2.pcmatern` to include it.
+```{r}
+spde = inla.spde2.matern(mesh = mesh)
+spde$n.spde #n. of mesh vertices
+```
+
+* 5. Prepare everything for `inlabru`:
+
+1. We first transform the `df` data frame into a **spatial object** (`SpatialPointsDataFrame`)
+```{r}
+coordinates(DataFit) = c("Longitude","Latitude")
+class(DataFit)
+```
+
+2. Define the **model components** including the intercept, 3 linear effects of the meteorological covariates and the spatio-temporal field (with AR(1) temporal dynamics):
+```{r}
+cmp  = sqrto8hrmax ~ Intercept(1) + cMAXTMP + WDSP + RH +
+  SPDE(coordinates, model = spde,
+       group = time, control.group = list(model = "ar1")) 
+```
+
+3. We then define the **likelihood**:
+```{r}
+library(inlabru)
+lik = like(formula = sqrto8hrmax ~ Intercept  + cMAXTMP + WDSP + RH + SPDE,
+           family = "gaussian",
+           data = DataFit)
+```
+
+4. We fit the model using the training data. We expect the measurement error variance to be small and we use a PC prior for the precision to specify this information (that will be included in the `bru()` function by means of the `options` argument):
+```{r,eval=T}
+#prob(sigma > sigma0)=alpha
+#prob(sigma > 0.2) = 0.1
+pc.prec = list(prec = list(prior = "pc.prec", param = c(0.2, 0.1)))
+
+fit = bru(cmp, lik,
+          options =  list(control.family = list(hyper = pc.prec)))
+summary(fit)
+```
+
+
+## Output exploration
+* We explore the output names: 
+```{r}
+names(fit$marginals.fixed)
+names(fit$marginals.random)
+names(fit$marginals.hyperpar)
+
+fit$summary.fixed[,c("mean","0.025quant","0.975quant")]
+```
+
+* We extract some the posterior summary statistics for the covariate effects and produce some plots (with the function `multiplot()` from `inlabru` we can combine together multiple plots representing the posterior distribution):
+```{r}
+int.plot <- plot(fit, "Intercept")
+cMAXTMP.plot <- plot(fit, "cMAXTMP")
+WDSP.plot <- plot(fit, "WDSP")
+RH.plot <- plot(fit, "RH")
+
+multiplot(int.plot, cMAXTMP.plot, WDSP.plot, RH.plot, ncols = 2)
+```
+
+* We do the same also for the spatial parameter. In the following code we use the function `spde.posterior()` from `inlabru` to extract the posterior distribution of the range and of the spatial variance (remember that the internal representation is different):
+```{r}
+# SPDE is the chosen name for the spatial field
+spde.range <- spde.posterior(fit, "SPDE", what = "range")
+spde.var <- spde.posterior(fit, "SPDE", what = "variance")
+range.plot <- plot(spde.range)
+var.plot <- plot(spde.var)
+
+multiplot(range.plot, var.plot)
+```
+
+## 6. Prediction at the hold-out validation sites
+In Section 2. we decided to left out 8 stations which are used now for validation purposes. 
+
+1. As before, we transform the dataframe into a spatial object:
+```{r}
+coordinates(DataValPred) = c("Longitude","Latitude")
+class(DataValPred)
+```
+
+2. We use then the `predict()` function to sample from the posterior predictive distribution and to compute the corresponding posterior summary statistics. Note that in this case we are interested in going back to the original scale of ozone concentrations and we square the linear predictor: 
+```{r}
+ValPred = predict(fit, DataValPred,
+                ~ (Intercept + SPDE + cMAXTMP + WDSP + RH)^2,
+                nsamples = 200)
+head(ValPred@data)
+```
+
+3. We plot now together the observed (red) and predicted time series (posterior median in black); the gray ribbon describes the posterior 95% interval:
+```{r}
+as.data.frame(ValPred) %>%
+  ggplot() + 
+  geom_line(aes(time, o8hrmax, group = s.index), color = "red") +
+  geom_line(aes(time, median, group = s.index)) +
+  geom_ribbon(aes(time, ymin = q0.025, ymax = q0.975, group = s.index), alpha = 0.5) +
+  facet_wrap(~ s.index)
+```
+
+## 7. Prediction at the grid level
+
+We now perform prediction on a grid to obtain a continuous surface of ozone concentrations. To do so, we use the data in the `NYgrid` object, which contains a total of 6200 rows for 62 days of observations for 10x10 = 100 grid points (see `?NYgrid`). 
+
+```{r}
+data(NYgrid)
+dim(NYgrid)
+class(NYgrid)
+head(NYgrid)
+```
+
+The following plot displays the grid points together with the mesh:
+```{r}
+NYgrid %>% 
+  distinct(Longitude, Latitude) %>% 
+  ggplot()+
+  geom_point(aes(Longitude, Latitude)) +
+  gg(mesh)
+```
+
+
+* We create also for `NYgrid` the variable containing the date information and then a variable which is an index for time:
+```{r}
+NYgrid <- NYgrid %>%
+  mutate(date = make_date(Year, Month, Day))
+
+
+NYgrid$time = rep(1:n_distinct(NYgrid$date),
+                   n_distinct(NYgrid$s.index))
+
+glimpse(NYgrid)
+```
+
+For the sake of simplicity we consider only the first 6 time points:
+```{r}
+NYgrid = NYgrid %>% filter(time <= 6)
+```
+
+
+* We transform the grid `NYgrid` into a `SpatialPixelsDataFrame`:
+```{r}
+coordinates(NYgrid) = c("Longitude","Latitude")
+class(NYgrid)
+
+grid = sp::SpatialPixelsDataFrame(NYgrid@coords,
+                                  data = NYgrid@data)
+class(grid)
+dim(grid@data)
+glimpse(grid@data)
+```
+
+
+* Finally, we compute the predictions as done before for the validation sites: 
+```{r}
+GridPred = predict(fit, grid,
+                ~ (Intercept + SPDE + cMAXTMP + WDSP + RH)^2)
+head(GridPred@data)
+```
+
+The following code produces the posterior median of ozone concentrations for the 6 considered days and for the regular grid covering NY:
+```{r}
+ggplot() + 
+  gg(GridPred, aes(Longitude, Latitude, fill = median))  +
+  facet_wrap(~ time) + 
+  scale_fill_viridis() +
+  coord_equal()+
+  geom_point(data = stations, aes(Longitude, Latitude))
+```
+
