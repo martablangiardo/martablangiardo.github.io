@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="" xml:lang="">
   <head>
-    <title>Session 5: Spatio-temporal model for geostatistical data</title>
+    <title>Session 5: Spatio-temporal models for geostatistical data</title>
     <meta charset="utf-8" />
     <script src="libs/header-attrs/header-attrs.js"></script>
     <link href="libs/panelset/panelset.css" rel="stylesheet" />
@@ -80,7 +80,7 @@
 
 class: title-slide
 
-# Session 5: Spatio-temporal model for geostatistical data&lt;span style="display:block; margin-top: 10px ;"&gt;&lt;/span&gt; 
+# Session 5: Spatio-temporal models for geostatistical data&lt;span style="display:block; margin-top: 10px ;"&gt;&lt;/span&gt; 
 
 ## 
 
@@ -130,8 +130,13 @@ At the end of this session you should be able to:
 
 &lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
 
+- develop spatio-temporal models for geostatistics data;
 
-- use `R-INLA` for implementing a (separable) space-time geostatistical model.
+
+&lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
+
+
+- use `R-INLA` for implementing a (separable) space-time geostatistical models.
 
 
 &lt;span style="display:block; margin-top: 30px ;"&gt;&lt;/span&gt;
@@ -155,7 +160,7 @@ The topics covered in this lecture can be found in:
 
 &lt;span style="display:block; margin-top: 30px ;"&gt;&lt;/span&gt;
 
-2\. [Implementation of a spatio-temporal process using `R-INLA`](#stinla)
+2\. [Implementation of a spatio-temporal model using `R-INLA`](#stinla)
 
 
 ---
@@ -189,7 +194,7 @@ and are observed at `\(n\)` spatial locations and at `\(T\)`  time points.
 
 --
 &lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
--  If we assume .red[**separability**] the stationary space-time covariance function is decomposed into the product (or the sum) of a purely spatial and a purely temporal term: `$$\mbox{Cov}\left(y_{it}, y_{ju}\right)=\mathcal{C}_1(\Delta_{ij})\mathcal{C}_2(\Lambda_{tu})$$`
+-  If we assume .red[**separability**] the stationary space-time covariance function is decomposed into the product of a purely spatial and a purely temporal term: `$$\mbox{Cov}\left(y_{it}, y_{ju}\right)=\mathcal{C}_1(\Delta_{ij})\mathcal{C}_2(\Lambda_{tu})$$`
 
 ---
 
@@ -199,7 +204,12 @@ and are observed at `\(n\)` spatial locations and at `\(T\)`  time points.
 
 &lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
 
-- The data have been collected over the years 2015 to 2017 from a set of sparse ground monitors.
+- The spatio-temporal model was firstly proposed by 
+Cameletti, Lindgren, Simpson, and Rue (2013), while the data are from Moraga (2019).
+
+&lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
+
+- These data have been collected over the years 2015 to 2017 from a set of sparse ground monitors.
 
 &lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
 
@@ -232,7 +242,7 @@ where `\(b_0\)`  is the intercept.
 
 # Hierarchical spatio-temporal model for PM concentrations [3]
 
-- The term `\(\omega_{it}\)` refers to the **latent spatio-temporal process** (i.e. the true unobserved level of pollution) which changes in time with first order autoregressive dynamics and spatially correlated innovations:
+- The term `\(\omega_{it}\)` refers to the **latent spatio-temporal process** (i.e. the true unobserved level of pollution), which changes in time with first order autoregressive dynamics and spatially correlated innovations:
 
 `$$\color{blue}{\omega_{it} = \rho\omega_{i(t-1)}+\xi_{it}}$$`
 with `\(t=2,\ldots,T\)`, `\(|\rho|&lt;1\)`, `\(\omega_{i1}\sim\text{Normal}\left(0,\sigma^2/ (1-\rho^2)\right)\)`.
@@ -270,6 +280,7 @@ where the precision matrix `\(\bm Q_S\)` comes from the SPDE representation. The
 with `\(\bm Q=\bm Q_T \otimes \bm Q_S\)`, where `\(\otimes\)` denotes the Kronecker product and `\(\bm Q_T\)` is the `\(T\)`-dimensional precision matrix of the AR(1) process.
 
 &lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
+
 - For the considered model the latent process is given by `\(\bm \theta=\{\bm \omega, b_0\}\)` while the hyperparameter vector is `\(\psi=(\sigma^2_e, \rho, \sigma^2, r)\)`.
 
 ---
@@ -286,7 +297,7 @@ name: stinla
 
 # Particle matter data
 
-- The data used in this Session to demonstrate the modelling framework are **PM2.5 concentrations** measured at several monitoring stations in Spain over the years 2015 to 2017 from the European Environment Agency. This example is taken from Moraga (2019), chapter 10.
+- The data used to demonstrate the modelling framework are **PM2.5 concentrations** measured at several monitoring stations in Spain over the years 2015 to 2017 from the European Environment Agency. This example is taken from Moraga (2019), chapter 10.
 
 
 .panelset[
@@ -338,11 +349,11 @@ attr(,"package")
 
 # Domain of the analysis [1]
 
-- We are interested in predicting fine air particle in the main territory of Spain, and therefore we will remove the islands from the map. 
+- We are interested in predicting fine air particle in the main territory of Spain, and therefore we need to remove the islands from the map. 
 
 &lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
 
-- To do so we will keep the polygon of the map that has the largest area using the packages `sf` and `dplyr`. 
+- To do so, we will keep the polygon of the map that has the largest area using the packages `sf` and `dplyr`. 
 
 &lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
 
@@ -452,7 +463,7 @@ We obtain a triangulation of the domain using the function `inla.mesh.2d`
 .pull-left[
 
 ```r
-&gt; sc = 1/1000 ##scaling
+&gt; sc = 1/1000 ## scaling (so we go from m to Km)
 &gt; coo = cbind(df$x, df$y)*sc
 &gt; 
 &gt; bnd = inla.nonconvex.hull(
@@ -464,11 +475,13 @@ We obtain a triangulation of the domain using the function `inla.mesh.2d`
 +   cutoff = 1000*sc)
 ```
 
-Given the mesh, it is now possible to create the SPDE model using the `inla.spde2.matern` or `inla.spde2.matern` functions. 
+Then we create the SPDE model using the `inla.spde2.matern` or `inla.spde2.pcmatern` functions. Here we use `inla.spde2.pcmatern` that adopts PC-priors for the model parameters range and marginal standard deviation.
 
 
 ```r
-&gt; spde = inla.spde2.matern(mesh = mesh) 
+&gt; spde &lt;- inla.spde2.pcmatern(mesh = mesh, 
++   prior.range = c(7, 0.01), # P(range &lt; 7) = 0.01
++   prior.sigma = c(1, 0.01)) # P(sigma &gt; 1) = 0.01
 &gt; spde$n.spde #n. of mesh vertices
 ```
 
@@ -519,7 +532,7 @@ single replication of the spatial process at each time point).
 
 # A matrix for the estimation part
 
-- We construct an observation matrix that extracts the values of the spatio-temporal field at the measurement locations and time points used for the parameter estimation. This is the .red[projection matrix A], that is used to project the Gaussian random field (GRF) from the observations to the triangulation vertices
+- We construct an observation matrix that extracts the values of the spatio-temporal field at the measurement locations and time points used for the parameter estimation. This is the .red[projection matrix A], that is used to project the Gaussian random field from the observations to the triangulation vertices
 
 - The projection matrix is defined using the coordinates of the observed data. In order to construct a Kronecker product model in `R-INLA`, we use the
 `group` feature in the `inla.spde.make.A`
@@ -564,7 +577,7 @@ This is a matrix equal in dimension to (number of observations) `\(\times\)` (nu
 
 &lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
 
-- To do so, we need to create a spatial grid upon which we map the predictions. Here, we create an 50 `\(\times\)` 50 grid. 
+- To do so, we need to create a **spatial grid** upon which we map the predictions. Here, we create an 50 `\(\times\)` 50 grid. 
 
 
 
@@ -699,8 +712,8 @@ Note that using the options `group` and `control.group` we specify that at each 
 ```
 
 ```
-    mean 0.025quant 0.975quant
-b0 8.559      7.948      9.176
+   mean 0.025quant 0.975quant
+b0 8.57      8.006       9.14
 ```
 
 
@@ -710,10 +723,10 @@ b0 8.559      7.948      9.176
 
 ```
                                           mean    sd 0.025quant 0.5quant 0.975quant   mode
-Precision for the Gaussian observations  0.950 0.195      0.617    0.932      1.381  0.902
-Theta1 for spatial.field                -1.090 0.145     -1.374   -1.090     -0.804 -1.092
-Theta2 for spatial.field                -1.854 0.103     -2.057   -1.854     -1.652 -1.854
-GroupRho for spatial.field               0.966 0.014      0.933    0.968      0.986  0.972
+Precision for the Gaussian observations  0.855 0.169      0.565    0.840      1.229  0.814
+Range for spatial.field                 18.886 1.847     15.485   18.805     22.750 18.663
+Stdev for spatial.field                  4.735 0.361      4.065    4.721      5.486  4.694
+GroupRho for spatial.field               0.963 0.015      0.928    0.965      0.985  0.970
 ```
 
 ---
@@ -727,8 +740,8 @@ GroupRho for spatial.field               0.966 0.014      0.933    0.968      0.
 ```
 
 ```
-       mean        sd 0.025quant 0.5quant 0.975quant     mode          kld
-b0 8.559106 0.3119693   7.948188 8.558082   9.175882 8.558096 2.292124e-08
+       mean       sd 0.025quant 0.5quant 0.975quant     mode          kld
+b0 8.570385 0.288333    8.00565 8.569599   9.139608 8.569605 1.587105e-08
 ```
 
 ```r
@@ -787,22 +800,22 @@ We can see that the AR(1) coefficient of the latent field, `\(\rho\)`, is large 
 
 &lt;center&gt;&lt;img src=./img/Plot_Var_Range.jpeg width='47%' title='INCLUDE TEXT HERE'&gt;&lt;/center&gt;
 
-These posterior distributions suggest that there is strong spatial and temporal dependencies in the data.
 ---
 
 # Map of the predicted particle concentrations (and 95% CI) by year 
 
-- To map the predicted concentrations of PM2.5, we need (i) to extract the indices to the prediction nodes and then (ii) to extract the posterior mean (and related 95%CI) of the response. To retrieve these predictions, we use `inla.stack.index()` to obtain the indices of the `stack` that correspond to `tag = "pred"`
+- To map the predicted concentrations of PM2.5, we need (i) to extract the indices to the prediction nodes, and then (ii) to extract the posterior mean (and related 95%CI) of the response. We use `inla.stack.index()` to obtain the indices of the `stack` that correspond to `tag = "pred"`
 
 
 ```r
 &gt; index = inla.stack.index(stack = stack, tag = "pred")$data
-&gt; 
 &gt; dp_final = data.frame(dp_final)
 &gt; names(dp_final) = c("x", "y", "time")
-&gt; 
+&gt; # posterior mean
 &gt; dp_final$pred_mean = fit$summary.fitted.values[index, "mean"]
-&gt; dp_final$pred_ll = fit$summary.fitted.values[index, "0.025quant"]
+&gt; # lower limits of the 95% credible intervals
+&gt; dp_final$pred_ll = fit$summary.fitted.values[index, "0.025quant"] 
+&gt; # upper limits of the 95% credible intervals
 &gt; dp_final$pred_ul = fit$summary.fitted.values[index, "0.975quant"]
 &gt; 
 &gt; library(reshape2)
@@ -814,9 +827,9 @@ These posterior distributions suggest that there is strong spatial and temporal 
 
 ```
          x       y time  variable    value
-1 260558.8 4004853    1 pred_mean 8.559195
-2 218306.0 4022657    1 pred_mean 8.559194
-3 239432.4 4022657    1 pred_mean 8.559194
+1 260558.8 4004853    1 pred_mean 8.570392
+2 218306.0 4022657    1 pred_mean 8.570392
+3 239432.4 4022657    1 pred_mean 8.570392
 ```
 ---
 
@@ -846,7 +859,7 @@ These posterior distributions suggest that there is strong spatial and temporal 
 
 &lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
 
-- In this last section of this lecture we explore an additional technique for the validation of our model(s), such as cross-validation.
+- In this last section of this lecture we introduce an additional technique for the validation of our model(s), such as cross-validation.
 
 ---
 
@@ -911,6 +924,8 @@ These posterior distributions suggest that there is strong spatial and temporal 
 # References
 
 Cameletti, M., R. Ignaccolo, and S. Bande (2011). "Comparing spatio-temporal models for particulate matter in Piemonte". In: _Environmetrics_ 22.8, pp. 985-996.
+
+Cameletti, M., F. Lindgren, D. Simpson, et al. (2013). "Spatio-temporal modeling of particulate matter concentration through the SPDE approach". In: _AStA Advances in Statistical Analysis_ 97, pp. 109-131.
 
 Moraga, P. (2019). _Geospatial health data: Modeling and visualization with R-INLA and shiny_. CRC Press.
 

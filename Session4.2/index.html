@@ -140,12 +140,15 @@ At the end of this session you should be able to:
 
 &lt;span style="display:block; margin-top: 30px ;"&gt;&lt;/span&gt;
 
-The topics treated in this lecture can be found in:
+The topics covered in this lecture can be found in:
 
 - Sections 6.5:6.8 of the book **Spatial and Spatio-Temporal Bayesian models with R-INLA**
 
 - Chapters 8 and 9 of the book **Geospatial Health Data: Modeling and Visualization with R-INLA and Shiny**  https://www.paulamoraga.com/book-geospatial/index.html
 
+- Chapter 2 of the book **Advanced Spatial Modeling with Stochastic Partial Differential Equations Using R and INLA** https://becarioprecario.bitbucket.io/spde-gitbook/
+
+&lt;span style="display:block; margin-top: 30px ;"&gt;&lt;/span&gt;
 
 ---
 
@@ -303,6 +306,9 @@ Spatial Statistics, Volume 50, 2022, https://doi.org/10.1016/j.spasta.2022.10059
 
 &lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
 
+- Blangiardo M and Cameletti M, **Spatial and Spatio-Temporal Bayesian models with R-INLA**, 2015, Wiley
+
+&lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
 
 - Moraga P, **Geospatial Health Data. Modeling and Visualization with R-INLA and Shiny**, 2020, CRC press, www.paulamoraga.com/book-geospatial-info/
 
@@ -1040,8 +1046,8 @@ Note that the projector matrix is passed to `inla` through `control.predictor`. 
 ```
 
 ```
-              mean 0.025quant 0.975quant
-intercept 9.502238   8.014723   10.88157
+             mean 0.025quant 0.975quant
+intercept 9.50255   8.016786   10.88026
 ```
 
 ```r
@@ -1050,9 +1056,9 @@ intercept 9.502238   8.014723   10.88157
 
 ```
                                              mean 0.025quant 0.975quant
-Precision for the Gaussian observations  2.866766   2.038247   3.898415
-Theta1 for spatial.field                -4.034174  -4.342587  -3.712423
-Theta2 for spatial.field                 2.093997   1.594946   2.567135
+Precision for the Gaussian observations  2.866982   2.041001   3.903147
+Theta1 for spatial.field                -4.034178  -4.342696  -3.712223
+Theta2 for spatial.field                 2.094849   1.596346   2.567184
 ```
 
 
@@ -1089,7 +1095,7 @@ The posterior mean of  `\(\sigma^2\)` and the range `\(r\)`  can be obtained by 
 ```
 
 ```
-[1] 4.010071
+[1] 4.004006
 ```
 
 ```r
@@ -1097,7 +1103,7 @@ The posterior mean of  `\(\sigma^2\)` and the range `\(r\)`  can be obtained by 
 ```
 
 ```
-[1] 0.3591339
+[1] 0.3587982
 ```
 
 
@@ -1108,13 +1114,13 @@ Also the other standard INLA functions can be applied to the marginal posteriors
 ```
 
 ```
-Mean            0.359134 
-Stdev           0.0904262 
-Quantile  0.025 0.217744 
-Quantile  0.25  0.294201 
-Quantile  0.5   0.346393 
-Quantile  0.75  0.410459 
-Quantile  0.975 0.570908 
+Mean            0.358798 
+Stdev           0.0902248 
+Quantile  0.025 0.217731 
+Quantile  0.25  0.294011 
+Quantile  0.5   0.346079 
+Quantile  0.75  0.410007 
+Quantile  0.975 0.570111 
 ```
 
 ---
@@ -1230,9 +1236,9 @@ We then extract the prediction posterior mean and sd at the first 3 grid points:
 
 ```
                    mean        sd
-APredictor.201 12.24867 0.2614671
-APredictor.202 12.06031 0.4239063
-APredictor.203 10.58879 0.4336550
+APredictor.201 12.24863 0.2614489
+APredictor.202 12.06042 0.4239206
+APredictor.203 10.58862 0.4336343
 ```
 
 In this case (identity link) `output6pred$summary.fitted.values` would return the same output.
@@ -1352,8 +1358,9 @@ We plot now the posterior standard deviation of the linear predictor at the grid
 
 ---
 
-# Wrap-up: fitting a geostatistical model using SPDE approach
+# Wrap-up: fitting a geostatistical model using SPDE approach with R-INLA
 
+- Load, among the others, the R packages: `INLA`, `fmesher`, `inlabru` 
 
 - Construct the mesh to obtain a triangulation of the domain using the function .red[`inla.mesh.2d`]
 
@@ -1365,7 +1372,11 @@ We plot now the posterior standard deviation of the linear predictor at the grid
 
 - Put everything together in a stack object using the function .red[`inla.stack`]
 
-- Run the model
+- Run the model!
+
+&lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt; 
+
+- Note that geostatistical analysis with`inlabru` is easier as it doesn't require the construction of the projection matrix and the stack object. To get further details visit `inlabru` website: https://sites.google.com/inlabru.org/inlabru/home?authuser=0
 
 
 
