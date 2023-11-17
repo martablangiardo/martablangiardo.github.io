@@ -19,13 +19,14 @@ pkg_list = c("sf", "spData", "terra", "stars", "sp", "spdep", "geoR", "fields", 
 remotes::install_cran(pkg_list)
 
 - install package fingertipsR as follows:
-
 options(repos = c(
   ropensci = 'https://ropensci.r-universe.dev',
   CRAN = 'https://cloud.r-project.org'))
 
 install.packages('fingertipsR')
 
+
+The html and pdf version of the slides and the practical material are here
 
 ## Timetable
 ### Day 1 - Mon 27th Nov 2023
