@@ -114,3 +114,4 @@ Pdf of the lectures are [here](Pdfs/day5.zip)
 
 
 **Afternoon session** (13.30-15.30): Participants will have the possibility to give a short presentation about their work/research and get feedback from their peers and from the teaching team. If you are interested please put your name and title of the presentation on this form
+https://docs.google.com/forms/d/e/1FAIpQLSe13bWUocGiRFVfmS72zSy9Ki2SdcA0h3QJvK8RCY9In-kaHQ/viewform?usp=sf_link
