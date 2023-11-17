@@ -10,9 +10,20 @@ It would be beneficial if you could bring your laptop having installed the lates
 
 - INLA (instructions at https://www.r-inla.org/download-install)
 
-- install.packages("remotes")
+- install packages using:
+
+install.packages("remotes")
+
 pkg_list = c("sf", "spData", "terra", "stars", "sp", "spdep", "geoR", "fields", "gstat", "tmap", "ggplot2", "RColorBrewer", "mapview", "leaflet", "cowplot", "viridis", "patchwork", "knitr", "kableExtra", "tidyverse", "mvtsplot", "GGally", "corrr", "SpatialEpi", "spTimer", "units", "stringr", "bmstdr" ,"inlabru", "fmesher")
+
 remotes::install_cran(pkg_list)
+
+- install package fingertipsR as follows:
+options(repos = c(
+  ropensci = 'https://ropensci.r-universe.dev',
+  CRAN = 'https://cloud.r-project.org'))
+
+install.packages('fingertipsR')
 
 
 The html and pdf version of the slides and the practical material are here
@@ -98,7 +109,7 @@ Material for the practical is [here](Practicals/Practical4a.zip)
 
 Material for the practical is [here](Practicals/temperature.croatia.zip)
 
-Pdf of the lectures are [here](Pdfs/day4.zip)
+Pdf of the lectures are [here](Pdfs/Day4.zip)
 
 ### Day 5 - Fri 1st Dec 2023
 
@@ -110,7 +121,7 @@ Break
 
 Lunch
 
-Pdf of the lectures are [here](Pdfs/day5.zip)
+Pdf of the lecture is [here](Pdfs/Day5.zip)
 
 
 **Afternoon session** (13.30-15.30): Participants will have the possibility to give a short presentation about their work/research and get feedback from their peers and from the teaching team. If you are interested please put your name and title of the presentation on this form
