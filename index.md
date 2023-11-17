@@ -59,7 +59,7 @@ Lunch
 
 Material for the practical is [here](Practicals/Practical2c.zip)
 
-Pdf of the lectures are [here](Pdfs/DPracticsaay2.zip)
+Pdf of the lectures are [here](Pdfs/Day2.zip)
 
 
 ### Day 3 - Wed 29th Nov 2023
@@ -77,7 +77,7 @@ Lunch
 Material for the practical is [here](Practicals/Practical3.zip)
 
 
-Pdf of the lectures are [here](Pdfs/day3.zip)
+Pdf of the lectures are [here](Pdfs/Day3.zip)
 
 
 ### Day 4 - Thur 30th Nov 2023
@@ -96,13 +96,13 @@ Material for the practical is [here](Practicals/Practical4a.zip)
 
 - [Practical4b](Practical4b)
 
-Material for the practical is [here](Practicals/temperature.croatia.RData)
+Material for the practical is [here](Practicals/temperature.croatia.zip)
 
 Pdf of the lectures are [here](Pdfs/day4.zip)
 
 ### Day 5 - Fri 1st Dec 2023
 
-- [Session 5.1](Session5.1): Spatio-temporal model for geostatistical data
+- [Session 5](Session5): Spatio-temporal model for geostatistical data
 
 Break
 
@@ -113,4 +113,4 @@ Lunch
 Pdf of the lectures are [here](Pdfs/day5.zip)
 
 
-**Afternoon session** (13.30-15.30): Participants will have the possibility to give a short presentation about their work/research and get feedback from their peers and from the teaching team.
+**Afternoon session** (13.30-15.30): Participants will have the possibility to give a short presentation about their work/research and get feedback from their peers and from the teaching team. If you are interested please put your name and title of the presentation on this form
