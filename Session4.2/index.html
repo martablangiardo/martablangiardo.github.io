@@ -1046,8 +1046,8 @@ Note that the projector matrix is passed to `inla` through `control.predictor`. 
 ```
 
 ```
-             mean 0.025quant 0.975quant
-intercept 9.50255   8.016786   10.88026
+              mean 0.025quant 0.975quant
+intercept 9.502619   8.017822   10.87952
 ```
 
 ```r
@@ -1056,9 +1056,9 @@ intercept 9.50255   8.016786   10.88026
 
 ```
                                              mean 0.025quant 0.975quant
-Precision for the Gaussian observations  2.866982   2.041001   3.903147
-Theta1 for spatial.field                -4.034178  -4.342696  -3.712223
-Theta2 for spatial.field                 2.094849   1.596346   2.567184
+Precision for the Gaussian observations  2.867297   2.040905   3.901461
+Theta1 for spatial.field                -4.034262  -4.342080  -3.712743
+Theta2 for spatial.field                 2.094820   1.597154   2.565840
 ```
 
 
@@ -1095,7 +1095,7 @@ The posterior mean of  `\(\sigma^2\)` and the range `\(r\)`  can be obtained by 
 ```
 
 ```
-[1] 4.004006
+[1] 4.003437
 ```
 
 ```r
@@ -1103,7 +1103,7 @@ The posterior mean of  `\(\sigma^2\)` and the range `\(r\)`  can be obtained by 
 ```
 
 ```
-[1] 0.3587982
+[1] 0.3587618
 ```
 
 
@@ -1114,13 +1114,13 @@ Also the other standard INLA functions can be applied to the marginal posteriors
 ```
 
 ```
-Mean            0.358798 
-Stdev           0.0902248 
-Quantile  0.025 0.217731 
-Quantile  0.25  0.294011 
-Quantile  0.5   0.346079 
-Quantile  0.75  0.410007 
-Quantile  0.975 0.570111 
+Mean            0.358762 
+Stdev           0.0900325 
+Quantile  0.025 0.218022 
+Quantile  0.25  0.294114 
+Quantile  0.5   0.346054 
+Quantile  0.75  0.409853 
+Quantile  0.975 0.56965 
 ```
 
 ---
@@ -1236,9 +1236,9 @@ We then extract the prediction posterior mean and sd at the first 3 grid points:
 
 ```
                    mean        sd
-APredictor.201 12.24863 0.2614489
-APredictor.202 12.06042 0.4239206
-APredictor.203 10.58862 0.4336343
+APredictor.201 12.24864 0.2614517
+APredictor.202 12.06023 0.4238650
+APredictor.203 10.58886 0.4336307
 ```
 
 In this case (identity link) `output6pred$summary.fitted.values` would return the same output.
@@ -1362,7 +1362,7 @@ We plot now the posterior standard deviation of the linear predictor at the grid
 
 - Load, among the others, the R packages: `INLA`, `fmesher`, `inlabru` 
 
-- Construct the mesh to obtain a triangulation of the domain using the function .red[`inla.mesh.2d`]
+- Construct the mesh to obtain a triangulation of the domain using the function .red[`inla.mesh.2d`]. Recently, a new function has been made available from the package `fmesher`: .red[`fm_mesh_2d_inla`]; you can check the documentation typing `?fm_mesh_2d_inla` in R
 
 - Construct the SPDE model using the function .red[`inla.spde2.matern`] or .red[`inla.spde2.pcmatern`]
 
@@ -1376,7 +1376,8 @@ We plot now the posterior standard deviation of the linear predictor at the grid
 
 &lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt; 
 
-- Note that geostatistical analysis with`inlabru` is easier as it doesn't require the construction of the projection matrix and the stack object. To get further details visit `inlabru` website: https://sites.google.com/inlabru.org/inlabru/home?authuser=0
+- Note that geostatistical analysis with`inlabru` is easier, due to the fact that index vectors and projector matrices are created automatically, and the user does not need to deal with them directly.
+ To get further details visit `inlabru` website: https://sites.google.com/inlabru.org/inlabru/home?authuser=0
 
 
 
