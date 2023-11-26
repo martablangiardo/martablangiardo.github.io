@@ -545,7 +545,7 @@ or equivalently
 
 1\. can be easily estimated as
 
-`$$\class{red}{p(\boldsymbol\psi\mid\boldsymbol{y})} \class{black}{= \frac{p(\boldsymbol\theta,\boldsymbol\psi\mid\boldsymbol{y})}{p(\boldsymbol\theta\mid\boldsymbol\psi,\boldsymbol{y})}} \text{ (Recall slide 17)}$$`
+`$$\class{red}{p(\boldsymbol\psi\mid\boldsymbol{y})} \class{black}{= \frac{p(\boldsymbol\theta,\boldsymbol\psi\mid\boldsymbol{y})}{p(\boldsymbol\theta\mid\boldsymbol\psi,\boldsymbol{y})}} \text{ (Recall slide 13)}$$`
 
 ---
 
@@ -1093,8 +1093,8 @@ We specify a simple regression model with `Petal.length` and `Petal.width` as de
 
 ```
                 mean         sd 0.025quant 0.5quant 0.975quant     mode          kld
-(Intercept) 1.083565 0.07286615  0.9404841 1.083565   1.226646 1.083565 3.639717e-09
-Petal.Width 2.229935 0.05132520  2.1291515 2.229935   2.330718 2.229935 3.639633e-09
+(Intercept) 1.083565 0.07286523  0.9404859 1.083565   1.226645 1.083565 3.640028e-09
+Petal.Width 2.229935 0.05132456  2.1291528 2.229935   2.330716 2.229935 3.640230e-09
 ```
 
 - For each unstructured *fixed* effect, `R-INLA` reports a set of summary statistics from the posterior distribution.
@@ -1117,7 +1117,7 @@ Petal.Width 2.229935 0.05132520  2.1291515 2.229935   2.330718 2.229935 3.639633
 
 ```
                                             mean        sd 0.025quant 0.5quant 0.975quant     mode
-Precision for the Gaussian observations 4.431766 0.5117049   3.486716 4.412179   5.490152 4.372817
+Precision for the Gaussian observations 4.431767 0.5117057   3.486713  4.41218   5.490153 4.372817
 ```
 
 - For each hyperparameter the summary statistics are reported to describe the posterior distribution.
@@ -1180,7 +1180,7 @@ Precision for the Gaussian observations 4.431766 0.5117049   3.486716 4.412179  
 ```
 
 ```
-[1] 1.994373
+[1] 1.994397
 ```
 
 ```r
@@ -1188,7 +1188,7 @@ Precision for the Gaussian observations 4.431766 0.5117049   3.486716 4.412179  
 ```
 
 ```
-[1] 2.346620 2.178577 2.102739 2.316937
+[1] 2.182217 2.188959 2.236672 2.203263
 ```
 
 ]

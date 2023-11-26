@@ -562,6 +562,15 @@ which is the Monte Carlo approximation to
 In `R`:
 
 
+```r
+&gt; a &lt;- 1
+&gt; b &lt;- 1
+&gt; theta &lt;- rbeta(1,a,b)
+&gt; n &lt;- 1000
+&gt; y &lt;- rbinom(1, size=n, p=theta)
+&gt; a1 &lt;- a + y
+&gt; b1 &lt;- n - y + b
+```
 
 --
 
