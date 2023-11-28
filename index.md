@@ -14,7 +14,7 @@ It would be beneficial if you could bring your laptop having installed the lates
 
 install.packages("remotes")
 
-pkg_list = c("sf", "spData", "terra", "stars", "sp", "spdep", "geoR", "fields", "gstat", "tmap", "ggplot2", "RColorBrewer", "mapview", "leaflet", "cowplot", "viridis", "patchwork", "knitr", "kableExtra", "tidyverse", "mvtsplot", "GGally", "corrr", "SpatialEpi", "spTimer", "units", "stringr", "bmstdr" ,"inlabru", "fmesher", "splancs")
+pkg_list = c("sf", "spData", "terra", "stars", "sp", "spdep", "geoR", "fields", "gstat", "tmap", "ggplot2", "RColorBrewer", "mapview", "leaflet", "cowplot", "viridis", "patchwork", "knitr", "kableExtra", "tidyverse", "mvtsplot", "GGally", "corrr", "SpatialEpi", "spTimer", "units", "stringr" ,"inlabru", "fmesher", "splancs")
 
 remotes::install_cran(pkg_list)
 
@@ -26,6 +26,9 @@ options(repos = c(
 
 install.packages('fingertipsR')
 
+- install Rtools from https://cran.r-project.org/bin/windows/Rtools/
+
+- install the latest version of Rstudio at https://posit.co/download/rstudio-desktop/
 
 ## Timetable
 ### Day 1 - Mon 27th Nov 2023 (9:30am to 3:30pm)
@@ -122,6 +125,7 @@ Break
 
 - [Practical 5](Practical5) (11:30pm to 12:30pm)
 
+Material for the practical is [here](Practicals/Practical5.zip)
 
 Lunch
 
