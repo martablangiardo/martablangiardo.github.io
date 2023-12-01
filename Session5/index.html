@@ -146,7 +146,7 @@ The topics covered in this lecture can be found in:
 
 - Chapter 10 of the book **Geospatial Health Data: Modeling and Visualization with R-INLA and Shiny**  https://www.paulamoraga.com/book-geospatial/index.html
 
-- Section 7.2 of the book **Spatio-Temporal Bayesian Models with `R-INLA`** https://sites.google.com/a/r-inla.org/stbook/
+- Section 7.2 of the book **Spatio-Temporal Bayesian Models with `R-INLA`** https://github.com/michelacameletti/Spatial-and-Spatio-Temporal-Bayesian-Models-with-R-INLA
 
 - Section 7.1 of the book **Advanced Spatial Modeling with Stochastic Partial Differential Equations Using R and INLA** https://becarioprecario.bitbucket.io/spde-gitbook/index.html
 
@@ -712,8 +712,8 @@ Note that using the options `group` and `control.group` we specify that at each 
 ```
 
 ```
-   mean 0.025quant 0.975quant
-b0 8.57      8.006       9.14
+    mean 0.025quant 0.975quant
+b0 8.571      8.006       9.14
 ```
 
 
@@ -723,9 +723,9 @@ b0 8.57      8.006       9.14
 
 ```
                                           mean    sd 0.025quant 0.5quant 0.975quant   mode
-Precision for the Gaussian observations  0.855 0.169      0.565    0.840      1.229  0.814
-Range for spatial.field                 18.886 1.847     15.485   18.805     22.750 18.663
-Stdev for spatial.field                  4.735 0.361      4.065    4.721      5.486  4.694
+Precision for the Gaussian observations  0.857 0.170      0.563    0.842      1.231  0.818
+Range for spatial.field                 18.888 1.841     15.493   18.810     22.735 18.675
+Stdev for spatial.field                  4.735 0.360      4.066    4.721      5.484  4.694
 GroupRho for spatial.field               0.963 0.015      0.928    0.965      0.985  0.970
 ```
 
@@ -740,8 +740,8 @@ GroupRho for spatial.field               0.963 0.015      0.928    0.965      0.
 ```
 
 ```
-       mean       sd 0.025quant 0.5quant 0.975quant     mode          kld
-b0 8.570385 0.288333    8.00565 8.569599   9.139608 8.569605 1.587105e-08
+       mean        sd 0.025quant 0.5quant 0.975quant     mode          kld
+b0 8.570513 0.2883178   8.005804 8.569729   9.139694 8.569735 1.579946e-08
 ```
 
 ```r
@@ -826,10 +826,10 @@ We can see that the AR(1) coefficient of the latent field, `\(\rho\)`, is large 
 ```
 
 ```
-         x       y time  variable    value
-1 260558.8 4004853    1 pred_mean 8.570392
-2 218306.0 4022657    1 pred_mean 8.570392
-3 239432.4 4022657    1 pred_mean 8.570392
+         x       y time  variable   value
+1 260558.8 4004853    1 pred_mean 8.57052
+2 218306.0 4022657    1 pred_mean 8.57052
+3 239432.4 4022657    1 pred_mean 8.57052
 ```
 ---
 

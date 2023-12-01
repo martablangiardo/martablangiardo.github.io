@@ -30,6 +30,14 @@ install.packages('fingertipsR')
 
 - install the latest version of Rstudio at https://posit.co/download/rstudio-desktop/
 
+**Instructors**
+
+- Marta Blangiardo m.blangiardo@imperial.ac.uk
+
+- Monica Pirani monica.pirani@imperial.ac.uk
+
+- Georges Bucyibaruta g.bucyibaruta@imperial.ac.uk
+
 ## Timetable
 ### Day 1 - Mon 27th Nov 2023 (9:30am to 3:30pm)
 
