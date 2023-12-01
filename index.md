@@ -53,9 +53,11 @@ Lunch
 
 - [Practical 1a](Practical1a) (2:15pm to 3:00pm)
 
+Material for the practical is [here](Practicals/Practical1a.zip)
+
 - [Practical 1b](Practical1b) (3:00pm to 3:30pm) 
 
-
+Material for the practical is [here](Practicals/Practical1b.zip)
 
 Pdf of the lectures are [here](Pdfs/Day1.zip)
 
@@ -121,7 +123,7 @@ Material for the practical is [here](Practicals/Practical4a.zip)
 
 - [Practical4b](Practical4b) (2:30pm to 3:30pm)
 
-Material for the practical is [here](Practicals/temperature.croatia.zip)
+Material for the practical is [here](Practicals/Practical4b.zip)
 
 Pdf of the lectures are [here](Pdfs/Day4.zip)
 
