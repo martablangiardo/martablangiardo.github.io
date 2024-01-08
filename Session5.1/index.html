@@ -1,0 +1,749 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>Session 5.1: Hierarchical models: longitudinal data</title>
+    <meta charset="utf-8" />
+    <script src="libs/header-attrs/header-attrs.js"></script>
+    <link href="libs/panelset/panelset.css" rel="stylesheet" />
+    <script src="libs/panelset/panelset.js"></script>
+    <!-- (Re)Defines a bunch of LaTeX commands that can then be used directly in the .Rmd file as '\command{...}' -->
+    <script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+      TeX: {
+        /* This enables color macros */
+        extensions: ["color.js"],
+        Macros: {
+          /* Probability & mathematical symbols */
+          Pr: "{\\style{font-family:inherit; font-size: 110%;}{\\text{Pr}}}",
+          exp: "{\\style{font-family:inherit; font-size: 105%;}{\\text{exp}}}",
+          log: "{\\style{font-family:inherit; font-size: 105%;}{\\text{log}}}",
+          ln: "{\\style{font-family:inherit; font-size: 105%;}{\\text{ln}}}",
+          logit: "{\\style{font-family:inherit; font-size: 100%;}{\\text{logit}}}",
+          HR: "{\\style{font-family:inherit; font-size: 105%;}{\\text{HR}}}",
+          OR: "{\\style{font-family:inherit; font-size: 105%;}{\\text{OR}}}",
+          E: "{\\style{font-family:inherit; font-size: 105%;}{\\text{E}}}",
+          Var: "{\\style{font-family:inherit; font-size: 105%;}{\\text{Var}}}",
+          Cov: "{\\style{font-family:inherit; font-size: 105%;}{\\text{Cov}}}",
+          Corr: "{\\style{font-family:inherit; font-size: 105%;}{\\text{Corr}}}",
+          DIC: "{\\style{font-family:inherit; font-size: 105%;}{\\text{DIC}}}",
+          se: "{\\style{font-family:inherit; font-size: 100%;}{\\text{se}}}",
+          sd: "{\\style{font-family:inherit; font-size: 100%;}{\\text{sd}}}",
+          kld: "{\\style{font-family:inherit; font-size: 100%;}{\\text{kld}}}",
+          /* Distributions */
+          dnorm: "{\\style{font-family:inherit;}{\\text{Normal}}}",
+          dt: "{\\style{font-family:inherit;}{\\text{t}}}",
+          ddirch: "{\\style{font-family:inherit;}{\\text{Dirichlet}}}",
+          dmulti: "{\\style{font-family:inherit;}{\\text{Multinomial}}}",
+          dbeta: "{\\style{font-family:inherit;}{\\text{Beta}}}",
+          dgamma: "{\\style{font-family:inherit;}{\\text{Gamma}}}",
+          dbern: "{\\style{font-family:inherit;}{\\text{Bernoulli}}}",
+          dbin: "{\\style{font-family:inherit;}{\\text{Binomial}}}",
+          dpois: "{\\style{font-family:inherit;}{\\text{Poisson}}}",
+          dweib: "{\\style{font-family:inherit;}{\\text{Weibull}}}",
+          dexp: "{\\style{font-family:inherit;}{\\text{Exponential}}}",
+          dlnorm: "{\\style{font-family:inherit;}{\\text{logNormal}}}",
+          dunif: "{\\style{font-family:inherit;}{\\text{Uniform}}}",
+          /* LaTeX formatting */
+          bm: ["{\\boldsymbol #1}",1],
+          /* These create macros to typeset numbers in maths with the basic font */
+          0: "{\\style{font-family:inherit; font-size: 105%;}{\\text{0}}}",
+          1: "{\\style{font-family:inherit; font-size: 105%;}{\\text{1}}}",
+          2: "{\\style{font-family:inherit; font-size: 105%;}{\\text{2}}}",
+          3: "{\\style{font-family:inherit; font-size: 105%;}{\\text{3}}}",
+          4: "{\\style{font-family:inherit; font-size: 105%;}{\\text{4}}}",
+          5: "{\\style{font-family:inherit; font-size: 105%;}{\\text{5}}}",
+          6: "{\\style{font-family:inherit; font-size: 105%;}{\\text{6}}}",
+          7: "{\\style{font-family:inherit; font-size: 105%;}{\\text{7}}}",
+          8: "{\\style{font-family:inherit; font-size: 105%;}{\\text{8}}}",
+          9: "{\\style{font-family:inherit; font-size: 105%;}{\\text{9}}}",
+          /* Health economics quantities */
+          icer: "{\\style{font-family:inherit; font-size: 100%;}{\\text{ICER}}}",
+          nb: "{\\style{font-family:inherit; font-size: 100%;}{\\text{NB}}}",
+          ol: "{\\style{font-family:inherit; font-size: 100%;}{\\text{OL}}}",
+          ceac: "{\\style{font-family:inherit; font-size: 100%;}{\\text{CEAC}}}",
+          evpi: "{\\style{font-family:inherit; font-size: 100%;}{\\text{EVPI}}}",
+          evppi: "{\\style{font-family:inherit; font-size: 100%;}{\\text{EVPPI}}}",
+          evsi: "{\\style{font-family:inherit; font-size: 100%;}{\\text{EVSI}}}"
+        }
+      }
+    });
+    </script>
+    <link rel="stylesheet" href="assets/beamer.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+
+
+
+
+
+
+class: title-slide
+
+# Session 5.1: Hierarchical models: longitudinal data&lt;span style="display:block; margin-top: 10px ;"&gt;&lt;/span&gt; 
+
+## 
+
+###     
+
+### Imperial College London
+
+&lt;!-- Can also separate the various components of the extra argument 'params', eg as in 
+### Imperial College London, , MSc in Epidemiology / Health Data Analytics
+--&gt;
+
+
+
+---
+
+layout: true  
+
+.my-footer[ 
+.alignleft[ 
+&amp;nbsp; &amp;copy; Marta Blangiardo | Monica Pirani 
+]
+.aligncenter[
+MSc in Epidemiology / Health Data Analytics 
+]
+.alignright[
+Imperial College London, NA 
+]
+] 
+
+
+---
+
+# Learning Objectives
+
+After this session you should be able to:
+
+&lt;span style="display:block; margin-top: 10px ;"&gt;&lt;/span&gt;
+
+- Specify hierarchical models for longitudinal data
+
+&lt;span style="display:block; margin-top: 10px ;"&gt;&lt;/span&gt;
+
+- Distinguish between random intercept and random slope models and recognise when each is more appropriate
+
+&lt;span style="display:block; margin-top: 10px ;"&gt;&lt;/span&gt;
+
+- Be able to run the above models in R-INLA
+
+&lt;span style="display:block; margin-top: 10px ;"&gt;&lt;/span&gt;
+
+
+The topics treated in this lecture are covered in Chapter 4 of Gómez-Rubio (2020a).
+
+---
+
+# Outline
+
+There is huge scope for elaborating the basic hierarchical models
+discussed in the previous lecture to reflect additional structure and complexity
+in the data, e.g.
+
+&lt;span style="display:block; margin-top: 10px ;"&gt;&lt;/span&gt;
+
+- Adding covariates at different levels of the hierarchy
+
+&lt;span style="display:block; margin-top: 10px ;"&gt;&lt;/span&gt;
+
+- Adding further levels to the hierarchy (patients within wards within hospitals, pupils within schools within local authorities, `\(\ldots\)`)
+
+&lt;span style="display:block; margin-top: 10px ;"&gt;&lt;/span&gt;
+
+- Adding non-nested (cross-classified) levels (patients within GPs crossed with hospitals, `\(\ldots\)`)
+
+&lt;span style="display:block; margin-top: 10px ;"&gt;&lt;/span&gt;
+
+- **Repeated observations on some/all units (longitudinal data - we will see it in this lecture)**
+
+&lt;span style="display:block; margin-top: 10px ;"&gt;&lt;/span&gt;
+
+- Modelling temporal or spatial structure in data, `\(\ldots\)` (we will see it from next week)
+
+&lt;span style="display:block; margin-top: 10px ;"&gt;&lt;/span&gt;
+
+---
+
+# Outline 
+
+1\. [What are longitudinal data](#longitudinal)
+
+&lt;span style="display:block; margin-top: 30px ;"&gt;&lt;/span&gt;
+
+2\. [Example: antidepressant clinical trial](#example)
+
+&lt;span style="display:block; margin-top: 30px ;"&gt;&lt;/span&gt;
+
+3\. [Model specification](#model)
+
+&lt;span style="display:block; margin-top: 30px ;"&gt;&lt;/span&gt;
+
+4\. [Interpretation](#interpretation)
+
+
+---
+
+name: longitudinal
+
+&lt;span style="display:block; margin-top: 250px ;"&gt;&lt;/span&gt;
+
+.myblue[.center[.huge[
+**What are longitudinal data**]]]
+
+
+---
+
+# What are longitudinal data?
+
+- Arise in studies where individual (or units) are measured repeatedly over time
+
+&lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
+
+- For a given individual, observations over time will be typically dependent
+
+&lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
+
+- Longitudinal data can arise in various forms:
+
+&lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
+
+  - continuous or discrete response; discrete response can be binary/binomial, categorical or counts
+
+&lt;span style="display:block; margin-top: 10px ;"&gt;&lt;/span&gt;
+  
+  - equally spaced or irregularly spaced
+
+&lt;span style="display:block; margin-top: 10px ;"&gt;&lt;/span&gt;
+
+  - same or different time points for each individual
+
+&lt;span style="display:block; margin-top: 10px ;"&gt;&lt;/span&gt;
+
+  - with or without missing data
+
+&lt;span style="display:block; margin-top: 10px ;"&gt;&lt;/span&gt;
+
+  - many or few time points, `\(T\)`
+
+&lt;span style="display:block; margin-top: 10px ;"&gt;&lt;/span&gt;
+
+  - many or few individuals or units, `\(n\)`
+
+
+---
+
+# Analysing longitudinal data
+ 
+- There are many different ways to analyse longitudinal data
+
+&lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
+
+- This is a very big field, so we have to be selective
+
+&lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
+
+-  The key feature of longitudinal data is the need to account for the dependence structure of the data
+
+&lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
+
+- Two common methods:
+
+  - random effects (hierarchical) models
+  &lt;span style="display:block; margin-top: 10px ;"&gt;&lt;/span&gt;
+  - autoregressive models
+
+&lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
+
+- Here, we will focus on random effects models
+
+---
+
+name: example
+
+&lt;span style="display:block; margin-top: 250px ;"&gt;&lt;/span&gt;
+
+.myblue[.center[.huge[
+**Example: sleep study**]]]
+
+
+---
+
+# Sleep study
+
+- Belenky, Wesensten, Thorne, Thomas, Sing, Redmond, Russo, and Balkin (2003) describes a study of reaction time in patients under sleep deprivation up to 10 days.
+
+&lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
+- 18 subjects followed for 10 days 
+&lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
+- Subjects rated on average reaction time (in ms) for different activities at each measurement
+&lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
+
+
+```r
+&gt; library(lme4)
+&gt; data(sleepstudy)
+&gt; head(sleepstudy)
+```
+
+```
+  Reaction Days Subject
+1 249.5600    0     308
+2 258.7047    1     308
+3 250.8006    2     308
+4 321.4398    3     308
+5 356.8519    4     308
+6 414.6901    5     308
+```
+&lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
+
+- Reaction time will be rescaled by dividing by 1000 to have the reaction time in seconds
+
+```r
+&gt; sleepstudy$Reaction &lt;- sleepstudy$Reaction / 1000
+```
+
+---
+
+# Sleep Example: data
+
+&lt;img src="./img/unnamed-chunk-5-1.png" style="display: block; margin: auto;" width="50%"&gt;
+---
+
+# Sleep Example: objective
+
+- Study objective: is the length of sleep deprivation a determinant of reaction time?
+&lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
+
+- The variables we will use are:
+&lt;span style="display:block; margin-top: 10px ;"&gt;&lt;/span&gt;
+  - `\(y\)`: Reaction time (in s)
+  - `\(t\)`: Days
+
+&lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
+
+- For simplicity we will
+&lt;span style="display:block; margin-top: 10px ;"&gt;&lt;/span&gt;
+  - assume a linear relationship
+&lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
+
+- The models we will consider are:
+&lt;span style="display:block; margin-top: 10px ;"&gt;&lt;/span&gt;
+  - a non-hierarchical model (standard linear regression) (LM)
+  &lt;span style="display:block; margin-top: 10px ;"&gt;&lt;/span&gt;
+  - a hierarchical model with random intercepts (LMM)
+  &lt;span style="display:block; margin-top: 10px ;"&gt;&lt;/span&gt;
+  - a hierarchical model with random intercepts and random slopes (LMM2)
+
+---
+
+name: model
+
+&lt;span style="display:block; margin-top: 250px ;"&gt;&lt;/span&gt;
+
+.myblue[.center[.huge[
+**Model specification**]]]
+
+
+---
+
+# Sleep Example: a Bayesian (non-hierarchical) linear model (LM)
+
+- Specification:
+  1\. probability distribution for responses:
+`$$y_{it} \sim \mbox{Normal}(\mu_{it},\sigma^2)$$`
+
+  - `\(\color{blue}{y_{it}}\)` = the reaction time for individual `\(i\)` on day `\(t\)` `\((\mbox{days } 0,\ldots,9)\)`
+&lt;span style="display:block; margin-top: 10px ;"&gt;&lt;/span&gt;
+  - linear predictor: `\(\color{blue}{\mu_{it}}=\alpha+\beta t\)`
+&lt;span style="display:block; margin-top: 10px ;"&gt;&lt;/span&gt;
+  - `\(\color{blue}{t}\)` = the day of the measurement
+
+&lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
+
+2\. .red[In this model no account is taken of the repeated structure (observations are nested within individuals)]
+
+&lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
+
+3\. Assume vague priors for all parameters:
+
+`\begin{align*}
+\alpha, \beta  &amp; \sim  \mbox{Normal}(0,10000)\\
+\frac{1}{\sigma^2} &amp; \sim  \mbox{Gamma}(1,0.001)
+\end{align*}`
+
+---
+
+# Sleep Example: a Bayesian hierarchical linear model
+
+- Modify LM to allow a separate intercept for each individual:
+
+&lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
+
+`\begin{align*}
+y_{it} &amp; \sim  \mbox{Normal}(\mu_{it},\sigma^2) \\
+\mu_{it}  &amp; =  \textcolor{red}{\alpha_i}+\beta t
+\end{align*}`
+
+We are assuming that *conditionally* on `\(\alpha_i\)`, `\(\{y_{it}, t=0,\ldots,9 \}\)` are independent
+&lt;span style="display:block; margin-top: 10px ;"&gt;&lt;/span&gt;
+
+- Assume that all the `\(\{\alpha_i\}\)` follow a *common* prior distribution, e.g.
+`$$\color{red}{\alpha_i \sim \mbox{Normal}(\mu_{\alpha}, \sigma^2_{\alpha}) \;\;\;\; i=1,\ldots,246}$$` 
+
+- Here we are assuming exchangeability between all the individuals
+- We may then assume vague priors for the *hyperparameters* of the population distribution:
+
+`\begin{align*}
+\color{red}{\mu_{\alpha}} &amp; \color{red}{\sim  \mbox{Normal}(0,10000)} \\
+\color{red}{\frac{1}{\sigma_{\alpha}}} &amp; \color{red}{\sim  \mbox{Gamma}(1,0.001)}
+\end{align*}`
+
+- This is an example of a *Hierarchical LM* or *Linear Mixed Model (LMM)* or *Random Intercepts* model
+
+---
+
+# Comparing the two models
+
+&lt;center&gt;&lt;img src=./img/DAGS.png width='80%' title='INCLUDE TEXT HERE'&gt;&lt;/center&gt;
+
+.pull-left[
+
+(left): LM
+
+]
+
+.pull-right[
+
+(right): LMM - random intercept
+
+]
+
+---
+
+# HAMD example: long vs wide format
+
+- In `R-INLA` is extremely easy to work with longitudinal data, as long as the dataset is in *long format*
+
+.panelset[
+.panel[.panel-name[Long format]
+
+```
+    Reaction Days Subject
+1  0.2495600    0     308
+2  0.2587047    1     308
+3  0.2508006    2     308
+4  0.3214398    3     308
+5  0.3568519    4     308
+6  0.4146901    5     308
+7  0.3822038    6     308
+8  0.2901486    7     308
+9  0.4305853    8     308
+10 0.4663535    9     308
+```
+- Note that a score is present only if the corresponding subject has been observed at that time point
+]
+
+.panel[.panel-name[Wide format]
+
+
+```
+   Subject Reaction.0 Reaction.1 Reaction.2 Reaction.3 Reaction.4
+1      308  0.2495600  0.2587047  0.2508006  0.3214398  0.3568519
+11     309  0.2227339  0.2052658  0.2029778  0.2047070  0.2077161
+21     310  0.1990539  0.1943322  0.2343200  0.2328416  0.2293074
+31     330  0.3215426  0.3004002  0.2838565  0.2851330  0.2857973
+41     331  0.2876079  0.2850000  0.3018206  0.3201153  0.3162773
+51     332  0.2348606  0.2428118  0.2729613  0.3097688  0.3174629
+61     333  0.2838424  0.2895550  0.2767693  0.2998097  0.2971710
+71     334  0.2654731  0.2762012  0.2433647  0.2546723  0.2790244
+81     335  0.2416083  0.2739472  0.2544907  0.2708021  0.2514519
+91     337  0.3123666  0.3138058  0.2916112  0.3461222  0.3657324
+```
+- Note that with this format should a subject not have measurement for the entire set of days, R would pad these out with NAs 
+
+]
+]
+
+---
+
+# Sleep example: `R-INLA` code for LM
+
+.panelset[
+.panel[.panel-name[Code]
+
+```r
+&gt; library(INLA)
+&gt; formula_LM &lt;- Reaction ~ Days
+&gt; lm &lt;- inla(formula_LM, data=sleepstudy, family="gaussian", control.compute = list(waic=TRUE))
+&gt; 
+&gt; #Plot
+&gt; ggplot(data = sleepstudy, aes(x=Days, y=Reaction)) + geom_point(aes(colour = Subject), alpha = .9) + 
++   #geom_smooth(method="lm") 
++   geom_abline(intercept=lm$summary.fixed[1,1], slope=lm$summary.fixed[2,1]) + labs(title = "Linear Model (LM)")+
++   theme(legend.position = "none")
+```
+]
+
+.panel[.panel-name[Plot]
+&lt;img src="./img/unnamed-chunk-9-1.png" style="display: block; margin: auto;" width="45%"&gt;
+- all the subjects share the same intercept and slope
+]
+]
+
+---
+
+# Sleep example: `R-INLA` code for LMM
+
+.panelset[
+.panel[.panel-name[Code]
+
+```r
+&gt; library(INLA)
+&gt; formula_LMM &lt;- Reaction ~ Days + f(Subject,model="iid")
+&gt; lmm &lt;- inla(formula_LMM, data=sleepstudy, family="gaussian", control.compute = list(waic=TRUE))
+&gt; #Plot
+&gt; p &lt;- ggplot(data = sleepstudy, aes(x=Days, y=Reaction, group=Subject))
+&gt; p + geom_point(aes(colour = Subject), alpha = .9) + geom_abline(slope=lmm$summary.fixed[2,1], intercept=lmm$summary.fixed[1,1]+lmm$summary.random$Subject$mean)+ labs(title = "Random Intercept Model (LMM)")+
++   theme(legend.position = "none")
+```
+]
+
+.panel[.panel-name[Plot]
+&lt;img src="./img/unnamed-chunk-11-1.png" style="display: block; margin: auto;" width="40%"&gt;
+- each individual has a different regression line
+- but all individuals have the same slope (parallel lines)
+
+]
+]
+
+---
+
+name: interpretation
+
+&lt;span style="display:block; margin-top: 250px ;"&gt;&lt;/span&gt;
+
+.myblue[.center[.huge[
+**Interpretation**]]]
+
+---
+
+# Sleep Example: revisiting the data
+.pull-left[
+&lt;img src="./img/unnamed-chunk-12-1.png" style="display: block; margin: auto;" width="100%"&gt;
+]
+
+.pull-right[
+- .blue[blue]: regression line for each subject; 
+- black: regression line from the LMM 
+&lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
+- Note that some of the subjects do not fit well in the *parallel lines* scenario 
+&lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
+- .red[So we add random slopes to the hierarchical model]
+]
+
+---
+
+# Sleep Example: adding random slopes
+
+- Modify LMM to allow a separate slope for each individual:
+`\begin{align*}
+y_{it} &amp; \sim  \mbox{Normal}(\mu_{it},\sigma^2) \\
+\mu_{it}  &amp; =  \alpha_i+\color{red}{\beta_{i}}t
+\end{align*}`
+
+- As for the `\(\{\alpha_i\}\)`, assume that the `\(\{\beta_{i}\}\)` follow *common* prior distributions with vague priors on their *hyperparameters*
+
+--
+
+&lt;span style="display:block; margin-top: 10px ;"&gt;&lt;/span&gt;
+
+- In `R-INLA`
+
+
+```r
+&gt; Subject2&lt;-sleepstudy$Subject
+&gt; formula_LMM2 &lt;- Reaction ~ f(Subject, model="iid") + f(Subject2, Days, model="iid")
+&gt; lmm2 &lt;- inla(formula_LMM2, data=sleepstudy, family="gaussian", control.compute = list(waic=TRUE))
+&gt; #To access the summaries of the beta_i
+&gt; lmm2$summary.random$Subject2[1:5,]
+```
+
+```
+   ID          mean          sd    0.025quant      0.5quant  0.975quant          mode          kld
+1 308  0.0202720101 0.002468461  0.0154202872  0.0202734853 0.025115247  0.0202734686 3.680886e-09
+2 309 -0.0002447903 0.002567720 -0.0052437367 -0.0002580761 0.004828643 -0.0002584514 6.417239e-09
+3 310  0.0033540086 0.002574238 -0.0016584051  0.0033410818 0.008438887  0.0033407099 6.032259e-09
+4 330  0.0046027925 0.002509989 -0.0003599004  0.0046159374 0.009491850  0.0046162941 7.333773e-09
+5 331  0.0065638451 0.002498617  0.0016241150  0.0065765431 0.011432400  0.0065768717 7.297432e-09
+```
+
+---
+
+# HAMD Example: random intercepts and slopes
+.pull-left[
+&lt;img src="./img/unnamed-chunk-14-1.png" style="display: block; margin: auto;" width="100%"&gt;
+]
+
+.pull-right[
+- .red[LMM with random intercepts only:]
+  - each individual has a different regression line
+  - but for each treatment, only intercept varies by individual
+
+&lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
+
+- .red[LMM with random intercepts and random slopes:]
+  - now intercepts and slopes both vary
+  -  better fit for each individual
+]
+
+---
+
+# References
+
+Belenky, G., N. J. Wesensten, D. R. Thorne, et al. (2003). "Patterns of performance degradation and restoration during sleep restriction and subsequent recovery: A sleep dose-response study". In: _Journal of sleep research_ 12.1, pp. 1-12.
+
+Gómez-Rubio, V. (2020a). _Bayesian inference with INLA_. CRC Press.
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script src="assets/remark-zoom.js"></script>
+<script src="https://platform.twitter.com/widgets.js"></script>
+<script>var slideshow = remark.create({
+"navigation": {
+"scroll": false
+},
+"highlightStyle": "github",
+"highlightLines": true,
+"countIncrementalSlides": false,
+"ratio": "16:9"
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+// add `data-at-shortcutkeys` attribute to <body> to resolve conflicts with JAWS
+// screen reader (see PR #262)
+(function(d) {
+  let res = {};
+  d.querySelectorAll('.remark-help-content table tr').forEach(tr => {
+    const t = tr.querySelector('td:nth-child(2)').innerText;
+    tr.querySelectorAll('td:first-child .key').forEach(key => {
+      const k = key.innerText;
+      if (/^[a-z]$/.test(k)) res[k] = t;  // must be a single letter (key)
+    });
+  });
+  d.body.setAttribute('data-at-shortcutkeys', JSON.stringify(res));
+})(document);
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+// adds .remark-code-has-line-highlighted class to <pre> parent elements
+// of code chunks containing highlighted lines with class .remark-code-line-highlighted
+(function(d) {
+  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
+  const preParents = [];
+  const findPreParent = function(line, p = 0) {
+    if (p > 1) return null; // traverse up no further than grandparent
+    const el = line.parentElement;
+    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
+  };
+
+  for (let line of hlines) {
+    let pre = findPreParent(line);
+    if (pre && !preParents.includes(pre)) preParents.push(pre);
+  }
+  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
+})(document);</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>

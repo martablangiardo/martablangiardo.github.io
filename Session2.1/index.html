@@ -1,11 +1,13 @@
 <!DOCTYPE html>
 <html lang="" xml:lang="">
   <head>
-    <title>Session 2.1: Hierarchical Models, Priors, Prediction and Model Checking</title>
+    <title>Session 2.1: Bayesian inference</title>
     <meta charset="utf-8" />
     <script src="libs/header-attrs/header-attrs.js"></script>
     <link href="libs/panelset/panelset.css" rel="stylesheet" />
     <script src="libs/panelset/panelset.js"></script>
+    <script src="libs/kePrint/kePrint.js"></script>
+    <link href="libs/lightable/lightable.css" rel="stylesheet" />
     <!-- (Re)Defines a bunch of LaTeX commands that can then be used directly in the .Rmd file as '\command{...}' -->
     <script type="text/x-mathjax-config">
     MathJax.Hub.Config({
@@ -80,27 +82,19 @@
 
 class: title-slide
 
-# Session 2.1: Hierarchical Models, Priors, Prediction and Model Checking&lt;span style="display:block; margin-top: 10px ;"&gt;&lt;/span&gt; 
+# Session 2.1:  Bayesian inference&lt;span style="display:block; margin-top: 10px ;"&gt;&lt;/span&gt; 
 
 ## 
 
-### Geospatial analytics using R and R-INLA
+###     
+
+### Imperial College London
 
 &lt;!-- Can also separate the various components of the extra argument 'params', eg as in 
-### Geospatial analytics using R and R-INLA, , 
+### Imperial College London, , MSc in Epidemiology / Health Data Analytics
 --&gt;
 
 
-
-&lt;span style="display:block; margin-top: 150px ;"&gt;&lt;/span&gt;
-
-.pull-left[
-&lt;center&gt;&lt;img src=./img/MRCICLogo.png width='60%' title='INCLUDE TEXT HERE'&gt;&lt;/center&gt;
-] 
-
-.pull-right[
-&lt;center&gt;&lt;img src=./img/AIMSLogo.jpg width='60%' title='INCLUDE TEXT HERE'&gt;&lt;/center&gt;
-]
 
 ---
 
@@ -110,40 +104,13 @@ layout: true
 .alignleft[ 
 &amp;nbsp; &amp;copy; Marta Blangiardo | Monica Pirani 
 ]
-
 .aligncenter[
-Geospatial analytics using R and R-INLA 
+MSc in Epidemiology / Health Data Analytics 
 ]
-
+.alignright[
+Imperial College London, NA 
+]
 ] 
-
-&lt;style type="text/css"&gt;
-.red {
-  color: red;
-}
-.blue {
-  color: 0.14 0.34 0.55;
-}
-
-.content-box-blue { background-color: #F0F8FF; }
-
-}
-
-.scrollable {
-  height: 80%;
-  overflow-y: auto;
-}
-
-&lt;/style&gt;
-&lt;style&gt;
-pre {
-  overflow-x: auto;
-}
-pre code {
-  word-wrap: normal;
-  white-space: pre;
-}
-&lt;/style&gt;
 
 
 ---
@@ -154,1068 +121,594 @@ After this session you should be able to:
 
 &lt;span style="display:block; margin-top: 10px ;"&gt;&lt;/span&gt;
 
-- Understand the different modelling assumptions for hierarchical data
+- Understand how Bayes Theorem can be applied to random variables
 
 &lt;span style="display:block; margin-top: 10px ;"&gt;&lt;/span&gt;
 
-- Be able to specify a hierarchical model for Poisson data
+- Describe what conjugacy means
 
 &lt;span style="display:block; margin-top: 10px ;"&gt;&lt;/span&gt;
 
-- Be able to perform prediction in a Bayesian approach
+- Obtain posterior distribution for the Beta-Binomial and Gamma-Poisson families
 
 &lt;span style="display:block; margin-top: 10px ;"&gt;&lt;/span&gt;
 
-- Distinguish and choose between several prior distributions for the precision/variance parameter 
-
-&lt;span style="display:block; margin-top: 10px ;"&gt;&lt;/span&gt;
-
-- Use the DIC/WAIC as tools for model selection.
-
-&lt;span style="display:block; margin-top: 10px ;"&gt;&lt;/span&gt;
-
-The topics treated in this lecture are covered in Chapter 5 of Blangiardo and Cameletti (2015).
+The topics treated in this lecture are presented in Chapter 3  of the book Blangiardo and Cameletti (2015) and in Chapter 2.3, 3.1-3.4 and 5.2-5.3 of the book Johnson, Ott, and Dogucu (2022).
 
 ---
 
 # Outline 
 
-1\. [What are hierarchical models](#hierarchical)
+1\. [Bayes Theorem for random variables](#BayRandom)
 
 &lt;span style="display:block; margin-top: 30px ;"&gt;&lt;/span&gt;
 
-2\. [Different modelling assumptions](#modelling-assumptions)
+
+2\. [A quick recap](#Recap)
 
 &lt;span style="display:block; margin-top: 30px ;"&gt;&lt;/span&gt;
 
-3\. [Parameter interpretation](#Interpretation)
+3\. [What is conjugacy?](#Conjugacy)
 
 &lt;span style="display:block; margin-top: 30px ;"&gt;&lt;/span&gt;
 
-4\. [Hierarchical regression](#Hier-regression)
-
-
-&lt;span style="display:block; margin-top: 30px ;"&gt;&lt;/span&gt;
-
-5\. [Posterior Prediction](#Prediction)
+4\. [Some conjugacy models: Beta-Binomial](#Beta-Binomial)
 
 &lt;span style="display:block; margin-top: 30px ;"&gt;&lt;/span&gt;
 
-6\. [Choice of prior](#Prior)
+5\. [Some conjugacy models: Gamma-Poisson](#PoissonGamma)
 
-&lt;span style="display:block; margin-top: 30px ;"&gt;&lt;/span&gt;
 
-7\. [Model selection](#Modelselection)
 ---
 
-name: hierarchical
+name: BayRandom
 
 &lt;span style="display:block; margin-top: 250px ;"&gt;&lt;/span&gt;
 
 .myblue[.center[.huge[
-**What are hierarchical models**]]]
+**Bayes Theorem for random variables**]]]
 
 
 ---
 
-# What are hierarchical models?
+# An example
 
-**Hierarchical model** is a very broad term that refers to wide range of
-model set-ups
-
+- A clinical trial is carried out to assess the efficacy of a preventive treatment for migraine
 &lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
- 
-- Multilevel models
-
-&lt;span style="display:block; margin-top: 10px ;"&gt;&lt;/span&gt;
-
-- Random effects models
-
-&lt;span style="display:block; margin-top: 10px ;"&gt;&lt;/span&gt;
-
-- Random coefficient models
-
-&lt;span style="display:block; margin-top: 10px ;"&gt;&lt;/span&gt;
-
-- Variance-component models
-
-&lt;span style="display:block; margin-top: 10px ;"&gt;&lt;/span&gt;
-
-- Mixed effect models
-
-&lt;span style="display:block; margin-top: 10px ;"&gt;&lt;/span&gt;
-
-.content-box-blue[**Key feature**: Hierarchical models are statistical models that provide a
-formal framework for analysis with a complexity of structure that matches the system being studied.]
+- A group of 20 patients are offered the new drug and they have to report if they have a migraine episode in the next week after taking the medication.
+&lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
+- Our aim is to estimate the probability of success of this new drug `\((\theta)\)`
+&lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
+- Our data here is `\(Y\)`: the number of patients reporting no migraine episodes.
+&lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
+Note that `\(Y\)` is a **random variable** (look at recording 3 for a more detailed description of this concept)
 
 ---
 
-# The hierarchical approach
- 
-- Attempt to capture (model) and understand the structure of the data 
+# Prior probability model
 
-&lt;span style="display:block; margin-top: 10px ;"&gt;&lt;/span&gt;
+As a first step we need to assign a prior on `\(\theta\)`. 
 
---
+As a simplification let's assume that `\(\theta\)` is discrete and can only get thevalues 0.1,0.4,0.8 with the following probability function, which specifies the prior probability of each possible `\(\theta\)` value:
+&lt;span style="display:block; margin-top: 30px ;"&gt;&lt;/span&gt;
 
-- Is flexible: 
+&lt;table class=" lightable-classic" style='font-family: "Arial Narrow", "Source Sans Pro", sans-serif; width: auto !important; margin-left: auto; margin-right: auto;'&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:right;"&gt; \(\theta\) &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; \(p(\theta)\) &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:right;"&gt; 0.1 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.2 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:right;"&gt; 0.4 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.5 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:right;"&gt; 0.8 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.3 &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
 
-  - all sources of correlation and heterogeneity can be incorporated in a modular fashion, in particular by the introduction of unit-specific parameters
-  - can be combined with other types of models, e.g. for missing data or measurement error
+&lt;span style="display:block; margin-top: 30px ;"&gt;&lt;/span&gt;
 
-&lt;span style="display:block; margin-top: 10px ;"&gt;&lt;/span&gt;
+Note that this prior reflects some sort of information from a previous study on a similar compound and put 50% probability on the event that 40% of the patients will report a reduction in migraine.
 
---
-
-- We wish to make inference on models with many parameters `\((\lambda_1,\ldots,\lambda_N)\)` measured on N units (individuals, areas, time-points, etc.) which are related or connected by the structure of the problem.
-
-&lt;span style="display:block; margin-top: 10px ;"&gt;&lt;/span&gt;
-
---
-
-- Unit specific parameters will .red[borrow strength] from corresponding parameters associated with the other units
 
 ---
 
-# Motivating example: Disease mapping
-  
-- To summarise spatial and spatio-temporal variation in disease risk
+# The Binomial data model
 
-- **Question**: Which areas have particularly high or low disease rates?
+- Our random variable `\(Y\)` can take any discrete value between 0 and 20 (total number of patients)
 
-- **Question**: Can we explain some of the variation in disease rates by
-area-level covariates?
---
-  
-- Data are the observed `\((y_{i})\)` and expected number of cases in area `\(i\)`: `\(E_{i} = \sum_k n_{ik} r_k\)`, where `\(r_k\)` reference rate for stratum `\(k\)` (age, sex,...)
- 
-- Rare disease and/or small areas: Poisson framework
-  
-`$$y_i \sim \text{Poisson}(\rho_i E_i)$$`
+- It will depend on the probability `\(\theta\)`
 
-&lt;span style="display:block; margin-top: -10px ;"&gt;&lt;/span&gt;
+- For our formal Bayesian analysis, we must model this dependence of `\(Y\)` on `\(\theta\)` through a **conditional probability model**  
 
-where `\(\rho_i\)` is the **unknown RR** in area `\(i\)`
+- We make two assumptions about the trials: (1) the outcome of any one patient doesn’t influence the outcome of another; and (2) the probability of success does not change among patients
 
-.content-box-beamer[
+- We can use the Binomial model
 
-### Non smoothed estimates of the RR (SMR or SIR)
-`\begin{align*}
-\text{SMR}_i &amp;=\frac{y_i}{E_i}\\ 
-\hat{\hbox{Var}}(\hbox{SMR}_i) &amp;=  \frac{y_i}{E_i^2}
-\end{align*}`
+
+.content-box-green[
+
+`\(Y \sim \mbox{Binomial}(n, \theta)\)`
+
+with conditional probability function
+`$$p(y \mid \theta) = \frac{n!}{y!(n-y)!}\theta^{y}(1-\theta)^{n-y}$$`
+- Mean of this distribution is `\(E(Y) = n \theta\)`
+- Variance is `\(V(Y) = n \theta(1-\theta)\)`
+
+.red[ Check out recording 4 for a recap on the Binomial distribution]
 ]
-  
-&lt;span style="display:block; margin-top: 10px ;"&gt;&lt;/span&gt;
-
---
-    
-- .red[very imprecise: areas with small] `\(\class{red}{E_i}\)` .red[have high associated variance]    
-
-- .red[estimated independently: makes no use of risk estimates in other areas of the map]
 
 ---
 
-# Motivating example: Disease mapping
+# The Binomial data model
 
-*Example*: 
+This model allows to calculate ANY conditional probability. For instance, conditioning on `\(\theta=0.4\)` let's see the difference in the probability of getting 12 or 15 successes
 
-&lt;span style="display:block; margin-top: 10px ;"&gt;&lt;/span&gt;
+1. `$$p(y=12 \mid \theta=0.4) = \frac{20!}{12!8!}0.4^{12}(1-0.4)^{8}= 0.035$$` 
+2. `$$p(y=15 \mid \theta=0.4) = \frac{20!}{15!5!}0.4^{15}(1-0.4)^{5} = 0.0013$$`
 
-- observed cases of lip cancer `\(y_i\)` diagnosed in Scotland in 1975-1980 at county level `\(i=1,\ldots,56\)` areas
+-- 
 
-&lt;span style="display:block; margin-top: 10px ;"&gt;&lt;/span&gt;
+Note you can get these results in R using
 
-- expected number of cases `\(E_i\)` are also available using age/sex standardised reference rates and population counts:
 
---
-  
-Assume a Poisson likelihood for the disease counts in each area:
-  
-`$$y_i\sim \text{Poisson}(\lambda_i)\qquad\qquad \lambda_i = \rho_i E_i \qquad\qquad i=1,\ldots,56$$`
-&lt;span style="display:block; margin-top: 10px ;"&gt;&lt;/span&gt;
-   
-- We have 56 parameters `\(\rho_i\)` (one for each area). What prior do we specify on `\(\rho_i\)`?    
+```r
+&gt; #1
+&gt; dbinom(12,20,0.4)
+```
+
+```
+[1] 0.03549744
+```
+
+```r
+&gt; #2
+&gt; dbinom(15,20,0.4)
+```
+
+```
+[1] 0.001294494
+```
+---
+
+# Binomial likelihood function
+
+- The Binomial provides a theoretical model of the data we might observe. 
+- In the end we observe 10 successes out of the 20 patients `\((y=10)\)`.
+- The next step in our Bayesian analysis is to determine how compatible this particular data is with the various possible `\(\theta\)`
+
+.content-box-green[
+We need to evaluate the *likelihood* of getting 10 successes in the trial under each possible value of `\(\theta\)`
+]
+
+Similarly to last week with events, the likelihood function follows from evaluating the conditional probability function `\(p(y=10\mid \theta)\)` for all the possible `\(\theta\)` values:
+
+1. `$$p(y=10 \mid \theta=0.1) = \frac{20!}{10!10!}0.1^{10}(1-0.1)^{10}= 0.00000644$$` 
+2. `$$p(y=10 \mid \theta=0.4) = \frac{20!}{10!10!}0.4^{10}(1-0.4)^{10} = 0.117$$`
+3. `$$p(y=10 \mid \theta=0.8) = \frac{20!}{10!10!}0.8^{10}(1-0.8)^{10} = 0.002$$`
 
 ---
 
+# Likelihood vs probability function
 
-# Expected numbers of cases - definition
-- Expected number of cases if the population had the same stratum-specific mortality/incidence rates as in a reference area
-- Adjustments (strata): age, gender ...
+Let's recall the fundamental difference between probability function and likelihood function
 
-&lt;span style="display:block; margin-top: 10px ;"&gt;&lt;/span&gt;
-Indirect standardisation: `\(E_i = \sum_k n_{ik} r_k\)`
-with
-- `\(r_k\)`: disease rate for stratum `\(k\)` in the reference population
-- `\(n_{ik}\)`: population at risk in area `\(i\)`, stratum `\(k\)`
+&lt;span style="display:block; margin-top: 50px ;"&gt;&lt;/span&gt;
+
+.pull-left[
+.content-box-yellow[
+When `\(\theta\)` is known, the **conditional probability function** `\(p(\cdot\mid \theta)\)` allows us to compare the probabilities of different values of the data `\(Y\)` occurring with `\(\theta\)`:
+`$$p(y_1\mid \theta) \text{  vs  } p(y_2\mid \theta)$$`
+]
+]
+
+.pull-right[
+.content-box-yellow[
+When `\(Y\)` is known, the **likelihood function** `\(L(\cdot\mid y) = p(y \mid \cdot)\)` allows us to compare the relative likelihood of the data `\(y\)` under different possible values of `\(\theta\)`:
+`$$L(\theta_1 \mid y) = p(y \mid \theta_1) \text{  vs  } L(\theta_2 \mid y) = p(y \mid \theta_2)$$`
+]
+]
+
+&lt;span style="display:block; margin-top: 50px ;"&gt;&lt;/span&gt;
+
+So `\(L(\cdot \mid y)\)` provides the tool we need to evaluate the relative compatibility of data `\(Y=y\)` with various `\(\theta\)` values.
+
+---
+
+# Normalising constant
+
+- Now we have a prior for `\(\theta\)` and a likelihood and as Bayesian we want to **balance** these two pieces of information to obtain the posterior.
+
+- Something is missing...
+
+--
+
+The normalising constant!
+
+This is the total probability of having `\(y=10\)` successes. How do we get this?
+
+--
+
+.content-box-green[
+**Law of total probability**: 
+`$$P(A) = \sum_j P(A \mid B_j)P(B_j) \text{   (for events)}$$`
+`$$P(Y=y) = \sum_j p(Y \mid \theta_j)p(\theta_j) \text{   (for discrete probability functions)}$$`
+]
 
 &lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
 
-.red[If internal comparison:] `\(\color{red}{\sum_{i=1}^N O_i = \sum_{i=1}^N E_i}\)`
-&lt;span style="display:block; margin-top: 10px ;"&gt;&lt;/span&gt;
-- age will almost always need controlling for since different disease risks in different areas may reflect differences in age population
+
+So we get `$$P(Y=10) = 0.00000644 \times 0.2 +  0.117 \times 0.5 + 0.002 \times 0.3 = 0.059$$`
+
+Interpretation: across all the possible `\(\theta\)` there is only around 6% chance that there are 10 successes.
+---
+
+# Posterior distribition
+
+Finally we are ready to apply Bayes theorem and get the posterior distribution
+
+`$$p(\theta \mid y=10) = \frac{p(\theta)L(\theta \mid y=10)}{p(y=10)} \text{  for  } \theta \in \{0.1,0.4,0.8\}$$`
+which gives us:
+
+`$$p(\theta=0.1 \mid y=10) = \frac{0.2 \times 0.0000064}{0.059} = 0$$`
+`$$p(\theta=0.4 \mid y=10) = \frac{0.5 \times 0.117}{0.059} = 0.99$$`
+
+`$$p(\theta=0.8 \mid y=10) = \frac{0.3 \times 0.002}{0.059} = 0.01$$`
+---
+
+# Comparing prior and posterior
+.pull-left[
+&lt;table class=" lightable-classic" style='font-family: "Arial Narrow", "Source Sans Pro", sans-serif; width: auto !important; margin-left: auto; margin-right: auto;'&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:right;"&gt; \(\theta\) &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; \(p(\theta)\) &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; \(p(\theta \mid y=10)\) &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:right;"&gt; 0.1 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.2 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.00 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:right;"&gt; 0.4 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.5 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.99 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:right;"&gt; 0.8 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.3 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.01 &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+]
+
+.pull-right[
+
+&lt;img src="./img/unnamed-chunk-4-1.png" style="display: block; margin: auto;" width="110%"&gt;
+]
+---
+
+# Posterior shortcut
+
+.pull-left[
+- Moving forward we can actually forget about calculating the normalising constant
+
+- Note that on slide 12 the `\(p(y=10)\)` appears at the denominator of all the `\(p(\theta \mid Y)\)`
 &lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
-- Direct standardisation: apply the disease rate in the population of interest (e.g. UK) to a standard population e.g. European standard population
--  External comparison: if the reference population is not the population of the study of interest. For example, to calculate the expected numbers in London, risks in England could be used.
+.box-content-green[
+It normalises the posterior probabilities so they sum to 1
+]
+
+- So we can simply acknowledge that  `\(p(y=10) = 1/c\)` and replace the posterior as:
+
+`$$p(\theta \mid y=10) \propto p(\theta)\times L(\theta \mid y)$$`
+- The proportionality means that if we compare the normalised and unnormalised posterior they preserve their relative relationship
+]
+
+.pull-right[
+&lt;img src="./img/unnamed-chunk-5-1.png" style="display: block; margin: auto;" width="110%"&gt;
+]
 ---
 
-# Expected numbers of cases - calculation
-
-&lt;center&gt;&lt;img src=./img/Expected.png width='60%' title='Lung cancer incidence in males, all ages, using the rates in England and Wales as reference, for the period 1985-2009'&gt;&lt;/center&gt;
-
-`$$\hbox{SIR}_A=\frac{118}{126.38}=0.93$$` 
-- Fewer incident cases of lung cancer for males in ward A than expected in EW after adjusting for differences in age.
-&lt;span style="display:block; margin-top: 10px ;"&gt;&lt;/span&gt;
-- In R we can perform indirect standardization using the package `SpatialEpi` (we will see it in Practical 2a).
-
----
-
-name: modelling-assumptions
+name: recap
 
 &lt;span style="display:block; margin-top: 250px ;"&gt;&lt;/span&gt;
 
 .myblue[.center[.huge[
-**Modelling assumptions**]]]
+**A quick recap**]]]
+
 
 ---
 
 
-# Different modelling assumptions
 
-.content-box-beamer[
 
-### Identical parameters
-- Assume `\(\rho_i = \rho\)` 
+# So a quick general recap: Bayesian inference
 
-`\(\rightsquigarrow\)` all  the  data can be pooled and the individual areas ignored.
+Makes fundamental distinction between 
+- Observable quantities `\(y\)`, i.e.~the data
+&lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
+- Unknown quantities `\(\theta\)`
 
-- Assume a prior `\(\rho \sim \text{Gamma}(1,1)\)`
+&lt;span style="display:block; margin-top: 30px ;"&gt;&lt;/span&gt;
 
-`\(\rightsquigarrow\)` conjugate prior
-
-]
+  - `\(\theta\)` can be statistical parameters, missing data, mismeasured data...
+&lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
+`\(\rightarrow\)` parameters are treated as random variables
+&lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
+`\(\rightarrow\)` in the Bayesian framework, we make probability statements about model parameters
 
 --
 
+&lt;span style="display:block; margin-top: 50px ;"&gt;&lt;/span&gt;
+
+.red[Note that in the Frequentist framework, parameters are fixed non-random quantities and the probability statements concern the data]
+
+---
+
+# Bayesian inference
+
+- As with any statistical analysis, we start building a model which specifies `\(p(Y=y \mid \theta)\)`
 &lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
 
-- One parameter generates all the observations
-&lt;span style="display:block; margin-top: 10px ;"&gt;&lt;/span&gt;
-- Very easy to implement as it is conjugate (no need for INLA) and all the data are .red[pooled] to produce one estimate of the parameter of interest
-&lt;span style="display:block; margin-top: 10px ;"&gt;&lt;/span&gt;
-- Can be unrealistic (it does not take into account differences in the areas)
-
----
-
-# Different modelling assumptions
-
-.content-box-beamer[
-
-### Independent parameters
-- All the `\(\rho_i\)` are unrelated, meaning that the areas are analysed independently 
-
-- Assume a prior `\(\rho_i \sim \text{Gamma}(1,1); \qquad i=1,\ldots,56\)`
-
-`\(\rightsquigarrow\)` individual estimates of `\(\rho_i\)` are likely to be highly variable (unless very large sample sizes)
-
-]
-
---
-
+- This is the .red[data distribution], which relates all variables into a .red[**full probability model**]
 &lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
 
-- Every area is treated separately (No exchange of information between these). Estimates close to SMR `\((\rho_i \approx y_i / E_i)\)`. 
-&lt;span style="display:block; margin-top: 10px ;"&gt;&lt;/span&gt;
-- Again no need for INLA, conjugacy can be exploited.
+- The choice of data distribution depends on the nature of the data:
 
----
-
-# Different modelling assumptions
-
-.content-box-beamer[
-
-### Similar (exchangeable) parameters
-- All the `\(\rho_i\)` are assumed to be *similar* 
-
-`\(\rightsquigarrow\)` they come from the same distribution (are generated by the same parameters)
-
-- Assume a hierarchical prior `\(\rho_i \sim \text{Gamma}(a,b)\)`
-
-where `\(a\)` and `\(b\)` are unknown parameters and need to be estimated.
-
-]
-
---
-
+e.g. are we analysing continuous or discrete data, are the data symmetric or skewed, etc.
 &lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
 
-- Different levels of analysis
-- Allow the exchange of information between different levels as they are all connected to each other
-- Assign hyperprior distribution to `\(a\)` and `\(b\)`, for instance `$$a \sim \text{Exp}(1); b\sim \text{Gamma}(1,1)$$` 
+- As we observe the data, we can use descriptive tools (e.g. plots) to visualise the data and choose the best likelihood
+&lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
 
 ---
 
-# Graphical representation of lip cancer hierarchical model
+# Bayesian inference
 
-&lt;center&gt;&lt;img src=./img/DAG.png width='100%' title=''&gt;&lt;/center&gt;
+From a Bayesian point of view
+&lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
+
+-  `\(\theta\)` is unknown so should have a .red[probability distribution] reflecting our uncertainty about it before seeing the data
+     
+&lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
+
+`\(\rightarrow\)` need to specify a .redp[prior distribution] `\(p(\theta)\)`
+&lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
+
+- `\(y\)` is known so we should condition on it
+&lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
+`\(\rightarrow\)` use Bayes theorem to obtain conditional probability distribution for unobserved quantities of interest given the data:
+
+`$$p(\theta \mid y)= \frac{ p(\theta)\, p(y \mid \theta)}
+                         {\int  p(\theta)\,p(y \mid \theta)\,d\theta}
+	\propto p(\theta)\,p(y \mid \theta)$$`
+&lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
+
+This is the .red[posterior distribution]
+
+--
+
+- The prior distribution `\(p(\theta)\)`, expresses our uncertainty about `\(\theta\)` .red[before] seeing the data
+
+- The posterior distribution `\(p(\theta \mid y)\)`, expresses our uncertainty about `\(\theta\)` .red[after] seeing the data
+
 
 ---
 
-# A more flexible hierarchical prior for the relative risks
-- A gamma random effect prior for the `\(\rho_i\)` is mathematically convenient, but might be restrictive:
+# The posterior distribution
 
-  - Covariate adjustment is difficult
-  
-  - Not possible to allow for spatial correlation between risks in nearby areas
+Posterior distribution forms basis for all inference --- can
+be summarised to provide
+&lt;span style="display:block; margin-top: 10px ;"&gt;&lt;/span&gt;
+- point and interval estimates of Quantities of Interest (QOI), e.g. treatment effect, small area estimates, ...
+&lt;span style="display:block; margin-top: 10px ;"&gt;&lt;/span&gt;
+- point and interval estimates of any function of the parameters
+&lt;span style="display:block; margin-top: 10px ;"&gt;&lt;/span&gt;
+- probability that QOI (e.g. treatment effect) exceeds a critical threshold
+&lt;span style="display:block; margin-top: 10px ;"&gt;&lt;/span&gt;
+- prediction of QOI in a new unit
+&lt;span style="display:block; margin-top: 10px ;"&gt;&lt;/span&gt;
+- prior information for future experiments, trials, surveys, ...
+&lt;span style="display:block; margin-top: 10px ;"&gt;&lt;/span&gt;
+- inputs for decision making
+&lt;span style="display:block; margin-top: 10px ;"&gt;&lt;/span&gt;
+- ...
 
---
+---
 
-  - A Normal random effect prior on the `\(\log \rho_i\)` is more flexible:
- 
-`\begin{align*}
-y_i &amp;\sim \text{Poisson}(\lambda_i = \rho_i E_i)\\
-\eta_i &amp;= \log \rho_i = b_0 + v_i\\
-v_i &amp;\sim \text{Normal}(0, \sigma^2_v)
-\end{align*}`
+name: Conjugacy
 
---
+&lt;span style="display:block; margin-top: 250px ;"&gt;&lt;/span&gt;
 
-- Need to specify hyperprior distributions for:
+.myblue[.center[.huge[
+**What is conjugacy?**]]]
 
-- `\(\sigma^2_v\)` (between-area variance), e.g. `\(1/\sigma^2_v \sim \text{Gamma}(1,0.001)\)`
-- `\(b_0\)` (mean log relative risk), e.g. `\(b_0 \sim \text{Normal}(0,0.0001)\)` 
+
+---
+
+# How to select a prior
+
+- Selecting the prior is crucial for a Bayesian analysis
+
+.content-box-green[
+- There is no right way to select a prior
+- The choices often depend on the objective of the study and the nature of the data 
 &lt;span style="display:block; margin-top: -10px ;"&gt;&lt;/span&gt;
+]
+
+- There are other criteria to consider when choosing a prior model:
+
+**Computational ease**
+
+Especially if we don’t have access to computing power, it is helpful if the posterior model is easy to build.
+
+**Interpretability**
+
+The posterior balance (is a compromise) the data and the prior. A posterior model is interpretable, and thus more useful, when you can look at its formulation and identify the contribution of the data relative to that of the prior.
+
 --
 
-### Advantages of this approach:
+We introduce now a type of models which satisfy both properties
+
+.content-box-yellow[
 &lt;span style="display:block; margin-top: -20px ;"&gt;&lt;/span&gt;
-Posterior for each `\(v_i\)`
+### Conjugate prior
+&lt;span style="display:block; margin-top: -20px ;"&gt;&lt;/span&gt;
+Let the prior model for a parameter `\(\theta\)` with `\(p(\theta)\)` and the model of data `\(Y\)` conditioned on `\(\theta\)` have likelihood function `\(L(\theta \mid y)\)`.
 
-- *borrows strength* from the likelihood contributions of **all** the areas, via their joint influence on the estimate of the unknown population (prior) parameter `\(\sigma^2_v\)` 
-
-&amp;rarr; *global smoothing* of the area RR 
-
-&amp;rarr; reflects our *full uncertainty* about the true values of `\(\sigma^2_v\)`
-
-.content-blue-box[
-Such models are called .red[*Hierarchical*] or .red[*Random effects*] or .red[*Multilevel*] models
+If the resulting posterior model `\(p(\theta \mid y) \propto p(\theta) \times p(y \mid \theta)\)` is of the same family as the prior, then we say it is a **conjugate prior**.
+&lt;span style="display:block; margin-top: -10px ;"&gt;&lt;/span&gt;
 ]
+
 
 ---
 
-
-name: interpretation
+name: Beta-Binomial
 
 &lt;span style="display:block; margin-top: 250px ;"&gt;&lt;/span&gt;
 
 .myblue[.center[.huge[
-**Interpretation**]]]
-
+**Some conjugacy models: Beta-Binomial**]]]
 
 ---
 
-# Parameter interpretation and useful quantities 
-- `\(\rho_i\)` is the log-relative risk for the area i compared to the average area with the same structure in the expected values.
 
-- `\(v_{i}\)` are the random effects. It can also be seen as the latent variable which captures the effect of unknown or unmeasured area level covariates.
+# Beta-Binomial model for proportions: example
 
-- If area level covariates are spatially structured we should take this into account when modelling `\(v_i\)` (we will see it later)
+- We consider an early investigation of a new drug
+&lt;span style="display:block; margin-top: 30px ;"&gt;&lt;/span&gt;
+- Experience with similar compounds has suggested that response rates between 0.2 and 0.6 could be feasible
+&lt;span style="display:block; margin-top: 30px ;"&gt;&lt;/span&gt;
+- We interpret this as a distribution with mean = 0.4 and standard deviation 0.1 
+&lt;span style="display:block; margin-top: 30px ;"&gt;&lt;/span&gt;
+- A Beta(9.2,13.8) distribution has these properties (Check recording 7 to see how to go from the .red[mean and sd] to the .red[a and b] parameters of a Beta distribution)
+&lt;span style="display:block; margin-top: 30px ;"&gt;&lt;/span&gt;
+- Suppose we now treat `\(n=20\)` volunteers with the compound and observe `\(y=15\)` positive responses
 
-- `\(\text{exp}(v_{i})\)` relative risk in area `\(i\)` compared to the risk for the whole study region
+---
 
-- The variance of the random effects `\(\sigma^2_v\)` reflects the amount of extra-Poisson variation in the data
-  
---
+# Identifying the different model components
 
-&lt;span style="display:block; margin-top: -15px ;"&gt;&lt;/span&gt;
+- Assuming patients are independent, with common unknown response rate `\(\theta\)`, leads to a binomial data distribution
+`\begin{align}
+p(y \mid  n, \theta) &amp;= \left( \begin{array}{c} n \\ y \end{array} \right) \theta^y (1-\theta)^{n-y} \; \propto \; \theta^y (1-\theta)^{n-y}
+\end{align}`
 
-- A useful summary of among unit variability in a Poisson hierarchical model is to rank the random effects and calculate the difference between two units at opposite extremes
 
-- Suppose we consider the `\(5^{th}\)` and `\(95^{th}\)` percentiles of the area relative risk distribution
+- `\(\theta\)`  needs a continuous prior distribution:
 
-- let `\(q_{5\%} = \rho_{5\%}\)` denote the log relative risk of outcome for the area ranked at the `\(5^{th}\)` percentile
+`\begin{align}
+\theta &amp; \sim  \hbox{Beta}(a,b )\\
+p(\theta) &amp;= \frac{\Gamma (a+b)}{\Gamma (a) \Gamma(b)} \; \theta^{a-1} (1-\theta)^{b-1}
+\end{align}`
 
-- let `\(q_{95\%} = \rho_{95\%}\)` denote the log relative risk of outcome  for the area ranked at the `\(95^{th}\)` percentile
+---
 
-.content-box-beamer[
-### Quantile ratio
-`$$\text{QR}_{90} = \text{exp}(q_{95\%}-q_{5\%})$$` 
-is the relative risk of outcome  between the top and bottom 5% of areas
+# Combining prior and data
+
+Combining the Binomial data and the Beta prior gives the following posterior distribution
+
+.content-box-green[
+`\begin{align}
+p(\theta \mid y, n)  &amp; \propto  p(y \mid \theta, n) p(\theta)\\
+&amp; \propto  \theta^y (1-\theta)^{n-y} \theta^{a-1} (1-\theta)^{b-1}\\
+&amp; =  \theta^{y+a-1} (1-\theta)^{n-y+b-1}
+\end{align}`
 ]
 
+The posterior is still a Beta distribution (with different parameters):
+
+`$$p(\theta \mid y, n)  \propto  \hbox{Beta}(y+a, \; n-y+b)$$`
 ---
 
-#Lip cancer dataset
+# Comparing prior, likelihood and posterior
 
-
-```r
-&gt; LipCancer &lt;- read.csv("scotlip.csv")
-&gt; LipCancer
-```
-
-
-
-```
-# A tibble: 6 × 11
-  CODENO       AREA PERIMETER RECORD_ID DISTRICT NAME          CODE      y    POP     E     x
-   &lt;int&gt;      &lt;dbl&gt;     &lt;dbl&gt;     &lt;int&gt;    &lt;int&gt; &lt;chr&gt;         &lt;chr&gt; &lt;int&gt;  &lt;int&gt; &lt;dbl&gt; &lt;int&gt;
-1   6126  974002000    184951         1        1 Skye-Lochalsh w6126     9  28324  1.38    16
-2   6016 1461990000    178224         2        2 Banff-Buchan  w6016    39 231337  8.66    16
-3   6121 1753090000    179177         3        3 Caithness     w6121    11  83190  3.04    10
-4   5601  898599000    128777         4        4 Berwickshire  w5601     9  51710  2.53    24
-5   6125 5109870000    580792         5        5 Ross-Cromarty w6125    15 129271  4.26    10
-6   6554  422639000    118433         6        6 Okney         w6554     8  53199  2.4     24
-```
-
-- `DISTRICT` identifies the area
-- `y` identifies the counts of cancer cases
-- `E` identifies the expected cases of cancer using the entire region under study as reference
-- `x` identifies the exposure to sun (percentage of agriculture , farming and fishery works)
- 
----
-
-# In `R-INLA` 
-
-We first populate the `formula` environment
-
-
-```r
-&gt; formula.inla &lt;- y ~ 1 + 
-+   f(RECORD_ID,model="iid", hyper=list(prec=list(prior="loggamma",
-+   	param=c(1,0.01))))
-```
-
-- The model specification is exactly the same as in GLM;
-- Anything with `f(.)` specifies a random effect; in this case `iid` represents the exchangeable structure. 
-
-Then we run the model through
-
-
-```r
-&gt; lipcancer.poisson &lt;- inla(formula.inla,family="poisson",
-+                           data=LipCancer, E=E,
-+                           control.predictor=list(compute=TRUE),
-+                           control.compute=list(config=TRUE),
-+                           control.fixed=list(mean.intercept=0,prec.intercept=0.00001))
-```
-&lt;span style="display:block; margin-top: -10px ;"&gt;&lt;/span&gt;
-Note that 
-
-- `control.fixed` allows to specify the parameters of the prior for the fixed effects (intercept)
-- `control.predictor` tells `INLA` to include the linear predictor estimation ( the parameters of the prior for the fixed effects (intercept)) useful for prediction - see later)
-- `control.compute` allows to include model selection indexes, as well as to draw samples from the joint posterior
+&lt;img src="./img/unnamed-chunk-6-1.png" style="display: block; margin: auto;" width="40%"&gt;
 
 ---
 
-# Results for lip cancer in Scotland example
+# Gamma-Poisson model for count data: example
 
-- `\(\text{exp}(b_0 + v_i)\)` is the relative risk of lip cancer in area `\(i\)` relative to the average area with the same age/sex structure (see map)
+- .red[For a recap on the Poisson distribution see recording 5]
 
-- `\(\sigma_v\)` is the between-area standard deviation of log relative risk of lip cancer
+&lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
 
-- As in INLA we get the precision we need to convert it into standard deviaiton using
+- In epidemiology we are often interested in estimating the .red[rate] or .red[relative risk] rather than the .red[mean] for Poisson data:
 
-```r
-&gt; sigma.v&lt;- inla.tmarginal(function(x) sqrt(1/x),
-+ 			lipcancer.poisson$marginals.hyperpar[[1]])
-```
+&lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
 
-And we can calculate quintiles with
+  - Suppose we observe `\(y=7\)` cases of leukaemia in one region;
+  - The expected number of cases is `\(E=4\)`
 
-```r
-&gt; inla.qmarginal(seq(0,1,0.2),sigma.v)
-```
+&lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
 
-```
-[1] 0.5018776 0.6746031 0.7255274 0.7731827 0.8332256 1.1426164
-```
+  - **Data distribution**: Poisson with mean `\(\theta = \lambda \times E\)`, where `\(\lambda\)` is the unknown incidence ratio:
+  
+`$$p(y \mid  \lambda, E) = \frac{(\lambda E)^{y}e^{-\lambda E} }{y!}$$`
+&lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
+
+  - **Prior**: `\(\mathrm{Gamma}(a, b)\)` on the the risk `\(\lambda\)`:
+$$p(\lambda)  =  \frac{b^a}{\Gamma(a)} \lambda^{a-1} e^{-b \lambda} $$
+
+.red[Check recording 8 for a recap on the Gamma distribution]
+---
+
+# Combining likelihood and prior
+
+This implies the following posterior
+
+`\begin{align*}
+p(\lambda \mid y) &amp; \propto p(\lambda)\,p(y \mid \lambda) \\
+  &amp; = \frac{b^a}{\Gamma(a)}\lambda^{a-1}e^{-b(\lambda)}e^{-(\lambda E)}\frac{(\lambda E)^{y}}{y!}\\
+  &amp; \propto  \lambda^{a+y-1} e^{-(b+E)\lambda}\\
+ &amp; =  \mathrm{Gamma}(a + y ,\, b + E)
+\end{align*}`
+
+--
+
+The posterior is another (different) Gamma distribution
+
+`$$E(\theta \mid y)= \frac{a + y }{ b + E}$$`
+
+So posterior mean depends on the prior `\((a, b)\)` and on the data `\((y, E)\)`
+
 
 ---
 
-# Maps: comparing SMR with smoothed estimates
-
-
-
+# Prior, likelihood, posterior for the Leukaemia example
 
 .pull-left[
-###SMR
-&lt;span style="display:block; margin-top: -10px ;"&gt;&lt;/span&gt;
-&lt;img src="./img/ggplot1-1.png" &gt;
+
+- Assuming a prior `\(\lambda \sim \mathrm{Gamma}(2,2)\)`
+&lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
+
+- Considering the data `\(y=7, E=4\)` 
+&lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
+
+- We obtain a posterior `\(\lambda \mid y \sim \mathrm{Gamma}(9,6)\)` centered around 1.5
+
 ]
 
 .pull-right[
-###Posterior mean
-&lt;span style="display:block; margin-top: -10px ;"&gt;&lt;/span&gt;
-&lt;img src="./img/ggplot2-1.png" &gt;
+
+&lt;center&gt;&lt;img src=./img/PoissonGamma.png width='75%' title='INCLUDE TEXT HERE'&gt;&lt;/center&gt;
+
+The posterior becomes a compromise between the prior and the data
 ]
-
----
-
-# Quantile ratios
-
-To obtain the quantile ratio we need to follow these steps:
-
-1\. Obtain the **join posterior distribution** for the model under consideration
-&lt;span style="display:block; margin-top: -10px ;"&gt;&lt;/span&gt;
-
-```r
-&gt; joint.post &lt;- inla.posterior.sample(100,lipcancer.poisson)
-&gt; names(joint.post[[1]])
-```
-
-```
-[1] "hyperpar" "latent"   "logdens" 
-```
-
-```r
-&gt; joint.post[[1]]$latent[1:3,]
-```
-
-```
-Predictor:1 Predictor:2 Predictor:3 
-  1.6044265   1.3879508   0.7025342 
-```
-&lt;span style="display:block; margin-top: -10px ;"&gt;&lt;/span&gt;
-Note that:
-- `joint.post` is a list of 100 elements and each element includes  a value from
-
-1\. the joint posterior distribution for the hyperparameters `joint.post$hyperpar`
-
-2\. joint posterior distribution for the linear predictor `\(\bm{\eta}\)` in `joint.post$latent` (row 1 to N) 
-
-3\. joint posterior distribution for the random effects `\(\bm{v}\)` in `joint.post$latent` (N +1 to 2N)
-
----
-
-# Quantile ratios
-
-2\. For each iteration rank the areas based on their `\(v_i\)` values
-
-```r
-&gt; joint.v &lt;- matrix(NA,56,100)
-&gt; for(i in 1:100){
-+   joint.v[,i]&lt;- joint.post[[i]]$latent[57:112]
-+ }
-```
-- Calculate `\(v_3\)` and `\(v_{53}\)` (5% and 95%) and build the ratio
-
-```r
-&gt; v5perc &lt;- apply(joint.v,2, function(x) quantile(x,0.05))
-&gt; v95perc &lt;- apply(joint.v,2, function(x) quantile(x,0.95))
-&gt; QR90&lt;- mean(exp(v95perc-v5perc))
-&gt; QR90
-```
-
-```
-[1] 10.898
-```
-
-- The `\(QR90\)` points towards a large spatial variability. 
-
----
-
-# SMR versus posterior mean RR for selected areas
-
-
-&lt;center&gt;&lt;img src=./img/shrinkage-1.png width='50%' title='INCLUDE TEXT HERE'&gt;&lt;/center&gt;
-
-- Comparing the SMR and the area level posterior mean from the model shows a shrinkage towards the global (national mean) 
----
-
-name: Hier-regression
-
-&lt;span style="display:block; margin-top: 250px ;"&gt;&lt;/span&gt;
-
-.myblue[.center[.huge[
-**Hierarchical Regression**]]]
-
-
----
-
-# Regression in `INLA`
-
-It is easy to move from hierarchical models to regression models with random effects. 
-
-&lt;span style="display:block; margin-top: 10px ;"&gt;&lt;/span&gt;
-
-**Example**: In the `Seeds` dataset we are interested in the proportion of seeds that germinated on each of 21 plates arranged according to a 2 by 2 factorial layout by seed and type of root extract. The data consider the number of germinated `\(y_i\)` and the total number of seeds `\(n_i\)` on the i `\(-th\)` plate, `\(i =1,...,21\)`.
-
---
-
-We specify a random effect logistic model 
-
-`\begin{eqnarray*}
- y_i &amp;\sim&amp; \text{Binomial}(\pi_i , n_i)\\
-\text{logit}(\pi_i) &amp;=&amp; b_0 + \beta_1 x_{1i} + \beta_2 x_{2i} + \beta_{12} x_{1i}x_{2i} + v_i\\
-v_i &amp;\sim&amp; \text{Normal}(0, \sigma^2_v)
-\end{eqnarray*}`
-
-where `\(x_{1i}\)` , `\(x_{2i}\)` are the seed type and root extract of the i `\(-th\)` plate, and an interaction term `\(\beta_{12} x_{1i}x_{2i}\)` is included. `\(b_0\)` , `\(\beta_1\)` , `\(\beta_2\)` , `\(\beta_{12}\)` , `\(\sigma^2_v\)` are given independent "noninformative" priors. 
-
-
----
-
-# `R-INLA` code
-
-
-```r
-&gt; data(Seeds)
-&gt; head(Seeds)
-```
-
-```
-   r  n x1 x2 plate
-1 10 39  0  0     1
-2 23 62  0  0     2
-3 23 81  0  0     3
-4 26 51  0  0     4
-5 17 39  0  0     5
-6  5  6  0  1     6
-```
-
-```r
-&gt; formula &lt;- r~x1 + x2 + x1*x2 + f(plate, model="iid")
-&gt; model.regression &lt;- inla(formula, data=Seeds, 
-+ 					family="binomial", Ntrials=n)
-```
-
----
-
-# Output: Parameters
-
-
-```r
-&gt; model.regression$summary.fixed
-```
-
-```
-                  mean        sd 0.025quant   0.5quant 0.975quant       mode          kld
-(Intercept) -0.5601515 0.1262569 -0.8077249 -0.5601540 -0.3125630 -0.5601540 4.306223e-11
-x1           0.1442102 0.2234559 -0.2939838  0.1442156  0.5823730  0.1442155 4.886427e-11
-x2           1.3231031 0.1778069  0.9744374  1.3231026  1.6717719  1.3231026 4.232582e-11
-x1:x2       -0.7787501 0.3068549 -1.3804733 -0.7787482 -0.1770382 -0.7787482 4.796443e-11
-```
-
-```r
-&gt; head(model.regression$summary.random$plate)
-```
-
-```
-  ID          mean         sd  0.025quant      0.5quant 0.975quant          mode        kld
-1  1 -7.414301e-04 0.01321553 -0.03004957 -3.230145e-04 0.02488458 -8.318972e-04 0.06296668
-2  2  7.304455e-05 0.01306497 -0.02699178  3.214655e-05 0.02749334  8.011102e-05 0.05319334
-3  3 -1.140664e-03 0.01332443 -0.03162285 -5.013701e-04 0.02370417 -1.234222e-03 0.06961408
-4  4  1.321997e-03 0.01344748 -0.02324881  5.782739e-04 0.03244584  1.421820e-03 0.07787333
-5  5  4.910102e-04 0.01314411 -0.02565030  2.139005e-04 0.02906356  5.536438e-04 0.05819151
-6  6  1.611215e-04 0.01314762 -0.02678069  6.892057e-05 0.02790506  1.860775e-04 0.05834290
-```
-
----
-
-name: Prediction
-
-&lt;span style="display:block; margin-top: 250px ;"&gt;&lt;/span&gt;
-
-.myblue[.center[.huge[
-**Prediction**]]]
-
-
----
-
-# Predictive distribution
-
-- An important consequence of the concept of exchangeability is that we can
-derive also a predictive result on the dependent variable
-
-- Assume that `\(y^\star\)` represents a future occurrence of `\(y\)`. If `\(\bm{y}\)` and `\(y^{\star}\)` are exchangeable, we then have that:
-
-`\begin{eqnarray*}
-  p(y^{\star} \mid \bm{y}) &amp;=&amp; \frac{p(\bm{y}, y^{\star})}{p(\bm{y})} \hspace{0.5cm}\mbox{from the conditional probability}\\
-  &amp;=&amp; \frac{\int p(y^{\star}\mid \bm{\theta})p(\bm{y}\mid \bm{\theta})p(\bm{\theta})\text{d}\bm{\theta}}{p(\bm{y})} \hspace{0.5cm}\mbox{by exchangeability}\nonumber\\
-  &amp;=&amp; \frac{\int p({y}^{\star}\mid \bm{\theta})p(\bm{\theta} \mid \bm{y})p(\bm{y})\text{d}\bm\theta}{p(\bm{y})} \hspace{0.5cm}\mbox{applying Bayes' Theorem}\nonumber\\
-  &amp;=&amp; \int p(y^{\star}\mid \bm{\theta})p(\bm{\theta}\mid \bm{y})\text{d}\bm{\theta}\nonumber
-\end{eqnarray*}`
-
-- Following the INLA notation `\(\bm{\theta}\)` identifies the vector of all the parameters. 
-
----
-
-# Predictive distribution
-
--  The quantity `\(p(y^{\star} \mid \bm{y})\)`, known as *predictive distribution*, is only meaningful within the Bayesian approach
-
-  &amp;rarr; the posterior distribution for `\(\bm{\theta}\)` only exists if `\(\bm{\theta}\)` are random variables.
-
-&lt;center&gt;&lt;img src=./img/PredictiveDistr.jpg width='50%' title='INCLUDE TEXT HERE'&gt;&lt;/center&gt;
-
-
-- `\(y\)` and `\(y^{\star}\)` are generated by the same random process governed by the parameters `\(\bm{\theta}\)`, associated with a suitable prior distribution, `\(p(\bm{\theta})\)`. 
-- When we observe the value `\(\bm{y}\)`, the uncertainty about the parameter is updated into the posterior distribution `\(p(\bm{\theta} \mid \bm{y})\)`, which in turns is used to infer about the future realization `\(y^{\star}\)`.
-
----
-
-# Example: Prediction of Missing data
-
-- We assume that the first observation in the Seeds dataset is missing
-
-
-
-- To predict it we simply run `INLA` with the option `control.predictor=list(link=link)` where `link` is a vector of the length equal to the number of observations with 1 only where the observation is missing
-
-
-
-```r
-&gt; link&lt;- rep(NA, length(Seeds$r))
-&gt; link[is.na(Seeds$r)]&lt;-1
-&gt; formula &lt;- r~x1 + x2 + x1*x2 + f(plate, model="iid")
-&gt; model.regression &lt;- inla(formula, data=Seeds, 
-+                          family="binomial", Ntrials=n,
-+                          control.predictor=list(link=link, compute=TRUE),
-+                   control.compute=list(return.marginals.predictor=TRUE))
-```
-
----
-
-# Example: Prediction of missing data
-
-- The summary statistics of the predicted values can be accessed by
-
-
-```r
-&gt; dim(model.regression$summary.fitted.values)
-```
-
-```
-[1] 21  6
-```
-
-```r
-&gt; model.regression$summary.fitted.values[1,]
-```
-
-```
-                         mean         sd 0.025quant  0.5quant 0.975quant      mode
-fitted.Predictor.01 0.3820279 0.03187628   0.321052 0.3815177  0.4458982 0.3804834
-```
-.pull-left[
-- Note that we get a distribution for each of the 21 observations, but we need to consider only the first as this was the missing one
-- The fitted value is on the probability scale - to go back to the scale of the observations we run
-
-
-```r
-&gt; pred.values &lt;- inla.tmarginal(function(x) x*Seeds$n[1], 
-+                           model.regression$marginals.fitted.values[[1]])
-```
-]
-
-.pull-right[
-&lt;img src="./img/pred_plot-1.png" &gt;
-]
-
----
-
-name: Prior
-
-&lt;span style="display:block; margin-top: 250px ;"&gt;&lt;/span&gt;
-
-.myblue[.center[.huge[
-**Choice of prior**]]]
-
----
-
-# How to specify priors?
-
-- *Relatively* easy to specify priors on regression parameters
-  - Typical choice is a Normal distribution
-  - Tuning the variance it can be more or less informative 
-  - .alert[The scale of the variable it represents need to be considered]
-  
---
-
-&lt;span style="display:block; margin-top: 40px ;"&gt;&lt;/span&gt;
-
-- Variances are more complex (and a bit more controversial)
-
-- In small area studies we usually work with Poisson/Binomial distribution on data - no variance parameter; the main interest is on random effect variance.
-
---
-&lt;span style="display:block; margin-top: 40px ;"&gt;&lt;/span&gt;
-
-- A Gamma `\((\epsilon,\epsilon)\)` can be used on the precision but inference could be sensitive to choice of `\(\epsilon\)`. Typically to ensure vague priors small `\(\epsilon\)` are specified (e.g. 0.1, 0.01). However, this prior has also been criticised (e.g. (Gelman, 2006)) as it has a spike for values around 0.
-
---
-
-- .alert[careful as "non informative" prior distributions are sensitive to changes of scale.]
-
----
-
-# Changing the scale
-
-- For instance starting with a Uniform on the standard deviation we end up with a high density on low values for the precision  
-
-
-
-
-
-
-
-&lt;img src="./img/tau_plot-1.png" style="display: block; margin: auto;" width="60%"&gt;
-
----
-
-# Remember...
-
-- `INLA` parametrises the precision and the default is
-
-`\(\log \left(1/\sigma^2\right) \sim \text{logGamma}(1,0.00005)\)`
-
-- However alternatives can be built, for instance: 
-
-  -  Truncated Normal on log precision (`logtnormal`)
-  -  Uniform prior on the standard deviation: as it is not implemented we need to specify it through the `expression` as follows
-  
-`UN.prior = "expression:
-  log_dens = 0 - log(2) - theta / 2;
-  return(log_dens);"`
-
-
-&lt;span style="display:block; margin-top: 50px ;"&gt;&lt;/span&gt;
-
-.content-box-blue[In general we need to be careful to check the level of information (weakly, strong) on the scale we are interested in (e.g. variance) and see what this corresponds on the standard deviation/precision (on which prior is usually specified).
-]
-
-See Gómez-Rubio (2020) for more information on how to specify priors in `INLA`.
----
-
-name: Modelselection
-
-&lt;span style="display:block; margin-top: 250px ;"&gt;&lt;/span&gt;
-
-.myblue[.center[.huge[
-**Model selection**]]]
-
----
-
-# Which model?
-
-.center[.content-box-blue[.Large[**All models are wrong, some models are useful.**
-
-G. Box]]]
-
-
-
-
-
-
-
-
-
-
-- When the interest lays mainly on the prior distribution or on the functional form of some parameters the deviance of the model can be used to evaluate the goodness of fit.
-
-Given the data `\(\bm{y}\)` with distribution  `\(p(\bm{y}\mid \theta)\)`, the deviance of the model is defined as:
-`\begin{eqnarray*}
-  D(\theta) = -2 \hbox{log} p(\bm{y} \mid \theta)
-\end{eqnarray*}`
-where `\(\theta\)` identifies the parameter of the likelihood
-
---
-
-- Ex. `\(y_i \sim \hbox{Bernoulli}(\theta) \rightsquigarrow p(\mathbf{y}\mid \theta) = \prod_{i=1}^n  \left( \begin{array}{c} n_i \\ y_i \end{array} \right) \theta^{y_i} (1-\theta)^{n_i-y_i}\)`
-
-`\(\displaystyle D(\theta) = -2\left[\sum_i y_i \log \theta_i + (n_i-y_i)\log(1-\theta_i)+ \log\left(\begin{array}{c}n_i\\y_i \end{array}\right)\right]\)`
-
-
----
-
-# Mean deviance
-
-- The deviance of the model measures the variability linked to the likelihood, ie the probabilistic structure used for the observation (conditional on the parameters)
-
-- This quantity is a random variable in the Bayesian framework, so it is possible to synthesise it through several indexes (mean, median, etc.)
-
--  Many authors suggested using posterior mean deviance `\((\overline{D}) = E_{\theta\mid y} [D(\theta)]\)` as a measure of fit
-
-**DRAWBACK:**  more complex models will fit the data better and so will have smaller `\(\overline{D}\)`
-
-- Need to have some measure of *model complexity* to trade off against `\(\overline{D}\)`
-
----
-
-# Deviance Information Criterion - DIC
-
-- Natural way to compare models is to use criterion based on trade-off between the fit of the data to the model and the corresponding complexity of the model
-
-- Deviance Information Criterion, DIC = goodness of fit + complexity of the model
-
---
-
-  - The fit is measure through the deviance
-
-`$$D(\theta) = -2 \hbox{log} p(\bm{y} \mid \theta)$$` 
-
---
-
-  - Complexity measured by estimate of the "effective number of parameters":
-
-&lt;!--  `$$p_D = \textsf{E}_{\theta\mid y}\left[D(\theta)\right] + D(\textsf{E}_{\theta\mid y}\left[\theta \right])$$`
---&gt;
-
---
-
-  - The DIC is then defined analogously to AIC as
-
-`$$\hbox{DIC} = D(\textsf{E}_{\theta\mid y}\left[\theta \right]) + 2p_D$$`
-
-  - Models with smaller DIC are better supported by the data
-
-- DIC can be monitored in INLA including  `control.compute=list(dic=TRUE)` into the `inla` function.
-
----
-
-# Back to the Lip Cancer example...
-
-
-
-We run the original model and the following alternative one (in both adding the `dic`):
-
-```r
-&gt; lipcancer.binomial &lt;- inla(formula.inla,family="binomial",
-+                           data=LipCancer, Ntrials=POP,
-+                           control.predictor=list(compute=TRUE),
-+                           control.compute=list(config=TRUE, dic=TRUE, waic=TRUE),
-+                           control.fixed=list(mean.intercept=0,prec.intercept=0.00001))
-```
-
-And now check the value of the DIC
-&lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
-
-```r
-&gt; # Poisson data distribution
-&gt; lipcancer.poisson$dic$dic
-```
-
-```
-[1] 315.9243
-```
-
-```r
-&gt; # Normal data distribution
-&gt; lipcancer.binomial$dic$dic
-```
-
-```
-[1] 324.8259
-```
-The first model is preferred as the DIC is smaller.
-
----
-
-# DIC: some drawbacks
-
-The DIC has been criticised over the years, specifically:
-
-1\. `\(p_D\)` is not invariant to reparameterization. For example, we would obtain a (slightly) different value if we parameterized in terms of `\(\sigma\)` or  `\(\log\sigma\)`
-
-2\. It is not based on a proper predictive criterion
-
-3\. Issues when there are missing data
-
-See  for a complete description of the criticisms.
-
---
-
-&lt;span style="display:block; margin-top: 50px ;"&gt;&lt;/span&gt;
-
-What is the alternative?
-
----
-
-#Watanabe AIC - WAIC
-
-- Considers the posterior predictive mean and variance (on the log scale)
-
-- Linked to cross-validation
-
-- Similarly to DIC:
-
-  - WAIC has a model-fit and model-complexity components
-  - Smaller WAIC indicates the preferred model
-
---
-
-
-- Let `\(m_i\)` and `\(v_i\)` be the posterior predictive mean and variance for the 
-`\(i^{th}\)` unit
-- The effective model size is 
-	`$$p_W = \sum_{i=1}^nv_i$$` 
-	&lt;span style="display:block; margin-top: 10px ;"&gt;&lt;/span&gt;
-	
-- The criteria is 
-	`$$WAIC = -2\sum_{i=1}^nm_i + 2p_W$$`
-- The WAIC is readily available in `INLA` using `control.compute=list(waic=TRUE)` 
-
-
----
-
-# Back to our example...
-
-
-We now check the value of the WAIC
-&lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
-
-```r
-&gt; # Poisson data distribution
-&gt; lipcancer.poisson$waic$waic
-```
-
-```
-[1] 315.118
-```
-
-```r
-&gt; # Normal data distribution
-&gt; lipcancer.binomial$waic$waic
-```
-
-```
-[1] 335.2924
-```
-There is accordance between DIC and WAIC as the first model is still preferred as the WAIC is smaller.
-
----
-
-
-
-# Summary
-
-- Hierarchical models allow **borrowing of strength** across units
-
-  &amp;rarr; posterior distribution of the unit-parameter borrows strength from the
-likelihood contributions for all the units, via their joint influence on
-the posterior estimates of the unknown hyper-parameters
-
-  &amp;rarr; improved efficiency
-  
-- Judgements of exchangeability need careful assessment
-  &amp;rarr; units suspected a priori to be systematically different might be
-modelled by including relevant covariates so that residual variability
-more plausibly reflects exchangeability
-
-- Subgroups of prior interest should be considered separately
-
---
-
-Careful on the prior specification
-
-- non informative on one scale might be informative on another
-
-- always run some sensitivity analyses changing the prior and investigating how this affect the estimates of parameters of interest
-
-- DIC/WAIC are useful tools for model selection, easy to calculate in INLA
-
-&amp;rarr; bear in mind that they can only be used to compare models - similarly to the AIC they do not have an absolute meaning.
 
 ---
 
@@ -1223,9 +716,7 @@ Careful on the prior specification
 
 Blangiardo, M. and M. Cameletti (2015). _Spatial and spatio-temporal Bayesian models with R-INLA_. John Wiley &amp; Sons.
 
-Gelman, A. (2006). "Prior distributions for variance parameters in hierarchical models". In: _Bayesian Analysis_ 1".3", pp. 515-534.
-
-Gómez-Rubio, V. (2020). _Bayesian inference with INLA_. CRC Press.
+Johnson, A. A., M. Q. Ott, and M. Dogucu (2022). _Bayes Rules!: An Introduction to Applied Bayesian Modeling_. CRC Press.
     </textarea>
 <style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
 <script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>

@@ -1,145 +1,80 @@
-Welcome to the course "Geospatial Analytics using R and R-INLA".
 
- This short course will provide a comprehensive introduction to concepts, methods, and R tools for geospatial data analytics, which involves collecting, exploring, modelling, and visualising data that exhibit dependencies in space and/or time. Specific focus will be given to Bayesian inference through the Integrated Nested Laplace Approximation (INLA) approach. 
- 
-We will first go through the basics of Bayesian inference and will then learn how to model hierarchical structures. We will also introduce elements for geocomputation with R. Then we will move to the core of the course, by focusing on area level data and presenting how to model spatially structured random effects through conditional autoregressive specifications.  Following that, we will extend the approach to include temporal dependency and touch briefly on spatio-temporal interactions. Moving on to geostatistical data we will introduce the stochastic partial differential equation (SPDE) approach, used for spatial modelling on a continuous field. We will then extend this to deal with spatio-temporal data. Finally, we will describe how to use R-INLA for more advanced problems in the spatio-temporal realm, for instance how to deal with misaligned data. 
+Welcome to the Bayesian Reasoning and Methods for spatio-temporal data module.
 
-Throughout the course there will be practical examples from epidemiology, public health, environmental and social sciences fields. The course will be delivered through a combination of lectures and computer-based practical sessions.
+Spatial and spatio-temporal analysis represent an increasingly important tool in public health research as well as in geographic and environmental epidemiology due to the emerging availability of spatial/temporal health data and the development of novel computational techniques, allowing for the analysis of large database.  
 
-It would be beneficial if you could bring your laptop having installed the latest R (version 4.3.1) and the following packages:
+The module provides a comprehensive introduction to the concepts of Bayesian modelling and inference, and the statistical methods used in analysing spatial and spatio-temporal data.  In the first part of the course, students will learn about the main theoretical concepts of the Bayesian approach to probability and inference, before moving on to statistical modelling and interpretation. Successively, they will acquire concepts, methodologies and practical skills to manipulate, effectively visualize and model spatially- and temporally-related data. At the end of this module, students will be able to handle with confidence spatial and/or temporal data, identify patterns of dependence and level of noise in the data, describe and quantify risk of diseases as well as critically interpret and discuss the results from their analyses.  
 
-- INLA (instructions at https://www.r-inla.org/download-install)
+Data analysis will be carried out using the statistical software R and model complexity will be handled within a Bayesian framework, while reproducible reporting will be ensured with R-Markdown. 
 
-- install packages using:
+The module will be delivered by lectures and live computer-based tutorials and practicals, along with quizzes/practical sessions, which will include real-life examples (from environmental science as well as chronic and infectious disease epidemiology), simulative examples and hands-on project.  
 
-install.packages("remotes")
+It would be beneficial if attendees could bring their laptop having installed the latest R (version 4.3.2) and the following packages:
+
+- INLA (install.packages("INLA", repos="http://www.math.ntnu.no/inla/R/stable"))
+
+- install.packages("remotes")
 
 pkg_list = c("sf", "spData", "terra", "stars", "sp", "spdep", "geoR", "fields", "gstat", "tmap", "ggplot2", "RColorBrewer", "mapview", "leaflet", "cowplot", "viridis", "patchwork", "knitr", "kableExtra", "tidyverse", "mvtsplot", "GGally", "corrr", "SpatialEpi", "spTimer", "units", "stringr" ,"inlabru", "fmesher", "splancs")
-
 remotes::install_cran(pkg_list)
 
-- install package fingertipsR as follows:
-
-options(repos = c(
-  ropensci = 'https://ropensci.r-universe.dev',
-  CRAN = 'https://cloud.r-project.org'))
-
-install.packages('fingertipsR')
-
-- install Rtools from https://cran.r-project.org/bin/windows/Rtools/
-
-- install the latest version of Rstudio at https://posit.co/download/rstudio-desktop/
-
-**Instructors**
-
-- Marta Blangiardo m.blangiardo@imperial.ac.uk
-
-- Monica Pirani monica.pirani@imperial.ac.uk
-
-- Georges Bucyibaruta g.bucyibaruta@imperial.ac.uk
+The html version of the slides and the practical material will be posted here before each week session
 
 ## Timetable
-### Day 1 - Mon 27th Nov 2023 (9:30am to 3:30pm)
+### Day 1 - Mon 15th Jan 2024
 
-- [Session 1.1](Session1.1): Introduction to Bayesian thinking  (9:30am to 10:30am)
-
-Break
-
-- [Session 1.2](Session1.2): Introduction to INLA and R-INLA (10:50am to 12:20pm)
+- [Session 1.1](Session1.1): Introduction to Bayesian thinking (pdf [here](Session1.1/Session1.1.pdf))
+- [Session 1.2](Session1.2): Introduction to Bayes Theorem (pdf [here](Session1.2/Session1.2.pdf))
 
 Lunch
 
-- [Session 1.3](Session1.3): Introduction to  geospatial data (1:30pm to 2:15pm)
+- [Practical 1 (html)](Practical1): Conditional/joint probability and Bayes theorem 
 
-- [Practical 1a](Practical1a) (2:15pm to 3:00pm)
+Complete material of practical 1 are [here](Practical1/Practical1.zip)
 
-Material for the practical is [here](Practicals/Practical1a.zip)
+### Day 2 - Mon 22th Jan 2024
 
-- [Practical 1b](Practical1b) (3:00pm to 3:30pm) 
-
-Material for the practical is [here](Practicals/Practical1b.zip)
-
-Pdf of the lectures are [here](Pdfs/Day1.zip)
-
-### Day 2 - Tue 28th Nov 2023 (9:30am to 3:30pm)
-
-- [Session 2.1](Session2.1): Hierarchical models, prediction, prior specification (9:30am to 10:50am)
-
-Break
-
-- [Practical 2a](Practical2a) (11:10am to 11:50am)
-
-Material for the practical is [here](Practicals/Practical2a.zip)
-
-- [Practical 2b](Practical2b)   (11:50am to 12:30pm)
-
-
-Material for the practical is [here](Practicals/Practical2b.zip)
+- [Session 2.1](Session2.1): Bayes Theorem for random variables and for general Bayesian inference; conjugate families (pdf [here](Session2.1/Session2.1.pdf))
+- [Session 2.2](Session2.2): Posterior Predictive Distribution and Monte Carlo computation (pdf [here](Session2.2/Session2.2.pdf))
 
 Lunch
 
-- [Session 2.2](Session2.2): Spatial models for small area data: disease mapping and ecological regression (1:30pm to 2:30pm) 
+- [Practical 2](Practical2): Conjugacy, prediction and Monte Carlo simulation
 
-- [Practical 2c](Practical2c) (2:30pm to 3:30pm) 
+Complete material of practical 2 are [here](Practical2/Practical2.zip)
 
-Material for the practical is [here](Practicals/Practical2c.zip)
+### Day 3 - Mon 29th Jan 2024
 
-Pdf of the lectures are [here](Pdfs/Day2.zip)
+- [Session 3.1](Session3.1): Introduction to INLA and R-INLA (pdf [here](Session3.1/Session3.1.pdf))
+- [Practical 3a](Practical3a): Tutorial on R-INLA
 
-
-### Day 3 - Wed 29th Nov 2023 (9:30am to 3:30pm)
-
-- [Session 3.1](Session3.1):  Introduction to temporal modelling (9:30am to 10:30am) 
-
--  Practical 2c (cont’d) (10:30am to 10:50am)
-
-Break
-
-- [Session 3.2](Session3.2): Spatio-temporal models for small area data (11:20am to 12.30pm)
+Complete material of practical 3a are [here](Practical3a/Practical3a.zip)
 
 Lunch
 
-- [Practical 3](Practical3) (1:30pm to 3:30pm)
+- [Practical 3b](Practical3b): Regression and comparison of Bayesian vs Frequentist approach in R-INLA 
 
-Material for the practical is [here](Practicals/Practical3.zip)
+Complete material of practical 3b are [here](Practical3b/Practical3b.zip)
 
+### Day 4 - Mon 5th Feb 2024
 
-Pdf of the lectures are [here](Pdfs/Day3.zip)
-
-
-### Day 4 - Thur 30th Nov 2023 (9:30am to 3:30pm)
-
-- [Session 4.1](Session4.1): Introduction to Geostatistics (9:30am to 10:30am)
-
-Break
-
-- [Session 4.2](Session4.2): Introduction to SPDE models with R-INLA (10:50am to 12:30pm) 
+- [Session 4.1](Session4.1): Introduction to hierarchical models, choice of prior and model checking (pdf [here](Session4.1/Session4.1.pdf))
+- [Practical 4](Practical4): Hierarchical models, regression and model checking in R-INLA
 
 Lunch
 
-- [Practical4a](Practical4a) (1:30pm to 2:30pm)
+- [Practical 4 (cont'd)](Practical4): Hierarchical models, regression and model checking in R-INLA
 
-Material for the practical is [here](Practicals/Practical4a.zip)
+Complete material of practical 4 are [here](Practical4/Practical4.zip)
 
-- [Practical4b](Practical4b) (2:30pm to 3:30pm)
 
-Material for the practical is [here](Practicals/Practical4b.zip)
+### Day 5 - Mon 12th Feb 2024
 
-Pdf of the lectures are [here](Pdfs/Day4.zip)
-
-### Day 5 - Fri 1st Dec 2023 (9:30am to 3:30pm)
-
-- [Session 5](Session5): Spatio-temporal models for geostatistical data (9:30am to 11:00am) 
-
-Break
-
-- [Practical 5](Practical5) (11:30pm to 12:30pm)
-
-Material for the practical is [here](Practicals/Practical5.zip)
+- [Session 5.1](Session5.1): Hierarchical models for longitudinal data (pdf [here](Session5.1/Session5.1.pdf))
+- [Session 5.2](Session5.2): Missing data imputation (pdf [here](Session5.2/Session5.2.pdf))
 
 Lunch
 
-Pdf of the lecture is [here](Pdfs/Day5.zip)
+- [Practical 5](Practical5): Hierarchical models for longitudinal data and missing data imputation in R-INLA
 
-
-**Afternoon session** (1:30pm to 3:30pm): Participants will have the possibility to give a short presentation about their work/research and get feedback from their peers and from the teaching team. If you are interested please put your name and title of the presentation on this [form](https://docs.google.com/forms/d/e/1FAIpQLSe13bWUocGiRFVfmS72zSy9Ki2SdcA0h3QJvK8RCY9In-kaHQ/viewform?usp=sf_link)
+Complete material of practical 5 are [here](Practical5/Practical5.zip)

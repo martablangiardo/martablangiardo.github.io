@@ -628,9 +628,9 @@ table.dataTable.hover tbody tr:hover, table.dataTable.display tbody tr:hover {
 */
 .content-box-beamer {
   color: #FFFFF;
-  font-size: 80%;
+  font-size: 90%;
   box-sizing: border-box;
-  border-radius: 15px;
+  border-radius: 5px;
   background-color: #dae4f5;
   padding: 0px 10px 5px 10px;
   box-shadow: 10px 10px 5px  rgba(0,0,0,0.6);
@@ -640,7 +640,7 @@ table.dataTable.hover tbody tr:hover, table.dataTable.display tbody tr:hover {
 */
 .content-box-beamer h3 {
   background-color: #abb3d6;
-  border-radius: 15px 15px 0px 0px;
+  border-radius: 15px 5px 0px 0px;
   margin-left: -10px;
   margin-right: -10px;
   margin-bottom: 5px;
@@ -813,5 +813,4 @@ ol > li::before {
   display: inline-block;
   box-shadow: 8px 5px 5px  rgba(0,0,0,0.6);
 }
-
 
