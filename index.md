@@ -23,8 +23,8 @@ The html version of the slides and the practical material will be posted here be
 ## Timetable
 ### Day 1 - Mon 15th Jan 2024
 
-- [Session 1.1](Session1.1): Introduction to Bayesian thinking (pdf [here](Session1.1/Session1.1.pdf))
-- [Session 1.2](Session1.2): Introduction to Bayes Theorem (pdf [here](Session1.2/Session1.2.pdf))
+- [Session 1.1 (html)](Session1.1): Introduction to Bayesian thinking (pdf [here](Session1.1/Session1.1.pdf))
+- [Session 1.2 (html)](Session1.2): Introduction to Bayes Theorem (pdf [here](Session1.2/Session1.2.pdf))
 
 Lunch
 
@@ -34,18 +34,18 @@ Complete material of practical 1 are [here](Practical1/Practical1.zip)
 
 ### Day 2 - Mon 22th Jan 2024
 
-- [Session 2.1](Session2.1): Bayes Theorem for random variables and for general Bayesian inference; conjugate families (pdf [here](Session2.1/Session2.1.pdf))
-- [Session 2.2](Session2.2): Posterior Predictive Distribution and Monte Carlo computation (pdf [here](Session2.2/Session2.2.pdf))
+- [Session 2.1 (html)](Session2.1): Bayes Theorem for random variables and for general Bayesian inference; conjugate families (pdf [here](Session2.1/Session2.1.pdf))
+- [Session 2.2 (html)](Session2.2): Posterior Predictive Distribution and Monte Carlo computation (pdf [here](Session2.2/Session2.2.pdf))
 
 Lunch
 
-- [Practical 2](Practical2): Conjugacy, prediction and Monte Carlo simulation
+- [Practical 2 (html)](Practical2): Conjugacy, prediction and Monte Carlo simulation
 
 Complete material of practical 2 are [here](Practical2/Practical2.zip)
 
 ### Day 3 - Mon 29th Jan 2024
 
-- [Session 3.1](Session3.1): Introduction to INLA and R-INLA (pdf [here](Session3.1/Session3.1.pdf))
+- [Session 3.1 (html)](Session3.1): Introduction to INLA and R-INLA (pdf [here](Session3.1/Session3.1.pdf))
 - [Practical 3a](Practical3a): Tutorial on R-INLA
 
 Complete material of practical 3a are [here](Practical3a/Practical3a.zip)
