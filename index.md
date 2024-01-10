@@ -26,16 +26,13 @@ If you are installing R and RStudio for the first time, useful suggestions can b
 2. Run the code below in R to install the main required R packages.
 Note that, during the module's labs, we will work with additional R packages that will be installed at the occurrence.
 
-```{r, eval=FALSE, echo=TRUE}
-# Packages
 install.packages("remotes")
 
 pkg_list = c("sf", "spData", "terra", "stars", "sp", "spdep", "geoR", "fields", "gstat", "tmap", "ggplot2", "RColorBrewer","tidyverse", "mapview", "leaflet", "cowplot", "viridis", "patchwork", "knitr", "kableExtra", "mvtsplot", "GGally", "corrr", "SpatialEpi", "spTimer", "units", "stringr", "inlabru", "fmesher")
 
 remotes::install_cran(pkg_list)
-```
 
-The html version of the slides and the practical material will be posted here before each week session
+The html version of the slides and the practical material will be posted here before each week session.
 
 ## Timetable
 ### Day 1 - Mon 15th Jan 2024
