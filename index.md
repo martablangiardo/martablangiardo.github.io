@@ -9,17 +9,17 @@ Data analysis will be carried out using the statistical software R and model com
 
 The module will be delivered by lectures and live computer-based tutorials and practicals, along with quizzes/practical sessions, which will include real-life examples (from environmental science as well as chronic and infectious disease epidemiology), simulative examples and hands-on project.  
 
-# Download and Install R, RStudio and RTools
+**Download and Install R, RStudio and RTools**
 
 We recommend installing the latest version of R, Rtools and Rstudio IDE (Integrated Development Environment). To do so, visit the links below:
 
-* R: https://www.r-project.org/
-* RStudio: https://posit.co/download/rstudio-desktop/
-* RTools: https://cran.r-project.org/bin/windows/Rtools/
+- R: https://www.r-project.org/
+- RStudio: https://posit.co/download/rstudio-desktop/
+- RTools: https://cran.r-project.org/bin/windows/Rtools/
 
 If you are installing R and RStudio for the first time, useful suggestions can be found here https://rstudio-education.github.io/hopr/starting.html
 
-# R packages
+**R packages**
 
 1. Install the **stable version of INLA**, following carefully the instructions at the package webpage: https://www.r-inla.org/download-install
 
