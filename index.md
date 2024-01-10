@@ -1,5 +1,5 @@
 
-Welcome to the Bayesian Reasoning and Methods for spatio-temporal data module.
+Welcome to this joint module between MSc Epi (Bayesian Reasoning and Methods for spatio-temporal data) And HDA (Advance Analytics).
 
 Spatial and spatio-temporal analysis represent an increasingly important tool in public health research as well as in geographic and environmental epidemiology due to the emerging availability of spatial/temporal health data and the development of novel computational techniques, allowing for the analysis of large database.  
 
@@ -9,14 +9,31 @@ Data analysis will be carried out using the statistical software R and model com
 
 The module will be delivered by lectures and live computer-based tutorials and practicals, along with quizzes/practical sessions, which will include real-life examples (from environmental science as well as chronic and infectious disease epidemiology), simulative examples and hands-on project.  
 
-It would be beneficial if attendees could bring their laptop having installed the latest R (version 4.3.2) and the following packages:
+# Download and Install R, RStudio and RTools
 
-- INLA (install.packages("INLA", repos="http://www.math.ntnu.no/inla/R/stable"))
+We recommend installing the latest version of R, Rtools and Rstudio IDE (Integrated Development Environment). To do so, visit the links below:
 
-- install.packages("remotes")
+* R: https://www.r-project.org/
+* RStudio: https://posit.co/download/rstudio-desktop/
+* RTools: https://cran.r-project.org/bin/windows/Rtools/
 
-pkg_list = c("sf", "spData", "terra", "stars", "sp", "spdep", "geoR", "fields", "gstat", "tmap", "ggplot2", "RColorBrewer", "mapview", "leaflet", "cowplot", "viridis", "patchwork", "knitr", "kableExtra", "tidyverse", "mvtsplot", "GGally", "corrr", "SpatialEpi", "spTimer", "units", "stringr" ,"inlabru", "fmesher", "splancs")
+If you are installing R and RStudio for the first time, useful suggestions can be found here https://rstudio-education.github.io/hopr/starting.html
+
+# R packages
+
+1. Install the **stable version of INLA**, following carefully the instructions at the package webpage: https://www.r-inla.org/download-install
+
+2. Run the code below in R to install the main required R packages.
+Note that, during the module's labs, we will work with additional R packages that will be installed at the occurrence.
+
+```{r, eval=FALSE, echo=TRUE}
+# Packages
+install.packages("remotes")
+
+pkg_list = c("sf", "spData", "terra", "stars", "sp", "spdep", "geoR", "fields", "gstat", "tmap", "ggplot2", "RColorBrewer","tidyverse", "mapview", "leaflet", "cowplot", "viridis", "patchwork", "knitr", "kableExtra", "mvtsplot", "GGally", "corrr", "SpatialEpi", "spTimer", "units", "stringr", "inlabru", "fmesher")
+
 remotes::install_cran(pkg_list)
+```
 
 The html version of the slides and the practical material will be posted here before each week session
 
