@@ -1889,57 +1889,19 @@ relationships between the prior and posterior probabilities of <span class="math
 <li><span class="math inline">\(A\)</span> is <em>you live in a house
 with someone who has COVID-19</em> and <span class="math inline">\(B\)</span> is <em>you become ill with
 COVID-19</em></li>
-</ol>
-<div class="blackbox">
-<div class="center">
-<p><strong>Solution</strong></p>
-</div>
-<p><span class="math inline">\(P(B|A) &gt; P(B)\)</span></p>
-</div>
-<ol start="2" style="list-style-type: lower-alpha">
 <li><span class="math inline">\(A\)</span> is <em>you wear a mask in
 areas with poor ventilation</em> and <span class="math inline">\(B\)</span> is <em>you become ill with
 COVID-19</em></li>
-</ol>
-<div class="blackbox">
-<div class="center">
-<p><strong>Solution</strong></p>
-</div>
-<p><span class="math inline">\(P(B|A) &lt; P(B)\)</span></p>
-</div>
-<ol start="3" style="list-style-type: lower-alpha">
 <li><span class="math inline">\(A\)</span> is <em>you attend a cervical
 cancer screening and have the HPV vaccine</em> and <span class="math inline">\(B\)</span> is <em>you contract cervical
 cancer</em></li>
-</ol>
-<div class="blackbox">
-<div class="center">
-<p><strong>Solution</strong></p>
-</div>
-<p><span class="math inline">\(P(B|A) &lt; P(B)\)</span></p>
-</div>
-<ol start="4" style="list-style-type: lower-alpha">
 <li><span class="math inline">\(A\)</span> is <em>you regularly smoke
 cigarettes</em> and <span class="math inline">\(B\)</span> is <em>you
 contract cervical cancer</em></li>
-</ol>
-<div class="blackbox">
-<div class="center">
-<p><strong>Solution</strong></p>
-</div>
-<p><span class="math inline">\(P(B|A) &gt; P(B)\)</span></p>
-</div>
-<ol start="5" style="list-style-type: lower-alpha">
 <li><span class="math inline">\(A\)</span> is <em>socially distance when
 you have flu-like symptoms</em> and <span class="math inline">\(B\)</span> is <em>you contract cervical
 cancer</em></li>
 </ol>
-<div class="blackbox">
-<div class="center">
-<p><strong>Solution</strong></p>
-</div>
-<p><span class="math inline">\(P(B|A) = P(B)\)</span></p>
-</div>
 </div>
 <div id="probabilities" class="section level1">
 <h1>2. Probabilities</h1>
@@ -1951,63 +1913,17 @@ notation.</p>
 <ol style="list-style-type: lower-alpha">
 <li><span class="math inline">\(47\%\)</span> of people that go to an
 underground bar get COVID-19</li>
-</ol>
-<div class="blackbox">
-<div class="center">
-<p><strong>Solution</strong></p>
-</div>
-<p><span class="math inline">\(P(B|A) = 47\%\)</span></p>
-</div>
-<ol start="2" style="list-style-type: lower-alpha">
 <li>If you have COVID-19, you have an <span class="math inline">\(86\%\)</span> chance of a positive COVID-19
 test</li>
-</ol>
-<div class="blackbox">
-<div class="center">
-<p><strong>Solution</strong></p>
-</div>
-<p><span class="math inline">\(P(B|C) = 86\%\)</span></p>
-</div>
-<ol start="3" style="list-style-type: lower-alpha">
 <li><span class="math inline">\(39\%\)</span> of the population have
 COVID-19</li>
-</ol>
-<div class="blackbox">
-<div class="center">
-<p><strong>Solution</strong></p>
-</div>
-<p><span class="math inline">\(P(C) = 39\%\)</span></p>
-</div>
-<ol start="4" style="list-style-type: lower-alpha">
 <li>If you do not have COVID-19, you have an <span class="math inline">\(4\%\)</span> chance of a negative COVID-19
 test</li>
-</ol>
-<div class="blackbox">
-<div class="center">
-<p><strong>Solution</strong></p>
-</div>
-<p><span class="math inline">\(P(B^c|C^c) = 4\%\)</span></p>
-</div>
-<ol start="5" style="list-style-type: lower-alpha">
 <li>All your friends have said they would go to the underground bar if
 they have a negative COVID-19 test</li>
-</ol>
-<div class="blackbox">
-<div class="center">
-<p><strong>Solution</strong></p>
-</div>
-<p><span class="math inline">\(P(A|B^c) = 100\%\)</span></p>
-</div>
-<ol start="6" style="list-style-type: lower-alpha">
 <li><span class="math inline">\(1\%\)</span> of people go to an
 underground bar and have a positive COVID-19 test</li>
 </ol>
-<div class="blackbox">
-<div class="center">
-<p><strong>Solution</strong></p>
-</div>
-<p><span class="math inline">\(P(A \cap B) = 1\%\)</span></p>
-</div>
 </div>
 <div id="cervical-cancer-example" class="section level1">
 <h1>3. Cervical cancer example</h1>
@@ -2016,47 +1932,15 @@ those who have cervical cancer and is known to be <span class="math inline">\(57
 <span class="math inline">\(A\)</span> be the event <em>an individual
 has cervical cancer</em> and <span class="math inline">\(B\)</span> be
 the event <em>an individual tests positive to having cervical cancer on
-the pap smear test</em>. Using the information above, answer the
-following:</p>
+the pap smear test</em>.</p>
+<p>Using the information above, answer the following:</p>
 <ol style="list-style-type: lower-alpha">
 <li>What are the probabilities that an individual has and has not got
 cervical cancer?</li>
-</ol>
-<!-- --- -->
-<!-- **HINT**: this is the true positive rate -->
-<!-- --- -->
-<div class="blackbox">
-<div class="center">
-<p><strong>Solution</strong></p>
-</div>
-<p><span class="math display">\[
-\begin{aligned}
-P(A) &amp; = 0.08 \\
-P(A^c) &amp; = 1 - 0.08 = 0.92
-\end{aligned}
-\]</span></p>
-</div>
-<ol start="2" style="list-style-type: lower-alpha">
 <li>What are the probabilities that an individual returns a positive pap
 smear test <strong>given</strong> they have cervical cancer and that an
 individual returns a negative pap smear test <strong>given</strong> they
 do not have cervical cancer?</li>
-</ol>
-<!-- --- -->
-<!-- **HINT**: this is the true negative rate -->
-<!-- --- -->
-<div class="blackbox">
-<div class="center">
-<p><strong>Solution</strong></p>
-</div>
-<p><span class="math display">\[
-\begin{aligned}
-P(B|A) &amp; = 0.57 \\
-P(B^c | A^c) &amp; = 0.76
-\end{aligned}
-\]</span></p>
-</div>
-<ol start="3" style="list-style-type: lower-alpha">
 <li>Consider the following table</li>
 </ol>
 <table class="table" style="margin-left: auto; margin-right: auto;">
@@ -2118,154 +2002,18 @@ following:</p>
 <ol style="list-style-type: lower-roman">
 <li>The probability an individual has cervical cancer
 <strong>and</strong> returns a positive pap smear test</li>
-</ol>
-<div class="blackbox">
-<div class="center">
-<p><strong>Solution</strong></p>
-</div>
-<p><span class="math inline">\(P(A \cap B) = P(A)P(B|A) = 0.08 \times
-0.57 = 0.0456\)</span></p>
-</div>
-<ol start="2" style="list-style-type: lower-roman">
 <li>The probability an individual has cervical cancer
 <strong>and</strong> returns a negative pap smear test</li>
-</ol>
-<div class="blackbox">
-<div class="center">
-<p><strong>Solution</strong></p>
-</div>
-<p><span class="math inline">\(P(A \cap B^c) = P(A)P(B^c|A) = 0.08
-\times [1 - 0.57] = 0.0344\)</span></p>
-</div>
-<ol start="3" style="list-style-type: lower-roman">
 <li>The probability an individual does not have cervical cancer
 <strong>and</strong> returns a positive pap smear test</li>
-</ol>
-<div class="blackbox">
-<div class="center">
-<p><strong>Solution</strong></p>
-</div>
-<p><span class="math inline">\(P(A^c \cap B) = P(A^c)P(B|A^c) = [1-0.08]
-\times [1 - 0.76] = 0.2208\)</span></p>
-</div>
-<ol start="4" style="list-style-type: lower-roman">
 <li>The probability an individual does not have cervical cancer
 <strong>and</strong> returns a negative pap smear test</li>
-</ol>
-<div class="blackbox">
-<div class="center">
-<p><strong>Solution</strong></p>
-</div>
-<p><span class="math inline">\(P(A^c \cap B^c) = P(A^c)P(B^c|A^c) =
-[1-0.08] \times 0.76 = 0.6992\)</span></p>
-</div>
-<ol start="22" style="list-style-type: lower-alpha">
 <li>The probability an individual returns a negative pap smear test</li>
-</ol>
-<div class="blackbox">
-<div class="center">
-<p><strong>Solution</strong></p>
-</div>
-<p><span class="math inline">\(P(B^c) = P(A \cap B^c) + P(A^c \cap B^c)
-= 0.0344 + 0.6992 = 0.7336\)</span></p>
-</div>
-<ol start="6" style="list-style-type: lower-roman">
 <li>The probability an individual returns a positive pap smear test</li>
-</ol>
-<div class="blackbox">
-<div class="center">
-<p><strong>Solution</strong></p>
-</div>
-<p><span class="math inline">\(P(B) = P(A \cap B) + P(A^c \cap B) =
-0.0456 + 0.2208 = 0.2664\)</span></p>
-</div>
-<ol start="7" style="list-style-type: lower-roman">
 <li>Complete the table</li>
-</ol>
-<div class="blackbox">
-<div class="center">
-<p><strong>Solution</strong></p>
-</div>
-<table class="table" style="margin-left: auto; margin-right: auto;">
-<thead>
-<tr>
-<th style="text-align:center;">
-<span class="math inline">\(Event\)</span>
-</th>
-<th style="text-align:center;">
-<span class="math inline">\(B\)</span>
-</th>
-<th style="text-align:center;">
-<span class="math inline">\(B^c\)</span>
-</th>
-<th style="text-align:center;">
-<span class="math inline">\(Total\)</span>
-</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td style="text-align:center;border-left:1px solid;border-right:1px solid;">
-<span class="math inline">\(A\)</span>
-</td>
-<td style="text-align:center;border-left:1px solid;border-right:1px solid;">
-0.0456
-</td>
-<td style="text-align:center;border-left:1px solid;border-right:1px solid;">
-0.0344
-</td>
-<td style="text-align:center;border-left:1px solid;border-right:1px solid;">
-0.08
-</td>
-</tr>
-<tr>
-<td style="text-align:center;border-left:1px solid;border-right:1px solid;">
-<span class="math inline">\(A^c\)</span>
-</td>
-<td style="text-align:center;border-left:1px solid;border-right:1px solid;">
-0.2208
-</td>
-<td style="text-align:center;border-left:1px solid;border-right:1px solid;">
-0.6992
-</td>
-<td style="text-align:center;border-left:1px solid;border-right:1px solid;">
-0.92
-</td>
-</tr>
-<tr>
-<td style="text-align:center;border-left:1px solid;border-right:1px solid;">
-<span class="math inline">\(Total\)</span>
-</td>
-<td style="text-align:center;border-left:1px solid;border-right:1px solid;">
-0.2664
-</td>
-<td style="text-align:center;border-left:1px solid;border-right:1px solid;">
-0.7336
-</td>
-<td style="text-align:center;border-left:1px solid;border-right:1px solid;">
-1.00
-</td>
-</tr>
-</tbody>
-</table>
-</div>
-<ol start="8" style="list-style-type: lower-roman">
 <li>Finally return the probability that an individual has cervical
 cancer given that they test positive on the pap smear.</li>
 </ol>
-<div class="blackbox">
-<div class="center">
-<p><strong>Solution</strong></p>
-</div>
-<p>We can get this it two ways: 1) using the table from point vii and
-noting that <span class="math display">\[P(A | B) = P(A \cap B) / P(B) =
-0.0456 / 0.2664 = 0.1711\]</span></p>
-<ol start="2" style="list-style-type: decimal">
-<li>Using Bayes’ theorem: <span class="math display">\[P(A | B) =
-\frac{P(B | A)P(A)}{P(B | A)P(A)+P(B | A^C)P(A^C)}=\frac{0.57 \times
-0.08}{0.57 \times 0.08 + 0.24 \times 0.92}=0.1711\]</span></li>
-</ol>
-</div>
 </div>
 <div id="new-screening-method" class="section level1">
 <h1>4. New screening method</h1>
@@ -2277,117 +2025,12 @@ specific.</p>
 <li>Using the same prevalence as in Question 2, obtain the probability
 of having cervical cancer if you test positive at the colposcopy.
 Compare the pros and cons of the two different screening methods.</li>
-</ol>
-<div class="blackbox">
-<div class="center">
-<p><strong>Solution</strong></p>
-</div>
-<table class="table" style="margin-left: auto; margin-right: auto;">
-<thead>
-<tr>
-<th style="text-align:center;">
-<span class="math inline">\(Event\)</span>
-</th>
-<th style="text-align:center;">
-<span class="math inline">\(B\)</span>
-</th>
-<th style="text-align:center;">
-<span class="math inline">\(B^c\)</span>
-</th>
-<th style="text-align:center;">
-<span class="math inline">\(Total\)</span>
-</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td style="text-align:center;border-left:1px solid;border-right:1px solid;">
-<span class="math inline">\(A\)</span>
-</td>
-<td style="text-align:center;border-left:1px solid;border-right:1px solid;">
-0.0736
-</td>
-<td style="text-align:center;border-left:1px solid;border-right:1px solid;">
-0.0064
-</td>
-<td style="text-align:center;border-left:1px solid;border-right:1px solid;">
-0.08
-</td>
-</tr>
-<tr>
-<td style="text-align:center;border-left:1px solid;border-right:1px solid;">
-<span class="math inline">\(A^c\)</span>
-</td>
-<td style="text-align:center;border-left:1px solid;border-right:1px solid;">
-0.3036
-</td>
-<td style="text-align:center;border-left:1px solid;border-right:1px solid;">
-0.6164
-</td>
-<td style="text-align:center;border-left:1px solid;border-right:1px solid;">
-0.92
-</td>
-</tr>
-<tr>
-<td style="text-align:center;border-left:1px solid;border-right:1px solid;">
-<span class="math inline">\(Total\)</span>
-</td>
-<td style="text-align:center;border-left:1px solid;border-right:1px solid;">
-0.3772
-</td>
-<td style="text-align:center;border-left:1px solid;border-right:1px solid;">
-0.6228
-</td>
-<td style="text-align:center;border-left:1px solid;border-right:1px solid;">
-1.00
-</td>
-</tr>
-</tbody>
-</table>
-<p>We now get <span class="math display">\[P(A | B) = 0.0736 / 0.3772 =
-0.1951\]</span></p>
-</div>
-<ol start="2" style="list-style-type: lower-alpha">
 <li>What does it mean for a test to be highly sensitive?</li>
-</ol>
-<div class="blackbox">
-<div class="center">
-<p><strong>Solution</strong></p>
-</div>
-<p>Sensitivity refers to a test’s ability to detect an individual with
-disease as positive. Therefore, a highly sensitive test means that there
-are few false negative results, and thus fewer cases of disease are
-missed.</p>
-</div>
-<ol start="3" style="list-style-type: lower-alpha">
 <li>What does it mean for a test to be highly specific?</li>
-</ol>
-<div class="blackbox">
-<div class="center">
-<p><strong>Solution</strong></p>
-</div>
-<p>Specificity refers to a test’s ability to designate an individual who
-does not have a disease as negative. Therefore, a highly specific test
-means that there are few false positive results, and thus fewer cases of
-disease are treated when they should not be. This is important for
-potentially intrusive treatment procedures.</p>
-</div>
-<ol start="4" style="list-style-type: lower-alpha">
 <li>Given the two screening methods in Questions 3 and 4, what is the
 best method of screening for cervical cancer? You can use, none, either,
 or both.</li>
 </ol>
-<div class="blackbox">
-<div class="center">
-<p><strong>Solution</strong></p>
-</div>
-<p>A pap smear is less sensitive, but more specific than the colposcopy.
-The probability of having cervical cancer given a positive smear is only
-slightly smaller than given a positive colposcopy. This along with a pap
-smear being less intrusive than a colposcopy, would be than using a pap
-smear as an initial diagnosis and then the colposcopy as a confirmation
-would be a good overall method for screening for cervical cancer.</p>
-</div>
 </div>
 
 
