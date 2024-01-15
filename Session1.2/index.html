@@ -174,7 +174,9 @@ Now we summarise the **data** that we get from the diagnostic tests:
 
 These are .alert[**conditional probabilities**] and defining B the event: a person tests positive for COVID-19, we can summarise the above information in  
 
-`$$P(B \mid A) = 0.8 \text{    and    } P(B \mid A^C)=0.01$$`
+`$$P(B \mid A) = 0.8$$`
+and
+`$$P(B \mid A^C) = 1 - P(B^C \mid A^C) = 1 - 0.99 =0.01$$`
 
 ---
 
@@ -214,7 +216,15 @@ Finally information about A does not always change our understanding of B: then 
 
 - Provable from probability axioms
 
+
+
 $$ P(A|B) =\frac{P(A \cap B)}{P(B)} = \frac{ P(B|A) P(A) } {P(B)}$$
+
+&lt;span style="display:block; margin-top: -20px ;"&gt;&lt;/span&gt;
+
+&lt;center&gt;&lt;img src=./img/venn_diagram.png width='50%' title=''&gt;&lt;/center&gt;
+
+&lt;span style="display:block; margin-top: -20px ;"&gt;&lt;/span&gt;
 
 - If `\(A_i\)` is a set of mutually exclusive and exhaustive events
 (*i.e.* `\(A_i\cap A_j=\emptyset\)`, `\(P( \bigcup\limits_i A_i ) = \sum\limits_i P(A_i) = 1\)`), then
@@ -232,10 +242,10 @@ We are moving unconsciously from conditional probability to likelihood.
 --
 
 When A is known, the conditional probability function `\(P(.\mid A)\)` allows to compute the probabilities of an unknown event `\(B\)` or `\(B^C\)`:
-`$$P(B\mid A) \text{ vs } P(B^C \mid A)$$`
+`$$P(B\mid A) \text{ compared to } P(B^C \mid A)$$`
 When B is known (i.e. observed), the likelihood function `\(L(.\mid B)\)` allows to evaluate the relative compatibility of the data `\(B\)` with the event `\(A\)` or `\(A^C\)`:
 
-`$$L(A \mid B) = P(B \mid A) \text{   vs   } L(A^C \mid B) = P(B \mid A^C)$$`
+`$$L(A \mid B) = P(B \mid A) \text{   compared to   } L(A^C \mid B) = P(B \mid A^C)$$`
 
 --
 
@@ -334,12 +344,33 @@ then Bayes' theorem will calculate `\(P(A \mid B)\)` combining information from 
 ---
 
 # Does it really work?
-&lt;span style="display:block; margin-top: 10px ;"&gt;&lt;/span&gt;
 
-&lt;img src="./img/unnamed-chunk-4-1.png" style="display: block; margin: auto;" width="50%" title="INSERT TEXT HERE"&gt;
+&lt;span style="display:block; margin-top: -10px ;"&gt;&lt;/span&gt;
+
+&lt;center&gt;&lt;img src=./img/example_as_bayes_no_values.png width='75%' title='INCLUDE TEXT HERE'&gt;&lt;/center&gt;
+
 --
 
-Usin Bayes' theorem we get
+&lt;span style="display:block; margin-top: -20px ;"&gt;&lt;/span&gt;
+
+Using Bayes' theorem we get
+
+`$$p(A|B) = \frac{ P(B|A) P(A) } {P(B|A) P(A) + P(B|A^C) P(A^C)}$$`
+
+---
+count:false
+
+# Does it really work?
+
+&lt;span style="display:block; margin-top: -10px ;"&gt;&lt;/span&gt;
+
+&lt;center&gt;&lt;img src=./img/example_as_bayes_values.png width='75%' title='INCLUDE TEXT HERE'&gt;&lt;/center&gt;
+
+--
+
+&lt;span style="display:block; margin-top: -20px ;"&gt;&lt;/span&gt;
+
+Using Bayes' theorem we get
 
 `$$p(A|B) = \frac{ P(B|A) P(A) } {P(B|A) P(A) + P(B|A^C) P(A^C)}=\frac{0.8 \times 0.06 } {0.8 \times  0.06 + 0.01 \times 0.94} = 0.84$$`
 
@@ -359,7 +390,7 @@ Usin Bayes' theorem we get
 
 .pull-right[
 
-&lt;center&gt;&lt;img src=./img/Bayes.png width='80%' title=''&gt;&lt;/center&gt;
+&lt;center&gt;&lt;img src=./img/Bayes1.png width='150%' title=''&gt;&lt;/center&gt;
 ]
 
 --
