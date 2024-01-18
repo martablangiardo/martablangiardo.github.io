@@ -1,5 +1,5 @@
 
-Welcome to this joint module between MSc Epi (Bayesian Reasoning and Methods for spatio-temporal data) And HDA (Advance Analytics).
+Welcome to this joint module between MSc Epi (Bayesian Reasoning and Methods for spatio-temporal data) and HDA (Advance Analytics).
 
 Spatial and spatio-temporal analysis represent an increasingly important tool in public health research as well as in geographic and environmental epidemiology due to the emerging availability of spatial/temporal health data and the development of novel computational techniques, allowing for the analysis of large database.  
 
