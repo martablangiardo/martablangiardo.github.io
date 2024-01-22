@@ -189,7 +189,7 @@ Note that `\(Y\)` is a **random variable** (look at recording 3 for a more detai
 
 As a first step we need to assign a prior on `\(\theta\)`. 
 
-As a simplification let's assume that `\(\theta\)` is discrete and can only get thevalues 0.1,0.4,0.8 with the following probability function, which specifies the prior probability of each possible `\(\theta\)` value:
+As a simplification let's assume that `\(\theta\)` is discrete and can only get the values 0.1,0.4,0.8 with the following probability function, which specifies the prior probability of each possible `\(\theta\)` value:
 &lt;span style="display:block; margin-top: 30px ;"&gt;&lt;/span&gt;
 
 &lt;table class=" lightable-classic" style='font-family: "Arial Narrow", "Source Sans Pro", sans-serif; width: auto !important; margin-left: auto; margin-right: auto;'&gt;
@@ -298,7 +298,7 @@ Similarly to last week with events, the likelihood function follows from evaluat
 
 ---
 
-# Likelihood vs probability function
+# Likelihood and probability function
 
 Let's recall the fundamental difference between probability function and likelihood function
 
@@ -307,14 +307,14 @@ Let's recall the fundamental difference between probability function and likelih
 .pull-left[
 .content-box-yellow[
 When `\(\theta\)` is known, the **conditional probability function** `\(p(\cdot\mid \theta)\)` allows us to compare the probabilities of different values of the data `\(Y\)` occurring with `\(\theta\)`:
-`$$p(y_1\mid \theta) \text{  vs  } p(y_2\mid \theta)$$`
+`$$p(y_1\mid \theta) \text{  compared to  } p(y_2\mid \theta)$$`
 ]
 ]
 
 .pull-right[
 .content-box-yellow[
 When `\(Y\)` is known, the **likelihood function** `\(L(\cdot\mid y) = p(y \mid \cdot)\)` allows us to compare the relative likelihood of the data `\(y\)` under different possible values of `\(\theta\)`:
-`$$L(\theta_1 \mid y) = p(y \mid \theta_1) \text{  vs  } L(\theta_2 \mid y) = p(y \mid \theta_2)$$`
+`$$L(\theta_1 \mid y) = p(y \mid \theta_1) \text{  compared to } \\L(\theta_2 \mid y) = p(y \mid \theta_2)$$`
 ]
 ]
 
@@ -412,7 +412,7 @@ which gives us:
 It normalises the posterior probabilities so they sum to 1
 ]
 
-- So we can simply acknowledge that  `\(p(y=10) = 1/c\)` and replace the posterior as:
+- So we can simply acknowledge that  `\(p(y=10) = c\)` and replace the posterior as:
 
 `$$p(\theta \mid y=10) \propto p(\theta)\times L(\theta \mid y)$$`
 - The proportionality means that if we compare the normalised and unnormalised posterior they preserve their relative relationship

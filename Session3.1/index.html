@@ -167,6 +167,89 @@ name: mcmcINLA
 
 ---
 
+# Why Markov Chain Monte Carlo?
+
+- For all but trivial examples it will be difficult to draw an iid Monte Carlo
+sample directly from the posterior distribution. 
+  - This happens, for example, when the dimension of the parameter vector `\(\bm{\theta}\)` is high  
+  - Also to use MC methods we must have a known form for the posterior distribution 
+
+--
+
+&lt;span style="display:block; margin-top: 10px ;"&gt;&lt;/span&gt;
+
+- Alternatively *correlated* values (via MCMC) can be (more easily) drawn to approximate the posterior distribution of the parameter of interest
+
+- Instead of simulating independent values from the posterior distribution we draw a sample by running a Markov chain whose stationary distribution is the posterior density `\(p(\theta\mid y)\)`
+
+--
+
+&lt;span style="display:block; margin-top: 10px ;"&gt;&lt;/span&gt;
+
+- A sequence of values `\(\left\{\theta^{(1)},\ldots, \theta^{(m)}\right\}\)`  generated from a Markov chain that has reached its stationary distribution (i.e. has converged) can be considered as an approximation to the posterior distribution and can be used to compute all the summaries of interest.
+
+--
+
+&lt;span style="display:block; margin-top: 10px ;"&gt;&lt;/span&gt;
+
+- MCMC methods are very general and can effectively be applied to `any` model
+
+- Even if **in theory**, MCMC can provide (nearly) exact inference, given perfect convergence and MC error `\(\rightarrow 0\)`, in practice, this has to be balanced with model complexity and running time 
+
+- This is an issue particularly for problems characterised by large data or very complex structure (e.g. hierarchical models)
+
+---
+
+# MCMC: Gibbs sampling
+
+The .red[**Gibbs sampling**] (GS) is one of the most popular schemes for MCMC. Consider the case of a generic `\(J\)` dimensional parameter set `\((\theta_1,\theta_2,\ldots,\theta_J)\)`:
+
+
+1. Select a set of initial values `\(\color{blue}{(\theta^{(0)}_1,\theta^{(0)}_2,\ldots,\theta^{(0)}_J)}\)`
+
+2. Sample `\(\color{blue}{\theta^{(1)}_1}\)` from the conditional distribution `\(\color{blue}{ p(\theta_1\mid \theta^{(0)}_2,\theta^{(0)}_3,\ldots,\theta^{(0)}_J,y)}\)`;
+Sample `\(\color{blue}{\theta^{(1)}_2}\)` from the conditional distribution `\(\color{blue}{p(\theta_2\mid \theta^{(1)}_1,\theta^{(0)}_3,\ldots,\theta^{(0)}_J,y)}\)`;
+...;
+Sample `\(\color{blue}{\theta^{(1)}_J}\)` from the conditional distribution `\(\color{blue}{p(\theta_J\mid \theta^{(1)}_1,\theta^{(1)}_2,\ldots,\theta^{(1)}_{J-1},y)}\)`
+
+--
+
+3. Repeat step 2. for `\(S\)` times until convergence is reached to the target distribution `\(\color{blue}{p(\bm\theta\mid y)}\)`
+
+4. Use the sample from the target distribution to compute all relevant statistics: (posterior) mean, variance, credibility intervals, etc.
+
+If the *full conditionals* are not readily available, they need to be estimated (eg via Metropolis-Hastings) before applying the GS 
+
+Easy references for MCMC are 
+
+- Blangiardo and Cameletti (2015), Chapter 4
+
+- Johnson, Ott, and Dogucu (2022), Chapters 6-7
+
+---
+
+# MCMC: convergence
+
+&lt;center&gt;&lt;img src=./img/NormGibbs1.jpeg width='50%' title='INCLUDE TEXT HERE'&gt;&lt;/center&gt;
+
+---
+
+count: false
+
+# MCMC: convergence
+
+&lt;center&gt;&lt;img src=./img/NormGibbs2.jpeg width='53%' title=''&gt;&lt;/center&gt;
+
+---
+
+count: false
+
+# MCMC: convergence
+
+&lt;center&gt;&lt;img src=./img/NormGibbs3.jpeg width='50%' title='INCLUDE TEXT HERE'&gt;&lt;/center&gt;
+
+---
+
 # From MCMC to INLA
 
 - `Standard` MCMC sampler are generally easy-ish to program and are in fact implemented in readily available software
@@ -1102,11 +1185,11 @@ We specify a simple regression model with `Petal.length` and `Petal.width` as de
 
 ```
                 mean         sd 0.025quant 0.5quant 0.975quant     mode
-(Intercept) 1.083565 0.07287884  0.9404591 1.083565   1.226671 1.083565
-Petal.Width 2.229935 0.05133414  2.1291339 2.229935   2.330735 2.229935
+(Intercept) 1.083565 0.07286566   0.940485 1.083565   1.226645 1.083565
+Petal.Width 2.229935 0.05132486   2.129152 2.229935   2.330717 2.229935
                      kld
-(Intercept) 3.636672e-09
-Petal.Width 3.636680e-09
+(Intercept) 3.639943e-09
+Petal.Width 3.639935e-09
 ```
 
 - For each unstructured *fixed* effect, `R-INLA` reports a set of summary statistics from the posterior distribution.
@@ -1129,9 +1212,9 @@ Petal.Width 3.636680e-09
 
 ```
                                             mean        sd 0.025quant 0.5quant
-Precision for the Gaussian observations 4.431769 0.5117028   3.486738 4.412184
+Precision for the Gaussian observations 4.431769 0.5117064   3.486714 4.412183
                                         0.975quant     mode
-Precision for the Gaussian observations   5.490167 4.372833
+Precision for the Gaussian observations   5.490159 4.372853
 ```
 
 - For each hyperparameter the summary statistics are reported to describe the posterior distribution.
@@ -1194,7 +1277,7 @@ Precision for the Gaussian observations   5.490167 4.372833
 ```
 
 ```
-[1] 1.994027
+[1] 1.994386
 ```
 
 ```r
@@ -1202,7 +1285,7 @@ Precision for the Gaussian observations   5.490167 4.372833
 ```
 
 ```
-[1] 2.324648 2.278172 2.254304 2.293080
+[1] 2.229367 2.299791 2.270855 2.291310
 ```
 
 ]
@@ -1260,7 +1343,7 @@ Precision for the Gaussian observations   5.490167 4.372833
 ```
 
 ```
-[1] 0.2286683
+[1] 0.2286688
 ```
 
 
@@ -1306,6 +1389,9 @@ The INLA approach is not a rival/competitor/replacement to/of MCMC, just a bette
 
 Blangiardo, M. and M. Cameletti (2015). _Spatial and spatio-temporal
 Bayesian models with R-INLA_. John Wiley &amp; Sons.
+
+Johnson, A. A., M. Q. Ott, and M. Dogucu (2022). _Bayes Rules!: An
+Introduction to Applied Bayesian Modeling_. CRC Press.
 
 Rue, H., S. Martino, and N. Chopin (2009). "Approximate Bayesian
 inference for latent Gaussian model by using integrated nested Laplace
