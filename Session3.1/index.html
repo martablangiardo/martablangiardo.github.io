@@ -510,55 +510,6 @@ or equivalently
 
 #Laplace approximation --- example
 
-- Consider a `\(\chi^2\)` distribution con `\(k\)` degrees of freedom: `\(\class{red}{f(x) =  \frac{x^{\frac{k}{2}-1}e^{\frac{-x}{2}}}{2^{k/2}\Gamma(k/2)}}\)`
-
---
-
-1\. `\(\class{myblue}{l(x) = \log f(x) = \left( \frac{k}{2}-1 \right)\log x - \frac{x}{2}+\mbox{constant}}\)`
-
---
-
-2\. `\(\class{myblue}{l'(x)  = \frac{\partial \log f(x)}{\partial x} = \left( \frac{k}{2}-1 \right)x^{-1}-\frac{1}{2}}\)`
-
---
-
-3\. `\(\class{myblue}{l''(x) = \frac{\partial^2 \log f(x)}{\partial x^2} = -\left( \frac{k}{2}-1 \right)x^{-2}}\)`
-
---
-
-- Then
-
-  - Solving `\(\class{myblue}{l'(x) = 0}\)` we find the mode: `\(\color{olive}{x^*=k-2}\)`
-  - Evaluating `\(\class{myblue}{-\frac{1}{l''(x)}}\)` at the mode gives `\(\color{olive}{\sigma^{2^*}=2(k-2)}\)`
-
---
-
-- Consequently, we can approximate `\(f(x)\)` as
-`$$\class{myblue}{f(x) \approx  \mbox{Normal}(k-2,2(k-2))}$$`
-
----
-
-# Laplace approximation --- example
-
-.panelset[
-.panel[.panel-name[Fig 1]
-&lt;img src="./img/fig2-1.png" style="display: block; margin: auto;" width="50%"&gt;
-]
-
-.panel[.panel-name[Fig 2]
-&lt;img src="./img/fig3-1.png" style="display: block; margin: auto;" width="50%"&gt;
-]
-
-.panel[.panel-name[Fig 3]
-&lt;img src="./img/fig4-1.png" style="display: block; margin: auto;" width="50%"&gt;
-]
-]
-
-
----
-
-#Laplace approximation --- example
-
 
 - Consider a Gamma distribution: `\(f(x)=\frac{b^a}{\Gamma(a)}\exp\left(-bx\right)x^{a-1}\qquad x,a,b&gt;0.\)`
 
@@ -630,7 +581,7 @@ or equivalently
 
 1\. can be easily estimated as
 
-`$$\class{red}{p(\boldsymbol\psi\mid\boldsymbol{y})} \class{black}{= \frac{p(\boldsymbol\theta,\boldsymbol\psi\mid\boldsymbol{y})}{p(\boldsymbol\theta\mid\boldsymbol\psi,\boldsymbol{y})}} \text{ (Recall slide 13)}$$`
+`$$\class{red}{p(\boldsymbol\psi\mid\boldsymbol{y})} \class{black}{= \frac{p(\boldsymbol\theta,\boldsymbol\psi\mid\boldsymbol{y})}{p(\boldsymbol\theta\mid\boldsymbol\psi,\boldsymbol{y})}} \text{ (Recall slide 16)}$$`
 
 ---
 
@@ -682,6 +633,7 @@ count:false
 
 1\. can be easily estimated as
 
+
 `\begin{align}
 \class{red}{p(\boldsymbol\psi\mid\boldsymbol{y})} &amp; \class{black}{= \frac{p(\boldsymbol\theta,\boldsymbol\psi\mid\boldsymbol{y})}{p(\boldsymbol\theta\mid\boldsymbol\psi,\boldsymbol{y})}}\\
 &amp; =\frac{p(\boldsymbol{y}\mid\boldsymbol\theta,\boldsymbol\psi)p(\boldsymbol\theta,\boldsymbol\psi)}{p(\boldsymbol{y})}\frac{1}{p(\boldsymbol\theta\mid\boldsymbol\psi,\boldsymbol{y})}\\
@@ -690,35 +642,45 @@ count:false
 &amp; \approx \left. \frac{p(\boldsymbol\psi)p(\boldsymbol\theta\mid\boldsymbol\psi)p(\boldsymbol{y}\mid\boldsymbol\theta)}{\tilde{p}(\boldsymbol\theta\mid\boldsymbol\psi,\boldsymbol{y})}\right |_{\boldsymbol\theta={\boldsymbol\theta}^*(\boldsymbol\psi)} =: \class{red}{\tilde{p}(\boldsymbol\psi\mid\boldsymbol{y})}
 \end{align}`
 
-where 
 
 - `\(\tilde{p}(\boldsymbol\theta\mid\boldsymbol\psi,\boldsymbol{y})\)` is the Gaussian approximation given by the Laplace method  of `\(p(\boldsymbol\theta\mid\boldsymbol\psi,\boldsymbol{y})\)` 
 - `\(\boldsymbol\theta={\boldsymbol\theta}^*(\boldsymbol\psi)\)` is its mode for a given `\(\boldsymbol \psi\)`
 
+
 ---
+
+count:false
 
 # Integrated Nested Laplace Approximation (INLA)
 
+1\. can be easily estimated as
+
+.pull-left[
+`\begin{align}
+\class{red}{p(\boldsymbol\psi\mid\boldsymbol{y})} &amp; \class{black}{= \frac{p(\boldsymbol\theta,\boldsymbol\psi\mid\boldsymbol{y})}{p(\boldsymbol\theta\mid\boldsymbol\psi,\boldsymbol{y})}}\\
+&amp; =\frac{p(\boldsymbol{y}\mid\boldsymbol\theta,\boldsymbol\psi)p(\boldsymbol\theta,\boldsymbol\psi)}{p(\boldsymbol{y})}\frac{1}{p(\boldsymbol\theta\mid\boldsymbol\psi,\boldsymbol{y})}\\
+&amp;=\frac{p(\boldsymbol{y}\mid\boldsymbol\theta, \boldsymbol \psi)p(\boldsymbol\theta\mid\boldsymbol\psi)p(\boldsymbol\psi)}{p(\boldsymbol{y})}\frac{1}{p(\boldsymbol\theta\mid\boldsymbol\psi,\boldsymbol{y})}\\ 
+&amp; \propto \frac{p(\boldsymbol\psi)p(\boldsymbol\theta\mid\boldsymbol\psi)p(\boldsymbol{y}\mid\boldsymbol\theta,\boldsymbol \psi)}{p(\boldsymbol\theta\mid\boldsymbol\psi,\boldsymbol{y})}\\
+&amp; \approx \left. \frac{p(\boldsymbol\psi)p(\boldsymbol\theta\mid\boldsymbol\psi)p(\boldsymbol{y}\mid\boldsymbol\theta)}{\tilde{p}(\boldsymbol\theta\mid\boldsymbol\psi,\boldsymbol{y})}\right |_{\boldsymbol\theta={\boldsymbol\theta}^*(\boldsymbol\psi)} =: \class{red}{\tilde{p}(\boldsymbol\psi\mid\boldsymbol{y})}
+\end{align}`
+
+&lt;span style="display:block; margin-top: -10px ;"&gt;&lt;/span&gt;
+
+- `\(\tilde{p}(\boldsymbol\theta\mid\boldsymbol\psi,\boldsymbol{y})\)` is the Gaussian approximation given by the Laplace method  of `\(p(\boldsymbol\theta\mid\boldsymbol\psi,\boldsymbol{y})\)` 
+- `\(\boldsymbol\theta={\boldsymbol\theta}^*(\boldsymbol\psi)\)` is its mode for a given `\(\boldsymbol \psi\)`
+
+]
+
+.pull-right[
 2\. is slightly more complex, because in general there will be more elements in `\(\boldsymbol\theta\)` than there are in `\(\boldsymbol\psi\)` and thus this computation is more expensive.
 
---
-&lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
-
-.olive[**Gaussian Approximation**]: one easy and cheap possibility is to start from `\(\tilde{p}(\boldsymbol\theta\mid\boldsymbol\psi,\boldsymbol{y})\)` and approximate the density of `\(\class{orange}{\theta_i\mid\boldsymbol\psi,\boldsymbol{y}}\)`,  with the Gaussian marginals. While this is very fast, the approximation is generally not very good.
-
---
-&lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
-.olive[**Full Laplace Approximation**]: alternatively, we can write `\(\boldsymbol\theta=\{\theta_i,\boldsymbol\theta_{-i}\}\)`, use the definition of conditional probability and again Laplace approximation to obtain `\(\class{orange}{\tilde{p}(\theta_i\mid\boldsymbol\psi,\boldsymbol{y})}\)`
-(very computationally expensive)
-
---
-&lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
 The most efficient algorithm is the .olive[**Simplified Laplace Approximation**]:
 - Based on a Taylor's series expansion of the Laplace approximation `\(\class{orange}{\tilde{p}(\theta_i\mid\boldsymbol\psi,\boldsymbol{y})}\)`.
 - The accuracy of this approximation is sufficient in many applied cases and that the computing time is considerably shorter, it is the standard option.
 
----
+]
 
+---
 
 
 &lt;!--
@@ -857,6 +819,8 @@ count: false
 &lt;span style="display:block; margin-top: -10px ;"&gt;&lt;/span&gt;
 &lt;center&gt;&lt;img src=./img/inla4-1.png width='85%' title=''&gt;&lt;/center&gt;
 ]
+
+More details on the estimation procedure are available in Chater 2 of Gómez-Rubio (2020)
 
 ---
 
@@ -1126,7 +1090,7 @@ Some of the elements in an `inla` object returned by a call to `inla()` are:
 
 &lt;center&gt;&lt;img src=./img/Table_out_inla.png width='60%' title=''&gt;&lt;/center&gt;
 
-.center[Source: , Section 2.3.1]
+.center[Source: Gómez-Rubio (2020), Section 2.3.1]
 
 ---
 
@@ -1185,11 +1149,11 @@ We specify a simple regression model with `Petal.length` and `Petal.width` as de
 
 ```
                 mean         sd 0.025quant 0.5quant 0.975quant     mode
-(Intercept) 1.083565 0.07286566   0.940485 1.083565   1.226645 1.083565
-Petal.Width 2.229935 0.05132486   2.129152 2.229935   2.330717 2.229935
+(Intercept) 1.083565 0.07286521  0.9404859 1.083565   1.226645 1.083565
+Petal.Width 2.229935 0.05132454  2.1291528 2.229935   2.330716 2.229935
                      kld
-(Intercept) 3.639943e-09
-Petal.Width 3.639935e-09
+(Intercept) 3.639988e-09
+Petal.Width 3.639811e-09
 ```
 
 - For each unstructured *fixed* effect, `R-INLA` reports a set of summary statistics from the posterior distribution.
@@ -1212,9 +1176,9 @@ Petal.Width 3.639935e-09
 
 ```
                                             mean        sd 0.025quant 0.5quant
-Precision for the Gaussian observations 4.431769 0.5117064   3.486714 4.412183
-                                        0.975quant     mode
-Precision for the Gaussian observations   5.490159 4.372853
+Precision for the Gaussian observations 4.431768 0.5117055   3.486713 4.412183
+                                        0.975quant    mode
+Precision for the Gaussian observations    5.49015 4.37286
 ```
 
 - For each hyperparameter the summary statistics are reported to describe the posterior distribution.
@@ -1277,7 +1241,7 @@ Precision for the Gaussian observations   5.490159 4.372853
 ```
 
 ```
-[1] 1.994386
+[1] 1.994398
 ```
 
 ```r
@@ -1285,7 +1249,7 @@ Precision for the Gaussian observations   5.490159 4.372853
 ```
 
 ```
-[1] 2.229367 2.299791 2.270855 2.291310
+[1] 2.268042 2.226016 2.194307 2.261901
 ```
 
 ]
@@ -1343,7 +1307,7 @@ Precision for the Gaussian observations   5.490159 4.372853
 ```
 
 ```
-[1] 0.2286688
+[1] 0.2286689
 ```
 
 
@@ -1389,6 +1353,8 @@ The INLA approach is not a rival/competitor/replacement to/of MCMC, just a bette
 
 Blangiardo, M. and M. Cameletti (2015). _Spatial and spatio-temporal
 Bayesian models with R-INLA_. John Wiley &amp; Sons.
+
+Gómez-Rubio, V. (2020). _Bayesian inference with INLA_. CRC Press.
 
 Johnson, A. A., M. Q. Ott, and M. Dogucu (2022). _Bayes Rules!: An
 Introduction to Applied Bayesian Modeling_. CRC Press.
