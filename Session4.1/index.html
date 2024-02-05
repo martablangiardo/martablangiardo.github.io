@@ -496,7 +496,7 @@ name: interpretation
 ---
 
 # Parameter interpretation and useful quantities 
-- `\(\rho_i\)` is the log-relative risk for the area i compared to the average area with the same structure in the expected values.
+- `\(\rho_i\)` is the relative risk for the area i compared to the average area with the same structure in the expected values.
 
 - `\(v_{i}\)` are the random effects. It can also be seen as the latent variable which captures the effect of unknown or unmeasured area level covariates.
 
@@ -594,7 +594,7 @@ Note that
 
 - `\(\sigma_v\)` is the between-area standard deviation of log relative risk of lip cancer
 
-- As in INLA we get the precision we need to convert it into standard deviaiton using
+- As in INLA we get the precision we need to convert it into standard deviation using
 
 ```r
 &gt; sigma.v&lt;- inla.tmarginal(function(x) sqrt(1/x),
@@ -654,7 +654,7 @@ To obtain the quantile ratio we need to follow these steps:
 
 ```
 Predictor:1 Predictor:2 Predictor:3 
-   1.696743    1.322882    1.250297 
+   1.855751    1.603242    1.048860 
 ```
 &lt;span style="display:block; margin-top: -10px ;"&gt;&lt;/span&gt;
 Note that:
@@ -688,7 +688,7 @@ Note that:
 ```
 
 ```
-[1] 10.66425
+[1] 10.56443
 ```
 
 - The `\(QR90\)` points towards a large spatial variability. 
@@ -801,9 +801,9 @@ where `\(x_{1i}\)` , `\(x_{2i}\)` are the elevation and forest cover for the i `
 
 ```
                     mean           sd  0.025quant     0.5quant   0.975quant         mode          kld
-(Intercept) -5.787771531 0.4732679434 -6.71580341 -5.787771402 -4.859740390 -5.787771402 5.526128e-11
+(Intercept) -5.787771531 0.4732679419 -6.71580340 -5.787771402 -4.859740393 -5.787771401 5.526128e-11
 elev         0.002336135 0.0002224772  0.00189988  0.002336135  0.002772391  0.002336135 5.525786e-11
-forest       0.042872372 0.0046380369  0.03377765  0.042872371  0.051967107  0.042872371 5.525707e-11
+forest       0.042872372 0.0046380369  0.03377765  0.042872371  0.051967107  0.042872371 5.525203e-11
 ```
 ]
 
@@ -965,11 +965,11 @@ The assumptions are
 
 ```
                           mean        sd 0.025quant  0.5quant 0.975quant      mode
-fitted.Predictor.001  7.721553 0.5540704   6.632861  7.709413   8.897669  7.701556
-fitted.Predictor.002  7.437117 0.5248997   6.438831  7.410661   8.594115  7.380633
-fitted.Predictor.003 12.164226 0.8383416  10.515680 12.143800  13.959113 12.131408
-fitted.Predictor.004  4.455800 0.3615330   3.795503  4.433741   5.248132  4.401226
-fitted.Predictor.005 10.801745 0.7428501   9.401855 10.756458  12.460262 10.702667
+fitted.Predictor.001  7.721553 0.5540705   6.632861  7.709413   8.897669  7.701556
+fitted.Predictor.002  7.437117 0.5248999   6.438831  7.410661   8.594115  7.380633
+fitted.Predictor.003 12.164226 0.8383418  10.515680 12.143800  13.959114 12.131409
+fitted.Predictor.004  4.455800 0.3615331   3.795503  4.433741   5.248132  4.401226
+fitted.Predictor.005 10.801745 0.7428503   9.401855 10.756458  12.460263 10.702667
 ```
 ]
 
@@ -1015,11 +1015,11 @@ The assumptions are
 
 ```
                           mean        sd 0.025quant  0.5quant 0.975quant      mode
-fitted.Predictor.001  6.560510 0.2189444   6.131036  6.560510   6.989985  6.560510
-fitted.Predictor.002  9.121423 0.1472643   8.832554  9.121423   9.410292  9.121423
-fitted.Predictor.003 10.513605 0.2060418  10.109440 10.513605  10.917770 10.513605
-fitted.Predictor.004  4.596248 0.3530703   3.903677  4.596248   5.288820  4.596248
-fitted.Predictor.005  9.383114 0.1539703   9.081090  9.383114   9.685137  9.383114
+fitted.Predictor.001  6.560510 0.2189402   6.131044  6.560510   6.989977  6.560510
+fitted.Predictor.002  9.121423 0.1472614   8.832559  9.121423   9.410286  9.121423
+fitted.Predictor.003 10.513605 0.2060378  10.109448 10.513605  10.917762 10.513605
+fitted.Predictor.004  4.596248 0.3530635   3.903690  4.596248   5.288807  4.596248
+fitted.Predictor.005  9.383114 0.1539674   9.081096  9.383114   9.685131  9.383114
 ```
 ]
 
@@ -1127,7 +1127,7 @@ where `\(\theta\)` identifies the parameter of the likelihood
 
 --
 
-  - Complexity measured by estimate of the "effective number of parameters":
+  - Complexity measured by estimate of the "effective number of parameters" ($p_D$):
 
 &lt;!--  `$$p_D = \textsf{E}_{\theta\mid y}\left[D(\theta)\right] + D(\textsf{E}_{\theta\mid y}\left[\theta \right])$$`
 --&gt;
@@ -1187,7 +1187,7 @@ The DIC has been criticised over the years, specifically:
 
 3\. Issues when there are missing data
 
-See  for a complete description of the criticisms.
+See (Spiegelhalter, Best, Carlin, and Van der Linde, 2014) for a complete description of the criticisms.
 
 --
 
@@ -1299,6 +1299,8 @@ Blangiardo, M. and M. Cameletti (2015). _Spatial and spatio-temporal Bayesian mo
 Gelman, A. (2006). "Prior distributions for variance parameters in hierarchical models". In: _Bayesian Analysis_ 1".3", pp. 515-534.
 
 Gómez-Rubio, V. (2020). _Bayesian inference with INLA_. CRC Press.
+
+Spiegelhalter, D. J., N. G. Best, B. P. Carlin, et al. (2014). "The deviance information criterion: 12 years on". In: _Journal of the Royal Statistical Society: Series B (Statistical Methodology)_ 76.3, pp. 485-493.
     </textarea>
 <style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
 <script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
@@ -1406,7 +1408,7 @@ if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
 })(document);</script>
 <style>
 .logo {
-  background-image: url("assets/IC_logo.jpg");
+  background-image: url("assets/MRC-Centre-Logo.png");
   background-size: 15% 10%;
   background-repeat: no-repeat;
   position: absolute;
