@@ -639,7 +639,7 @@ count:false
 &amp; =\frac{p(\boldsymbol{y}\mid\boldsymbol\theta,\boldsymbol\psi)p(\boldsymbol\theta,\boldsymbol\psi)}{p(\boldsymbol{y})}\frac{1}{p(\boldsymbol\theta\mid\boldsymbol\psi,\boldsymbol{y})}\\
 &amp;=\frac{p(\boldsymbol{y}\mid\boldsymbol\theta, \boldsymbol \psi)p(\boldsymbol\theta\mid\boldsymbol\psi)p(\boldsymbol\psi)}{p(\boldsymbol{y})}\frac{1}{p(\boldsymbol\theta\mid\boldsymbol\psi,\boldsymbol{y})}\\ 
 &amp; \propto \frac{p(\boldsymbol\psi)p(\boldsymbol\theta\mid\boldsymbol\psi)p(\boldsymbol{y}\mid\boldsymbol\theta,\boldsymbol \psi)}{p(\boldsymbol\theta\mid\boldsymbol\psi,\boldsymbol{y})}\\
-&amp; \approx \left. \frac{p(\boldsymbol\psi)p(\boldsymbol\theta\mid\boldsymbol\psi)p(\boldsymbol{y}\mid\boldsymbol\theta)}{\tilde{p}(\boldsymbol\theta\mid\boldsymbol\psi,\boldsymbol{y})}\right |_{\boldsymbol\theta={\boldsymbol\theta}^*(\boldsymbol\psi)} =: \class{red}{\tilde{p}(\boldsymbol\psi\mid\boldsymbol{y})}
+&amp; \approx \left. \frac{p(\boldsymbol\psi)p(\boldsymbol\theta\mid\boldsymbol\psi)p(\boldsymbol{y}\mid\boldsymbol\theta, \boldsymbol\psi)}{\tilde{p}(\boldsymbol\theta\mid\boldsymbol\psi,\boldsymbol{y})}\right |_{\boldsymbol\theta={\boldsymbol\theta}^*(\boldsymbol\psi)} =: \class{red}{\tilde{p}(\boldsymbol\psi\mid\boldsymbol{y})}
 \end{align}`
 
 
@@ -661,7 +661,7 @@ count:false
 &amp; =\frac{p(\boldsymbol{y}\mid\boldsymbol\theta,\boldsymbol\psi)p(\boldsymbol\theta,\boldsymbol\psi)}{p(\boldsymbol{y})}\frac{1}{p(\boldsymbol\theta\mid\boldsymbol\psi,\boldsymbol{y})}\\
 &amp;=\frac{p(\boldsymbol{y}\mid\boldsymbol\theta, \boldsymbol \psi)p(\boldsymbol\theta\mid\boldsymbol\psi)p(\boldsymbol\psi)}{p(\boldsymbol{y})}\frac{1}{p(\boldsymbol\theta\mid\boldsymbol\psi,\boldsymbol{y})}\\ 
 &amp; \propto \frac{p(\boldsymbol\psi)p(\boldsymbol\theta\mid\boldsymbol\psi)p(\boldsymbol{y}\mid\boldsymbol\theta,\boldsymbol \psi)}{p(\boldsymbol\theta\mid\boldsymbol\psi,\boldsymbol{y})}\\
-&amp; \approx \left. \frac{p(\boldsymbol\psi)p(\boldsymbol\theta\mid\boldsymbol\psi)p(\boldsymbol{y}\mid\boldsymbol\theta)}{\tilde{p}(\boldsymbol\theta\mid\boldsymbol\psi,\boldsymbol{y})}\right |_{\boldsymbol\theta={\boldsymbol\theta}^*(\boldsymbol\psi)} =: \class{red}{\tilde{p}(\boldsymbol\psi\mid\boldsymbol{y})}
+&amp; \approx \left. \frac{p(\boldsymbol\psi)p(\boldsymbol\theta\mid\boldsymbol\psi)p(\boldsymbol{y}\mid\boldsymbol\theta,\boldsymbol\psi)}{\tilde{p}(\boldsymbol\theta\mid\boldsymbol\psi,\boldsymbol{y})}\right |_{\boldsymbol\theta={\boldsymbol\theta}^*(\boldsymbol\psi)} =: \class{red}{\tilde{p}(\boldsymbol\psi\mid\boldsymbol{y})}
 \end{align}`
 
 &lt;span style="display:block; margin-top: -10px ;"&gt;&lt;/span&gt;
@@ -1149,11 +1149,11 @@ We specify a simple regression model with `Petal.length` and `Petal.width` as de
 
 ```
                 mean         sd 0.025quant 0.5quant 0.975quant     mode
-(Intercept) 1.083565 0.07286521  0.9404859 1.083565   1.226645 1.083565
-Petal.Width 2.229935 0.05132454  2.1291528 2.229935   2.330716 2.229935
+(Intercept) 1.083565 0.07286553  0.9404853 1.083565   1.226645 1.083565
+Petal.Width 2.229935 0.05132477  2.1291524 2.229935   2.330717 2.229935
                      kld
-(Intercept) 3.639988e-09
-Petal.Width 3.639811e-09
+(Intercept) 3.639935e-09
+Petal.Width 3.639948e-09
 ```
 
 - For each unstructured *fixed* effect, `R-INLA` reports a set of summary statistics from the posterior distribution.
@@ -1176,9 +1176,9 @@ Petal.Width 3.639811e-09
 
 ```
                                             mean        sd 0.025quant 0.5quant
-Precision for the Gaussian observations 4.431768 0.5117055   3.486713 4.412183
-                                        0.975quant    mode
-Precision for the Gaussian observations    5.49015 4.37286
+Precision for the Gaussian observations 4.431767 0.5117051   3.486715 4.412181
+                                        0.975quant     mode
+Precision for the Gaussian observations    5.49015 4.372847
 ```
 
 - For each hyperparameter the summary statistics are reported to describe the posterior distribution.
@@ -1241,7 +1241,7 @@ Precision for the Gaussian observations    5.49015 4.37286
 ```
 
 ```
-[1] 1.994398
+[1] 1.994389
 ```
 
 ```r
@@ -1249,7 +1249,7 @@ Precision for the Gaussian observations    5.49015 4.37286
 ```
 
 ```
-[1] 2.268042 2.226016 2.194307 2.261901
+[1] 2.249799 2.212731 2.223766 2.280751
 ```
 
 ]
