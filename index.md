@@ -92,3 +92,31 @@ Lunch
 - [Practical 5](Practical5): Hierarchical models for longitudinal data and missing data imputation in R-INLA
 
 Complete material of practical 5 are [here](Practical5/Practical5.zip)
+
+Note that the last hour will be dedicated  to **Self directed learning**:  Maes et al, [Benefit of woodland and other natural environments for adolescents’ cognition and mental health](https://www.nature.com/articles/s41893-021-00751-1)
+
+A pdf version is available [here](Practical5/s41893-021-00751-1.pdf)
+
+### Day 6 - Mon 19th Feb 2024
+
+- Paper discussion: Benefit of woodland and other natural environments for adolescents' cognition and mental health (1 hr)
+- [Session 6](Session6):  Introduction to geospatial data (pdf [here](Session6/Session6.pdf))
+
+Lunch
+
+- [Practical 6a](Practical6a): Indirect standardization with R
+- [Practical6b](Practical6b): Disease mapping study of COVID-19 mortality in England
+
+Complete material of practical 6a are [here](Practical6a/Practical6a.zip)
+
+Complete material of practical 6b are [here](Practical6b/Practical6b.zip)
+
+### Day 7 - Mon 26th Feb 2024
+
+- [Session 7](Session7): Spatial models for small area data: disease mapping and ecological regression (pdf [here](Session7/Session7.pdf))
+
+Lunch
+
+- [Practical 7](Practical7): A spatial model for vaccination uptake - This practical is based on the [paper](https://link.springer.com/article/10.1007/s10654-022-00905-1)
+
+Complete material of practical 7 are [here](Practical7/Practical7.zip)
