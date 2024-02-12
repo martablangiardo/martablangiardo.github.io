@@ -132,7 +132,7 @@ After this session you should be able to:
 &lt;span style="display:block; margin-top: 10px ;"&gt;&lt;/span&gt;
 
 
-The topics treated in this lecture are covered in Chapter 4 of Gómez-Rubio (2020a).
+The topics covered in this lecture are covered in Chapter 4 of Gómez-Rubio (2020a).
 
 ---
 
@@ -390,14 +390,14 @@ We are assuming that *conditionally* on `\(\alpha_i\)`, `\(\{y_{it}, t=0,\ldots,
 &lt;span style="display:block; margin-top: 10px ;"&gt;&lt;/span&gt;
 
 - Assume that all the `\(\{\alpha_i\}\)` follow a *common* prior distribution, e.g.
-`$$\color{red}{\alpha_i \sim \mbox{Normal}(\mu_{\alpha}, \sigma^2_{\alpha}) \;\;\;\; i=1,\ldots,246}$$` 
+`$$\color{red}{\alpha_i \sim \mbox{Normal}(\mu_{\alpha}, \sigma^2_{\alpha}) \;\;\;\; i=1,\ldots,18}$$` 
 
 - Here we are assuming exchangeability between all the individuals
 - We may then assume vague priors for the *hyperparameters* of the population distribution:
 
 `\begin{align*}
 \color{red}{\mu_{\alpha}} &amp; \color{red}{\sim  \mbox{Normal}(0,10000)} \\
-\color{red}{\frac{1}{\sigma_{\alpha}}} &amp; \color{red}{\sim  \mbox{Gamma}(1,0.001)}
+\color{red}{\frac{1}{\sigma^2_{\alpha}}} &amp; \color{red}{\sim  \mbox{Gamma}(1,0.001)}
 \end{align*}`
 
 - This is an example of a *Hierarchical LM* or *Linear Mixed Model (LMM)* or *Random Intercepts* model
@@ -501,7 +501,7 @@ We are assuming that *conditionally* on `\(\alpha_i\)`, `\(\{y_{it}, t=0,\ldots,
 
 ```r
 &gt; library(INLA)
-&gt; formula_LMM &lt;- Reaction ~ Days + f(Subject,model="iid")
+&gt; formula_LMM &lt;- Reaction ~ -1 + Days + f(Subject,model="iid")
 &gt; lmm &lt;- inla(formula_LMM, data=sleepstudy, family="gaussian", control.compute = list(waic=TRUE))
 &gt; #Plot
 &gt; p &lt;- ggplot(data = sleepstudy, aes(x=Days, y=Reaction, group=Subject))
@@ -545,6 +545,23 @@ name: interpretation
 
 ---
 
+# Comparing the three models
+
+&lt;center&gt;&lt;img src=./img/DAGS2.png width='100%' title='INCLUDE TEXT HERE'&gt;&lt;/center&gt;
+
+.center[
+
+(left): LM
+
+(center): LMM - random intercept
+
+(right): LMM - random intercept and slope
+
+]
+
+
+---
+
 # Sleep Example: adding random slopes
 
 - Modify LMM to allow a separate slope for each individual:
@@ -564,19 +581,19 @@ y_{it} &amp; \sim  \mbox{Normal}(\mu_{it},\sigma^2) \\
 
 ```r
 &gt; Subject2&lt;-sleepstudy$Subject
-&gt; formula_LMM2 &lt;- Reaction ~ f(Subject, model="iid") + f(Subject2, Days, model="iid")
+&gt; formula_LMM2 &lt;- Reaction ~ -1 + f(Subject, model="iid", constr=FALSE) + f(Subject2, Days, model="iid", constr=FALSE)
 &gt; lmm2 &lt;- inla(formula_LMM2, data=sleepstudy, family="gaussian", control.compute = list(waic=TRUE))
 &gt; #To access the summaries of the beta_i
 &gt; lmm2$summary.random$Subject2[1:5,]
 ```
 
 ```
-   ID          mean          sd    0.025quant      0.5quant  0.975quant          mode          kld
-1 308  0.0202720101 0.002468461  0.0154202872  0.0202734853 0.025115247  0.0202734686 3.680886e-09
-2 309 -0.0002447903 0.002567720 -0.0052437367 -0.0002580761 0.004828643 -0.0002584514 6.417239e-09
-3 310  0.0033540086 0.002574238 -0.0016584051  0.0033410818 0.008438887  0.0033407099 6.032259e-09
-4 330  0.0046027925 0.002509989 -0.0003599004  0.0046159374 0.009491850  0.0046162941 7.333773e-09
-5 331  0.0065638451 0.002498617  0.0016241150  0.0065765431 0.011432400  0.0065768717 7.297432e-09
+   ID        mean          sd    0.025quant    0.5quant  0.975quant        mode          kld
+1 308 0.020670507 0.002755625  0.0152490733 0.020674366 0.026070095 0.020674410 3.306600e-09
+2 309 0.002253256 0.002725803 -0.0030979042 0.002252969 0.007606057 0.002252971 3.069934e-09
+3 310 0.005886435 0.002727833  0.0005291753 0.005886891 0.011241114 0.005886895 3.063615e-09
+4 330 0.003006663 0.002726323 -0.0023450831 0.003006223 0.008360930 0.003006226 3.073045e-09
+5 331 0.005133955 0.002727477 -0.0002213224 0.005133960 0.010489223 0.005133964 3.061511e-09
 ```
 
 ---
@@ -596,6 +613,72 @@ y_{it} &amp; \sim  \mbox{Normal}(\mu_{it},\sigma^2) \\
 - .red[LMM with random intercepts and random slopes:]
   - now intercepts and slopes both vary
   -  better fit for each individual
+
+]
+]
+---
+
+# Which model is the best?
+
+.pull-left[
+- Comparing WAIC    
+
+```r
+&gt; #Linear model
+&gt; lm$waic$waic
+```
+
+```
+[1] -580.1704
+```
+
+```r
+&gt; #Random intercept
+&gt; lmm$waic$waic
+```
+
+```
+[1] -716.7855
+```
+
+```r
+&gt; #Random intercept and slope
+&gt; lmm2$waic$waic
+```
+
+```
+[1] -763.4362
+```
+
+- It looks like the model with random intercept and slope fits the data best
+]
+
+.pull-right[
+- We can look at the variance hyperparameters of the lmm2 model to see how variable the intercept and slope are across individuals
+
+
+```r
+&gt; #Random slope model
+&gt; #Variability of the random intercept
+&gt; inla.emarginal(fun=function(x) 1/x, 
++                lmm2$marginals.hyperpar[[2]])
+```
+
+```
+[1] 0.06369514
+```
+
+```r
+&gt; #Variability of the random slope
+&gt; inla.emarginal(fun=function(x) 1/x, 
++                lmm2$marginals.hyperpar[[3]])
+```
+
+```
+[1] 0.0001472959
+```
+
+- Some variability for both intercept and slope. 
 ]
 
 ---

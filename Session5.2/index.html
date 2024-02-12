@@ -432,9 +432,9 @@ name: model
 
 ```
                  mean        sd 0.025quant  0.5quant 0.975quant      mode          kld
-(Intercept)  6.259187 0.4357703   5.404510  6.259188   7.113863  6.259188 8.606053e-12
-age          3.330942 0.0336741   3.264897  3.330942   3.396987  3.330942 7.832665e-12
-sexgirl     -2.378945 0.4458790  -3.253446 -2.378945  -1.504441 -2.378945 8.601113e-12
+(Intercept)  6.259187 0.4366541   5.402776  6.259187   7.115596  6.259187 8.226538e-12
+age          3.330942 0.0337424   3.264763  3.330942   3.397121  3.330942 8.191037e-12
+sexgirl     -2.378943 0.4467831  -3.255217 -2.378943  -1.502665 -2.378943 8.222614e-12
 ```
 
 ```r
@@ -443,7 +443,7 @@ sexgirl     -2.378945 0.4458790  -3.253446 -2.378945  -1.504441 -2.378945 8.6011
 
 ```
                                               mean           sd 0.025quant   0.5quant 0.975quant       mode
-Precision for the Gaussian observations 0.01973016 0.0008699233 0.01805505 0.01971744 0.02147084 0.01968416
+Precision for the Gaussian observations 0.01972965 0.0008695491   0.018057 0.01972063  0.0214716 0.01971399
 ```
 
 - Note that we need to include `control.predictor=list(compute = TRUE)` so `INLA` can estimate the predictive distribution for the missing observations, while `control.compute=list(return.marginals.predictor=TRUE)` tells inla that we want to access the entire posterior distribution of the prediction (rather than only the summary)
@@ -470,12 +470,12 @@ We now subset the children indexes with missing values so we can report their pr
 ```
 
 ```
-                           mean        sd
-fitted.Predictor.0002 23.067927 0.3200624
-fitted.Predictor.0003 27.617341 0.3328608
-fitted.Predictor.0004 54.019923 0.3765110
-fitted.Predictor.0006 13.144502 0.3926976
-fitted.Predictor.0009  7.838159 0.3936680
+                          mean        sd
+fitted.Predictor.0002 23.06793 0.3206082
+fitted.Predictor.0003 27.61734 0.3334283
+fitted.Predictor.0004 54.01992 0.3771530
+fitted.Predictor.0006 13.14450 0.3933672
+fitted.Predictor.0009  7.83816 0.3943393
 ```
 
 Remember that you can also access the marginal posterior distributions (rather than the summary) using `wgt.inla$marginals.fitted.values`
@@ -495,9 +495,9 @@ Remember that you can also access the marginal posterior distributions (rather t
 
 ```
                  mean         sd 0.025quant  0.5quant 0.975quant      mode          kld
-(Intercept) 77.148127 0.71788318  75.740129 77.148129  78.556119 77.148129 1.058877e-11
-age          6.022575 0.05524522   5.914221  6.022575   6.130928  6.022575 1.047647e-11
-sexgirl     -4.716091 0.72790698  -6.143739 -4.716094  -3.288429 -4.716094 1.156810e-11
+(Intercept) 77.148115 0.72150119  75.733029 77.148117  78.563195 77.148117 7.425339e-12
+age          6.022575 0.05552369   5.913676  6.022575   6.131473  6.022575 8.643032e-12
+sexgirl     -4.716066 0.73157410  -6.150898 -4.716068  -3.281220 -4.716068 8.495129e-12
 ```
 
 ```r
@@ -506,7 +506,7 @@ sexgirl     -4.716091 0.72790698  -6.143739 -4.716094  -3.288429 -4.716094 1.156
 
 ```
                                                mean           sd  0.025quant    0.5quant  0.975quant        mode
-Precision for the Gaussian observations 0.007401298 0.0003331522 0.006759002 0.007402407 0.008059761 0.007431234
+Precision for the Gaussian observations 0.007395396 0.0003241965 0.006762723 0.007391652 0.008044646 0.007383216
 ```
 
 ---
@@ -526,16 +526,16 @@ Precision for the Gaussian observations 0.007401298 0.0003331522 0.006759002 0.0
 
 ```
                            mean        sd
-fitted.Predictor.0001 122.24530 0.5340634
-fitted.Predictor.0005  83.24902 0.6814383
-fitted.Predictor.0007  74.64155 0.6767965
-fitted.Predictor.0008  82.80382 0.6840185
-fitted.Predictor.0010  88.26139 0.5997251
-fitted.Predictor.0012  96.55558 0.6119300
-fitted.Predictor.0013  86.31596 0.6640740
-fitted.Predictor.0016  81.84747 0.6896103
-fitted.Predictor.0017  77.75822 0.7142424
-fitted.Predictor.0018  81.59987 0.6355219
+fitted.Predictor.0001 122.24529 0.5364459
+fitted.Predictor.0005  83.24901 0.6844784
+fitted.Predictor.0007  74.64156 0.6798160
+fitted.Predictor.0008  82.80381 0.6870701
+fitted.Predictor.0010  88.26140 0.6024006
+fitted.Predictor.0012  96.55556 0.6146600
+fitted.Predictor.0013  86.31595 0.6670367
+fitted.Predictor.0016  81.84746 0.6926869
+fitted.Predictor.0017  77.75821 0.7174290
+fitted.Predictor.0018  81.59988 0.6383572
 ```
 ]
 
@@ -624,7 +624,7 @@ with
 &gt; sex.joint = rep(fdgs.sub$sex, 2)
 ```
 
-- Finally we need two index vectors to indicate which coefficient to use from the `iid2d` model is required. These indexes will be 1 for the first half of observations (to indicate that the coefficient is `\(\beta_h\)` and 2 for the second half (to indicate that the coefficient is `\(\beta_w\)`).
+- Finally we need two index vectors to indicate which coefficient to use from the `iid2d` model is required. These indexes will be 1 for the first half of observations (to indicate that the coefficient is `\(\beta_h\)`) and 2 for the second half (to indicate that the coefficient is `\(\beta_w\)`).
 
 
 ```r
@@ -653,36 +653,39 @@ The model is fit and summarized as seen below
 ```
 
 ```
-        mean        sd 0.025quant  0.5quant 0.975quant      mode          kld
-I1 80.246876 1.1116359  78.074215 80.244351  82.433815 80.244311 1.345205e-09
-I2  8.319242 0.6884827   6.972261  8.318076   9.672871  8.318074 7.415314e-10
+       mean        sd 0.025quant  0.5quant 0.975quant      mode          kld
+I1 80.06873 1.1331984  77.853096 80.066486  82.297212 80.066482 1.083441e-09
+I2  8.00363 0.6894115   6.654851  8.002477   9.358907  8.002455 6.890018e-10
 ```
 
 ---
 
-# Hyperparameters and variable effects
+# Hyperparameters
 
 - The hyperparameters can be obtained through
 
 
 ```r
-&gt; fdgs.joint$summary.hyperpar
+&gt; fdgs.joint$summary.hyperpar[,1:5]
 ```
 
 ```
-                                                  mean           sd  0.025quant    0.5quant  0.975quant        mode
-Precision for the Gaussian observations    0.007406056 0.0003135132 0.006803454 0.007400996 0.008037609 0.007394277
-Precision for the Gaussian observations[2] 0.019724829 0.0008435417 0.018143478 0.019697624 0.021464261 0.019623041
-Precision for idx.sex (component 1)        0.701083928 0.1041724411 0.523964507 0.691663554 0.933358851 0.669635332
-Precision for idx.sex (component 2)        1.375125970 0.1924790178 1.017449315 1.367535940 1.773355982 1.365714767
-Rho1:2 for idx.sex                         0.688271565 0.0285343425 0.628366022 0.689519325 0.740892875 0.692486213
-Precision for idx.age (component 1)        0.237943283 0.0330966195 0.182714897 0.234658066 0.312637373 0.226045664
-Precision for idx.age (component 2)        0.658142902 0.1094451846 0.471961367 0.648242976 0.901700797 0.627245197
-Rho1:2 for idx.age                         0.785988513 0.0262499631 0.724844957 0.789187793 0.826921333 0.800341404
+                                                   mean           sd   0.025quant    0.5quant   0.975quant
+Precision for the Gaussian observations     0.007373593 0.0003145598  0.006717084  0.00738595  0.007946252
+Precision for the Gaussian observations[2]  0.019709776 0.0008207887  0.018139774  0.01969391  0.021370938
+Precision for idx.sex (component 1)         0.807691801 0.1376265502  0.598186111  0.78851971  1.134375795
+Precision for idx.sex (component 2)         1.843422184 0.2500229465  1.459318058  1.81103534  2.432346926
+Rho1:2 for idx.sex                          0.425326147 0.0411698112  0.339263622  0.42702710  0.501307207
+Precision for idx.age (component 1)         0.035227168 0.0042850275  0.026607350  0.03527524  0.043234135
+Precision for idx.age (component 2)         0.388983798 0.0422206656  0.310523126  0.38731394  0.476848834
+Rho1:2 for idx.age                         -0.335491522 0.0535833688 -0.446291707 -0.33384686 -0.236586888
 ```
+---
+
+# Variable effects
 
 - While the coefficients for `age` and `sex` are part of the random effects of the model:
-.pull-left[
+
 
 ```r
 &gt; #Sex
@@ -691,13 +694,10 @@ Rho1:2 for idx.age                         0.785988513 0.0262499631 0.724844957 
 
 ```
   ID      mean        sd 0.025quant  0.5quant 0.975quant      mode          kld
-1  1 -3.665276 0.6080339  -4.864646 -3.662704  -2.480407 -3.662651 4.647983e-09
-2  2 -2.166010 0.3805585  -2.915577 -2.164910  -1.422706 -2.164907 2.159819e-09
+1  1 -3.559709 0.6248791  -4.791506 -3.557376   -2.34126 -3.557374 3.874032e-09
+2  2 -1.955127 0.3812267  -2.705947 -1.953993   -1.21068 -1.953964 2.145948e-09
 ```
-]
 
-.pull-right[
-&lt;span style="display:block; margin-top: -23px ;"&gt;&lt;/span&gt;
 
 ```r
 &gt; #Age
@@ -706,10 +706,10 @@ Rho1:2 for idx.age                         0.785988513 0.0262499631 0.724844957 
 
 ```
   ID     mean         sd 0.025quant 0.5quant 0.975quant     mode          kld
-1  1 6.022639 0.05532880   5.914127 6.022640   6.131147 6.022640 0.000000e+00
-2  2 3.330118 0.03367797   3.264069 3.330118   3.396165 3.330118 3.915418e-13
+1  1 6.024578 0.05525105   5.916224 6.024577   6.132939 6.024577 5.819012e-13
+2  2 3.329329 0.03369649   3.263241 3.329330   3.395410 3.329330 1.173335e-12
 ```
-]
+
 ---
 
 # Estimates of missing values
