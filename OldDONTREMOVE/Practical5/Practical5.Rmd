@@ -1,0 +1,221 @@
+---
+title: "Practical 5 - Longitudinal data analysis using `R-INLA`"
+author: "Bayesian modelling for spatial and spatio-temporal data"
+output: 
+  html_document:
+    toc: true
+    toc_float: true
+bibliography: biblio.bib
+editor_options: 
+  chunk_output_type: console
+---
+
+\pagenumbering{gobble} 
+\pagenumbering{arabic} 
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, message=FALSE, warning=FALSE, fig.align = "center", class.source='klippy')
+```
+```{r klippy, echo=FALSE, include=TRUE}
+klippy::klippy(position = c('top', 'right'),color = 'darkred',
+               tooltip_message = 'Click to copy', tooltip_success = 'Done')
+```
+
+In this practical we will carry out a longitudinal analysis using data on individuals collected over time. The data are included in the R package `brinla`, which contains data and R code from the book by @wang2018 available at the website: https://julianfaraway.github.io/brinlabook/index.html
+
+The longitudinal data that we are going to use are from @singer2003 and concern reading scores (PIAT = Peabody Individual Achievement Test) measured on n = 89 children at ages 6.5, 8.5 and 10.5 years of age.
+We expect scores on the same student to be correlated, and as we saw in this week lecture, one way of acknowledging this is to include a random intercept in the model.
+
+
+To start with, create a separate subdirectory to save your files created during this practical (e.g. setwd("~/Practicals/Practical5")).
+
+
+# 1. Install and load packages 
+
+* This practical requires the installation of package `brinla` via `devtools`. Install the `devtools` R package if you have not already done so.
+
+```{r echo=TRUE, eval=FALSE}
+library(devtools)
+remotes::install_github("julianfaraway/brinla")
+```
+
+* Then, load the needed packages:
+```{r eval = TRUE, results="hide", message=FALSE, warning=FALSE}
+library(INLA)         
+library(brinla)  
+library(ggplot2)
+library(dplyr)
+
+# For tables in RMarkdown
+library(knitr)
+library(kableExtra)
+```
+
+
+# 2. Description and visualization of the data
+
+* We start by loading the data 
+```{r, eval=TRUE, echo=TRUE}
+data(reading, package = "brinla")
+```
+
+* Inspect the first rows of the data set `reading`
+```{r, eval=FALSE, echo=FALSE}
+head(reading)
+```
+
+* We now see an alternative and more elegant way to print the first five rows of the data, formatting these in a table. 
+RMarkdown by default displays data frames and matrices as they would be in the R terminal. To display a table with additional formatting, we can use the `knitr::kable` function:
+
+```{r eval=TRUE, echo=TRUE, message=FALSE}
+kable(reading[1:5,], booktabs = T) %>%
+  kable_styling(bootstrap_options = "striped", full_width = F, position = "center")
+```
+Note: to know more about this function, you can type in the console `?knitr::kable` and visit the page https://haozhu233.github.io/kableExtra/awesome_table_in_pdf.pdf
+
+
+* We visualize the data using `ggplot2`, showing how the reading score of the students vary across three ages of measurements
+```{r, echo=TRUE, eval=FALSE}
+ggplot(reading, aes(agegrp, piat, group = id)) + geom_line()
+```
+
+What do you observe?
+
+
+* Obtain the mean of the reading scores at the three time points (i.e. age groups)
+
+```{r, echo=FALSE, eval=FALSE}
+score_age = reading %>% group_by(agegrp) %>% 
+  summarise(mean.piat=mean(piat))
+score_age            
+```
+
+
+# 3. Model with random intecept for each student
+
+The simple and effective way to capture the dependence within child is to build a model with a random intercept.
+Let $i$ be the student index, for $i=1,\dots,89$ and $j$ be the time index (i.e., time related to the measurements performed at three different ages), for $j=1,2,3$. 
+We assume a Gaussian model for the reading scores and we include a random intercept in the linear predictor:
+
+\begin{equation*}
+y_{ij} = \beta_0 + \beta_{1}t_j + \alpha_i + \epsilon_{ij} 
+\end{equation*}
+
+where $\beta_0$ and $\beta_1$ are the fixed effects, and are the common intercept and slope for all students. The random intercept is given by $\alpha_i$ and is modelled as $\alpha_i\sim N(0, \sigma^2_{\alpha})$. Finally, $\epsilon_{ij}$ is the error term,  with $\epsilon_{ij} \sim N(0, \sigma^2_{\epsilon})$, where $\sigma^2_{\epsilon}$ is the measurement error variance.
+
+* Write the formula and fit the model in `R-INLA` for this model, calling the output as `imod`. In the formula, you can include the random intercept term using `f(id, model="iid")`. Here we use the model `iid` based on the assumption that the students are independent and have a common variance. 
+
+```{r, eval=TRUE, echo=FALSE}
+formula = piat ~ agegrp + f(id, model="iid")
+
+imod = inla(formula, family="gaussian", data=reading)
+```
+
+* Obtain the fixed effects summary
+
+```{r, eval=FALSE, echo=FALSE}
+imod$summary.fixed
+```
+
+* How you interpret the coefficient for `agegrp `?
+
+
+* Now inspect the hyperparameters, taking advantage of the function `bri.hyperpar.summary` (with argument the name of the model output), which directly converts precisions used internally by INLA to standard deviations (SD); then plot the posterior densities using the function `bri.hyperpar.plot`. Comment the results
+
+
+```{r, eval=FALSE, echo=FALSE}
+# summaries of the hyperparameters
+bri.hyperpar.summary(imod)
+
+# posterior densities
+bri.hyperpar.plot(imod)
+```
+
+* The information about individuals can be found in the posterior distributions of the random effects parameters, i.e. $\alpha_i$. These posterior summaries can be found in `imod$summary.random$id`. Try to comment the results
+ 
+```{r, eval=TRUE, echo=FALSE}
+summary(imod$summary.random$id$mean)
+```
+
+
+# 4. Prediction 
+
+### Case study 1
+
+Suppose we have a new student who has scored 18 and 25 at the first two points of measurements, and we are interested in what will happen at the final point of measurement. 
+
+To answer this question, we create a data frame with this information and append it to the original data set (which we reload to clear out the additional variables we created above):
+
+```{r, eval=TRUE, echo = TRUE}
+data(reading, package="brinla")
+reading$id = as.numeric(reading$id)
+newsub = data.frame(id=90, agegrp = c(6.5,8.5,10.5), 
+              piat=c(18, 25, NA))
+nreading = rbind(reading, newsub)
+```
+
+* Refit the model as before, but now include the option `control.predictor = list(compute=TRUE)`  to compute the posterior means of the linear predictors and `control.compute=list(return.marginals.predictor=TRUE)` to obtain the marginals of the linear predictor
+
+```{r, eval=TRUE, echo = FALSE}
+formula = piat ~ agegrp + f(id, model="iid")
+
+imod = inla(formula, family="gaussian", data=nreading, 
+            control.predictor = list(compute=TRUE),
+            control.compute=list(return.marginals.predictor=TRUE))
+
+```
+
+* There are $90 \times 3 = 270$ cases in the data. Only the last of these has an unknown response. You can access  the posterior distribution for this fitted value (the linear predictor) using the function `marginals.fitted.values` (call the output as `pm90`)
+
+```{r, eval=TRUE, echo=FALSE}
+pm90 = imod$marginals.fitted.values[[270]]
+```
+
+* Now plot the posterior distribution as follows:
+```{r, eval=TRUE, echo=TRUE}
+p1 = ggplot(data.frame(pm90),aes(x,y))+geom_line()+xlim(c(20,60)) 
+p1
+```
+
+
+### Case study 2
+
+Now assume that we don't have any information on the new student, and that all the data on `piat` response variable are missing. 
+
+* Reload the data as in the previous section, and set all the new data for the 90-th student as missing, modifing the code given in the previous section
+
+```{r, eval=TRUE, echo = FALSE}
+data(reading, package="brinla")
+reading$id = as.numeric(reading$id)
+
+newsub = data.frame(id=90, agegrp = c(6.5,8.5,10.5), 
+                  piat=c(NA, NA, NA))
+nreading = rbind(reading, newsub)
+
+```
+
+* Refit the model again and construct the prediction. Call the new model results as `imodq`
+```{r, echo=FALSE, eval=TRUE}
+formula = piat ~ agegrp + f(id, model="iid")
+imodq = inla(formula, family="gaussian", data=nreading, 
+              control.predictor = list(compute=TRUE),
+              control.compute=list(return.marginals.predictor=TRUE))
+
+
+```
+
+
+* Inspect the posterior distribution for this fitted value as we did before
+```{r, echo=FALSE, eval=TRUE}
+qm90 = imodq$marginals.fitted.values[[270]]
+
+```
+
+* Finally, we plot the predictive distributions for individual with partial response information (solid) and no response information (dashed)
+```{r, echo=TRUE, eval=FALSE, warning=FALSE}
+p1 + geom_line(data=data.frame(qm90),aes(x=x,y=y),linetype=2)+xlab("PIAT")+ylab("density") 
+```
+
+* How would you interpret these results?
+
+# References

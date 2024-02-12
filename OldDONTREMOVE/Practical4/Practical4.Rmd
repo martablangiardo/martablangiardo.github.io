@@ -1,0 +1,790 @@
+---
+title: "Hirarchical models, regression and model fit"
+date: "Week 4"
+output:
+  html_document:
+    css: practical.css
+    toc: true
+    toc_float: true
+---
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, eval = TRUE, fig.align = 'center', fig.width = 10, fig.height = 10)
+```
+
+# Malaria Prevalence in The Gambia
+
+In this tutorial we will analyse the prevalence of malaria among children in The Gambia.
+
+We start by importing the data:
+
+```{r import}
+# change this line to where you have the data saved
+## remember to either use a double \\ or forward / for paths in r
+dataPath <- 'C:/Users/cgascoig/OneDrive - Imperial College London/PUBH70061 Bayesian Modelling for SSTD 2022-23/Week 04/practicals/'
+load(paste0(dataPath, 'gambia.RData'))
+
+nrow(gambia)
+head(gambia)
+```
+This dataset consists of observations about $N=500$ children living in The Gambia who were tested for malaria. For each child, the following variables are recorded and reported:
+
+* `pos`: presence (1) or absence (0) of malaria in a blood sample taken from the child
+* `age`: age of the child, in days
+* `netuse`: indicator variable denoting whether (1) or not (0) the child regularly sleeps under a bed-net.
+* `treated`: indicator variable denoting whether (1) or not (0) the bed-net is treated (coded 0 if netuse=0).
+* `phc`: indicator variable denoting the presence (1) or absence (0) of a health centre in the village.
+
+These variables are quite different in nature: `age` is a numeric variable, while `pos`, `netuse`, `treated` and `phc` are categorical variables, encoded into $1$ or $0$. When the categorical variable assumes only $2$ values (denoting the presence or absence of the character), they are typically called binary dummy variables.
+
+
+## Model Specification
+
+Our goal for the analysis is to assess whether the probability that a child has a positive test is affected by any of the aforementioned variables. Since the response variable `pos` is a binary variable, standard linear regression is not appropriate, and we turn to Generalized Linear Models instead.
+
+One way to model these data is to fit a logistic regression model. We assume that for each child $i$ in village $j$, the presence or absence of malaria `pos`$_{ij}$ follows a Bernoulli distribution with parameter $p_{ij}$, so that \[P({\tt pos}_{ij} = 1 | \text{all the rest}) = p_{ij}\]. Using this,
+
+  1. Write out a logistic regression model using a logit-link function to model the relationship between a positive malaria blood sample, age of the child, whether they regularly sleep under a bed-net, whether the bed-net is treated or not, and whether there is a health center in the village. In addition, include a random effect for the particular village the child lives in using the coordinates of the village $x$ and $y$ available in the dataset.
+
+:::: {.blackbox data-latex=""}
+::: {.center data-latex=""}
+**Solution**
+:::
+\begin{eqnarray*}
+{\tt pos}_{ij} & \sim & \hbox{Bernoulli}(p_{ij})\\
+\hbox{logit}(p_{ij}) & = & \beta_0 + \beta_{age} {\tt age}_{ij} +  \beta_{net} {\tt netuse}_{ij} +
+                        \beta_{tre} {\tt treated}_{ij} + 
+                        \beta_{phc} {\tt phc}_{ij} + v_j \\
+                        v_j & = & {\tt Normal}(0, 1/\sigma^2)
+\end{eqnarray*}
+::::
+
+Remember that the *logit* transformation is equal to the log-odds, i.e. $$\hbox{logit}(p_{ij}) = \log \left(\frac{p_{ij}}{1 - p_{ij}}\right)$$ and is useful for transforming a probability (which is constrained to lie between 0 and 1) onto the range $(-\infty, +\infty)$.
+
+## Model Fit
+
+### Initial model
+
+The following code can be used to define a village identification number from the co-ordinates:
+```{r, eval = FALSE}
+regData <- 
+  gambia %>%
+  # group by distinct combinations of x and y (longitude and latitude co-ordinates)
+  dplyr::group_by(x, y) %>%
+  # dplyr::cur_group_id() gives a unique identifier for the current group
+  dplyr::mutate(village = dplyr::cur_group_id()) %>%
+  # always ungroup once finished with group
+  dplyr::ungroup()
+```
+
+
+  2. Implement the logistic regression written above in `r-inla`. Use `?inla()` to help work out arguments necessary to fit a model. Call this model `fit1`.
+  
+:::: {.blackbox data-latex=""}
+::: {.center data-latex=""}
+**Solution**
+:::
+
+We first load in any packages we need. The main package is `INLA`. The package `tidyverse` is for data wrangling. Then we organise the data by including an idicaor for village and finally selecting only the columns we need. 
+```{r, warning = FALSE, message = FALSE}
+library(INLA)
+library(tidyverse)
+
+regData <- 
+  gambia %>%
+  dplyr::group_by(x, y) %>%
+  dplyr::mutate(village = dplyr::cur_group_id()) %>%
+  dplyr::ungroup() %>%
+  # to make things clearer
+  dplyr::select(pos, age, netuse, treated, phc, village)
+```
+
+
+Since the `r-inla` default for a binomial model is to use a `logit` link function, we can use the following simple implementation of a model:
+```{r}
+family <- 'binomial'
+
+# we write it in the same way as a in lm() or glm()
+formula <- as.formula('pos ~ 1 + age + netuse + treated + phc + f(village, model = "iid")')
+fit1.a <- INLA::inla(formula = formula,
+                     data = regData,
+                     family = family)
+```
+We can see the summaries of the marginal posterior distribution by looking at the output of the fixed effects only:
+```{r}
+fit1.a$summary.fixed
+```
+We can look at the summaries for the random effects as well. Since we only have one random effect, we pull out the summary for that one:
+```{r}
+fit1.a$summary.random$village
+```
+
+As we said, the default in `r-inla` for a binomial model is to use a `logit` link function, but we can specify this explicitly:
+```{r}
+control.family <- list(control.link = list(model = 'logit'))
+fit1.b <- INLA::inla(formula = formula,
+                     data = regData,
+                     family = family,
+                     control.family = control.family)
+```
+::::
+  
+In a Bayesian analysis, we need to assume prior distributions for any unknown model parameters. In this case, we have specified the success rate parameters of the binomial ($p_{ij}$) as functions of regression coefficients and covariates, so we need to specify priors on the regression coefficients. As we will see later, the interpretation of the regression coefficient varies depending on the type of variable it refers to (i.e., binary or numerical), however the fitting procedure is unchanged.
+
+We will choose vague, uniform priors for each coefficient (including the intercept):
+\begin{eqnarray*}
+\beta_j & \sim & \hbox{Normal}(\mu = 0, \tau = 1/100)\\
+\end{eqnarray*}
+```{r eval = TRUE, echo = FALSE, fig.height=5}
+curve(dnorm(x, 0, 10), -50, 50)
+```
+
+In `r-inla`, the default priors for the intercept and fixed effects are
+\begin{equation*}
+  \begin{split}
+    \beta_0 & \sim \text{Normal}(\mu = 0, \tau = 0) \\
+    \beta_j & \sim \text{Normal}(\mu = 0, \tau = 0.001)
+  \end{split}
+\end{equation*}
+where $\mu$ is the mean and $\tau = 1/\sigma^2$ is the precision (the inverse of the variance). It is important to remember that `r-inla` uses the precision rather than the standard deviation. To see the default priors for fixed effects in `r-inla`, we can type `inla.set.control.fixed.default()`. In order to change the priors on the fixed effects in `r-inla`, we need to edit the `control.fixed` argument in the `inla()` function. The `control.fixed` argument (and any of the other arguments starting with `control`, see `?inla()`) needs to be inputted as a list. 
+
+  3. Using `?control.fixed`, update `fit1` to have the prior distributions of the intercept and model coefficients to be the ones specified above. HINT: look at the `mean`, `mean.intercept`, `prec`, and `prec.intercept` arguments. Keep the prior for the random effects the same (the `r-inla` default priors).
+
+:::: {.blackbox data-latex=""}
+::: {.center data-latex=""}
+**Solution**
+:::
+
+First, lets look at the output of `inla.set.control.fixed.default()`:
+```{r}
+inla.set.control.fixed.default()
+# Note that there are several elements in it as this command returns all the default settings in INLA, but we are only interested in the $mean, $mean.intercept, $prec, $prec.intercept
+```
+In order to define the prior distributions for the fixed effects, we need to change the `mean.intercept`, `mean.prec`, `mean` and `prec` arguments. Remember `r-inla` uses the precision rather than the standard deviation. As with specifying the link function explicitly, we can specify the prior mean and precision for the fixed effects explicit using the `control.fixed` argument in the `inla()` function. We can do this two ways: by specifying the mean for each sequential effect,
+```{r}
+control.fixed.a <- list(mean = list(a = 0, b = 0, c = 0, d = 0), 
+                        prec = list(a = 0.001, b = 0.001, c = 0.001, d = 0.001), # precision not sd
+                        mean.intercept = 0,
+                        prec.intercept = 0)
+fit1.c <- INLA::inla(formula = formula,
+                     data = regData,
+                     family = family,
+                     control.family = control.family,
+                     control.fixed = control.fixed.a)
+```
+or a default for all effects.
+```{r}
+control.fixed.b <- list(mean = list(default = 0), 
+                        prec = list(default = 0.001), # precision not sd
+                        mean.intercept = 0,
+                        prec.intercept = 0)
+fit1.d <- INLA::inla(formula = formula,
+                     data = regData,
+                     family = family,
+                     control.family = control.family,
+                     control.fixed = control.fixed.b)
+```
+
+To conclude, the final model we have is
+To recap, the model we are fitting will be 
+\begin{eqnarray*}
+{\tt pos}_{ij} & \sim & \hbox{Bernoulli}(p_{ij})\\
+\hbox{logit}(p_{ij}) & = & \beta_0 + \beta_{age} {\tt age}_{ij} +  \beta_{net} {\tt netuse}_{ij} +
+                        \beta_{tre} {\tt treated}_{ij} + 
+                        \beta_{phc} {\tt phc}_{ij} + v_j\\
+                        v_j & = & {\tt Normal}(0, 1/\sigma^2)
+\end{eqnarray*}
+with 
+\begin{eqnarray*}
+\beta_j & \sim & \hbox{Normal}(\mu = 0, \tau = 1/100)\\
+\end{eqnarray*}
+for the prior specification. We write this in `r-inla` as
+```{r fit1}
+# formula
+formula1 <- as.formula('pos ~ 1 + age + netuse + treated + phc + f(village, model = "iid")')
+# family specification
+family <- 'binomial'
+control.family <- list(control.link = list(model = 'logit'))
+# prior specification
+control.fixed <- list(mean = list(default = 0), 
+                        prec = list(default = 1/100),
+                        mean.intercept = 0,
+                        prec.intercept = 1/100)
+# model fit
+fit1 <- INLA::inla(formula = formula1,
+                       data = regData,
+                       family = family,
+                       control.family = control.family,
+                       control.fixed = control.fixed)
+```
+
+::::
+
+A great benefit of using `r-inla` is the avoidance of costly computation by performing a full Markov chain Monte Carlo simulation. This makes model fitting much quicker and means it is more practical to fit several models to test things such as the results sensitivity to the prior distribution choices. See the output in `summary(fit)` for the time used to run the model. The model should take several seconds to run whereas an MCMC evaluation of the same model may take up to a couple of minutes. We have exploited this feature already (and will continue to do so) by fitting a number of models which would’ve taken longer if we used an MCMC evaluation. This speed up becomes increasingly important for larger datasets and with more complicated correlations between the coefficients.
+
+The speed up offered using INLA is not to say that an INLA evaluation is the `be-all and end-all' for Bayesian modelling. A main advantage of MCMC is that samples from the joint posterior distribution are readily available. For INLA, we can use a Monte Carlo to obtain simulations from the posteriors of the linear predictor and marginal distributions - not the joint distribution. In addition, INLA works on a class of models call Latent Gaussian Models (LGMs). Whilst several models full under the LGM umbrella, this is a limitation in comparison to a MCMC evaluation which can be used for LGMs and other, more complicated models. 
+
+As INLA focuses on marginal distributions, we want to exploit these and `r-inla` provides several functions that allow us to do this. The posterior densities of the marginals of the fixed effects are readily available from `$marginals.fixed`. We use the values given from `$marginals.fixed` in order to plot the marginal posterior densities, or in order to have a smoothed curve, we can use the function `inla.smarginal()`. This function uses spline interpolation between the points provided by `$marginals.fixed` to produce a smooth density plot.
+
+  4. Using both `$marginals.fixed` and `inla.smarginal()`, plot the posterior distribution of the marginals and comment on the difference between the two curves.
+
+:::: {.blackbox data-latex=""}
+::: {.center data-latex=""}
+**Solution**
+:::
+
+To make our lives easier and the code cleaner, we can save the `$marginals.fixed` for each of the coefficients:
+```{r}
+# extract the marginals from the model fit
+ageMarginal <- fit1$marginals.fixed$age
+netuseMarginal <- fit1$marginals.fixed$netuse
+treatedMarginal <- fit1$marginals.fixed$treated
+phcMarginal <- fit1$marginals.fixed$phc
+```
+
+Using the `inla.smarginal()` function, we input each of the coefficients `$marginals.fixed` output and then do some formatting into a data frame with more informative labels. We are going to plot using a package called` ggplot2` which requires the data to be in a `data.frame` format. We change the labels to clearly have an `x` and a `y` and include an additional column `type`, which we use to distinguish between the `inla.smarginal()` and `$marginal.fixed` curves.
+```{r}
+# use inla.smarginal for smoothed curves
+ageDensity_spline <- 
+  INLA::inla.smarginal(ageMarginal) %>%
+  # fomat into a data frame
+  unlist() %>%
+  matrix(., ncol = 2) %>%
+  as.data.frame() %>%
+  # more informative columns labels
+  dplyr::rename('x' = 'V1', 'y' = 'V2') %>% 
+  # add additional columns for labelling in plot
+  dplyr::mutate(type = 'inla.smarginal',
+                coefficient = 'age')
+netuseDensity_spline <- 
+  INLA::inla.smarginal(netuseMarginal) %>%
+  unlist() %>%
+  matrix(., ncol = 2) %>%
+  as.data.frame() %>%
+  dplyr::rename('x' = 'V1', 'y' = 'V2') %>% 
+  dplyr::mutate(type = 'inla.smarginal',
+                coefficient = 'netuse')
+treatedDensity_spline <- 
+  INLA::inla.smarginal(treatedMarginal) %>%
+  unlist() %>%
+  matrix(., ncol = 2) %>%
+  as.data.frame() %>%
+  dplyr::rename('x' = 'V1', 'y' = 'V2') %>% 
+  dplyr::mutate(type = 'inla.smarginal',
+                coefficient = 'treated')
+phcDensity_spline <- 
+  INLA::inla.smarginal(phcMarginal) %>%
+  unlist() %>%
+  matrix(., ncol = 2) %>%
+  as.data.frame() %>%
+  dplyr::rename('x' = 'V1', 'y' = 'V2') %>% 
+  dplyr::mutate(type = 'inla.smarginal',
+                coefficient = 'phc')
+```
+
+We repeat the same but with the summaries from the `$marginal.fixed`:
+```{r}
+# marginals.fixed output
+ageDensity_inlaSummary <- 
+  ageMarginal %>% 
+  as.data.frame() %>% 
+  dplyr::mutate(type = 'inla summary',
+                coefficient = 'age')
+netuseDensity_inlaSummary <- 
+  netuseMarginal %>% 
+  as.data.frame() %>% 
+  dplyr::mutate(type = 'inla summary',
+                coefficient = 'netuse')
+treatedDensity_inlaSummary <- 
+  treatedMarginal %>% 
+  as.data.frame() %>% 
+  dplyr::mutate(type = 'inla summary',
+                coefficient = 'treated')
+phcDensity_inlaSummary <- 
+  phcMarginal %>% 
+  as.data.frame() %>% 
+  dplyr::mutate(type = 'inla summary',
+                coefficient = 'phc')
+```
+
+Join all the individual data frames into one to plot:
+```{r}
+coefficientDensity_all <-
+  rbind(ageDensity_spline, netuseDensity_spline, treatedDensity_spline, phcDensity_spline,
+        ageDensity_inlaSummary, netuseDensity_inlaSummary, treatedDensity_inlaSummary, phcDensity_inlaSummary)
+```
+
+Plot:
+```{r}
+ggplot2::ggplot(data = coefficientDensity_all, 
+                # aes is the aethetics
+                # normally need and x and an y
+                # we include group to make sure we have individual lines for each type and coefficient
+                # want to distinguish between type so make the colour, linetype and shape by this
+                aes(x = x, y = y, group = interaction(type, coefficient), colour = type, linetype = type, shape = type)) +
+  # include line for each term we are plotting
+  ggplot2::geom_line() +
+  # facet_wrap (or facet_grid) will seperate out each term we choose to make individual plots
+  ggplot2::facet_wrap(~ coefficient, scales = 'free', ncol = 2) +
+  # colours for each of the lines
+  ggplot2::scale_color_manual(values = c('green', 'blue')) +
+  # x and y labels
+  ggplot2::labs(x = expression(beta['j']),
+                y = expression(paste(pi, '(', beta['j'], ' | ', bold(y), ')'))) +
+  # a clean theme with no legend title
+  ggplot2::theme_bw() +
+  ggplot2::theme(legend.title = element_blank())
+```
+
+In the above plots, the peaks are the same as one another (as expected), but clearly the plot from `inla.smarginal()` produces a smoother curve at the start of where the tails form. If you wanted to include the points with `+ ggplot::geom_point()`, you would be able to see the interpolation from `inla.smarginal()` since there are many more points which leads to a smoother curve.
+::::
+
+### Model evalution and comparison
+
+  5.a Looking at each of the marginals posterior distributions, do all of the coefficients have a practical importance in the model? That is, is the probability of a given coefficient significantly different from zero?
+  
+:::: {.blackbox data-latex=""}
+::: {.center data-latex=""}
+**Solution**
+:::
+
+To understand if a coefficient contributes to the model, or if it only adds noise, we can look to see if $0$ falls within the Credible Interval (CI) of the distribution. The CI is an interval in which the coefficient falls within a particular probability. This probability is usually 80%, 90% or 95%. From here-on, when we speak of the CI, we are referring to the 95% CI. The interpretation of a 95% CI is “given the observed data, the coefficient has 95% probability of falling within this range”.
+
+Since we are now convinced the curves from both `inla.smarginal()` and `$marginals.fixed` are the same, with will only plot those from `inla.smarginal()` from now on.
+```{r}
+# selecting only the inla.smarginal curves and cropping unnecessary columns
+coefficientDensity_all <- 
+  rbind(ageDensity_spline, netuseDensity_spline, treatedDensity_spline, phcDensity_spline) %>%
+  dplyr::select(-type)
+
+# plot
+ggplot2::ggplot(data = coefficientDensity_all, aes(x = x, y = y, group = coefficient)) +
+  ggplot2::geom_line() +
+  ggplot2::facet_wrap(~ coefficient, scales = 'free', ncol = 2) +
+  ggplot2::labs(x = expression(beta['j']),
+                y = expression(paste(pi, '(', beta['j'], ' | ', bold(y), ')'))) +
+  ggplot2::theme_bw() +
+  # include a zero line
+  ggplot2::geom_vline(xintercept = 0, linetype = 'dashed', colour = 'red')
+```
+
+By looking at the four marginal posterior distributions, it is clear that $0$ falls within the CI for `treated` and `phc`. In order to see the others more clearly, we use the `inla.qmarginal()` function to include an indication of the upper and lower quantiles on the distributions.
+
+First let’s start by clearly marking out the range of values that fall within the outside the CI
+```{r}
+# a nice way to automate the CI if you wish to change it
+CI = 0.95
+lower = (1 - CI)/2
+upper = 1 - lower
+
+# finding the values in the density outside of the CI
+## age
+### values in the lower quantile
+ageDensity_splineLower <- subset(ageDensity_spline, x < INLA::inla.qmarginal(lower, ageMarginal)) %>% dplyr::mutate(type = 'lower')
+### values in the upper quantile
+ageDensity_splineUpper <- subset(ageDensity_spline, INLA::inla.qmarginal(upper, ageMarginal) < x) %>% dplyr::mutate(type = 'upper')
+## repeat for the others
+netuseDensity_splineLower <- subset(netuseDensity_spline, x < INLA::inla.qmarginal(lower, netuseMarginal)) %>% dplyr::mutate(type = 'lower')
+netuseDensity_splineUpper <- subset(netuseDensity_spline, INLA::inla.qmarginal(upper, netuseMarginal) < x) %>% dplyr::mutate(type = 'upper')
+treatedDensity_splineLower <- subset(treatedDensity_spline, x < INLA::inla.qmarginal(lower, treatedMarginal)) %>% dplyr::mutate(type = 'lower')
+treatedDensity_splineUpper <- subset(treatedDensity_spline, INLA::inla.qmarginal(upper, treatedMarginal) < x) %>% dplyr::mutate(type = 'upper')
+phcDensity_splineLower <- subset(phcDensity_spline, x < INLA::inla.qmarginal(lower, phcMarginal)) %>% dplyr::mutate(type = 'lower')
+phcDensity_splineUpper <- subset(phcDensity_spline, INLA::inla.qmarginal(upper, phcMarginal) < x) %>% dplyr::mutate(type = 'upper')
+
+# putting all into one
+coefficientCI_all <- 
+  rbind(ageDensity_splineLower, ageDensity_splineUpper,
+        netuseDensity_splineLower, netuseDensity_splineUpper,
+        treatedDensity_splineLower, treatedDensity_splineUpper,
+        phcDensity_splineLower, phcDensity_splineUpper)
+  
+```
+
+Rerun the plot with the $0$ line and a CIs area outside of the CI being coloured in:
+```{r}
+ggplot2::ggplot(data = coefficientDensity_all, aes(x = x, y = y, group = coefficient)) +
+  ggplot2::geom_line() +
+  ggplot2::facet_wrap(~ coefficient, scales = 'free', ncol = 2) +
+  ggplot2::labs(x = expression(beta['j']),
+                y = expression(paste(pi, '(', beta['j'], ' | ', bold(y), ')'))) +
+  ggplot2::theme_bw() +
+  ggplot2::geom_vline(xintercept = 0, linetype = 'dashed', colour = 'red') +
+  # colour in the area outside of the CI as black
+  ggplot2::geom_area(data = coefficientCI_all %>% dplyr::filter(type == 'lower'), fill = 'black') +
+  ggplot2::geom_area(data = coefficientCI_all %>% dplyr::filter(type == 'upper'), fill = 'black')
+```
+
+We can see that both `treated` and `phc` are the only posterior distributions to contain $0$ within the CI. Unlike in frequentist statistics where we can say an effect is statistically insignificant (given a level) if the estimates falls within the confidence interval, the fact $0$ falls within the CI only indicates whether the effect is practically important. We test to see if both `treated` and `phc` contribute to the model or adds noise by fitting another model, this time without both `treated` and `phc` as coefficients, and then compare the models. 
+::::
+  
+  5.b Based on your answer from 5.a, fit a new model with only those coefficients that offer a practical importance and call it `fit2`.
+  
+:::: {.blackbox data-latex=""}
+::: {.center data-latex=""}
+**Solution**
+:::
+
+From the answer to 5.a., we will re-run the model without including the coefficients for `treated` and `phc`:
+```{r fit2}
+# formula - now without treated and phc
+formula2 <- as.formula('pos ~ 1 + age + netuse + f(village, model = "iid")')
+# model fit
+fit2 <- INLA::inla(formula = formula2,
+                        data = regData,
+                        family = family,
+                        control.family = control.family,
+                        control.fixed = control.fixed)
+```
+
+We can see now all the coefficients in the model offer practical importance:
+```{r}
+# extract the marginals from the model fit
+ageMarginal <- fit2$marginals.fixed$age
+netuseMarginal <- fit2$marginals.fixed$netuse
+
+# use inla.smarginal for smoothed curves
+ageDensity_spline <- 
+  INLA::inla.smarginal(ageMarginal) %>%
+  unlist() %>%
+  matrix(., ncol = 2) %>%
+  as.data.frame() %>%
+  dplyr::rename('x' = 'V1', 'y' = 'V2') %>% 
+  dplyr::mutate(type = 'inla.smarginal',
+                coefficient = 'age')
+netuseDensity_spline <- 
+  INLA::inla.smarginal(netuseMarginal) %>%
+  unlist() %>%
+  matrix(., ncol = 2) %>%
+  as.data.frame() %>%
+  dplyr::rename('x' = 'V1', 'y' = 'V2') %>% 
+  dplyr::mutate(type = 'inla.smarginal',
+                coefficient = 'netuse')
+
+# selecting only the inla.smarginal curves and cropping unnecessary columns
+coefficientDensity_all <- 
+  rbind(ageDensity_spline, netuseDensity_spline) %>%
+  dplyr::select(-type)
+
+# a nice way to automate the CI if you wish to change it
+CI = 0.95
+lower = (1 - CI)/2
+upper = 1 - lower
+
+# finding the values in the density outside of the CI
+ageDensity_splineLower <- subset(ageDensity_spline, x < INLA::inla.qmarginal(lower, ageMarginal)) %>% dplyr::mutate(type = 'lower')
+ageDensity_splineUpper <- subset(ageDensity_spline, INLA::inla.qmarginal(upper, ageMarginal) < x) %>% dplyr::mutate(type = 'upper')
+netuseDensity_splineLower <- subset(netuseDensity_spline, x < INLA::inla.qmarginal(lower, netuseMarginal)) %>% dplyr::mutate(type = 'lower')
+netuseDensity_splineUpper <- subset(netuseDensity_spline, INLA::inla.qmarginal(upper, netuseMarginal) < x) %>% dplyr::mutate(type = 'upper')
+
+# putting all into one
+coefficientCI_all <- 
+  rbind(ageDensity_splineLower, ageDensity_splineUpper,
+        netuseDensity_splineLower, netuseDensity_splineUpper)
+
+
+ggplot2::ggplot(data = coefficientDensity_all, aes(x = x, y = y, group = coefficient)) +
+  ggplot2::geom_line() +
+  ggplot2::facet_wrap(~ coefficient, scales = 'free', ncol = 2) +
+  ggplot2::labs(x = expression(beta['j']),
+                y = expression(paste(pi, '(', beta['j'], ' | ', bold(y), ')'))) +
+  ggplot2::theme_bw() +
+  ggplot2::geom_vline(xintercept = 0, linetype = 'dashed', colour = 'red') +
+  ggplot2::geom_area(data = coefficientCI_all %>% dplyr::filter(type == 'lower'), fill = 'black') +
+  ggplot2::geom_area(data = coefficientCI_all %>% dplyr::filter(type == 'upper'), fill = 'black')
+```
+::::
+  
+  5.c There are several different ways to compare between different models. One method is to use information-based metrics, such as WAIC, which account for model-fit and model complexity. Using `control.compute = list(waic = TRUE)` in the `inla()` call, re-run both `fit1` and `fit2` and compare their scores and comment on which model you would choose and why.
+
+:::: {.blackbox data-latex=""}
+::: {.center data-latex=""}
+**Solution**
+:::
+
+Let us compare the WAIC for the two models:
+```{r WAIC, eval = TRUE}
+control.compute = list(waic = TRUE)
+fit1 <- INLA::inla(formula = formula1, 
+                   data = regData, 
+                   family = family, 
+                   control.family = control.family, 
+                   control.fixed = control.fixed,
+                   control.compute = control.compute)
+fit2 <- INLA::inla(formula = formula2, 
+                   data = regData, 
+                   family = family, 
+                   control.family = control.family, 
+                   control.fixed = control.fixed,
+                   control.compute = control.compute)
+
+fit1$waic$waic
+fit2$waic$waic
+```
+You should always prefer the model with the smallest WAIC. In this case, even though the difference is little, `fit2` seems to be the best one. 
+::::
+
+  5.d Using the model you choose in 5.c., fit a new model, `fit3`, which is the same but without a random effect. Use the WAIC criterion to decide if the random effect should be included or not.
+  
+:::: {.blackbox data-latex=""}
+::: {.center data-latex=""}
+**Solution**
+:::
+
+Let us compare the WAIC for the two models:
+```{r fit3, eval = TRUE}
+formula3 <- as.formula('pos ~ 1 + age + netuse')
+# model fit
+fit3 <- INLA::inla(formula = formula3, 
+                   data = regData, 
+                   family = family, 
+                   control.family = control.family, 
+                   control.fixed = control.fixed,
+                   control.compute = control.compute)
+fit2$waic$waic
+fit3$waic$waic
+```
+Again we see that `fit2` is the smaller of the two score. Therefore, including the random effect leads to a better fitting model.
+::::
+
+### Model interpretation
+
+A common statistic to quantify the strength of an association between an exposure and an outcome is the odds ratio, $\text{Odds Ratio} = \frac{\text{Odd of an event occurring}}{\text{Odd of an event not occurring}}$. An odds ratio (OR) greater than $1$ indicates an event (outcome) is more likely to occur when the predictor (exposure) increases. An odds ratio (OR) less than $1$ indicates an outcome is less likely to occur when the exposure increases. From a binomial model, we can calculate the ORs by taking the exponential of the coefficients.
+
+
+  6. For the model you selected as the best fitting during Question 5, plot the posterior distribution of the marginal OR and comment on the interpretation of each of the coefficients.
+
+
+:::: {.blackbox data-latex=""}
+::: {.center data-latex=""}
+**Solution**
+:::
+
+To do this, we can use the `inla.tmarginal()` function which takes a transform of the marginal distribution. First lets extract the marginals from the model fit and then run them through `inla.tmarginal()`:
+```{r}
+# marginal terms from model fit
+ageMarginal <- fit2$marginals.fixed$age
+netuseMarginal <- fit2$marginals.fixed$netuse
+
+# transformed marginal
+ageMarginal_transformed <- INLA::inla.tmarginal(function(x) exp(x), ageMarginal)
+netuseMarginal_transformed <- INLA::inla.tmarginal(function(x) exp(x), netuseMarginal)
+
+# posterior distribution of odds ratios
+ageDensity_OddsRatio <- 
+  ageMarginal_transformed %>%
+  as.data.frame() %>% 
+  dplyr::mutate(coefficient = 'age')
+netuseDensity_OddsRatio <- 
+  netuseMarginal_transformed %>%
+  as.data.frame() %>% 
+  dplyr::mutate(coefficient = 'netuse')
+
+# selecting only the inla.smarginal curves and cropping unnecessary columns
+coefficientDensity_OddsRatio <- 
+  rbind(ageDensity_OddsRatio, netuseDensity_OddsRatio)
+
+# upper and lower quantiles of odds ratios
+# a nice way to automate the CI if you wish to change it
+CI = 0.95
+lower = (1 - CI)/2
+upper = 1 - lower
+
+# finding the values in the density outside of the CI
+ageDensity_oddsRatioLower <- subset(ageDensity_OddsRatio, x < INLA::inla.qmarginal(lower, ageMarginal_transformed)) %>% dplyr::mutate(type = 'lower')
+ageDensity_oddsRatioUpper <- subset(ageDensity_OddsRatio, INLA::inla.qmarginal(upper, ageMarginal_transformed) < x) %>% dplyr::mutate(type = 'upper')
+netuseDensity_oddsRatioLower <- subset(netuseDensity_OddsRatio, x < INLA::inla.qmarginal(lower, netuseMarginal_transformed)) %>% dplyr::mutate(type = 'lower')
+netuseDensity_oddsRatioUpper <- subset(netuseDensity_OddsRatio, INLA::inla.qmarginal(upper, netuseMarginal_transformed) < x) %>% dplyr::mutate(type = 'upper')
+
+# putting all into one
+coefficientCI_OddsRatio <- 
+  rbind(ageDensity_oddsRatioLower, ageDensity_oddsRatioUpper,
+        netuseDensity_oddsRatioLower, netuseDensity_oddsRatioUpper)
+
+# plot
+ggplot2::ggplot(data = coefficientDensity_OddsRatio, aes(x = x, y = y, group = coefficient)) +
+  ggplot2::geom_line() +
+  ggplot2::facet_wrap(~ coefficient, scales = 'free', ncol = 2) +
+  ggplot2::labs(x = expression(paste('exp[', beta['j'], ']')),
+                y = expression(paste('exp[', pi, '(', beta['j'], ' | ', bold(y), ')]'))) +
+  ggplot2::theme_bw() +
+  # now want this to be 1 as we are looking at odds ratio
+  ggplot2::geom_vline(xintercept = 1, linetype = 'dashed', colour = 'red') +
+  ggplot2::geom_area(data = coefficientCI_OddsRatio %>% dplyr::filter(type == 'lower'), fill = 'black') +
+  ggplot2::geom_area(data = coefficientCI_OddsRatio %>% dplyr::filter(type == 'upper'), fill = 'black')
+```
+
+It may be tempting to draw conclusion on the causality of the relation between the covariates and the response variable and assume that if we were to provide an intervention and, for example, increase one variable by one unit for every individual in a population, then the expected response would change by some estimated factor. This is a causal interpretation which need to be carefully considered due to unmeasured confounding, i.e.  unmeasured variables that are associated with both the response and the covariates that will be contributing to the observed association between the response and the covariates.
+
+::::
+
+### Posterior predictive checks
+
+If the assumptions we made to fit the model are reasonable, then we should be able to generate data from the posterior distribution that is similar to the true data. Since we are fitting a binomial model, the `$fitted.values` are probabilities between $0$ and $1$. We can transform these probabilities into a Bernoulli random variable using `rbinom(n = 1, size = 1, prob = $fitted.values[i])` for a given fitted value. Here `n` is the number of observations we want to produce (we want one), `size` is the number of trials (since we want to generate a Bernoulli random variable, this will be one), and `prob` is the probability of success for each trial. 
+
+  7. By transforming the probabilities from `$fitted.values` into a predicted observation for each child $i$ in village $j$, generate a set of predicted observations and compare these against the true observations.
+  
+:::: {.blackbox data-latex=""}
+::: {.center data-latex=""}
+**Solution**
+:::
+
+We first want to define the Bernoulli observations
+```{r}
+predictedData <-
+  regData %>%
+  # add a column for the predicted prevalence (probability)
+  dplyr::mutate(pHat = fit2$summary.fitted.values$mean) %>%
+  # turn the prevalence into a Bernoulli random variable
+  ## first specify we want these operations row wise (similar to group_by each row)
+  dplyr::rowwise() %>%
+  # generate the Bernoulli random variable
+  dplyr::mutate(yHat = rbinom(1, 1, pHat)) %>%
+  # always ungroup once finished
+  dplyr::ungroup() %>%
+  # rename for better naming
+  dplyr::rename('Observed' = 'pos', 'Predicted' = 'yHat') %>%
+  # format from wide to long to use in ggplot with facet
+  tidyr::pivot_longer(cols = c('Observed', 'Predicted'), names_to = 'type', values_to = 'values')
+```
+
+Then we make the plot:
+```{r}
+ggplot(predictedData, aes(x = factor(values),colour = type, fill = type)) +
+  ggplot2::geom_bar() +
+  ggplot2::facet_grid(~ type) +
+  ggplot2::labs(y = 'Count', x = 'Malaria Observations') +
+  ggplot2::theme_bw() +
+  ggplot2::theme(legend.position = 'none')
+```
+Whilst there is a difference between the two sets, with the number of predicted cases being ever so higher than observed, the predictions are similar to the truth indicating the model is suitable.
+
+:::: 
+  
+
+### Extension: Full posterior samples
+
+Previously we have used the `r-inla` outputs which are summaries of the marginals of the posterior distributions. For example, amongst other things  `$summary.fixed` will return a mean, standard deviation, 2.5%, 50% and 97.5% quantiles of the marginal posterior distribution. Whilst this is helpful, the full marginal posterior distributions are often needed.
+
+In order to run `inla.posterior.sample()` with the model you have chosen, we need to rerun the model and include `control.compute = list(config = TRUE)` in the `inla()` call. Once this is done, we are able to use the `inla.posterior.sample()` function to generate full samples of the posterior distributions. As a minimum, we need to include the number of samples we wish to draw from the posterior distribution and the model fit in `inla.posterior.sample()`:
+```{r, eval =  FALSE}
+control.compute <- list(waic = TRUE, config = TRUE)
+fit <- INLA::inla(..., control.compute = control.compute)
+nSamples <- 1000
+sampleAll <- INLA::inla.posterior.sample(result = fit, n = nSamples)
+```
+
+The output of `sampleAll` is a nested list of length `nSamples`. Use the following code to extract the relevant information from the list and put it into matrix format
+```{r, eval = FALSE}
+sampleMatrix <- 
+  lapply(sampleAll, function(x) x$latent) %>%
+  unlist() %>%
+  matrix(., ncol = nSamples)
+colnames(sampleMatrix) <- paste0('sample:', 1:nSamples)
+rownames(sampleMatrix) <- rownames(sampleAll[[1]]$latent)
+```
+
+This matrix has 1000 columns, one for each of the samples from the posterior distribution and has 500+ rows. The rows 1- 500 are the posterior distributions for the linear predictor and the additional rows from 501 onwards are for the posterior distributions of the coefficients in the model. The code
+```{r, eval = FALSE}
+fit$misc$configs$contents
+```
+will show the name of the term (linear predictor, intercept, etc...) and where it starts (which we have constructed to correspond to the row of `sampleMatrix`). If you wanted to plot the posterior distribution of one of the marginals, then you would create a histogram using the data in the row of the term you are interested.
+
+  8. Fit the model you have chosen, plot a histogram of the samples from the posterior distribution for each of model coefficients and superimpose the smooth plot of the marginal distribution used in Question 4 (e.g., using `inla.smarginal()`) and comment on what you see. 
+
+:::: {.blackbox data-latex=""}
+::: {.center data-latex=""}
+**Solution**
+:::
+
+Using the above code:
+```{r}
+control.compute <- list(waic = TRUE, config = TRUE)
+fit2 <- INLA::inla(formula = formula2, data = regData, family = family, 
+                   control.family = control.family, 
+                   control.fixed = control.fixed,
+                   control.compute = control.compute)
+
+
+# sample from the posterior
+nSamples <- 1000
+sampleAll <- INLA::inla.posterior.sample(result = fit2, n = nSamples)
+
+# extract the results we want
+sampleMatrix <- 
+  lapply(sampleAll, function(x) x$latent) %>%
+  unlist() %>%
+  matrix(., ncol = nSamples)
+colnames(sampleMatrix) <- paste0('sample:', 1:nSamples)
+rownames(sampleMatrix) <- rownames(sampleAll[[1]]$latent)
+```
+
+Extracting the rows relating to the coefficients from the samples matrix:
+```{r}
+# starting points for each of the terms in the sample matrix
+ageStart <- fit2$misc$configs$contents$start[4]
+netuseStart <- fit2$misc$configs$contents$start[5]
+
+# posterior distributions draws
+ageDraws <- 
+  sampleMatrix[ageStart,] %>%
+  data.frame() %>%
+  dplyr::rename('x' = '.') %>%
+  tibble::rownames_to_column(var = 'sample') %>% 
+  dplyr::mutate(sample = sample %>% gsub('sample:', '', .),
+                coefficient = 'age')
+netuseDraws <- 
+  sampleMatrix[netuseStart,] %>%
+  data.frame() %>%
+  dplyr::rename('x' = '.') %>%
+  tibble::rownames_to_column(var = 'sample') %>% 
+  dplyr::mutate(sample = sample %>% gsub('sample:', '', .),
+                coefficient = 'netuse')
+
+# together
+allDraws <- rbind(ageDraws, netuseDraws)
+```
+
+Collecting the densities together for comparison:
+```{r}
+# marginal terms from model fit
+ageMarginal <- fit2$marginals.fixed$age
+netuseMarginal <- fit2$marginals.fixed$netuse
+
+# use inla.smarginal for smoothed curves
+ageDensity <- 
+  INLA::inla.smarginal(ageMarginal) %>%
+  unlist() %>%
+  matrix(., ncol = 2) %>%
+  as.data.frame() %>%
+  dplyr::rename('x' = 'V1', 'y' = 'V2') %>% 
+  dplyr::mutate(coefficient = 'age')
+netuseDensity <- 
+  INLA::inla.smarginal(netuseMarginal) %>%
+  unlist() %>%
+  matrix(., ncol = 2) %>%
+  as.data.frame() %>%
+  dplyr::rename('x' = 'V1', 'y' = 'V2') %>% 
+  dplyr::mutate(coefficient = 'netuse')
+
+# together
+allDensity <- rbind(ageDensity, netuseDensity)
+
+```
+
+Plotting a histogram of the draws with the densities overlapped:
+```{r}
+ggplot2::ggplot(allDraws, aes(x = x, y = after_stat(density))) +
+  # add a histogram of the draws
+  ggplot2::geom_histogram(colour = 'black', fill = 'white', bins = 40) +
+  # add a curve for the density
+  ggplot2::geom_line(data = allDensity, aes(x = x, y = y), colour = 'blue', linewidth = 1) +
+  ggplot2::facet_wrap(~ coefficient, scales = 'free', ncol = 2) +
+  ggplot2::labs(x = expression(beta['j']),
+                y = expression(paste(pi, '(', beta['j'], ' | ', bold(y), ')'))) +
+  ggplot2::theme_bw()
+```
+
+We can see how the density curve and the histograms match very closely. There are some difference, but this will be due to the random sampling and should go the more samples we use. Try running the above code by with a large number of samples to see if it makes any difference. 
+::::
+

@@ -1,0 +1,1246 @@
+---
+title: "Session 4.1: Hierarchical Models, Priors and Model Checking"
+params: 
+   conference: "Bayesian modelling for Spatial and Spatio-temporal data"
+   location: "Imperial College"
+   date: ""
+   short_title: "MSc in Epidemiology"
+output:    
+  xaringan::moon_reader: 
+    includes: 
+       in_header: "../assets/latex_macros.html" 
+       # This line adds a logo based on the format selected in the file 'assets/include_logo.html'
+       # NB: the actual options (eg placement of the logo and actual logo file) can be changed there
+       after_body: "../assets/insert-logo.html"
+    seal: false
+    yolo: no
+    lib_dir: libs
+    nature:
+      beforeInit: ["https://platform.twitter.com/widgets.js"]
+      highlightStyle: github
+      highlightLines: yes
+      countIncrementalSlides: no
+      ratio: '16:9'
+      titleSlideClass:
+      - center
+      - middle
+    self_contained: false 
+    css:
+    - "../assets/beamer.css"
+---
+
+```{r global_options, echo = FALSE, include = FALSE}
+options(width = 999)
+knitr::opts_chunk$set(echo = FALSE, warning = FALSE, message = FALSE,
+                      cache = FALSE, tidy = FALSE, size = "small")
+```
+```{r echo=F,message=FALSE,warning=FALSE,comment=NA}
+# Sources the R file with all the relevant setup and commands
+source("../assets/setup.R")
+library(INLA)
+
+# Stuff from 'xaringanExtra' (https://pkg.garrickadenbuie.com/xaringanExtra)
+# This allows the use of panels (from 'xaringanExtra')
+xaringanExtra::use_panelset()
+# This allows to copy code from the slides directly
+#xaringanExtra::use_clipboard()
+# This freezes the frame for when there's a gif included
+#xaringanExtra::use_freezeframe()
+
+# Defines the path to the file with the .bib entries (in case there are references)
+bibfile=ReadBib("~/Dropbox/Books/INLABook/ShortCourse/VIBASS/Biblio.bib",check = FALSE)
+#bibfile=ReadBib("~/Dropbox/Lavori condivisi/2015_Book/ShortCourse/VIBASS/Biblio.bib",check = FALSE)
+
+```
+
+class: title-slide
+
+# `r rmarkdown::metadata$title``r vspace("10px")` `r rmarkdown::metadata$subtitle`
+
+## `r rmarkdown::metadata$author`
+
+### `r rmarkdown::metadata$institute`    
+
+### `r rmarkdown::metadata$params$conference`, `r rmarkdown::metadata$params$location` 
+
+<!-- Can also separate the various components of the extra argument 'params', eg as in 
+### `r paste(rmarkdown::metadata$params, collapse=", ")`
+-->
+
+`r ifelse(is.null(rmarkdown::metadata$params$date),format(Sys.Date(),"%e %B %Y"),rmarkdown::metadata$params$date)`
+
+---
+
+layout: true  
+
+.my-footer[ 
+.alignleft[ 
+&nbsp; &copy; Marta Blangiardo | Monica Pirani 
+]
+.aligncenter[
+`r rmarkdown::metadata$params$short_title` 
+]
+.alignright[
+`r rmarkdown::metadata$params$conference`, `r short_date` 
+]
+] 
+
+```{css,echo=FALSE, eval=FALSE}
+.red {
+  color: red;
+}
+.blue {
+  color: 0.14 0.34 0.55;
+}
+
+.content-box-blue { background-color: #F0F8FF; }
+
+}
+```
+<style>
+pre {
+  overflow-x: auto;
+}
+pre code {
+  word-wrap: normal;
+  white-space: pre;
+}
+</style>
+
+
+---
+
+# Learning Objectives
+
+After this session you should be able to:
+
+`r vspace("10px")`
+
+- Understand the different modelling assumptions for hierarchical data
+
+`r vspace("10px")`
+
+- Be able to specify a hierarchical model for Poisson data
+
+`r vspace("10px")`
+
+- Be able to perform prediction in a Bayesian approach
+
+`r vspace("10px")`
+
+- Distinguish and choose between several prior distributions for the precision/variance parameter 
+
+`r vspace("10px")`
+
+- Use the DIC/WAIC as tools for model selection.
+
+`r vspace("10px")`
+
+The topics treated in this lecture are covered in Chapter 5 of `r Citet(bibfile, "blangiardo2015spatial")`.
+
+---
+
+# Outline 
+
+1\. [What are hierarchical models](#hierarchical)
+
+`r vspace("30px")`
+
+2\. [Different modelling assumptions](#modelling-assumptions)
+
+`r vspace("30px")`
+
+3\. [Parameter interpretation](#Interpretation)
+
+`r vspace("30px")`
+
+4\. [Hierarchical regression](#Hier-regression)
+
+
+`r vspace("30px")`
+
+6\. [Choice of prior](#Prior)
+
+`r vspace("30px")`
+
+7\. [Model selection](#Modelselection)
+---
+
+name: hierarchical
+
+`r vspace("250px")`
+
+.myblue[.center[.huge[
+**What are hierarchical models**]]]
+
+
+---
+
+# What are hierarchical models?
+
+**Hierarchical model** is a very broad term that refers to wide range of
+model set-ups
+
+`r vspace("20px")`
+ 
+- Multilevel models
+
+`r vspace("10px")`
+
+- Random effects models
+
+`r vspace("10px")`
+
+- Random coefficient models
+
+`r vspace("10px")`
+
+- Variance-component models
+
+`r vspace("10px")`
+
+- Mixed effect models
+
+`r vspace("10px")`
+
+.content-box-blue[**Key feature**: Hierarchical models are statistical models that provide a
+formal framework for analysis with a complexity of structure that matches the system being studied.]
+
+---
+
+# The hierarchical approach
+ 
+- Attempt to capture (model) and understand the structure of the data 
+
+`r vspace("10px")`
+
+--
+
+- Is flexible: 
+
+  - all sources of correlation and heterogeneity can be incorporated in a modular fashion, in particular by the introduction of unit-specific parameters
+  - can be combined with other types of models, e.g. for missing data or measurement error
+
+`r vspace("10px")`
+
+--
+
+- We wish to make inference on models with many parameters $(\lambda_1,\ldots,\lambda_N)$ measured on N units (individuals, areas, time-points, etc.) which are related or connected by the structure of the problem.
+
+`r vspace("10px")`
+
+--
+
+- Unit specific parameters will .red[borrow strength] from corresponding parameters associated with the other units
+
+---
+
+# Motivating example: Disease mapping
+  
+- To summarise spatial and spatio-temporal variation in disease risk
+
+- **Question**: Which areas have particularly high or low disease rates?
+
+- **Question**: Can we explain some of the variation in disease rates by
+area-level covariates?
+--
+  
+- Data are the observed $(y_{i})$ and expected number of cases in area $i$: $E_{i} = \sum_k n_{ik} r_k$, where $r_k$ reference rate for stratum $k$ (age, sex,...)
+ 
+- Rare disease and/or small areas: Poisson framework
+  
+$$y_i \sim \text{Poisson}(\rho_i E_i)$$
+
+`r vspace("-10px")`
+
+where $\rho_i$ is the **unknown RR** in area $i$
+
+.content-box-beamer[
+
+### Non smoothed estimates of the RR (SMR or SIR)
+\begin{align*}
+\text{SMR}_i &=\frac{y_i}{E_i}\\ 
+\hat{\hbox{Var}}(\hbox{SMR}_i) &=  \frac{y_i}{E_i^2}
+\end{align*}
+]
+  
+`r vspace("10px")`
+
+--
+    
+- .red[very imprecise: areas with small] $\class{red}{E_i}$ .red[have high associated variance]    
+
+- .red[estimated independently: makes no use of risk estimates in other areas of the map]
+
+---
+
+# Motivating example: Disease mapping
+
+*Example*: 
+
+`r vspace("10px")`
+
+- observed cases of lip cancer $y_i$ diagnosed in Scotland in 1975-1980 at county level $i=1,\ldots,56$ areas
+
+`r vspace("10px")`
+
+- expected number of cases $E_i$ are also available using age/sex standardised reference rates and population counts:
+
+--
+  
+Assume a Poisson likelihood for the disease counts in each area:
+  
+$$y_i\sim \text{Poisson}(\lambda_i)\qquad\qquad \lambda_i = \rho_i E_i \qquad\qquad i=1,\ldots,56$$
+`r vspace("10px")`
+   
+- We have 56 parameters $\rho_i$ (one for each area). What prior do we specify on $\rho_i$?    
+
+---
+
+
+# Expected numbers of cases - definition
+- Expected number of cases if the population had the same stratum-specific mortality/incidence rates as in a reference area
+- Adjustments (strata): age, gender ...
+
+`r vspace("10px")`
+Indirect standardisation: $E_i = \sum_k n_{ik} r_k$
+with
+- $r_k$: disease rate for stratum $k$ in the reference population
+- $n_{ik}$: population at risk in area $i$, stratum $k$
+
+`r vspace("20px")`
+
+.red[If internal comparison:] $\color{red}{\sum_{i=1}^N O_i = \sum_{i=1}^N E_i}$
+`r vspace("10px")`
+- age will almost need controlling for since different disease risks in different areas may reflect differences in age population
+`r vspace("20px")`
+- Direct standardisation: apply the disease rate in the population of interest (e.g. UK) to a standard population e.g. European standard population
+-  External comparison: if the reference population is not the population of the study of interest. For example, to calculate the expected numbers in London, risks in England could be used.
+---
+
+# Expected numbers of cases - calculation
+
+`r include_fig("Expected.png",width="60%",title="Lung cancer incidence in males, all ages, using the rates in England and Wales as reference, for the period 1985-2009")`
+
+$$\hbox{SIR}_A=\frac{118}{126.38}=0.93$$ 
+- Fewer incident cases of lung cancer for males in ward A than expected in EW after adjusting for differences in age.
+`r vspace("20px")`
+- In R we can perform indirect standardization using the package `SpatialEpi` (we will see it in the Practical in week 6).
+
+---
+
+name: modelling-assumptions
+
+`r vspace("250px")`
+
+.myblue[.center[.huge[
+**Modelling assumptions**]]]
+
+---
+
+
+# Different modelling assumptions
+
+.content-box-beamer[
+
+### Identical parameters
+- Assume $\rho_i = \rho$ 
+
+$\rightsquigarrow$ all  the  data can be pooled and the individual areas ignored.
+
+- Assume a prior $\rho \sim \text{Gamma}(1,1)$
+
+$\rightsquigarrow$ conjugate prior
+
+]
+
+--
+
+`r vspace("20px")`
+
+- One parameter generates all the observations
+`r vspace("10px")`
+- Very easy to implement as it is conjugate (no need for INLA) and all the data are .red[pooled] to produce one estimate of the parameter of interest
+`r vspace("10px")`
+- Can be unrealistic (it does not take into account differences in the areas)
+
+---
+
+# Different modelling assumptions
+
+.content-box-beamer[
+
+### Independent parameters
+- All the $\rho_i$ are unrelated, meaning that the areas are analysed independently 
+
+- Assume a prior $\rho_i \sim \text{Gamma}(1,1); \qquad i=1,\ldots,56$
+
+$\rightsquigarrow$ individual estimates of $\rho_i$ are likely to be highly variable (unless very large sample sizes)
+
+]
+
+--
+
+`r vspace("20px")`
+
+- Every area is treated separately (No exchange of information between these). Estimates close to SMR $(\rho_i \approx y_i / E_i)$. 
+`r vspace("10px")`
+- Again no need for INLA, conjugacy can be exploited.
+
+---
+
+# Different modelling assumptions
+
+.content-box-beamer[
+
+### Similar (exchangeable) parameters
+- All the $\rho_i$ are assumed to be *similar* 
+
+$\rightsquigarrow$ they come from the same distribution (are generated by the same parameters)
+
+- Assume a hierarchical prior $\rho_i \sim \text{Gamma}(a,b)$
+
+where $a$ and $b$ are unknown parameters and need to be estimated.
+
+]
+
+--
+
+`r vspace("20px")`
+
+- Different levels of analysis
+- Allow the exchange of information between different levels as they are all connected to each other
+- Assign hyperprior distribution to $a$ and $b$, for instance $$a \sim \text{Exp}(1); b\sim \text{Gamma}(1,1)$$ 
+
+---
+
+# Graphical representation of lip cancer hierarchical model
+
+`r include_fig("DAG.png",title="")`
+
+---
+
+# A more flexible hierarchical prior for the relative risks
+- A gamma random effect prior for the $\rho_i$ is mathematically convenient, but might be restrictive:
+
+  - Covariate adjustment is difficult
+  
+  - Not possible to allow for spatial correlation between risks in nearby areas
+
+--
+
+  - A Normal random effect prior on the $\log \rho_i$ is more flexible:
+ 
+\begin{align*}
+y_i &\sim \text{Poisson}(\lambda_i = \rho_i E_i)\\
+\eta_i &= \log \rho_i = b_0 + v_i\\
+v_i &\sim \text{Normal}(0, \sigma^2_v)
+\end{align*}
+
+--
+
+- Need to specify hyperprior distributions for:
+
+- $\sigma^2_v$ (between-area variance), e.g. $1/\sigma^2_v \sim \text{Gamma}(1,0.001)$
+- $b_0$ (mean log relative risk), e.g. $b_0 \sim \text{Normal}(0,0.0001)$ 
+`r vspace("-10px")`
+--
+
+### Advantages of this approach:
+`r vspace("-20px")`
+Posterior for each $v_i$
+
+- *borrows strength* from the likelihood contributions of **all** the areas, via their joint influence on the estimate of the unknown population (prior) parameter $\sigma^2_v$ 
+
+&rarr; *global smoothing* of the area RR 
+
+&rarr; reflects our *full uncertainty* about the true values of $\sigma^2_v$
+
+.content-blue-box[
+Such models are called .red[*Hierarchical*] or .red[*Random effects*] or .red[*Multilevel*] models
+]
+
+---
+
+
+name: interpretation
+
+`r vspace("250px")`
+
+.myblue[.center[.huge[
+**Interpretation**]]]
+
+
+---
+
+# Parameter interpretation and useful quantities 
+- $\rho_i$ is the log-relative risk for the area i compared to the average area with the same structure in the expected values.
+
+- $v_{i}$ are the random effects. It can also be seen as the latent variable which captures the effect of unknown or unmeasured area level covariates.
+
+- If area level covariates are spatially structured we should take this into account when modelling $v_i$ (we will see it later)
+
+- $\text{exp}(v_{i})$ relative risk in area $i$ compared to the risk for the whole study region
+
+- The variance of the random effects $\sigma^2_v$ reflects the amount of extra-Poisson variation in the data
+  
+--
+
+`r vspace("-15px")`
+
+- A useful summary of among unit variability in a Poisson hierarchical model is to rank the random effects and calculate the difference between two units at opposite extremes
+
+- Suppose we consider the $5^{th}$ and $95^{th}$ percentiles of the area relative risk distribution
+
+- let $q_{5\%} = \rho_{5\%}$ denote the log relative risk of outcome for the area ranked at the $5^{th}$ percentile
+
+- let $q_{95\%} = \rho_{95\%}$ denote the log relative risk of outcome  for the area ranked at the $95^{th}$ percentile
+
+.content-box-beamer[
+### Quantile ratio
+$$\text{QR}_{90} = \text{exp}(q_{95\%}-q_{5\%})$$ 
+is the relative risk of outcome  between the top and bottom 5% of areas
+]
+
+---
+
+#Lip cancer dataset
+
+```{r lip, echo=TRUE, eval=FALSE}
+LipCancer <- read.csv("scotlip.csv")
+LipCancer
+```
+
+
+```{r lip2, echo=FALSE, tidy=TRUE}
+library(INLA)
+LipCancer <- tibble(read.csv("~/Dropbox/Books/INLABook/ShortCourse/VIBASS/Datasets/scotlip/scotlip.csv"))
+#LipCancer <- tibble(read.csv("~/Dropbox/Lavori condivisi/2015_Book/ShortCourse/VIBASS/Datasets/scotlip/scotlip.csv"))
+
+head(LipCancer)
+```
+
+- `DISTRICT` identifies the area
+- `y` identifies the counts of cancer cases
+- `E` identifies the expected cases of cancer using the entire region under study as reference
+- `x` identifies the exposure to sun (percentage of agriculture , farming and fishery works)
+ 
+---
+
+# In `R-INLA` 
+
+We first populate the `formula` environment
+
+```{r formula_lip, echo=TRUE, eval=TRUE}
+formula.inla <- y ~ 1 + 
+  f(RECORD_ID,model="iid", hyper=list(prec=list(prior="loggamma",
+  	param=c(1,0.01))))
+```
+
+- The model specification is exactly the same as in GLM;
+- Anything with `f(.)` specifies a random effect; in this case `iid` represents the exchangeable structure. 
+
+Then we run the model through
+
+```{r inla_lip, echo=TRUE, eval=TRUE}
+lipcancer.poisson <- inla(formula.inla,family="poisson",
+                          data=LipCancer, E=E,
+                          control.predictor=list(compute=TRUE),
+                          control.compute=list(config=TRUE),
+                          control.fixed=list(mean.intercept=0,prec.intercept=0.00001))
+```
+`r vspace("-10px")`
+Note that 
+
+- `control.fixed` allows to specify the parameters of the prior for the fixed effects (intercept)
+- `control.predictor` tells `INLA` to include the linear predictor estimation ( the parameters of the prior for the fixed effects (intercept)) useful for prediction - see later)
+- `control.compute` allows to include model selection indexes, as well as to draw samples from the joint posterior
+
+---
+
+# Results for lip cancer in Scotland example
+
+- $\text{exp}(b_0 + v_i)$ is the relative risk of lip cancer in area $i$ relative to the average area with the same age/sex structure (see map)
+
+- $\sigma_v$ is the between-area standard deviation of log relative risk of lip cancer
+
+- As in INLA we get the precision we need to convert it into standard deviaiton using
+```{r convert, echo=TRUE}
+sigma.v<- inla.tmarginal(function(x) sqrt(1/x),
+			lipcancer.poisson$marginals.hyperpar[[1]])
+```
+
+And we can calculate quintiles with
+```{r sigma_quintiles, echo=TRUE, eval=TRUE}
+inla.qmarginal(seq(0,1,0.2),sigma.v)
+```
+
+---
+
+# Maps: comparing SMR with smoothed estimates
+
+
+```{r read_shp1, echo=TRUE, include=FALSE,eval=TRUE}
+library(sf)
+lip.shp <- read_sf("~/Dropbox/Books/INLABook/ShortCourse/VIBASS/Datasets/scotlip/scotdistricts.shp")
+#lip.shp <- read_sf("~/Dropbox/Lavori condivisi/2015_Book/ShortCourse/VIBASS/Datasets/scotlip/scotdistricts.shp")
+output <- data.frame(RECORD_ID=lipcancer.poisson$summary.random$RECORD_ID$ID, mean=exp(lipcancer.poisson$summary.random$RECORD_ID$mean), SMR=LipCancer$y/LipCancer$E)
+out_map <- left_join(lip.shp,output, by="RECORD_ID")
+breaks =  c(0,0.5,0.9,1.1,1.5,2,7)
+out_map <- mutate(out_map, SMR_cat = cut(SMR, breaks, include.lowest = TRUE), mean_cat = cut(mean, breaks, include.lowest = TRUE)) 
+```
+
+.pull-left[
+###SMR
+`r vspace("-10px")`
+```{r ggplot1, echo=FALSE, eval=TRUE, fig.height = 2.5, fig.width = 4}
+library(RColorBrewer)
+ggplot() + geom_sf(data = out_map,aes(fill = SMR_cat)) + 
+          theme_bw() + scale_fill_brewer(palette = "OrRd") + 
+          guides(fill=guide_legend(title="SMR")) +
+          theme(axis.text.x=element_blank(), axis.ticks.x=element_blank(), 
+          axis.text.y=element_blank(),  axis.ticks.y=element_blank(),
+          legend.key.size = unit(0.4, 'cm'), legend.text = element_text(size=6),
+          legend.title = element_text(size=6))
+```
+]
+
+.pull-right[
+###Posterior mean
+`r vspace("-10px")`
+```{r ggplot2, echo=FALSE, eval=TRUE, fig.height = 2.5, fig.width = 4}
+ggplot() + geom_sf(data = out_map,aes(fill = mean_cat)) + 
+          theme_bw() + scale_fill_brewer(palette = "OrRd") + 
+          guides(fill=guide_legend(title="Post mean")) +
+          theme(axis.text.x=element_blank(), axis.ticks.x=element_blank(), 
+          axis.text.y=element_blank(),  axis.ticks.y=element_blank(),
+          legend.key.size = unit(0.4, 'cm'), legend.text = element_text(size=6),
+          legend.title = element_text(size=6))
+```
+]
+
+---
+
+# Quantile ratios
+
+To obtain the quantile ratio we need to follow these steps:
+
+1\. Obtain the **join posterior distribution** for the model under consideration
+`r vspace("-10px")`
+```{r q_ratio, echo=TRUE}
+joint.post <- inla.posterior.sample(100,lipcancer.poisson)
+names(joint.post[[1]])
+joint.post[[1]]$latent[1:3,]
+```
+`r vspace("-10px")`
+Note that:
+- `joint.post` is a list of 100 elements and each element includes  a value from
+
+1\. the joint posterior distribution for the hyperparameters `joint.post$hyperpar`
+
+2\. joint posterior distribution for the linear predictor $\bm{\eta}$ in `joint.post$latent` (row 1 to N) 
+
+3\. joint posterior distribution for the random effects $\bm{v}$ in `joint.post$latent` (N +1 to 2N)
+
+---
+
+# Quantile ratios
+
+2\. For each iteration rank the areas based on their $v_i$ values
+```{r qq_ratio1, echo=TRUE}
+joint.v <- matrix(NA,56,100)
+for(i in 1:100){
+  joint.v[,i]<- joint.post[[i]]$latent[57:112]
+}
+```
+- Calculate $v_3$ and $v_{53}$ (5% and 95%) and build the ratio
+```{r qq_ratio3, echo=TRUE}
+v5perc <- apply(joint.v,2, function(x) quantile(x,0.05))
+v95perc <- apply(joint.v,2, function(x) quantile(x,0.95))
+QR90<- mean(exp(v95perc-v5perc))
+QR90
+```
+
+- The $QR90$ points towards a large spatial variability. 
+
+---
+
+# SMR versus posterior mean RR for selected areas
+
+```{r shrinkage, echo=FALSE, eval=TRUE, include=FALSE}
+ggplot() + geom_segment(data=output, aes(x=10, y=SMR,xend=20, yend=mean)) +
+   scale_y_continuous(
+     # Features of the first axis
+    name = "SMR",
+    
+    # Add a second axis and specify its features
+    sec.axis = sec_axis(~.*1, name="Posterior mean")
+  ) +
+  theme(axis.text.x=element_blank(),
+        axis.ticks.x=element_blank(),
+        axis.title.x=element_blank()
+        )
+```
+`r include_fig("shrinkage-1.png", width="50%")`
+
+- Comparing the SMR and the area level posterior mean from the model shows a shrinkage towards the global (national mean) 
+---
+
+name: Hier-regression
+
+`r vspace("250px")`
+
+.myblue[.center[.huge[
+**Hierarchical Regression**]]]
+
+
+---
+
+# Regression in `INLA`
+
+It is easy to move from hierarchical models to regression models with random effects. 
+
+`r vspace("10px")`
+
+**Example**: In the `Seeds` dataset we are interested in the proportion of seeds that germinated on each of 21 plates arranged according to a 2 by 2 factorial layout by seed and type of root extract. The data consider the number of germinated $y_i$ and the total number of seeds $n_i$ on the i $-th$ plate, $i =1,...,21$.
+
+--
+
+We specify a random effect logistic model 
+
+\begin{eqnarray*}
+ y_i &\sim& \text{Binomial}(\pi_i , n_i)\\
+\text{logit}(\pi_i) &=& b_0 + \beta_1 x_{1i} + \beta_2 x_{2i} + \beta_{12} x_{1i}x_{2i} + v_i\\
+v_i &\sim& \text{Normal}(0, \sigma^2_v)
+\end{eqnarray*}
+
+where $x_{1i}$ , $x_{2i}$ are the seed type and root extract of the i $-th$ plate, and an interaction term $\beta_{12} x_{1i}x_{2i}$ is included. $b_0$ , $\beta_1$ , $\beta_2$ , $\beta_{12}$ , $\sigma^2_v$ are given independent "noninformative" priors. 
+
+
+---
+
+# `R-INLA` code
+
+```{r Seeds, echo=TRUE}
+data(Seeds)
+head(Seeds)
+formula <- r~x1 + x2 + x1*x2 + f(plate, model="iid")
+model.regression <- inla(formula, data=Seeds, 
+					family="binomial", Ntrials=n)
+```
+
+---
+
+# Output: Parameters
+
+```{r Seeds_reg, echo=TRUE}
+model.regression$summary.fixed
+head(model.regression$summary.random$plate)
+```
+
+---
+
+name: Prior
+
+`r vspace("250px")`
+
+.myblue[.center[.huge[
+**Choice of prior**]]]
+
+---
+
+# How to specify priors?
+
+- *Relatively* easy to specify priors on regression parameters
+  - Typical choice is a Normal distribution
+  - Tuning the variance it can be more or less informative 
+  - .alert[The scale of the variable it represents need to be considered]
+  
+--
+
+`r vspace("40px")`
+
+- Variances are more complex (and a bit more controversial)
+
+- In small area studies we usually work with Poisson/Binomial distribution on data - no variance parameter; the main interest is on random effect variance.
+
+--
+`r vspace("40px")`
+
+- A Gamma $(\epsilon,\epsilon)$ can be used on the precision but inference could be sensitive to choice of $\epsilon$. Typically to ensure vague priors small $\epsilon$ are specified (e.g. 0.1, 0.01). However, this prior has also been criticised (e.g. `r Cite(bibfile, "gelman2006prior")`) as it has a spike for values around 0.
+
+--
+
+- .alert[careful as "non informative" prior distributions are sensitive to changes of scale.]
+
+---
+
+# Changing the scale
+
+- For instance starting with a Uniform on the standard deviation we end up with a high density on low values for the precision  
+
+```{r changing_scale, echo=FALSE, include=TRUE, eval=TRUE}
+sigma <- data.frame(s=runif(100000,0,5))
+logsigma<- log(sigma)
+#library(truncnorm)
+#sigma<-data.frame(s=rtruncnorm(10000, a=0, b=Inf, mean = 0, sd = 5))
+#logsigma<- log(sigma)#sigma <- data.frame(s=rnorm(100000,0,5))
+tau <- 1/sigma^2
+```
+
+```{r logsigma_plot,echo=FALSE, eval=TRUE, include=FALSE}
+library(patchwork)
+p1<-ggplot(logsigma, aes(x=s)) + geom_density()  + xlab(expression(log(sigma))) 
+```
+
+```{r sigma_plot,echo=FALSE, eval=TRUE, include=FALSE}
+p2<-ggplot(sigma, aes(x=s)) + geom_density()  + xlab(expression(sigma))
+```
+
+```{r tau_plot,echo=FALSE, eval=TRUE, include=TRUE, fig.height = 10, fig.width = 14, fig.show='hold',opts=list(width="60%")}
+p3<-ggplot(tau, aes(x=s)) + geom_density()  + xlab(expression(tau))
+
+p1+p2+p3
+```
+
+---
+
+# Remember...
+
+- `INLA` parametrises the precision and the default is
+
+$\log \left(1/\sigma^2\right) \sim \text{logGamma}(1,0.00005)$
+
+- However alternatives can be built, for instance: 
+
+  -  Truncated Normal on log precision (`logtnormal`)
+  -  Uniform prior on the standard deviation: as it is not implemented we need to specify it through the `expression` as follows
+  
+`UN.prior = "expression:
+  log_dens = 0 - log(2) - theta / 2;
+  return(log_dens);"`
+
+
+`r vspace("50px")`
+
+.content-box-blue[In general we need to be careful to check the level of information (weakly, strong) on the scale we are interested in (e.g. variance) and see what this corresponds on the standard deviation/precision (on which prior is usually specified).
+]
+
+See `r Citet(bibfile, "gomez2020bayesian")` for more information on how to specify priors in `INLA`.
+---
+
+name: Modelselection
+
+`r vspace("250px")`
+
+.myblue[.center[.huge[
+**Model selection**]]]
+
+---
+
+# Which model?
+
+
+.center[.content-box-blue[.Large[**All models are wrong, some models are useful.**
+
+G. Box]]]
+
+--
+`r vspace("30px")`
+
+So the question is: how is my model doing?
+`r vspace("20px")`
+  1. in terms of model assumption
+`r vspace("20px")`
+  2. compared to other models
+
+--
+
+We can answer the first question using the .red[posterior predictive distribution]
+
+`r vspace("30px")`
+
+We can answer the first question using .red[methods based on the trade-off between a measure of model fit and of model complexity]
+
+---
+
+# Posterior predictive distribution
+
+.red[Main idea: If the combined model assumptions are reasonable, then our posterior model should be able to simulate data that’s similar to the original one]
+
+- Let's assume we want to find the relationship between asthma air pollution and asthma attacks and we collect data of the outcome over 500 days in a London Local Authority 
+```{r eval=TRUE}
+#Simulate some data
+set.seed(1234)
+air_poll <- rnorm(500,10,2)
+dow<- sample(c(0,1),500,replace=TRUE)
+E_asthma <- exp(1 + 0.1*air_poll + 0.3*dow)
+y<-c()
+for(i in 1:500){
+  y[i] <- rpois(1,E_asthma[i])}
+
+data<-data.frame(y=y,x=air_poll,ID=seq(1,500))
+```
+--
+
+We propose the following model (y=number of asthma attacks, x=level of $PM_{10}$ in the previous 3 days $i=1,\ldots,500$:
+
+\begin{align}
+y_i &\sim \text{Poisson}(E \rho_i)\\
+\text{log}(\rho_i) &= b_0 + \beta x_i + v_i\\
+b_0, \beta &\sim N(0,0.001)\\
+v_i &\sim N(0,\sigma^2_{v})\\
+\text{log}(1/\sigma^2_{v}) &\sim \text{logGamma}(1,0.00005)
+\end{align}
+
+The assumptions are 
+  1. that the data are distributed as .red[Poisson]
+  2. that there is a linear relationship between air pollution and the log risk of asthma attacks
+  3. that the days are similar (we include a random effect)
+---
+
+# Posterior predictive distribution
+
+- We run the model and predict observations $y^*_1,\ldots,y^*_{500}$ based on the posterior distribution of the parameters (note that we need to include `control.predictor` in the `inla` function to access these):
+
+```{r eval=FALSE, include=TRUE, echo=TRUE}
+asthma_formula1 <- y ~  x + as.factor(dow) + f(ID, model="iid")
+asthma_model1 <- inla(asthma_formula1, data=data,family="poisson",E = E, control.predictor=list(compute=TRUE),control.compute=list(config=TRUE,dic=TRUE, waic=TRUE, return.marginals.predictor=TRUE))
+```
+```{r eval=TRUE, include=FALSE}
+asthma_formula1 <- y ~  x  + dow + f(ID, model="iid", hyper=list(prec=list(prior="gamma", param=c(0.01,1))))
+asthma_model1 <- inla(asthma_formula1, data=data,family="poisson", control.predictor=list(compute=TRUE), control.compute=list(config=TRUE,dic=TRUE, waic=TRUE , return.marginals.predictor=TRUE))
+```
+
+.pull-left[To get the fitted values we run:
+```{r eval=TRUE}
+asthma_model1$summary.fitted.values[1:5,]
+```
+]
+
+
+.pull-right[
+```{r eval=TRUE, fig.height = 10, fig.width = 14, fig.show='hold',opts=list(width="75%")}
+pred <- data.frame(asthma=c(y,asthma_model1$summary.fitted.values$mean),
+                   ID = c(rep("obs",500),rep("pred",500)))
+
+library(easyGgplot2)
+p1<-ggplot2.histogram(pred, xName="asthma", groupName="ID", alpha=0.5, binwidth=0.1)
+p1
+```
+]
+
+---
+
+# Posterior predictive distribution
+
+Now let's assume we run a different model 
+
+\begin{align}
+y_i &\sim \text{Normal}(E\theta_i, \tau)\\
+\theta_i &= b_0 + \beta x_i\\
+b_0, \beta &\sim N(0,0.001)\\
+\text{log}(\tau) &\sim \text{logGamma}(1,0.00005)
+\end{align}
+
+The assumptions are 
+  1. that the data are distributed as .red[Gaussian]
+  2. that there is a linear relationship between air pollution and the risk of asthma attacks
+  
+---
+
+# Posterior predictive distribution
+
+- We run the model and predict observations $y^*_1,\ldots,y^*_{500}$ based on the posterior distribution of the parameters (note that we need to include `control.predictor` and `control.compute` in the `inla` function to access these):
+
+```{r eval=FALSE, include=TRUE, echo=TRUE}
+asthma_formula2 <- y ~ x
+asthma_model2 <- inla(asthma_formula2, data=data,family="gaussian", E=E,
+                      control.predictor=list(link=1,compute=TRUE),
+                      control.compute=list(config=TRUE,dic=TRUE, waic=TRUE, return.marginals.predictor=TRUE))
+```
+
+```{r eval=TRUE, include=FALSE}
+asthma_formula2 <- y ~ x 
+asthma_model2 <- inla(asthma_formula2, data=data,family="gaussian",control.predictor=list(link=1,compute=TRUE), 
+control.compute=list(config=TRUE,dic=TRUE, waic=TRUE, return.marginals.predictor=TRUE))
+```
+
+.pull-left[To get the fitted values we run:
+```{r eval=TRUE}
+asthma_model2$summary.fitted.values[1:5,]
+```
+]
+
+.pull-right[
+```{r eval=TRUE, fig.height = 10, fig.width = 14, fig.show='hold',opts=list(width="75%")}
+pred <- data.frame(asthma=c(y,asthma_model2$summary.fitted.values$mean),
+                   ID = c(rep("obs",500),rep("pred",500)))
+
+library(easyGgplot2)
+p2<-ggplot2.histogram(pred, xName="asthma", groupName="ID", alpha=0.45, binwidth=0.1)
+p2
+```
+]
+
+---
+
+# Comparison 
+
+`r vspace("50px")`
+
+- Both models seem reasonable (the predicted values are in line with the observed ones), but there is more of a shift on the right for the Gaussian model (as expected given its symmetric property)
+
+`r vspace("50px")`
+
+- Which one is better?
+
+---
+
+# Model comparison: Bayesian p-value
+
+- We can use the posterior predictive distribution to compare to the observed one through a *p-value*
+
+- Let's go back to `asthma_model1` and `asthma_model2` as output of running the `inla` function and use `inla.pmarginal`
+
+.pull-left[
+```{r eval=TRUE, include=TRUE, echo=TRUE}
+# Model 1
+Bayesian_p1 <- c()
+model1_sample <- matrix(NA,500,1000)
+model1_pois <- matrix(NA,500,1000)
+
+for(i in 1:500){
+model1_sample[i,] <- inla.rmarginal(1000,asthma_model1$marginals.fitted.values[[i]])
+for(j in 1:1000){
+model1_pois[i,j] <- rpois(1, model1_sample[i,j])
+}
+
+Bayesian_p1[i] <- sum(model1_pois[i,]<y[i])/1000
+}
+```
+
+```{r eval=TRUE, echo=FALSE}
+#Model 2
+Bayesian_p2 <- c()
+model2_sample <- matrix(NA,500,1000)
+model2_pois <- matrix(NA,500,1000)
+
+for(i in 1:500){
+model2_sample[i,] <- inla.rmarginal(1000,asthma_model2$marginals.fitted.values[[i]])
+for(j in 1:1000){
+model2_pois[i,j] <- rpois(1, model2_sample[i,j])
+}
+
+Bayesian_p2[i] <- sum(model2_pois[i,]<y[i])/1000
+}
+```
+]
+
+.pull-right[
+```{r eval=TRUE, fig.height = 10, fig.width = 14, fig.show='hold',opts=list(width="75%")}
+par(mfrow=c(2,1))
+hist(Bayesian_p1, ylim=c(0,80),breaks=10,col=rgb(1,0,0,0.5), xlab="", ylab="Model1", main="")
+hist(Bayesian_p2, ylim=c(0,80),breaks=10,col=rgb(0,0,1,0.5), xlab="Bayesian p-value", ylab="Model2", main="")
+```
+]
+
+
+
+- Ideally we would expect a uniform distribution of the p-values which would tell us there is no pattern of over(under) estimation in the prediction
+
+- Here model 1 seems a bit better than model 2
+
+---
+# Model comparison: fit vs complexity
+
+
+- When the interest lays mainly on the prior distribution or on the functional form of some parameters the deviance of the model can be used to evaluate the goodness of fit.
+
+Given the data $\bm{y}$ with distribution  $p(\bm{y}\mid \theta)$, the deviance of the model is defined as:
+\begin{eqnarray*}
+  D(\theta) = -2 \hbox{log} p(\bm{y} \mid \theta)
+\end{eqnarray*}
+where $\theta$ identifies the parameter of the likelihood
+
+--
+
+- Ex. $y_i \sim \hbox{Bernoulli}(\theta) \rightsquigarrow p(\mathbf{y}\mid \theta) = \prod_{i=1}^n  \left( \begin{array}{c} n_i \\ y_i \end{array} \right) \theta^{y_i} (1-\theta)^{n_i-y_i}$
+
+$\displaystyle D(\theta) = -2\left[\sum_i y_i \log \theta_i + (n_i-y_i)\log(1-\theta_i)+ \log\left(\begin{array}{c}n_i\\y_i \end{array}\right)\right]$
+
+
+---
+
+# Mean deviance
+
+- The deviance of the model measures the variability linked to the likelihood, ie the probabilistic structure used for the observation (conditional on the parameters)
+
+- This quantity is a random variable in the Bayesian framework, so it is possible to synthesise it through several indexes (mean, median, etc.)
+
+-  Many authors suggested using posterior mean deviance $(\overline{D}) = E_{\theta\mid y} [D(\theta)]$ as a measure of fit
+
+**DRAWBACK:**  more complex models will fit the data better and so will have smaller $\overline{D}$
+
+- Need to have some measure of *model complexity* to trade off against $\overline{D}$
+
+---
+
+# Deviance Information Criterion - DIC
+
+- Natural way to compare models is to use criterion based on trade-off between the fit of the data to the model and the corresponding complexity of the model
+
+- Deviance Information Criterion, DIC = goodness of fit + complexity of the model
+
+--
+
+  - The fit is measure through the deviance
+
+$$D(\theta) = -2 \hbox{log} p(\bm{y} \mid \theta)$$ 
+
+--
+
+  - Complexity measured by estimate of the "effective number of parameters":
+
+<!--  $$p_D = \textsf{E}_{\theta\mid y}\left[D(\theta)\right] + D(\textsf{E}_{\theta\mid y}\left[\theta \right])$$
+-->
+
+--
+
+  - The DIC is then defined analogously to AIC as
+
+$$\hbox{DIC} = D(\textsf{E}_{\theta\mid y}\left[\theta \right]) + 2p_D$$
+
+  - Models with smaller DIC are better supported by the data
+
+- DIC can be monitored in INLA including  `control.compute=list(dic=TRUE)` into the `inla` function.
+
+---
+
+# Back to our example...
+
+We run the model adding the `dic` (here for model 1, it is the same for model 2):
+```{r eval=FALSE, include=TRUE, echo=TRUE}
+asthma_model1 <- inla(asthma_formula1, data=data,family="gamma",control.predictor=list(link=1,compute=TRUE), 
+                      control.compute=list(dic=TRUE))
+```
+
+And now check the value of the DIC
+`r vspace("20px")`
+```{r eval=TRUE, echo=TRUE}
+# Poisson data distribution
+asthma_model1$dic$dic
+# Normal data distribution
+asthma_model2$dic$dic
+```
+The first model is without any doubt preferred as the DIC is smaller.
+
+---
+
+# DIC: some drawbacks
+
+The DIC has been criticised over the years, specifically:
+
+1\. $p_D$ is not invariant to reparameterization. For example, we would obtain a (slightly) different value if we parameterized in terms of $\sigma$ or  $\log\sigma$
+
+2\. It is not based on a proper predictive criterion
+
+3\. Issues when there are missing data
+
+See `r Cite(bibfile, "spiegelhalter2014deviance")` for a complete description of the criticisms.
+
+--
+
+`r vspace("50px")`
+
+What is the alternative?
+
+---
+
+#Watanabe AIC - WAIC
+
+- Considers the posterior predictive mean and variance (on the log scale)
+
+- Linked to cross-validation
+
+- Similarly to DIC:
+
+  - WAIC has a model-fit and model-complexity components
+  - Smaller WAIC indicates the preferred model
+
+--
+
+
+- Let $m_i$ and $v_i$ be the posterior predictive mean and variance for the 
+$i^{th}$ unit
+- The effective model size is 
+	$$p_W = \sum_{i=1}^nv_i$$ 
+	`r vspace("10px")`
+	
+- The criteria is 
+	$$WAIC = -2\sum_{i=1}^nm_i + 2p_W$$
+- The WAIC is readily available in `INLA` using `control.compute=list(waic=TRUE)` 
+
+
+---
+
+# Back to our example...
+
+We run the model adding the `waic` (here for model 1, it is the same for model 2):
+```{r eval=FALSE, include=TRUE, echo=TRUE}
+asthma_model1 <- inla(asthma_formula1, data=data,family="gamma",control.predictor=list(link=1,compute=TRUE), 
+                      control.compute=list(waic=TRUE))
+```
+
+And now check the value of the DIC
+`r vspace("20px")`
+```{r eval=TRUE, echo=TRUE}
+# Poisson data distribution
+asthma_model1$waic$waic
+# Normal data distribution
+asthma_model2$waic$waic
+```
+There is accordance between DIC and WAIC as the first model is still preferred as the WAIC  is smaller.
+
+---
+
+
+
+# Summary
+
+- Hierarchical models allow **borrowing of strength** across units
+
+  &rarr; posterior distribution of the unit-parameter borrows strength from the
+likelihood contributions for all the units, via their joint influence on
+the posterior estimates of the unknown hyper-parameters
+
+  &rarr; improved efficiency
+  
+- Judgements of exchangeability need careful assessment
+  &rarr; units suspected a priori to be systematically different might be
+modelled by including relevant covariates so that residual variability
+more plausibly reflects exchangeability
+
+- Subgroups of prior interest should be considered separately
+
+--
+
+Careful on the prior specification
+
+- non informative on one scale might be informative on another
+
+- always run some sensitivity analyses changing the prior and investigating how this affect the estimates of parameters of interest
+
+- posterior predictive distribution is useful to check if a model is in line with the data under study
+
+- DIC/WAIC are useful tools for model selection, easy to calculate in INLA
+
+&rarr; bear in mind that they can only be used to compare models - similarly to the AIC they do not have an absolute meaning.
+
+---
+
+# References
+
+```{r refs, echo=FALSE, results="asis"}
+PrintBibliography(bibfile,.opts=list(max.names=3))
+```

@@ -1,0 +1,7 @@
+#website for GIS boundaries
+http://publications.newberry.org/ahcbp/statepages/Georgia.html#gisfiles
+
+#Health Data
+Georgia DHR Division of Public Health
+(http://oasis.state.ga.us/).
+Download separately the low birthweight births and the total births (don't reconstruct the total births using the %).

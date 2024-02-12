@@ -1,0 +1,603 @@
+---
+title: "Practical 9 - Hospital admissions for respiratory conditions in Greater Glasgow and Clyde (2007-2011)"
+author: "Bayesian model for spatial and spatio-temporal data"
+output: 
+  html_document:
+    toc: true
+    toc_float: true
+bibliography: biblio.bib
+---
+  
+  \pagenumbering{gobble} 
+\pagenumbering{arabic} 
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, message=FALSE, warning=FALSE, fig.align = "center", class.source='klippy')
+```
+```{r klippy, echo=FALSE, include=TRUE}
+klippy::klippy(position = c('top', 'right'),color = 'darkred',
+               tooltip_message = 'Click to copy', tooltip_success = 'Done')
+```
+
+In this practical we will use `R` [@R-base] as well as `INLA` to carry out a spatial and a spatio-temporal small area disease risk analysis.
+
+In particular, you are going to model yearly hospital admissions for respiratory conditions (ICD-10 codes: J00-J99) in the Greater Glasgow and Clyde health board, for the period 2007 - 2011.
+
+Scotland is divided into 14 health boards, and here we focus on the Greater Glasgow and Clyde health board, which contains the city of Glasgow and has a population of around 1.2 million people, during the period 2007 to 2011. This health board is split into N = 271 intermediate geographies (IG), which are a key geography for the distribution of small-area statistics in Scotland and contain populations of between 2,468 and 9,517 people. 
+
+The data used in this practical are freely available from the R package `CARBayesST` [@Lee2018]. 
+A subset of these data is in the file `RESP_DATA.csv`.
+
+
+Load needed libraries:
+
+```{r echo=TRUE, eval = TRUE, message=FALSE}
+library(dplyr)        # A package for data manipulation
+library(sf)           # Simple feature for R
+library(spdep)        # Functions and tests for evaluating spatial patterns 
+library(tidyr)        # Tools to create tidy data
+library(INLA)         # Integrated Nested Laplace Approximation package
+library(ggplot2)      # A package for creating maps and graphs
+library(viridis)      # A package providing color palettes 
+library(patchwork)    # A package to compose plots
+
+# For tables in RMarkdown
+library(knitr)
+library(kableExtra)
+```
+
+# 1. Import and explore the data
+
+1. Import the`.csv` file with the data and call the data.frame object as *RESP_DATA*. 
+
+```{r eval=TRUE, echo=TRUE, message=FALSE}
+RESP_DATA = read.csv("RESP_DATA.csv", header=TRUE)
+```
+Here The first column labelled `IG` is the set of unique identifiers for each IG, `year` is the year of hospitalization, while `observed` and `expected` are  respectively the observed and expected numbers of hospital admissions due to respiratory diseases.
+
+2. Compute the total number of cases of hospital admissions per year, and format the output in a table. To display a table with additional formatting, we can use the `knitr::kable` function:
+```{r eval=TRUE, echo=TRUE, message=FALSE}
+kable(RESP_DATA %>%
+        group_by(year) %>%
+         summarise(observed = sum(observed), expected=sum(expected)), booktabs = T, caption = "Hospital admissions by year") %>%
+  kable_styling(bootstrap_options = "striped", full_width = F, position = "center")
+```
+Note: to know more about this function, you can type in the console `?knitr::kable` and visit the page https://haozhu233.github.io/kableExtra/awesome_table_in_pdf.pdf
+
+
+3. Import the shape file *GGHB* using the function `st_read` from `sf` package and call the object as *GGHB*.
+
+```{r echo=TRUE, eval=TRUE, include=TRUE, message=FALSE}
+GGHB = st_read("GGHB.shp")
+```
+
+4. Then, plot the spatial object *GGHB* using `ggplot2` package. 
+```{r echo=TRUE, eval=TRUE, fig.width=5.5, fig.height=4}
+ggplot() + 
+      geom_sf(data = GGHB, color = "blue", fill = "white") + 
+      coord_sf() +    #axis limits and CRS
+      theme_bw() +    # dark-on-light theme
+      theme(axis.title = element_text(size = 14),
+            axis.text = element_text(size = 12))
+```
+
+The figure shows that the river Clyde partitions the study region into a northern and a southern sub-region, and no areal units on opposite banks of the river border each other. 
+We will account for this issue when creating neighbors for the areal units.
+
+
+# 2. Spatial model
+
+In order to use the same data structure for both the space-only model and later
+the space-time model, a new set of data is formed by aggregating both the
+observed and expected counts over time. 
+A Poisson-log linear model is then fitted, assuming a BYM2 model for the random effects. Let each areal unit $i$ be indexed by the integers $1, 2,\dots,N$. The model is specified as:
+
+\[
+\begin{eqnarray}
+O_i &\sim & \text{Poisson}(\rho_i E_i)\\
+\eta_i &= & \log \rho_i = b_0 + b_i\\
+\boldsymbol{b} &= & \frac{1}{\sqrt{\tau_b}}(\sqrt{1-\phi}\boldsymbol{v}_{*} + \sqrt{\phi}\boldsymbol{u}_{*})\\
+\end{eqnarray}
+\]
+
+where $\boldsymbol{v}_{*}$ and $\boldsymbol{u}_{*}$ are standardised versions of $\boldsymbol{u}$ and $\boldsymbol{v}$. 
+In detail, we specify the spatial random effect $\boldsymbol{b}$ using a re-parameterisation of the  Besag-York-Molli\'e prior [@Besag1991], which is a convolution of an intrinsic conditional autoregressive (CAR) model and an independent and identically distributed Gaussian model, where
+
+ * $u_i$ is the spatially structured component defined by an intrinsic CAR prior:  $\boldsymbol{u}\sim ICAR(\boldsymbol{W}, \sigma^2_u)$, 
+ 
+ * $v_i$  the unstructured component defined with prior: $v_s \overset{iid}{\sim} \text{Normal}(0,\sigma^2_v)$. 
+
+
+
+5. Define the neighbors and create the weights list. Due to the river, some areas are not connected. To avoid this artifact you can use the `snap` argument (boundary points less than snap distance apart are considered to indicate contiguity; see  https://r-spatial.github.io/spdep/reference/poly2nb.html)
+
+```{r eval=TRUE, echo=TRUE}
+
+GGHB_nb = poly2nb(GGHB, snap=1000, queen=TRUE)
+summary(GGHB_nb)
+
+```
+
+* Convert the list of neighbors to `inla` format using the function `nb2WB()`. Call the graph as `GGHB.adj`
+```{r echo=TRUE, eval=TRUE,}
+nb2INLA("GGHB.graph",GGHB_nb)
+GGHB.adj = paste(getwd(),"/GGHB.graph",sep="")
+
+```
+
+6. Aggregate observed and expected cases over geographical areas
+
+```{r eval=TRUE, echo=TRUE}
+
+RESP_DATAagg = RESP_DATA %>% group_by(SP_ID) %>% 
+              summarize(observed = sum(observed), 
+                        expected = sum(expected)) %>% 
+              dplyr::rename(O = observed, E = expected) 
+
+```
+
+7. Compute the standardized morbidity ratios (SMRs)
+
+```{r eval=TRUE, echo=TRUE}
+
+RESP_DATAagg = RESP_DATAagg %>% mutate(SMR = O/E) 
+
+```
+
+
+8. Produce a spatial map of the aggregated SMRs using `ggplot2` package. For the map use the following breakpoints [min,0.4], (0.4-0.6], (0.6-0.8], (0.8,1], (1,1.2], (1.2-1.4], (1.4-1.6], (1.6-max]. 
+
+
+Remember that, before to produce the map, you need to join the `sf` object and the data frame`RESP_DATAagg`. To do so you can use the function `left_join` from the library `dplyr` (as seen in previous labs, e.g. Lab2a).
+
+```{r eval=TRUE, echo=TRUE}
+RESP_DATAagg$SMRcat = cut(RESP_DATAagg$SMR, 
+                      breaks=c(min(RESP_DATAagg$SMR), 
+                               0.4, 0.6, 0.8, 1, 1.2, 1.4, 1.6, 
+                               max(RESP_DATAagg$SMR)), include.lowest = T)
+
+map_SMR = left_join(GGHB, RESP_DATAagg, by = c("SP_ID" = "SP_ID"))
+```
+
+and plot:
+
+```{r mapSMR, eval=TRUE, echo=TRUE, fig.cap="Map of the average SMRs over the period 2007-2011"}
+
+ggplot() + geom_sf(data = map_SMR, col = NA) + aes(fill = SMRcat) +
+  theme_bw() + scale_fill_viridis_d() + 
+  guides(fill=guide_legend(title="SMR")) 
+
+```
+
+9. Fit the hierarchical Poisson log-linear model in `INLA`. Remember to create an ID for the areas, i.e. index vector, and use a `bym2` prior for the spatial random effect setting the PC priors [@Simpson2017] seen in Session 2.2. Monitor also the Watanabe-Akaike information criterion (WAIC) including `control.compute=list(waic=TRUE)`
+
+```{r eval=TRUE}
+ID = seq(1,271)
+formula_BYM2 = O ~ f(ID, model="bym2", graph=GGHB.adj,
+                            hyper=list(prec = list(
+        prior = "pc.prec",
+        param = c(0.5 / 0.31, 0.01)),
+        phi = list(
+        prior = "pc",
+        param = c(0.5, 2 / 3))))	
+
+sBYM.model = inla(formula=formula_BYM2, family="poisson", data=RESP_DATAagg, E=E, control.compute=list(waic=TRUE))
+```
+
+10. Obtain the posterior summary statistics (mean and posterior probability that the residual is above 1 - (or log-residual is above 0)) of the parameters of interest:
+
+```{r eval=TRUE} 
+#Relative risks
+RR_sBYM = c()
+
+for(i in 1:271){
+  RR_sBYM[i] = inla.emarginal(function(x) exp(x), 
+        sBYM.model$marginals.random$ID[[i]])
+}
+
+#Posterior probabilities
+RR_sBYM_marg = sBYM.model$marginals.random$ID[1:271]
+PP_sBYM = lapply(RR_sBYM_marg, function(x) {1-inla.pmarginal(0,x)})
+
+```	
+
+11. Obtain the posterior estimates from the spatial model to be plotted, that is (i) the area level posterior mean of the residual RRs and (ii) the posterior probability (PP) that the residual RRs > 1.
+
+```{r eval=TRUE, echo=TRUE, include=TRUE}
+resRR_PP = data.frame(resRR=RR_sBYM, 
+                       PP=unlist(PP_sBYM),
+                      SP_ID=RESP_DATAagg[,1])
+```
+
+
+12. Using `ggplot2` package, produce a map of the posterior mean of the residual RRs and the posterior probabilities that the residual RRs are > 1
+
++ For the map of the posterior mean of the residual RRs, use the following breakpoints [min,0.4], (0.4-0.6], (0.6-0.8], (0.8,1], (1,1.2], (1.2-1.4], (1.4-1.6], (1.6-max].
+
+```{r eval=TRUE, echo=TRUE, include=TRUE}
+
+resRR_PP$resRRcat = cut(resRR_PP$resRR, breaks=c(min(resRR_PP$resRR), 
+                  0.4, 0.6, 0.8, 1, 1.2, 1.4, 1.6, 
+                  max(resRR_PP$resRR)),include.lowest = T)
+
+```
+
+
++ For the map of the probabilities `PP` that the residual RRs is > 1, use the following breakpoints
+[0-0.2], (0.2-0.8], (0.8-1].
+
+```{r eval=TRUE, echo=TRUE, include=TRUE}
+# breakpoints
+resRR_PP$PPcat = cut(resRR_PP$PP, c(0, 0.2, 0.8, 1.00), include.lowest = TRUE)
+```
+
+
+* Remember to join `sf` object and data frame with the posterior estimates
+```{r eval=TRUE, echo=TRUE, include=TRUE}
+map_RR_PP = left_join(GGHB, resRR_PP, by = c("SP_ID" = "SP_ID"))
+```
+
+
+* Produce the maps of the posterior mean of the residual RRs and the posterior probabilities `PP` using `ggplot2` package. 
+
+```{r mapRRsp, eval=TRUE, echo=TRUE, include=TRUE, fig.width=12, fig.height=4}
+
+p1 = ggplot() + geom_sf(data = map_RR_PP) + aes(fill = resRRcat) +
+  theme_bw() + scale_fill_brewer(palette = "PuOr") + 
+  guides(fill=guide_legend(title="RR")) + ggtitle("RR Spatial model") + 
+  theme(text = element_text(size=15), 
+                  axis.text.x = element_blank(), 
+                  axis.text.y = element_blank(), plot.title = element_text(size = 12, face = "bold"))
+
+p2 = ggplot() + geom_sf(data = map_RR_PP) + aes(fill = PPcat) +
+  theme_bw() +
+  scale_fill_viridis(
+    option = "plasma", name="PP",
+    discrete = T,
+    direction = -1,
+    guide = guide_legend(
+      title.position = 'top',
+      reverse = T
+    )) +  ggtitle("PP Spatial model") + theme(text = element_text(size=15), 
+                  axis.text.x = element_blank(), 
+                  axis.text.y = element_blank(), plot.title = element_text(size = 12, face = "bold")) 
+
+p1|p2
+
+```
+
+# 3. Estimate the spatial fraction
+
+* As the BYM2 has the structured (CAR) and unstructured (iid) components it might be useful to get some ideas about the strength of the spatially structured components as this would indicate the level of clustering in the data. To do so we ca simply obtain the posterior summary of the `phi` hyperparameter. How do you interpret it?
+
+```{r eval=TRUE}
+sBYM.model$summary.hyperpar
+```
+
+ANSWER:
+This tells us that about 2/3 of the spatial variability is explained by the spatially structured component - which makes sense if we look at the map of the RR, which show a degree of spatial clustering. 
+
+
+# 4. Spatio-temporal model (no interaction)
+
+Now, we extend the above analysis to a separable space-time model without interactions. For the temporal component, we use the specification introduces in the lecture with a temporal unstructured random effect and a structured one (RW1 prior). 
+
+Let each areal unit $i$ be indexed by the integers $1, 2,\dots,N$. As in the spatial case, we use a Poisson distribution to model the number of hospital admission $O_it$, in area $i$ at time $t$. The mathematical specification of the model includes now an additional temporal dependence term, which can be modeled using a non-stationary random walk prior: $\xi_{i} \sim \text{N}(\xi_{i-1}, \sigma^2_{\xi}).  
+The model implement in this practical assumes no space-time interaction and a spatial convolution with random walk in time:
+
+\[
+\begin{eqnarray}
+O_{it} &\sim & \text{Poisson}(\rho_{it} E_{it}) \\
+\log \rho_{it} &= & b_0 + b_i + \gamma_t + \psi_t \\
+\boldsymbol{b} &= & \frac{1}{\sqrt{\tau_b}}(\sqrt{1-\phi}\boldsymbol{v}_{*} + \sqrt{\phi}\boldsymbol{u}_{*})\\
+\gamma_t & \sim & \hbox{RW(1)}\\
+\psi_t & \sim & N(0,\sigma^2_{\psi})\\
+\end{eqnarray}
+\]
+
+As seen before $\boldsymbol{v}_{*}$ and $\boldsymbol{u}_{*}$ are standardised versions of $\boldsymbol{u}$ and $\boldsymbol{v}$. 
+In detail, we specify the spatial random effect $\boldsymbol{b}$ using a re-parameterisation of the  Besag-York-Molli\'e prior, which is a convolution of an intrinsic conditional autoregressive (CAR) model and an independent and identically distributed Gaussian model, where
+
+ * $u_i$ is the spatially structured component defined by an intrinsic CAR prior:  $\boldsymbol{u}\sim ICAR(\boldsymbol{W}, \sigma^2_u)$, 
+ 
+ * $v_i$  the unstructured component defined with prior: $v_s \overset{iid}{\sim} \text{Normal}(0,\sigma^2_v)$. 
+
+
+13. First prepare the data, joining in the shapefile to make sure that the order is the same and then create an ID for time and one for space. 
+
+```{r eval=TRUE}
+#Join the data with the shapefile so the order of the shapefile is maintained.  
+RESP_DATA_ST = left_join(GGHB, RESP_DATA, by="SP_ID")
+
+#Rename the columns of Observed and Expected as we did before
+RESP_DATA_ST = RESP_DATA_ST  %>% dplyr::rename(O = observed, E = expected)
+
+#Create the ID for year (time)
+RESP_DATA_ST$ID.time = RESP_DATA_ST$year - 2006
+
+#Create the ID for space
+RESP_DATA_ST$ID.space = rep(seq(1,271),each=5)
+
+```
+
+14. Run the model in `INLA`, monitoring the WAIC and using PC priors (as specified in Session 2.2) for the `bym2` and `rw1` models (note: for the `rw1` model you could try the following specification `f(ID.time,model="rw1", hyper=list(prec = list(prior = "pc.prec",param = c(0.5 / 0.31, 0.01))))`). Call the output as `stBYM.model`
+
+```{r mod_ST, eval=TRUE}
+formula_ST_noint = O ~ f(ID.space, model="bym2", graph=GGHB.adj,
+                            hyper=list(prec = list(
+                            prior = "pc.prec",
+                            param = c(0.5 / 0.31, 0.01)),
+                            phi = list(
+                            prior = "pc",
+                            param = c(0.5, 2 / 3)))) + f(ID.time,model="rw1", hyper=list(prec = list(
+                            prior = "pc.prec",
+                            param = c(0.5 / 0.31, 0.01))))
+                            
+stBYM.model = inla(formula=formula_ST_noint, family="poisson", 
+                   data=RESP_DATA_ST, E=E, 
+                   control.compute=list(waic=TRUE))
+```
+
+15. Create the posterior mean for the spatial (as we did in point 10) and temporal effects
+
+```{r eval=TRUE} 
+#Spatial Relative risks
+RR_stBYM = c()
+
+for(i in 1:271){
+  RR_stBYM[i] = inla.emarginal(function(x) exp(x), 
+        stBYM.model$marginals.random$ID.space[[i]])
+}
+
+#Posterior probabilities (for spatial RR)
+RR_stBYM_marg = stBYM.model$marginals.random$ID.space[1:271]
+PP_stBYM = lapply(RR_stBYM_marg, function(x) {1-inla.pmarginal(0,x)})
+
+#Temporal Relative risks and CI95
+RR_stRW_RR = c()
+RR_stRW_lo = c()
+RR_stRW_hi = c()
+
+for(i in 1:5){
+  #Posterior mean
+  RR_stRW_RR[i] = inla.emarginal(function(x) exp(x), 
+        stBYM.model$marginals.random$ID.time[[i]])
+  #2.5% quantile 
+  RR_stRW_lo[i] = inla.qmarginal(0.025,inla.tmarginal(function(x) exp(x), stBYM.model$marginals.random$ID.time[[i]]))
+  #97.5% quantile 
+  RR_stRW_hi[i] = inla.qmarginal(0.975, inla.tmarginal(function(x) exp(x), stBYM.model$marginals.random$ID.time[[i]]))
+}
+
+RR_stRW = data.frame(RR=RR_stRW_RR,low=RR_stRW_lo,high=RR_stRW_hi)
+```	
+
+16. Plot the temporal residual RRs (`RR_stWR`)
+```{r eval=TRUE}
+Temp1 = ggplot(RR_stRW, aes(seq(2007,2011), RR)) + geom_line() + ggtitle("ST model No Int") + geom_ribbon(aes(ymin=low,ymax=high), alpha=0.2) + labs(x="year")
+
+Temp1
+
+```
+
+17. Map the spatial residual RRs (`RR_stBYM`) with `ggplot2` package using the following breakpoints [min,0.4], (0.4-0.6], (0.6-0.8], (0.8,1], (1,1.2], (1.2-1.4], (1.4-1.6], (1.6-max]. Compare this map against the map of the residual RR obtained from the spatial model.
+
+```{r eval=TRUE, echo=TRUE, include=TRUE}
+resRR_PP_st = data.frame(resRR=RR_stBYM, 
+                       PP=unlist(PP_stBYM),
+                      SP_ID=RESP_DATAagg[,1])
+# breakpoints
+resRR_PP_st$resRRcat = cut(resRR_PP_st$resRR, breaks=c(min(resRR_PP_st$resRR), 
+                  0.4, 0.6, 0.8, 1, 1.2, 1.4, 1.6, 
+                  max(resRR_PP_st$resRR)),include.lowest = T)
+
+resRR_PP_st$PPcat = cut(resRR_PP_st$PP, c(0, 0.2, 0.8, 1.00), include.lowest = TRUE)
+
+map_RR_ST = left_join(GGHB, resRR_PP_st, by = c("SP_ID" = "SP_ID"))
+```
+
+```{r mapRRst, eval=TRUE, echo=TRUE, include=TRUE, fig.cap="Spatio-temporal model: Map of the residual RRs and posterior probabilities", , fig.width=12, fig.height=10}
+p3 = ggplot() + geom_sf(data = map_RR_ST) + aes(fill = resRRcat) +
+  theme_bw() + scale_fill_brewer(palette = "PuOr") + 
+  guides(fill=guide_legend(title="RR")) +  ggtitle("RR ST model") +
+  theme(text = element_text(size=15), 
+        axis.text.x = element_blank(), 
+        axis.text.y = element_blank(), plot.title = element_text(size = 12, face = "bold")) 
+
+p4 = ggplot() + geom_sf(data = map_RR_ST) + aes(fill = PPcat) +
+  theme_bw() +
+  scale_fill_viridis(
+    option = "plasma",
+    name = "PP ST model",
+    discrete = T,
+    direction = -1,
+    guide = guide_legend(
+      title.position = 'top',
+      reverse = T
+    )) +  ggtitle("PP ST model") + theme(text = element_text(size=15), 
+        axis.text.x = element_blank(), 
+        axis.text.y = element_blank(), plot.title = element_text(size = 12, face = "bold"))
+
+(p1|p2) / (p3|p4)
+```
+
+# 5. Spatio-temporal model (type I interaction)
+
+Now, we extend the above spatio-temporal analysis to a separable space-time model with type I interaction: 
+
+\[
+\begin{eqnarray}
+O_{it} &\sim & \text{Poisson}(\rho_{it} E_{it}) \\
+\log \rho_{it} &= & b_0 + b_i + \gamma_t + \psi_t + \delta_{it} \\
+\boldsymbol{b} &= & \frac{1}{\sqrt{\tau_b}}(\sqrt{1-\phi}\boldsymbol{v}_{*} + \sqrt{\phi}\boldsymbol{u}_{*})\\
+\gamma_t & \sim & \hbox{RW(1)}\\
+\psi_t & \sim & N(0,\sigma^2_{\psi})\\
+\delta_{it} & \sim & \hbox{Normal}(0, \sigma^2_{\delta})
+\end{eqnarray}
+\]
+
+
+
+18. Specify the formula and run the model in `INLA`. Remember that you need to create an index which goes from 1 to the length of the dataset (i.e. the space x time). For the `iid` model defining the interaction term, use the PC prior previously used for the `rw1` model. Call the output `stIntI.BYM.model` (remember to monitor the WAIC)
+
+```{r eval=TRUE}
+RESP_DATA_ST$ID.space.time = seq(1,dim(RESP_DATA_ST)[1])
+
+formula_ST_intI = O ~ f(ID.space, model="bym2", graph=GGHB.adj,
+                            hyper=list(prec = list(
+                            prior = "pc.prec",
+                            param = c(0.5 / 0.31, 0.01)),
+                            phi = list(
+                            prior = "pc",
+                            param = c(0.5, 2 / 3)))) + 
+                      f(ID.time,model="rw1", hyper=list(prec = list(
+                            prior = "pc.prec",
+                            param = c(0.5 / 0.31, 0.01))))+
+                      f(ID.space.time,model="iid", hyper=list(prec = list(
+                            prior = "pc.prec",
+                            param = c(0.5 / 0.31, 0.01))))
+                    
+                            
+stIntI.BYM.model = inla(formula=formula_ST_intI, family="poisson", data=RESP_DATA_ST, E=E,
+                        control.compute=list(dic=TRUE, waic=TRUE))
+
+```
+
+19. Create the posterior mean for the spatial and temporal effects and compare with the ST model results without interaction
+```{r eval=TRUE} 
+#Spatial Relative risks
+RR_stIntI.BYM = c()
+
+for(i in 1:271){
+  RR_stIntI.BYM[i] = inla.emarginal(function(x) exp(x), 
+        stIntI.BYM.model$marginals.random$ID.space[[i]])
+}
+
+#Posterior probabilities (for spatial RR)
+RR_stIntI.BYM_marg = stIntI.BYM.model$marginals.random$ID.space[1:271]
+PP_stIntI.BYM = lapply(RR_stIntI.BYM_marg, function(x) {1-inla.pmarginal(0,x)})
+
+#Temporal Relative risks and CI95
+RR_stIntI.RW_RR = c()
+RR_stIntI.RW_lo = c()
+RR_stIntI.RW_hi = c()
+
+for(i in 1:5){
+  #Posterior mean
+  RR_stIntI.RW_RR[i] = inla.emarginal(function(x) exp(x), 
+        stIntI.BYM.model$marginals.random$ID.time[[i]])
+  #2.5% quantile 
+  RR_stIntI.RW_lo[i] = inla.qmarginal(0.025,inla.tmarginal(function(x) exp(x), stIntI.BYM.model$marginals.random$ID.time[[i]]))
+  #97.5% quantile 
+  RR_stIntI.RW_hi[i] = inla.qmarginal(0.975, inla.tmarginal(function(x) exp(x), stIntI.BYM.model$marginals.random$ID.time[[i]]))
+}
+
+RR_stIntI.RW = data.frame(RR=RR_stIntI.RW_RR,low=RR_stIntI.RW_lo,high=RR_stIntI.RW_hi)
+```	
+
+20. Plot the temporal residual RRs (`RR_stWR`)
+```{r eval=TRUE}
+Temp2 = ggplot(RR_stIntI.RW, aes(seq(2007,2011), RR)) + geom_line() + ggtitle("ST model Int I") + geom_ribbon(aes(ymin=low,ymax=high), alpha=0.2) + labs(x="year")
+
+Temp1 | Temp2
+```
+
+21. Map the spatial residual RRs (`RR_stIntI.BYM`) with `ggplot2` package using the following breakpoints [min,0.4], (0.4-0.6], (0.6-0.8], (0.8,1], (1,1.2], (1.2-1.4], (1.4-1.6], (1.6-max]. 
+Compare this map against the map of the residual RR obtained from the spatio-temporal model with no interaction. Try to comment the results
+
+```{r eval=TRUE, echo=TRUE, include=TRUE}
+resRR_PP_stIntI = data.frame(resRR=RR_stIntI.BYM, 
+                       PP=unlist(PP_stIntI.BYM),
+                      SP_ID=RESP_DATAagg[,1])
+# breakpoints
+resRR_PP_stIntI$resRRcat = cut(resRR_PP_stIntI$resRR, breaks=c(min(resRR_PP_stIntI$resRR), 
+                  0.4, 0.6, 0.8, 1, 1.2, 1.4, 1.6, 
+                  max(resRR_PP_stIntI$resRR)),include.lowest = T)
+
+resRR_PP_stIntI$PPcat = cut(resRR_PP_stIntI$PP, c(0, 0.2, 0.8, 1.00), include.lowest = TRUE)
+
+map_RR_ST.IntI = left_join(GGHB, resRR_PP_stIntI, by = c("SP_ID" = "SP_ID"))
+```
+
+
+```{r mapRRstIntI, eval=TRUE, echo=TRUE, include=TRUE, fig.cap="Spatio-temporal model: Map of the residual RRs and posterior probabilities", , fig.width=12, fig.height=10}
+p5 = ggplot() + geom_sf(data = map_RR_ST.IntI) + aes(fill = resRRcat) +
+  theme_bw() + scale_fill_brewer(palette = "PuOr") + 
+  guides(fill=guide_legend(title="RR")) +  ggtitle("RR ST model Int I") +
+  theme(text = element_text(size=15), 
+        axis.text.x = element_blank(), 
+        axis.text.y = element_blank(), plot.title = element_text(size = 12, face = "bold")) 
+
+p6 = ggplot() + geom_sf(data = map_RR_ST.IntI) + aes(fill = PPcat) +
+  theme_bw() +
+  scale_fill_viridis(
+    option = "plasma",
+    name = "PP ST model Int I",
+    discrete = T,
+    direction = -1,
+    guide = guide_legend(
+      title.position = 'top',
+      reverse = T
+    )) +  ggtitle("PP ST model Int I") + theme(text = element_text(size=15), 
+        axis.text.x = element_blank(), 
+        axis.text.y = element_blank(), plot.title = element_text(size = 12, face = "bold"))
+
+(p1|p2) / (p3|p4) / (p5|p6)
+```
+
+ANSWER:
+We basically see that across the different models there is no difference in the spatial residuals. Let's now look at the space-time interaction.
+
+22. Plot the space-time interaction
+
+```{r include=TRUE, fig.width=20, fig.height=10}
+RESP_DATA_ST$intI = stIntI.BYM.model$summary.random$ID.space.time$mean
+
+RESP_DATA_ST$intI_cat = cut(RESP_DATA_ST$intI,  breaks=c(-1,-0.05, 
+                  -0.01, 0.01, 0.05, 1),include.lowest = T)
+ggplot() +
+  geom_sf(data = RESP_DATA_ST, aes(fill = intI_cat))+ theme_bw() +  scale_fill_brewer(palette = "PuOr") + 
+            guides(fill=guide_legend(title=NULL)) + 
+            theme(text = element_text(size=20), 
+                  axis.text.x = element_blank(), 
+                  axis.text.y = element_blank()) +
+facet_wrap(~ year, ncol = 3, labeller=labeller(ID.year=c("1"="2007","2"="2008","3"="2009","4"="2010","5"="2011"))) +
+labs("")
+```
+We can see that there is not clear pattern in the interactions.
+
+23. Get a table of the hyperparameters. How do you interpret this table?
+
+```{r eval=TRUE, echo=TRUE}
+
+dat.hyper2 = 
+  round(
+  data.frame(median = stIntI.BYM.model$summary.hyperpar[,4],
+    LL = stIntI.BYM.model$summary.hyperpar[,3], 
+    UL = stIntI.BYM.model$summary.hyperpar[,5]),
+  digits = 3)
+
+row.names(dat.hyper2) = 
+  rownames(stIntI.BYM.model$summary.hyperpar)
+
+knitr::kable(dat.hyper2, caption = "Posterior median and 95% CrI of hyperparameters.") %>%  kable_styling(bootstrap_options = "striped", full_width = F, position = "center")
+
+```
+
+24. Compare the WAIC from the three different models: spatial, spatio-temporal without interaction and spatio-temporal with interaction. What do you observe?
+```{r}
+
+dat.WAIC = data.frame(model = c("Spatial", "SpatTemp no int", "SpatTemp typeI"), 
+                       WAIC = round(c(sBYM.model$waic$waic, stBYM.model$waic$waic, stIntI.BYM.model$waic$waic))
+)
+
+row.names(dat.WAIC) = NULL
+
+knitr::kable(dat.WAIC, caption = "WAIC of the fifferent models") %>%  kable_styling(bootstrap_options = "striped", full_width = F, position = "center")
+
+```
+
+ANSWER:
+Although the spatial model has a lower WAIC it cannot be directly compared to the two spatio-temporal models, as it is essentially based on a different data set (i.e. data were aggregated removing the temporal component). The fair comparison in between the two spatio-temporal models, and we observe that the model with type I interaction performs better that the model without interaction.
+
+
+# References

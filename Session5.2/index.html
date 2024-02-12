@@ -130,7 +130,7 @@ missing, and stating your modelling assumptions
 
 &lt;span style="display:block; margin-top: 10px ;"&gt;&lt;/span&gt;
 
-- Learn about how Bayesian methods can be used as  ‘statistically principled’ for handling missing data
+- Learn about how Bayesian methods can be used for handling missing data
 
 &lt;span style="display:block; margin-top: 10px ;"&gt;&lt;/span&gt;
 
@@ -139,11 +139,11 @@ missing, and stating your modelling assumptions
 &lt;span style="display:block; margin-top: 10px ;"&gt;&lt;/span&gt;
 
 
-The topics covered in this lecture are covered in Chapter 12 of Gómez-Rubio (2020a).
+The topics covered in this lecture are covered in Chapter 12 of Gómez-Rubio (2020): https://becarioprecario.bitbucket.io/inla-gitbook/
 
 ---
 
-# Why we care about missing data
+# Why we care about missing data?
 
 - Missing data are common!
 
@@ -152,7 +152,7 @@ experimental research
 
 &lt;span style="display:block; margin-top: 10px ;"&gt;&lt;/span&gt;
 
-- For example,  reviewed 71 recently published BMJ, JAMA, Lancet and NEJM papers
+- For example, Wood, White, and Thompson (2004) reviewed 71 recently published BMJ, JAMA, Lancet and NEJM papers
 
   - 89% had partly missing outcome data
   
@@ -162,7 +162,7 @@ experimental research
 
 &lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
 
--  reviewed articles using Multiple Imputation in BMJ, JAMA, Lancet and NEJM from 2002 to 2007
+- Sterne, White, Carlin, Spratt, Royston, Kenward, Wood, and Carpenter (2009) reviewed articles using Multiple Imputation in BMJ, JAMA, Lancet and NEJM from 2002 to 2007
 
   - 59 articles found, with use doubling over 6 year period
   
@@ -250,13 +250,13 @@ This scenario is difficult to tackle since there is no information about the mis
 
 - Missingness in the covariats requires additional steps:
 &lt;span style="display:block; margin-top: 10px ;"&gt;&lt;/span&gt;
-  - a model needs to be specified on the covariate (imputation model) if the missingness mechanism is MCAR or MAR
+  - A model needs to be specified on the covariate (imputation model) if the missingness mechanism is MCAR or MAR
 &lt;span style="display:block; margin-top: 10px ;"&gt;&lt;/span&gt;
-  - an additional model of missingness needs to be specified if the mechanism is MNAR
+  - An additional model of missingness needs to be specified if the mechanism is MNAR
 &lt;span style="display:block; margin-top: 10px ;"&gt;&lt;/span&gt;  
   - Here we will consider only missing values in the response
 &lt;span style="display:block; margin-top: 10px ;"&gt;&lt;/span&gt;  
-  - `R-INLA` reguires a certain degree of complexity to deal with missing values in covariates, if you are interested in learning more look at 
+  - `R-INLA` requires a certain degree of complexity to deal with missing values in covariates, if you are interested in learning more look at Gómez-Rubio, Cameletti, and Blangiardo (2022)
   
 
 ---
@@ -273,11 +273,11 @@ name: example
 
 # Example: height and weight of children
 
-- Information of 10,030 children measured within the Fifth Dutch Growth Study 2009 
+- Information of 10,030 children measured within the Fifth Dutch Growth Study 2009 (Schönbeck, Talma, Van Dommelen, Bakker, Buitendijk, HiraSing, and Van Buuren, 2013)
 
 &lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
 
-- Data available from the `fdgs` dataset in the `library(mice)` 
+- Data available from the `fdgs` dataset in the `library(mice)` (Van Buuren and Groothuis-Oudshoorn, 2011)
 
 &lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
 
@@ -431,10 +431,10 @@ name: model
 ```
 
 ```
-                 mean         sd 0.025quant  0.5quant 0.975quant      mode         kld
-(Intercept)  6.259187 0.43576270   5.404524  6.259188   7.113849  6.259188 8.95248e-12
-age          3.330942 0.03367352   3.264898  3.330942   3.396986  3.330942 8.61623e-12
-sexgirl     -2.378945 0.44587122  -3.253432 -2.378945  -1.504455 -2.378945 8.93984e-12
+                 mean        sd 0.025quant  0.5quant 0.975quant      mode          kld
+(Intercept)  6.259187 0.4357703   5.404510  6.259188   7.113863  6.259188 8.606053e-12
+age          3.330942 0.0336741   3.264897  3.330942   3.396987  3.330942 7.832665e-12
+sexgirl     -2.378945 0.4458790  -3.253446 -2.378945  -1.504441 -2.378945 8.601113e-12
 ```
 
 ```r
@@ -443,7 +443,7 @@ sexgirl     -2.378945 0.44587122  -3.253432 -2.378945  -1.504455 -2.378945 8.939
 
 ```
                                               mean           sd 0.025quant   0.5quant 0.975quant       mode
-Precision for the Gaussian observations 0.01972943 0.0008729198 0.01805322 0.01971746 0.02147696 0.01969183
+Precision for the Gaussian observations 0.01973016 0.0008699233 0.01805505 0.01971744 0.02147084 0.01968416
 ```
 
 - Note that we need to include `control.predictor=list(compute = TRUE)` so `INLA` can estimate the predictive distribution for the missing observations, while `control.compute=list(return.marginals.predictor=TRUE)` tells inla that we want to access the entire posterior distribution of the prediction (rather than only the summary)
@@ -456,7 +456,7 @@ We now subset the children indexes with missing values so we can report their pr
 
 
 ```r
-&gt; wgt.na &lt;- which(is.na(fdgs.sub$wgt))
+&gt; wgt.na = which(is.na(fdgs.sub$wgt))
 &gt; rownames(fdgs.sub)[wgt.na]
 ```
 
@@ -471,11 +471,11 @@ We now subset the children indexes with missing values so we can report their pr
 
 ```
                            mean        sd
-fitted.Predictor.0002 23.067927 0.3200569
-fitted.Predictor.0003 27.617341 0.3328551
-fitted.Predictor.0004 54.019923 0.3765046
-fitted.Predictor.0006 13.144502 0.3926908
-fitted.Predictor.0009  7.838159 0.3936613
+fitted.Predictor.0002 23.067927 0.3200624
+fitted.Predictor.0003 27.617341 0.3328608
+fitted.Predictor.0004 54.019923 0.3765110
+fitted.Predictor.0006 13.144502 0.3926976
+fitted.Predictor.0009  7.838159 0.3936680
 ```
 
 Remember that you can also access the marginal posterior distributions (rather than the summary) using `wgt.inla$marginals.fitted.values`
@@ -487,7 +487,7 @@ Remember that you can also access the marginal posterior distributions (rather t
 
 
 ```r
-&gt; hgt.inla &lt;- inla(hgt ~ age + sex, data = fdgs.sub,
+&gt; hgt.inla = inla(hgt ~ age + sex, data = fdgs.sub,
 + control.predictor = list(compute = TRUE),
 + control.compute = list(return.marginals.predictor=TRUE))
 &gt; hgt.inla$summary.fixed
@@ -495,9 +495,9 @@ Remember that you can also access the marginal posterior distributions (rather t
 
 ```
                  mean         sd 0.025quant  0.5quant 0.975quant      mode          kld
-(Intercept) 77.148117 0.72109712  75.733811 77.148118  78.562415 77.148118 1.005731e-11
-age          6.022575 0.05549259   5.913736  6.022575   6.131413  6.022575 1.096012e-11
-sexgirl     -4.716069 0.73116459  -6.150109 -4.716071  -3.282014 -4.716071 1.096018e-11
+(Intercept) 77.148127 0.71788318  75.740129 77.148129  78.556119 77.148129 1.058877e-11
+age          6.022575 0.05524522   5.914221  6.022575   6.130928  6.022575 1.047647e-11
+sexgirl     -4.716091 0.72790698  -6.143739 -4.716094  -3.288429 -4.716094 1.156810e-11
 ```
 
 ```r
@@ -505,8 +505,8 @@ sexgirl     -4.716069 0.73116459  -6.150109 -4.716071  -3.282014 -4.716071 1.096
 ```
 
 ```
-                                               mean           sd  0.025quant   0.5quant  0.975quant        mode
-Precision for the Gaussian observations 0.007403866 0.0003304386 0.006769282 0.00740418 0.008066786 0.007423371
+                                               mean           sd  0.025quant    0.5quant  0.975quant        mode
+Precision for the Gaussian observations 0.007401298 0.0003331522 0.006759002 0.007402407 0.008059761 0.007431234
 ```
 
 ---
@@ -520,22 +520,22 @@ Precision for the Gaussian observations 0.007403866 0.0003304386 0.006769282 0.0
 
 
 ```r
-&gt; hgt.na &lt;- which(is.na(fdgs.sub$hgt))
+&gt; hgt.na = which(is.na(fdgs.sub$hgt))
 &gt; hgt.inla$summary.fitted.values[hgt.na, c("mean", "sd")][1:10,]
 ```
 
 ```
                            mean        sd
-fitted.Predictor.0001 122.24529 0.5361333
-fitted.Predictor.0005  83.24901 0.6840796
-fitted.Predictor.0007  74.64156 0.6794198
-fitted.Predictor.0008  82.80381 0.6866698
-fitted.Predictor.0010  88.26140 0.6020496
-fitted.Predictor.0012  96.55557 0.6143018
-fitted.Predictor.0013  86.31595 0.6666480
-fitted.Predictor.0016  81.84746 0.6922833
-fitted.Predictor.0017  77.75821 0.7170109
-fitted.Predictor.0018  81.59988 0.6379852
+fitted.Predictor.0001 122.24530 0.5340634
+fitted.Predictor.0005  83.24902 0.6814383
+fitted.Predictor.0007  74.64155 0.6767965
+fitted.Predictor.0008  82.80382 0.6840185
+fitted.Predictor.0010  88.26139 0.5997251
+fitted.Predictor.0012  96.55558 0.6119300
+fitted.Predictor.0013  86.31596 0.6640740
+fitted.Predictor.0016  81.84747 0.6896103
+fitted.Predictor.0017  77.75822 0.7142424
+fitted.Predictor.0018  81.59987 0.6355219
 ```
 ]
 
@@ -590,24 +590,24 @@ with
 
 # Joint model of height and weight: prior
 
-- The vectors `\((\mathbf{\beta}_{1h}, \mathbf{\beta}_{1w})\)` and `\((\mathbf{\beta}_{2h}, \mathbf{\beta}_{2w})\)` are modeled using a multivariate Gaussian distribution with mean 0 and covariance matrix with `\(1/\tau_{hj}\)` and `\(1/\tau_{wj}\)` as variances and `\(\rho_j  / \sqrt{(\tau_{jh} \tau_{jw})}\)` as the covariance where `\(\rho_j\)` is the correlation parameter.
+- The vectors `\((\mathbf{\beta}_{1h}, \mathbf{\beta}_{1w})\)` and `\((\mathbf{\beta}_{2h}, \mathbf{\beta}_{2w})\)` are modeled using a multivariate Gaussian distribution with mean 0 and covariance matrix with `\(1/\tau_{hj}\)` and `\(1/\tau_{wj}\)` as variances, and `\(\rho_j  / \sqrt{(\tau_{jh} \tau_{jw})}\)` as the covariance where `\(\rho_j\)` is the correlation parameter.
 
 - First, the bivariate response variable needs to be put in a two-column matrix given that the model will be made of two data distributions
 
 
 ```r
-&gt; n &lt;- nrow(fdgs.sub)
-&gt; y &lt;- matrix(NA, nrow = 2 * n, ncol = 2)
-&gt; y[1:n, 1] &lt;- fdgs.sub$hgt
-&gt; y[n + 1:n, 2] &lt;- fdgs.sub$wgt
+&gt; n = nrow(fdgs.sub)
+&gt; y = matrix(NA, nrow = 2 * n, ncol = 2)
+&gt; y[1:n, 1] = fdgs.sub$hgt
+&gt; y[n + 1:n, 2] = fdgs.sub$wgt
 ```
 
 - Similarly, as we have two intercepts, we need to define these explicitly as covariates with all values equal to one:
 
 ```r
-&gt; I &lt;- matrix(NA, nrow = 2 * n, ncol = 2)
-&gt; I[1:n, 1] &lt;- 1
-&gt; I[n + 1:n, 2] &lt;- 1
+&gt; I = matrix(NA, nrow = 2 * n, ncol = 2)
+&gt; I[1:n, 1] = 1
+&gt; I[n + 1:n, 2] = 1
 ```
 
 ---
@@ -620,8 +620,8 @@ with
 
 
 ```r
-&gt; age.joint &lt;- rep(fdgs.sub$age, 2)
-&gt; sex.joint &lt;- rep(fdgs.sub$sex, 2)
+&gt; age.joint = rep(fdgs.sub$age, 2)
+&gt; sex.joint = rep(fdgs.sub$sex, 2)
 ```
 
 - Finally we need two index vectors to indicate which coefficient to use from the `iid2d` model is required. These indexes will be 1 for the first half of observations (to indicate that the coefficient is `\(\beta_h\)` and 2 for the second half (to indicate that the coefficient is `\(\beta_w\)`).
@@ -642,10 +642,10 @@ The model is fit and summarized as seen below
 
 ```r
 &gt; # Model formula
-&gt; joint.f &lt;- y ~ -1 + I + f(idx.sex, sex, model="iid2d", n=2) + f(idx.age, age, model = "iid2d", n = 2) 
+&gt; joint.f = y ~ -1 + I + f(idx.sex, sex, model="iid2d", n=2) + f(idx.age, age, model = "iid2d", n = 2) 
 &gt; # Model fit
-&gt; fdgs.joint &lt;- inla(joint.f, 
-+   data = list(y = y, I = I, sex = sex.joint, age = age.joint, idx.age = idx.age, idx.sex= idx.sex),
+&gt; fdgs.joint = inla(joint.f, 
++   data = list(y = y, I = I, sex = sex.joint, age = age.joint, idx.age = idx.age, idx.sex = idx.sex),
 +   family = rep("gaussian", 2),
 +   control.predictor = list(compute = TRUE))
 &gt; # Summary fixed (intercept)
@@ -654,8 +654,8 @@ The model is fit and summarized as seen below
 
 ```
         mean        sd 0.025quant  0.5quant 0.975quant      mode          kld
-I1 81.124354 1.1467496   78.89268 81.118125  83.391094 81.117990 7.177745e-09
-I2  8.512301 0.6799152    7.18675  8.509552   9.853253  8.509475 4.004876e-09
+I1 80.246876 1.1116359  78.074215 80.244351  82.433815 80.244311 1.345205e-09
+I2  8.319242 0.6884827   6.972261  8.318076   9.672871  8.318074 7.415314e-10
 ```
 
 ---
@@ -670,15 +670,15 @@ I2  8.512301 0.6799152    7.18675  8.509552   9.853253  8.509475 4.004876e-09
 ```
 
 ```
-                                                  mean           sd  0.025quant   0.5quant  0.975quant        mode
-Precision for the Gaussian observations    0.007381468 0.0003158389 0.006760246 0.00738111 0.008003156 0.007395552
-Precision for the Gaussian observations[2] 0.019730455 0.0008577595 0.017983707 0.01974962 0.021349126 0.019890956
-Precision for idx.sex (component 1)        0.229098980 0.0421660917 0.147725213 0.22842312 0.310628523 0.234393163
-Precision for idx.sex (component 2)        0.752987237 0.1325558166 0.530631196 0.73997939 1.051043080 0.711889033
-Rho1:2 for idx.sex                         0.913712999 0.0150280999 0.885675060 0.91371111 0.943606611 0.910155893
-Precision for idx.age (component 1)        0.344366034 0.0564052256 0.252994487 0.33791276 0.474058828 0.321423805
-Precision for idx.age (component 2)        1.132872604 0.1700804329 0.828579940 1.12244242 1.496724034 1.105970743
-Rho1:2 for idx.age                         0.843269536 0.0278518255 0.779593953 0.84634295 0.888782528 0.854107618
+                                                  mean           sd  0.025quant    0.5quant  0.975quant        mode
+Precision for the Gaussian observations    0.007406056 0.0003135132 0.006803454 0.007400996 0.008037609 0.007394277
+Precision for the Gaussian observations[2] 0.019724829 0.0008435417 0.018143478 0.019697624 0.021464261 0.019623041
+Precision for idx.sex (component 1)        0.701083928 0.1041724411 0.523964507 0.691663554 0.933358851 0.669635332
+Precision for idx.sex (component 2)        1.375125970 0.1924790178 1.017449315 1.367535940 1.773355982 1.365714767
+Rho1:2 for idx.sex                         0.688271565 0.0285343425 0.628366022 0.689519325 0.740892875 0.692486213
+Precision for idx.age (component 1)        0.237943283 0.0330966195 0.182714897 0.234658066 0.312637373 0.226045664
+Precision for idx.age (component 2)        0.658142902 0.1094451846 0.471961367 0.648242976 0.901700797 0.627245197
+Rho1:2 for idx.age                         0.785988513 0.0262499631 0.724844957 0.789187793 0.826921333 0.800341404
 ```
 
 - While the coefficients for `age` and `sex` are part of the random effects of the model:
@@ -691,8 +691,8 @@ Rho1:2 for idx.age                         0.843269536 0.0278518255 0.779593953 
 
 ```
   ID      mean        sd 0.025quant  0.5quant 0.975quant      mode          kld
-1  1 -4.235610 0.6346222  -5.496296 -4.229926  -3.006712 -4.229748 1.903061e-08
-2  2 -2.285555 0.3740273  -3.026223 -2.282892  -1.559643 -2.282772 1.212372e-08
+1  1 -3.665276 0.6080339  -4.864646 -3.662704  -2.480407 -3.662651 4.647983e-09
+2  2 -2.166010 0.3805585  -2.915577 -2.164910  -1.422706 -2.164907 2.159819e-09
 ```
 ]
 
@@ -706,8 +706,8 @@ Rho1:2 for idx.age                         0.843269536 0.0278518255 0.779593953 
 
 ```
   ID     mean         sd 0.025quant 0.5quant 0.975quant     mode          kld
-1  1 6.021963 0.05527628   5.913552 6.021964   6.130369 6.021964 5.643357e-20
-2  2 3.328917 0.03357334   3.263077 3.328916   3.394766 3.328916 1.969932e-12
+1  1 6.022639 0.05532880   5.914127 6.022640   6.131147 6.022640 0.000000e+00
+2  2 3.330118 0.03367797   3.264069 3.330118   3.396165 3.330118 3.915418e-13
 ```
 ]
 ---
@@ -753,7 +753,17 @@ Rho1:2 for idx.age                         0.843269536 0.0278518255 0.779593953 
 
 # References
 
-Gómez-Rubio, V. (2020a). _Bayesian inference with INLA_. CRC Press.
+Gómez-Rubio, V. (2020). _Bayesian inference with INLA_. CRC Press.
+
+Gómez-Rubio, V., M. Cameletti, and M. Blangiardo (2022). "Missing data analysis and imputation via latent Gaussian Markov random fields". In: _SORT-Statistics and Operations Research Transactions_, pp. 217-244.
+
+Schönbeck, Y., H. Talma, P. Van Dommelen, et al. (2013). "The world’s tallest nation has stopped growing taller: the height of Dutch children from 1955 to 2009". In: _Pediatric Research_ 73.3, pp. 371-377.
+
+Sterne, J. A., I. R. White, J. B. Carlin, et al. (2009). "Multiple imputation for missing data in epidemiological and clinical research: potential and pitfalls". In: _BMJ_ 338.
+
+Van Buuren, S. and K. Groothuis-Oudshoorn (2011). "mice: Multivariate imputation by chained equations in R". In: _Journal of Statistical Software_ 45, pp. 1-67.
+
+Wood, A. M., I. R. White, and S. G. Thompson (2004). "Are missing outcome data adequately handled? A review of published randomized controlled trials in major medical journals". In: _Clinical trials_ 1.4, pp. 368-376.
     </textarea>
 <style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
 <script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
