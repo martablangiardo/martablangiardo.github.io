@@ -306,123 +306,7 @@ name: example
 
 ---
 
-# Sleep Example: data
-
-&lt;img src="./img/unnamed-chunk-5-1.png" style="display: block; margin: auto;" width="50%"&gt;
----
-
-# Sleep Example: objective
-
-- Study objective: is the length of sleep deprivation a determinant of reaction time?
-&lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
-
-- The variables we will use are:
-&lt;span style="display:block; margin-top: 10px ;"&gt;&lt;/span&gt;
-  - `\(y\)`: Reaction time (in s)
-  - `\(t\)`: Days
-
-&lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
-
-- For simplicity we will
-&lt;span style="display:block; margin-top: 10px ;"&gt;&lt;/span&gt;
-  - assume a linear relationship
-&lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
-
-- The models we will consider are:
-&lt;span style="display:block; margin-top: 10px ;"&gt;&lt;/span&gt;
-  - a non-hierarchical model (standard linear regression) (LM)
-  &lt;span style="display:block; margin-top: 10px ;"&gt;&lt;/span&gt;
-  - a hierarchical model with random intercepts (LMM)
-  &lt;span style="display:block; margin-top: 10px ;"&gt;&lt;/span&gt;
-  - a hierarchical model with random intercepts and random slopes (LMM2)
-
----
-
-name: model
-
-&lt;span style="display:block; margin-top: 250px ;"&gt;&lt;/span&gt;
-
-.myblue[.center[.huge[
-**Model specification**]]]
-
-
----
-
-# Sleep Example: a Bayesian (non-hierarchical) linear model (LM)
-
-- Specification:
-  1\. probability distribution for responses:
-`$$y_{it} \sim \mbox{Normal}(\mu_{it},\sigma^2)$$`
-
-  - `\(\color{blue}{y_{it}}\)` = the reaction time for individual `\(i\)` on day `\(t\)` `\((\mbox{days } 0,\ldots,9)\)`
-&lt;span style="display:block; margin-top: 10px ;"&gt;&lt;/span&gt;
-  - linear predictor: `\(\color{blue}{\mu_{it}}=\alpha+\beta t\)`
-&lt;span style="display:block; margin-top: 10px ;"&gt;&lt;/span&gt;
-  - `\(\color{blue}{t}\)` = the day of the measurement
-
-&lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
-
-2\. .red[In this model no account is taken of the repeated structure (observations are nested within individuals)]
-
-&lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
-
-3\. Assume vague priors for all parameters:
-
-`\begin{align*}
-\alpha, \beta  &amp; \sim  \mbox{Normal}(0,10000)\\
-\frac{1}{\sigma^2} &amp; \sim  \mbox{Gamma}(1,0.001)
-\end{align*}`
-
----
-
-# Sleep Example: a Bayesian hierarchical linear model
-
-- Modify LM to allow a separate intercept for each individual:
-
-&lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
-
-`\begin{align*}
-y_{it} &amp; \sim  \mbox{Normal}(\mu_{it},\sigma^2) \\
-\mu_{it}  &amp; =  \textcolor{red}{\alpha_i}+\beta t
-\end{align*}`
-
-We are assuming that *conditionally* on `\(\alpha_i\)`, `\(\{y_{it}, t=0,\ldots,9 \}\)` are independent
-&lt;span style="display:block; margin-top: 10px ;"&gt;&lt;/span&gt;
-
-- Assume that all the `\(\{\alpha_i\}\)` follow a *common* prior distribution, e.g.
-`$$\color{red}{\alpha_i \sim \mbox{Normal}(\mu_{\alpha}, \sigma^2_{\alpha}) \;\;\;\; i=1,\ldots,18}$$` 
-
-- Here we are assuming exchangeability between all the individuals
-- We may then assume vague priors for the *hyperparameters* of the population distribution:
-
-`\begin{align*}
-\color{red}{\mu_{\alpha}} &amp; \color{red}{\sim  \mbox{Normal}(0,10000)} \\
-\color{red}{\frac{1}{\sigma^2_{\alpha}}} &amp; \color{red}{\sim  \mbox{Gamma}(1,0.001)}
-\end{align*}`
-
-- This is an example of a *Hierarchical LM* or *Linear Mixed Model (LMM)* or *Random Intercepts* model
-
----
-
-# Comparing the two models
-
-&lt;center&gt;&lt;img src=./img/DAGS.png width='80%' title='INCLUDE TEXT HERE'&gt;&lt;/center&gt;
-
-.pull-left[
-
-(left): LM
-
-]
-
-.pull-right[
-
-(right): LMM - random intercept
-
-]
-
----
-
-# HAMD example: long vs wide format
+# Sleep Study: long vs wide format
 
 - In `R-INLA` is extremely easy to work with longitudinal data, as long as the dataset is in *long format*
 
@@ -468,7 +352,82 @@ We are assuming that *conditionally* on `\(\alpha_i\)`, `\(\{y_{it}, t=0,\ldots,
 
 ---
 
-# Sleep example: `R-INLA` code for LM
+# Sleep Study: data
+
+&lt;img src="./img/unnamed-chunk-7-1.png" style="display: block; margin: auto;" width="50%"&gt;
+---
+
+# Sleep Study: objective
+
+- Study objective: is the length of sleep deprivation a determinant of reaction time?
+&lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
+
+- The variables we will use are:
+&lt;span style="display:block; margin-top: 10px ;"&gt;&lt;/span&gt;
+  - `\(y\)`: Reaction time (in s)
+  - `\(t\)`: Days
+
+&lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
+
+- For simplicity we will
+&lt;span style="display:block; margin-top: 10px ;"&gt;&lt;/span&gt;
+  - assume a linear relationship
+&lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
+
+- The models we will consider are:
+&lt;span style="display:block; margin-top: 10px ;"&gt;&lt;/span&gt;
+  - a non-hierarchical model (standard linear regression) (LM)
+  &lt;span style="display:block; margin-top: 10px ;"&gt;&lt;/span&gt;
+  - a hierarchical model with random intercepts (LMM)
+  &lt;span style="display:block; margin-top: 10px ;"&gt;&lt;/span&gt;
+  - a hierarchical model with random intercepts and random slopes (LMM2)
+
+---
+
+name: model
+
+&lt;span style="display:block; margin-top: 250px ;"&gt;&lt;/span&gt;
+
+.myblue[.center[.huge[
+**Model specification**]]]
+
+
+---
+
+# Sleep Study: a Bayesian (non-hierarchical) linear model (LM)
+
+- Specification:
+  1\. probability distribution for responses:
+`$$y_{it} \sim \mbox{Normal}(\mu_{it},\sigma^2)$$`
+
+  - `\(\color{blue}{y_{it}}\)` = the reaction time for individual `\(i\)` on day `\(t\)` `\((\mbox{days } 0,\ldots,9)\)`
+&lt;span style="display:block; margin-top: 10px ;"&gt;&lt;/span&gt;
+  - linear predictor: `\(\color{blue}{\mu_{it}}=\alpha+\beta t\)`
+&lt;span style="display:block; margin-top: 10px ;"&gt;&lt;/span&gt;
+  - `\(\color{blue}{t}\)` = the day of the measurement
+
+&lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
+
+2\. .red[In this model no account is taken of the repeated structure (observations are nested within individuals)]
+
+&lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
+
+3\. Assume vague priors for all parameters:
+
+`\begin{align*}
+\alpha, \beta  &amp; \sim  \mbox{Normal}(0,10000)\\
+\frac{1}{\sigma^2} &amp; \sim  \mbox{Gamma}(1,0.001)
+\end{align*}`
+
+---
+
+# Sleep Study: DAG for LM
+
+&lt;center&gt;&lt;img src=./img/DAGS0.png width='80%' title='INCLUDE TEXT HERE'&gt;&lt;/center&gt;
+
+---
+
+# Sleep Study: `R-INLA` code for LM
 
 .panelset[
 .panel[.panel-name[Code]
@@ -494,7 +453,54 @@ We are assuming that *conditionally* on `\(\alpha_i\)`, `\(\{y_{it}, t=0,\ldots,
 
 ---
 
-# Sleep example: `R-INLA` code for LMM
+# Sleep Study: a Bayesian hierarchical linear model (LMM)
+
+- Modify LM to allow a separate intercept for each individual:
+
+&lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
+
+`\begin{align*}
+y_{it} &amp; \sim  \mbox{Normal}(\mu_{it},\sigma^2) \\
+\mu_{it}  &amp; =  \textcolor{red}{\alpha_i}+\beta t
+\end{align*}`
+
+We are assuming that *conditionally* on `\(\alpha_i\)`, `\(\{y_{it}, t=0,\ldots,9 \}\)` are independent
+&lt;span style="display:block; margin-top: 10px ;"&gt;&lt;/span&gt;
+
+- Assume that all the `\(\{\alpha_i\}\)` follow a *common* prior distribution, e.g.
+`$$\color{red}{\alpha_i \sim \mbox{Normal}(\mu_{\alpha}, \sigma^2_{\alpha}) \;\;\;\; i=1,\ldots,18}$$` 
+
+- Here we are assuming exchangeability between all the individuals
+- We may then assume vague priors for the *hyperparameters* of the population distribution:
+
+`\begin{align*}
+\color{red}{\mu_{\alpha}} &amp; \color{red}{\sim  \mbox{Normal}(0,10000)} \\
+\color{red}{\frac{1}{\sigma^2_{\alpha}}} &amp; \color{red}{\sim  \mbox{Gamma}(1,0.001)}
+\end{align*}`
+
+- This is an example of a *Hierarchical LM* or *Linear Mixed Model (LMM)* or *Random Intercepts* model
+
+---
+
+# Sleep Study: DAG for LM and LMM
+
+&lt;center&gt;&lt;img src=./img/DAGS.png width='80%' title='INCLUDE TEXT HERE'&gt;&lt;/center&gt;
+
+.pull-left[
+
+(left): LM
+
+]
+
+.pull-right[
+
+(right): LMM - random intercept
+
+]
+
+---
+
+# Sleep Study: `R-INLA` code for LMM
 
 .panelset[
 .panel[.panel-name[Code]
@@ -529,7 +535,7 @@ name: interpretation
 
 ---
 
-# Sleep Example: revisiting the data
+# Sleep Study: revisiting the data
 .pull-left[
 &lt;img src="./img/unnamed-chunk-12-1.png" style="display: block; margin: auto;" width="100%"&gt;
 ]
@@ -545,24 +551,7 @@ name: interpretation
 
 ---
 
-# Comparing the three models
-
-&lt;center&gt;&lt;img src=./img/DAGS2.png width='100%' title='INCLUDE TEXT HERE'&gt;&lt;/center&gt;
-
-.center[
-
-(left): LM
-
-(center): LMM - random intercept
-
-(right): LMM - random intercept and slope
-
-]
-
-
----
-
-# Sleep Example: adding random slopes
+# Sleep Study: adding random slopes (LMM2)
 
 - Modify LMM to allow a separate slope for each individual:
 `\begin{align*}
@@ -589,16 +578,34 @@ y_{it} &amp; \sim  \mbox{Normal}(\mu_{it},\sigma^2) \\
 
 ```
    ID        mean          sd    0.025quant    0.5quant  0.975quant        mode          kld
-1 308 0.020670507 0.002755625  0.0152490733 0.020674366 0.026070095 0.020674410 3.306600e-09
-2 309 0.002253256 0.002725803 -0.0030979042 0.002252969 0.007606057 0.002252971 3.069934e-09
-3 310 0.005886435 0.002727833  0.0005291753 0.005886891 0.011241114 0.005886895 3.063615e-09
-4 330 0.003006663 0.002726323 -0.0023450831 0.003006223 0.008360930 0.003006226 3.073045e-09
-5 331 0.005133955 0.002727477 -0.0002213224 0.005133960 0.010489223 0.005133964 3.061511e-09
+1 308 0.020664136 0.002753505  0.0152464237 0.020667959 0.026060361 0.020675715 9.922790e-10
+2 309 0.002252942 0.002723946 -0.0030951694 0.002252658 0.007602673 0.002252102 8.756571e-10
+3 310 0.005884906 0.002725960  0.0005307129 0.005885373 0.011236474 0.005886322 8.753454e-10
+4 330 0.003006279 0.002724463 -0.0023424157 0.003005842 0.008357465 0.003004983 8.771539e-10
+5 331 0.005132853 0.002725608 -0.0002193643 0.005132866 0.010485018 0.005132910 8.739421e-10
 ```
 
 ---
 
-# HAMD Example: random intercepts and slopes
+# Sleep Study: DAG for LM, LMM and LMM2
+
+&lt;center&gt;&lt;img src=./img/DAGS2.png width='100%' title='INCLUDE TEXT HERE'&gt;&lt;/center&gt;
+
+.center[
+
+(left): LM
+
+(center): LMM - random intercept
+
+(right): LMM2 - random intercept and slope
+
+]
+
+
+---
+
+# Sleep Study: random intercepts and slopes (LMM2)
+
 .pull-left[
 &lt;img src="./img/unnamed-chunk-14-1.png" style="display: block; margin: auto;" width="100%"&gt;
 ]
@@ -615,7 +622,7 @@ y_{it} &amp; \sim  \mbox{Normal}(\mu_{it},\sigma^2) \\
   -  better fit for each individual
 
 ]
-]
+
 ---
 
 # Which model is the best?
@@ -629,7 +636,7 @@ y_{it} &amp; \sim  \mbox{Normal}(\mu_{it},\sigma^2) \\
 ```
 
 ```
-[1] -580.1704
+[1] -580.1698
 ```
 
 ```r
@@ -638,7 +645,7 @@ y_{it} &amp; \sim  \mbox{Normal}(\mu_{it},\sigma^2) \\
 ```
 
 ```
-[1] -716.7855
+[1] -716.7829
 ```
 
 ```r
@@ -647,7 +654,7 @@ y_{it} &amp; \sim  \mbox{Normal}(\mu_{it},\sigma^2) \\
 ```
 
 ```
-[1] -763.4362
+[1] -763.5387
 ```
 
 - It looks like the model with random intercept and slope fits the data best
@@ -665,7 +672,7 @@ y_{it} &amp; \sim  \mbox{Normal}(\mu_{it},\sigma^2) \\
 ```
 
 ```
-[1] 0.06369514
+[1] 0.06454952
 ```
 
 ```r
@@ -675,7 +682,7 @@ y_{it} &amp; \sim  \mbox{Normal}(\mu_{it},\sigma^2) \\
 ```
 
 ```
-[1] 0.0001472959
+[1] 0.0001491506
 ```
 
 - Some variability for both intercept and slope. 
