@@ -341,21 +341,31 @@ name: example
 
 
 ```r
+&gt; options(width = 100)
 &gt; summary(fdgs)
 ```
 
 ```
-       id            reg            age              sex            hgt             wgt              hgt.z               wgt.z         
- Min.   :100001   North: 732   Min.   : 0.008214   boy :4829   Min.   : 46.0   Min.   :  2.585   Min.   :-4.470000   Min.   :-5.04000  
- 1st Qu.:106353   East :2528   1st Qu.: 1.618754   girl:5201   1st Qu.: 83.8   1st Qu.: 11.600   1st Qu.:-0.678000   1st Qu.:-0.62475  
- Median :203855   South:2931   Median : 8.084873               Median :131.5   Median : 27.500   Median :-0.019000   Median : 0.02600  
- Mean   :180091   West :2578   Mean   : 8.157936               Mean   :123.9   Mean   : 32.385   Mean   :-0.006054   Mean   : 0.04573  
- 3rd Qu.:210591   City :1261   3rd Qu.:13.547570               3rd Qu.:162.3   3rd Qu.: 51.100   3rd Qu.: 0.677000   3rd Qu.: 0.70700  
- Max.   :401955                Max.   :21.993155               Max.   :208.0   Max.   :135.300   Max.   : 3.900000   Max.   : 4.74100  
-                                                               NA's   :23      NA's   :20        NA's   :23          NA's   :20        
+       id            reg            age              sex            hgt             wgt         
+ Min.   :100001   North: 732   Min.   : 0.008214   boy :4829   Min.   : 46.0   Min.   :  2.585  
+ 1st Qu.:106353   East :2528   1st Qu.: 1.618754   girl:5201   1st Qu.: 83.8   1st Qu.: 11.600  
+ Median :203855   South:2931   Median : 8.084873               Median :131.5   Median : 27.500  
+ Mean   :180091   West :2578   Mean   : 8.157936               Mean   :123.9   Mean   : 32.385  
+ 3rd Qu.:210591   City :1261   3rd Qu.:13.547570               3rd Qu.:162.3   3rd Qu.: 51.100  
+ Max.   :401955                Max.   :21.993155               Max.   :208.0   Max.   :135.300  
+                                                               NA's   :23      NA's   :20       
+     hgt.z               wgt.z         
+ Min.   :-4.470000   Min.   :-5.04000  
+ 1st Qu.:-0.678000   1st Qu.:-0.62475  
+ Median :-0.019000   Median : 0.02600  
+ Mean   :-0.006054   Mean   : 0.04573  
+ 3rd Qu.: 0.677000   3rd Qu.: 0.70700  
+ Max.   : 3.900000   Max.   : 4.74100  
+ NA's   :23          NA's   :20        
 ```
 
-- Note that several variables in the dataset have missing observations. In particular, height `(hgt)` and weight `(wgt)`, which are common variables used as response or predictors in models
+
+- Note that several variables in the dataset have missing observations. In particular, height `(hgt)` and weight `(wgt)`, which are common variables used as response or predictors in models.
 
 ---
 
@@ -371,21 +381,39 @@ name: example
 &gt; #Subset 2, random sample of 1000 individuals
 &gt; set.seed(1)
 &gt; subset2 &lt;- sample((1:nrow(fdgs))[-subset1], 1000)
+&gt; 
 &gt; # Subset 1 + subset 2
 &gt; fdgs.sub &lt;- fdgs[c(subset1, subset2), ]
+```
+
+---
+
+# Sumamry of the data
+
+
+```r
 &gt; summary(fdgs.sub)
 ```
 
 ```
-       id            reg           age             sex           hgt              wgt              hgt.z              wgt.z        
- Min.   :100098   North: 78   Min.   : 0.07118   boy :493   Min.   : 46.00   Min.   :  2.585   Min.   :-4.26300   Min.   :-4.0750  
- 1st Qu.:106293   East :275   1st Qu.: 1.74264   girl:550   1st Qu.: 86.28   1st Qu.: 11.960   1st Qu.:-0.66800   1st Qu.:-0.6520  
- Median :204306   South:298   Median : 8.59411              Median :136.05   Median : 29.000   Median :-0.04550   Median :-0.0070  
- Mean   :183214   West :250   Mean   : 8.56536              Mean   :127.04   Mean   : 33.614   Mean   :-0.02313   Mean   : 0.0202  
- 3rd Qu.:211388   City :142   3rd Qu.:14.16427              3rd Qu.:165.10   3rd Qu.: 53.100   3rd Qu.: 0.64550   3rd Qu.: 0.6960  
- Max.   :401949               Max.   :21.88364              Max.   :199.00   Max.   :117.300   Max.   : 3.20000   Max.   : 3.6300  
-                                                            NA's   :23       NA's   :20        NA's   :23         NA's   :20       
+       id            reg           age             sex           hgt              wgt         
+ Min.   :100098   North: 78   Min.   : 0.07118   boy :493   Min.   : 46.00   Min.   :  2.585  
+ 1st Qu.:106293   East :275   1st Qu.: 1.74264   girl:550   1st Qu.: 86.28   1st Qu.: 11.960  
+ Median :204306   South:298   Median : 8.59411              Median :136.05   Median : 29.000  
+ Mean   :183214   West :250   Mean   : 8.56536              Mean   :127.04   Mean   : 33.614  
+ 3rd Qu.:211388   City :142   3rd Qu.:14.16427              3rd Qu.:165.10   3rd Qu.: 53.100  
+ Max.   :401949               Max.   :21.88364              Max.   :199.00   Max.   :117.300  
+                                                            NA's   :23       NA's   :20       
+     hgt.z              wgt.z        
+ Min.   :-4.26300   Min.   :-4.0750  
+ 1st Qu.:-0.66800   1st Qu.:-0.6520  
+ Median :-0.04550   Median :-0.0070  
+ Mean   :-0.02313   Mean   : 0.0202  
+ 3rd Qu.: 0.64550   3rd Qu.: 0.6960  
+ Max.   : 3.20000   Max.   : 3.6300  
+ NA's   :23         NA's   :20       
 ```
+
 ---
 name: model
 
@@ -431,10 +459,10 @@ name: model
 ```
 
 ```
-                 mean        sd 0.025quant  0.5quant 0.975quant      mode          kld
-(Intercept)  6.259187 0.4366541   5.402776  6.259187   7.115596  6.259187 8.226538e-12
-age          3.330942 0.0337424   3.264763  3.330942   3.397121  3.330942 8.191037e-12
-sexgirl     -2.378943 0.4467831  -3.255217 -2.378943  -1.502665 -2.378943 8.222614e-12
+                 mean         sd 0.025quant  0.5quant 0.975quant      mode          kld
+(Intercept)  6.259187 0.43617515   5.403716  6.259187   7.114657  6.259187 8.506052e-12
+age          3.330942 0.03370539   3.264835  3.330942   3.397048  3.330942 8.599942e-12
+sexgirl     -2.378944 0.44629314  -3.254258 -2.378944  -1.503627 -2.378944 8.499316e-12
 ```
 
 ```r
@@ -442,8 +470,10 @@ sexgirl     -2.378943 0.4467831  -3.255217 -2.378943  -1.502665 -2.378943 8.2226
 ```
 
 ```
-                                              mean           sd 0.025quant   0.5quant 0.975quant       mode
-Precision for the Gaussian observations 0.01972965 0.0008695491   0.018057 0.01972063  0.0214716 0.01971399
+                                              mean           sd 0.025quant   0.5quant 0.975quant
+Precision for the Gaussian observations 0.01972451 0.0008707156  0.0180516 0.01971203 0.02147299
+                                              mode
+Precision for the Gaussian observations 0.01968792
 ```
 
 - Note that we need to include `control.predictor=list(compute = TRUE)` so `INLA` can estimate the predictive distribution for the missing observations, while `control.compute=list(return.marginals.predictor=TRUE)` tells inla that we want to access the entire posterior distribution of the prediction (rather than only the summary)
@@ -461,7 +491,8 @@ We now subset the children indexes with missing values so we can report their pr
 ```
 
 ```
- [1] "275"  "1278" "1419" "2135" "2684" "2940" "3069" "3189" "3543" "4262" "5687" "6485" "7101" "7108" "7506" "8064" "8065" "8067" "8098" "8588"
+ [1] "275"  "1278" "1419" "2135" "2684" "2940" "3069" "3189" "3543" "4262" "5687" "6485" "7101"
+[14] "7108" "7506" "8064" "8065" "8067" "8098" "8588"
 ```
 
 ```r
@@ -470,12 +501,12 @@ We now subset the children indexes with missing values so we can report their pr
 ```
 
 ```
-                          mean        sd
-fitted.Predictor.0002 23.06793 0.3206082
-fitted.Predictor.0003 27.61734 0.3334283
-fitted.Predictor.0004 54.01992 0.3771530
-fitted.Predictor.0006 13.14450 0.3933672
-fitted.Predictor.0009  7.83816 0.3943393
+                           mean        sd
+fitted.Predictor.0002 23.067927 0.3203228
+fitted.Predictor.0003 27.617341 0.3331316
+fitted.Predictor.0004 54.019923 0.3768173
+fitted.Predictor.0006 13.144501 0.3930171
+fitted.Predictor.0009  7.838159 0.3939883
 ```
 
 Remember that you can also access the marginal posterior distributions (rather than the summary) using `wgt.inla$marginals.fitted.values`
@@ -505,8 +536,10 @@ sexgirl     -4.716066 0.73157410  -6.150898 -4.716068  -3.281220 -4.716068 8.495
 ```
 
 ```
-                                               mean           sd  0.025quant    0.5quant  0.975quant        mode
-Precision for the Gaussian observations 0.007395396 0.0003241965 0.006762723 0.007391652 0.008044646 0.007383216
+                                               mean           sd  0.025quant    0.5quant
+Precision for the Gaussian observations 0.007395396 0.0003241965 0.006762723 0.007391652
+                                         0.975quant        mode
+Precision for the Gaussian observations 0.008044646 0.007383216
 ```
 
 ---
@@ -547,7 +580,7 @@ fitted.Predictor.0018  81.59988 0.6383572
 &gt; plot(hgt.inla$marginals.fitted.values[[hgt.na[1]]], type="l")
 ```
 
-&lt;img src="./img/unnamed-chunk-11-1.png" style="display: block; margin: auto;" width="80%"&gt;
+&lt;img src="./img/unnamed-chunk-12-1.png" style="display: block; margin: auto;" width="80%"&gt;
 ]
 
 ---
@@ -654,8 +687,8 @@ The model is fit and summarized as seen below
 
 ```
        mean        sd 0.025quant  0.5quant 0.975quant      mode          kld
-I1 80.06873 1.1331984  77.853096 80.066486  82.297212 80.066482 1.083441e-09
-I2  8.00363 0.6894115   6.654851  8.002477   9.358907  8.002455 6.890018e-10
+I1 80.39418 1.1103714  78.230017 80.389852  82.582920 80.389796 4.452303e-09
+I2  8.58588 0.6944199   7.232892  8.582641   9.957273  8.582617 5.505778e-09
 ```
 
 ---
@@ -670,15 +703,24 @@ I2  8.00363 0.6894115   6.654851  8.002477   9.358907  8.002455 6.890018e-10
 ```
 
 ```
-                                                   mean           sd   0.025quant    0.5quant   0.975quant
-Precision for the Gaussian observations     0.007373593 0.0003145598  0.006717084  0.00738595  0.007946252
-Precision for the Gaussian observations[2]  0.019709776 0.0008207887  0.018139774  0.01969391  0.021370938
-Precision for idx.sex (component 1)         0.807691801 0.1376265502  0.598186111  0.78851971  1.134375795
-Precision for idx.sex (component 2)         1.843422184 0.2500229465  1.459318058  1.81103534  2.432346926
-Rho1:2 for idx.sex                          0.425326147 0.0411698112  0.339263622  0.42702710  0.501307207
-Precision for idx.age (component 1)         0.035227168 0.0042850275  0.026607350  0.03527524  0.043234135
-Precision for idx.age (component 2)         0.388983798 0.0422206656  0.310523126  0.38731394  0.476848834
-Rho1:2 for idx.age                         -0.335491522 0.0535833688 -0.446291707 -0.33384686 -0.236586888
+                                                  mean           sd  0.025quant    0.5quant
+Precision for the Gaussian observations    0.007384289 0.0003034016 0.006816054 0.007374328
+Precision for the Gaussian observations[2] 0.019764793 0.0008283452 0.018189014 0.019745778
+Precision for idx.sex (component 1)        0.470089210 0.0442688411 0.395293604 0.466514161
+Precision for idx.sex (component 2)        0.881830101 0.1135674860 0.639700696 0.886038462
+Rho1:2 for idx.sex                         0.854849683 0.0114490963 0.835076086 0.854691634
+Precision for idx.age (component 1)        0.110412222 0.0085333429 0.091359517 0.110446031
+Precision for idx.age (component 2)        0.318005972 0.0377428687 0.235637882 0.320288517
+Rho1:2 for idx.age                         0.968896310 0.0025834910 0.963975317 0.968965331
+                                            0.975quant
+Precision for the Gaussian observations    0.008010606
+Precision for the Gaussian observations[2] 0.021450099
+Precision for idx.sex (component 1)        0.569357127
+Precision for idx.sex (component 2)        1.070437584
+Rho1:2 for idx.sex                         0.879601588
+Precision for idx.age (component 1)        0.123905000
+Precision for idx.age (component 2)        0.377084846
+Rho1:2 for idx.age                         0.974250923
 ```
 ---
 
@@ -694,8 +736,8 @@ Rho1:2 for idx.age                         -0.335491522 0.0535833688 -0.44629170
 
 ```
   ID      mean        sd 0.025quant  0.5quant 0.975quant      mode          kld
-1  1 -3.559709 0.6248791  -4.791506 -3.557376   -2.34126 -3.557374 3.874032e-09
-2  2 -1.955127 0.3812267  -2.705947 -1.953993   -1.21068 -1.953964 2.145948e-09
+1  1 -3.763250 0.6062827  -4.962474 -3.759162  -2.587257 -3.759101 1.433920e-08
+2  2 -2.347257 0.3854653  -3.112132 -2.344237  -1.599495 -2.344202 1.522774e-08
 ```
 
 
@@ -706,8 +748,8 @@ Rho1:2 for idx.age                         -0.335491522 0.0535833688 -0.44629170
 
 ```
   ID     mean         sd 0.025quant 0.5quant 0.975quant     mode          kld
-1  1 6.024578 0.05525105   5.916224 6.024577   6.132939 6.024577 5.819012e-13
-2  2 3.329329 0.03369649   3.263241 3.329330   3.395410 3.329330 1.173335e-12
+1  1 6.022913 0.05536535   5.914333 6.022912   6.131494 6.022912 5.795005e-13
+2  2 3.331332 0.03362666   3.265391 3.331330   3.397287 3.331330 2.356426e-12
 ```
 
 ---
@@ -740,14 +782,14 @@ Rho1:2 for idx.age                         -0.335491522 0.0535833688 -0.44629170
 
 .red[Weight]
 
-&lt;img src="./img/unnamed-chunk-24-1.png" &gt;
+&lt;img src="./img/unnamed-chunk-25-1.png" &gt;
 ]
 
 .pull-right[
 
 .red[Height]
 
-&lt;img src="./img/unnamed-chunk-25-1.png" &gt;
+&lt;img src="./img/unnamed-chunk-26-1.png" &gt;
 ]
 ---
 
@@ -755,15 +797,23 @@ Rho1:2 for idx.age                         -0.335491522 0.0535833688 -0.44629170
 
 Gómez-Rubio, V. (2020). _Bayesian inference with INLA_. CRC Press.
 
-Gómez-Rubio, V., M. Cameletti, and M. Blangiardo (2022). "Missing data analysis and imputation via latent Gaussian Markov random fields". In: _SORT-Statistics and Operations Research Transactions_, pp. 217-244.
+Gómez-Rubio, V., M. Cameletti, and M. Blangiardo (2022). "Missing data analysis and
+imputation via latent Gaussian Markov random fields". In: _SORT-Statistics and Operations
+Research Transactions_, pp. 217-244.
 
-Schönbeck, Y., H. Talma, P. Van Dommelen, et al. (2013). "The world’s tallest nation has stopped growing taller: the height of Dutch children from 1955 to 2009". In: _Pediatric Research_ 73.3, pp. 371-377.
+Schönbeck, Y., H. Talma, P. Van Dommelen, et al. (2013). "The world’s tallest nation has
+stopped growing taller: the height of Dutch children from 1955 to 2009". In: _Pediatric
+Research_ 73.3, pp. 371-377.
 
-Sterne, J. A., I. R. White, J. B. Carlin, et al. (2009). "Multiple imputation for missing data in epidemiological and clinical research: potential and pitfalls". In: _BMJ_ 338.
+Sterne, J. A., I. R. White, J. B. Carlin, et al. (2009). "Multiple imputation for missing
+data in epidemiological and clinical research: potential and pitfalls". In: _BMJ_ 338.
 
-Van Buuren, S. and K. Groothuis-Oudshoorn (2011). "mice: Multivariate imputation by chained equations in R". In: _Journal of Statistical Software_ 45, pp. 1-67.
+Van Buuren, S. and K. Groothuis-Oudshoorn (2011). "mice: Multivariate imputation by
+chained equations in R". In: _Journal of Statistical Software_ 45, pp. 1-67.
 
-Wood, A. M., I. R. White, and S. G. Thompson (2004). "Are missing outcome data adequately handled? A review of published randomized controlled trials in major medical journals". In: _Clinical trials_ 1.4, pp. 368-376.
+Wood, A. M., I. R. White, and S. G. Thompson (2004). "Are missing outcome data adequately
+handled? A review of published randomized controlled trials in major medical journals".
+In: _Clinical trials_ 1.4, pp. 368-376.
     </textarea>
 <style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
 <script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
