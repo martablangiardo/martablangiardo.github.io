@@ -120,3 +120,33 @@ Lunch
 - [Practical 7](Practical7): A spatial model for vaccination uptake - This practical is based on the [paper](https://link.springer.com/article/10.1007/s10654-022-00905-1)
 
 Complete material of practical 7 are [here](Practical7/Practical7.zip)
+
+### Day 8 - Mon 4th March 2024
+
+- [Session 8.1](Session8.1): Introduction to Geostatistics (pdf [here](Session8.1/Session8.1.pdf))
+
+- [Session 8.2](Session8.2):  Introduction to SPDE model with R-INLA (pdf [here](Session8.2/Session8.2.pdf))
+
+Lunch
+
+- [Practical 8a](Practical8a): INLA-SPDE for geostatistical data: Temperature in Croatia
+
+Complete material of practical 8a are [here](Practical8a/Practical8a.zip)
+
+- [Practical 8b](Practical8b): Geostatistical Modelling for Childhood malaria in the Gambia
+
+Complete material of practical 8b are [here](Practical8b/Practical8b.zip)
+
+### Day 9 - Mon 11th March 2024
+
+- [Session 9.1](Session9.1): Introduction to temporal modelling (pdf [here](Session9.1/Session9.1.pdf))
+
+- [Session 9.2](Session9.2): Spatio-temporal modelling for area data (pdf [here](Session9.2/Session9.2.pdf))
+
+Lunch
+
+- [Practical 9](Practical9): Hospital admissions for respiratory conditions in Greater Glasgow and Clyde (2007-2011)
+
+Complete material of practical 9 are [here](Practical9/Practical9.zip)
+
+

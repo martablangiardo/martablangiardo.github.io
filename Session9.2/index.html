@@ -418,7 +418,7 @@ Log SMR time trends in each county
 
 ---
 
-# Simple linear spatio-temporal model (Model 1)
+# Model 1: linear time + space
 
 `\begin{align*}
 y_{it} &amp; \sim  \hbox{Poisson}(\hbox{E}_{it} \rho_{it}) \\
@@ -447,7 +447,7 @@ Additional temporal random effects can be added...
 
 ---
 
-# Log-linear temporal model with structured temporal RE (Model 2)
+# Model 2: linear time + space + structured time
 
 `\begin{align*}
 y_{it} &amp; \sim  \hbox{Poisson}(\hbox{E}_{it} \rho_{it}) \\
@@ -479,9 +479,8 @@ where
 ```
 ---
 
-# Comparing model 1 and 2
+# Comparing model 1 and 2: Fixed effects
 
-- Fixed effects
 
 ```r
 &gt; mod1$summary.fixed
@@ -489,7 +488,7 @@ where
 
 ```
                    mean         sd  0.025quant    0.5quant  0.975quant        mode          kld
-(Intercept) -0.98833298 0.11239029 -1.20942093 -0.98831791 -0.76733001 -0.98831792 1.473307e-08
+(Intercept) -0.98833298 0.11239019 -1.20942072 -0.98831791 -0.76733021 -0.98831792 1.473309e-08
 year         0.02612109 0.00058628  0.02497146  0.02612109  0.02727073  0.02612109 5.512062e-11
 ```
 
@@ -499,35 +498,30 @@ year         0.02612109 0.00058628  0.02497146  0.02612109  0.02727073  0.026121
 
 ```
                    mean        sd 0.025quant    0.5quant 0.975quant        mode          kld
-(Intercept) -1.22479524 1.8557582  -4.899649 -1.22480739  2.4501320 -1.22480611 9.030611e-08
-year         0.04083632 0.1683608  -0.292596  0.04083756  0.3742611  0.04083742 9.099647e-08
+(Intercept) -1.22479524 1.8557521 -4.8996367 -1.22480739    2.45012 -1.22480612 9.030395e-08
+year         0.04083632 0.1683602 -0.2925949  0.04083756    0.37426  0.04083742 9.099426e-08
 ```
 
 ---
 
-# Comparing model 1 and 2
+# Comparing model 1 and 2: Fitted values
 
-- Fitted values
 &lt;img src="./img/comp2-1.png" &gt;
 
 
 ```r
-&gt; mod1$waic$waic
+&gt; mod1$waic$waic; mod2$waic$waic
 ```
 
 ```
 [1] 83781.91
 ```
 
-```r
-&gt; mod2$waic$waic
-```
-
 ```
 [1] 93873.31
 ```
 ---
-# What if we remove the linear trend
+# Model 3: space + structured time + unstructured time
 
 - Exploring if a combination of random effects could be more flexible in capturing the temporal trend than a linear trend
 
@@ -558,9 +552,8 @@ where
 ```
 ---
 
-# Comparing model 1, and 3
+# Comparing model 1 and 3: Fixed effects
 
-- Fixed effects
 
 ```r
 &gt; mod1$summary.fixed
@@ -568,7 +561,7 @@ where
 
 ```
                    mean         sd  0.025quant    0.5quant  0.975quant        mode          kld
-(Intercept) -0.98833298 0.11239029 -1.20942093 -0.98831791 -0.76733001 -0.98831792 1.473307e-08
+(Intercept) -0.98833298 0.11239019 -1.20942072 -0.98831791 -0.76733021 -0.98831792 1.473309e-08
 year         0.02612109 0.00058628  0.02497146  0.02612109  0.02727073  0.02612109 5.512062e-11
 ```
 
@@ -578,14 +571,13 @@ year         0.02612109 0.00058628  0.02497146  0.02612109  0.02727073  0.026121
 
 ```
                   mean        sd 0.025quant   0.5quant 0.975quant       mode          kld
-(Intercept) -0.7759727 0.1580489  -1.086833 -0.7759593 -0.4651878 -0.7759591 1.532338e-08
+(Intercept) -0.7759717 0.1580244  -1.086783 -0.7759583 -0.4652365 -0.7759582 1.529714e-08
 ```
 
 ---
 
-# Comparing model 1, 2 and 3
+# Comparing model 1, 2 and 3: Fitted values
 
-- Fitted values
 &lt;img src="./img/comp5-1.png" &gt;
 ---
 
@@ -622,6 +614,7 @@ additive structure (given by the BYM2 in space and RW1+iid in time).
 ---
 
 # Interpretation of the interactions 
+
 - The interactions `\(\delta_{it}\)` allow to highlight unusual temporal trends
 
 - Rules based on the posterior probabilities `\(p(\delta_{it} &gt; 0)\)` for at least 1 time `\(t\)`
@@ -673,10 +666,6 @@ name: interactions
 **Types of interactions**]]]
 
 ---
-
-
-
-
 
 # Another example: Birth weight in Georgia
 
@@ -814,9 +803,9 @@ For instance
 
 - There is a function in `R` which does exactly that: `kronecker(a,b)`
 
-- We will not go through type II-IV of interactions, as they are pretty complex and also they can take a **very long** time to run
+- Type II-IV of interactions are pretty complex and can take a **very long** time to run
 
-- If you are interested in knowing more how to set interactions using the Kronecker product in `INLA` see Goicoa, Adin, Ugarte, and Hodges (2018)
+- We breifly discuss, but for more information on how to set interactions using the Kronecker product in `INLA` see Goicoa, Adin, Ugarte, and Hodges (2018)
 ---
 
 # Type II interaction: in INLA
