@@ -654,17 +654,16 @@ name: Example
 
 - Methods with no spatial structure: SMR, non spatial smoothing
 
-- Spatial smoothing using the BYM model
+- Spatial smoothing using the BYM2 model
 
 `\begin{align*}
 y_i &amp; \sim  \hbox{Poisson}(\rho_i E_i)\\
 \log \rho_i  &amp; =  b_0 + b_i\\
-v_i &amp;\sim  \hbox{Normal}(0, \sigma^2_v)\\
-\bm{u} &amp; \sim  \hbox{ICAR}(\mathbf{W}, \sigma^2_u)
+\boldsymbol{b} &amp;= \frac{1}{\sqrt{\tau_b}}(\sqrt{1-\phi}\boldsymbol{v}_{*} + \sqrt{\phi}\boldsymbol{u}_{*})
 \end{align*}`
 
 - Data: `\(\bm{y}\)` and `\(\bm{E}\)`
-- Priors: `\(\sigma^2_v\)`, `\(\sigma^2_u\)`, `\(b_0\)`
+- Priors: `\(\tau_b\)`, `\(b_0\)`, `\(\phi\)`
 - Parameters of interest: 
   - residual RR `\((\hbox{resRR}_i=\exp(b_i))\)`
   - marginal variance `\((1/ \tau_b)\)`
@@ -779,7 +778,7 @@ On the example:
 
 
 
-To run the model in INLA
+To run the model in INLA 
 
 ```r
 &gt; mod.suicides = inla(formula,family="poisson",
@@ -802,13 +801,13 @@ To run the model in INLA
 
 
 ```
-  ID        mean         sd  0.025quant   0.5quant  0.975quant        mode          kld
-1  1 -0.08520546 0.10806505 -0.29842629 -0.0847971  0.12571078 -0.08479125 4.429461e-09
-2  2 -0.17682930 0.08551900 -0.34571340 -0.1764739 -0.00995885 -0.17647163 6.362340e-09
-3  3 -0.21879662 0.09676391 -0.40988735 -0.2183994 -0.02996946 -0.21840083 6.370175e-09
-4  4  0.11867905 0.08262008 -0.04260925  0.1183672  0.28174317  0.11836771 5.466049e-09
-5  5 -0.14137325 0.08418336 -0.30667064 -0.1413676  0.02388834 -0.14136871 2.924911e-09
-6  6  0.40094124 0.08265596  0.23906647  0.4008213  0.56354109  0.40083376 2.468177e-09
+  ID        mean         sd  0.025quant    0.5quant   0.975quant        mode          kld
+1  1 -0.08520571 0.10806503 -0.29842674 -0.08479728  0.125710349 -0.08479143 4.431102e-09
+2  2 -0.17682950 0.08551914 -0.34571400 -0.17647405 -0.009958857 -0.17647179 6.363872e-09
+3  3 -0.21879690 0.09676412 -0.40988824 -0.21839964 -0.029969446 -0.21840105 6.372153e-09
+4  4  0.11867926 0.08262032 -0.04260947  0.11836740  0.281743916  0.11836790 5.466778e-09
+5  5 -0.14137329 0.08418355 -0.30667107 -0.14136764  0.023888688 -0.14136876 2.925415e-09
+6  6  0.40094149 0.08265620  0.23906629  0.40082157  0.563541877  0.40083400 2.468795e-09
 ```
 
 which is a matrix formed by `\(2n\)` rows: 
@@ -836,7 +835,7 @@ this returns a list with `Nareas` number of elements, each representing the post
 --
 &lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
 
-- Then we can get the posterior mean and 95% credible intervals:
+- Then we can get the posterior mean and 95% credible intervals of the exp(b):
 
 .pull-left[
 
@@ -908,7 +907,7 @@ where `marg` is the marginal distribution of the residual relative risks, and `\
 #...and then create some maps
 
 .pull-left[
-### Map of posterior mean of `\(b_i\)`
+### Map of posterior mean of `\(\zeta_i\)`
 
 ```r
 &gt; ggplot() + geom_sf(data = out_map, 
@@ -920,7 +919,7 @@ where `marg` is the marginal distribution of the residual relative risks, and `\
 ]
 
 .pull-right[
-### Map of posterior probability of `\(b_i&gt;0\)`
+### Map of posterior probability of `\(\zeta_i&gt;0\)`
 
 ```r
 &gt; ggplot() + geom_sf(data = out_map, 
@@ -1020,10 +1019,8 @@ Straightforward extension of disease mapping model:
   
 `\begin{align*}
 \hbox{y}_i &amp; \sim  \hbox{Poisson}(E_i \rho_i); \;\;\; i=1,...,N\\
-\log \rho_i &amp; =  b_0 + \class{red}{\beta_1 x_i} + u_i + v_i\\
-\text{residual RR}_i &amp;= \exp(b_i) = \exp(u_i + v_i)\\
+\log \rho_i &amp; =  b_0 + \class{red}{\beta_1 x_i} + b_i\\
 \boldsymbol{b} &amp;= \frac{1}{\sqrt{\tau_b}}(\sqrt{1-\phi}\boldsymbol{v}_{*} + \sqrt{\phi} \boldsymbol{u}_{*})\\ 
-v_i &amp;\sim \text{Normal}(0, \sigma^2_v) \;\;\; \mathbf{u} \sim \hbox{ICAR}(\mathbf{W},\sigma^2_u)
 \end{align*}`
 ]
 
@@ -1068,9 +1065,7 @@ where
 
 ```r
 &gt; formula.ecoreg.inla = y ~ 1 + x +
-+         f(id,model="bym", graph=graph,                 
-+           hyper=list(prec.spatial=list(
-+                 prior="loggamma",param=c(0.01,0.01))))
++         f(id,model="bym2", graph=graph)
 ```
 
   - Categorical covariate
@@ -1078,9 +1073,7 @@ where
 ```r
 &gt; formula.ecoreg.inla = y ~ 1 + cut(x,breaks=c(0,7,10,24),
 +                            include.lowest=TRUE) +
-+                            f(id,model="bym", graph=graph,   
-+                              hyper=list(prec.spatial=list(
-+                              prior="loggamma",param=c(0.01,0.01))))
++                            f(id,model="bym2", graph=graph)
 ```
 
 ---
