@@ -149,4 +149,13 @@ Lunch
 
 Complete material of practical 9 are [here](Practical9/Practical9.zip)
 
+### Day 10 - Mon 18th March 2024
+
+- [Session 10](Session10): Spatio-temporal model for geostatistical data (pdf [here](Session10/Session10.pdf))
+
+Lunch
+
+- [Practical 10](Practical10): Spatio-temoral estimation and prediction of ozone concentrations in New York
+
+Complete material of practical 10 are [here](Practical10/Practical10.zip)
 
