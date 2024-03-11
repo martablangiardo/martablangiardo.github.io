@@ -1,0 +1,749 @@
+---
+title: "Lab 5 - Spatio-temoral estimation and prediction of ozone concentrations in New York"
+author: "Advanced Analytics"
+header-includes:
+    - \usepackage{bm}
+output:
+  html_document:
+    toc: true
+    toc_float: true
+bibliography: biblio.bib
+---
+  
+\pagenumbering{gobble} 
+\pagenumbering{arabic} 
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, message=FALSE, warning=FALSE, fig.align = "center", class.source='klippy')
+```
+```{r klippy, echo=FALSE, include=TRUE}
+klippy::klippy(position = c('top', 'right'),color = 'darkred',
+               tooltip_message = 'Click to copy', tooltip_success = 'Done')
+```
+
+## 1. Introduction
+
+In this lab we use a dataset that comprises daily maximum
+8-hour average ground level ozone ($O_3$, ppb) concentrations for the period July 1 and August 31 in 2006 (62 days), measured at 28 monitoring sites in the state of New York, USA. 
+The stations are part of the Environmental Protection Agency (EPA) monitoring network.
+
+Ozone  occurs naturally in the upper atmosphere and protects the Earth from the sun's rays. However, at ground level it can be harmful for population health, as it can lead to adverse respiratory effects. Ozone is most likely to reach worrisome levels on hot sunny days in urban environments (even if it can still reach high levels during colder months). 
+
+The dataset used for this lab is included in the package `bmstdr` [@Sahu2022]. The data are also included in the package `spTimer` [@Bakar2015]. The data available are as follows:
+
+* `s.index`: index of the monitoring station in the NY state
+
+* `Longitude` and `Latitude`: spatial coordinates of the monitoring stations
+
+* `utmx` and `utmy`: spatial UTM X and UTM Y coordinate of the monitoring stations
+
+* `Year`, `Month` and `Day`: temporal coordinates of the measurements
+
+* `y8hrmax`: daily 8-hour maximum average ozone concentrations (parts per billion) 
+
+* `xmaxtemp`: daily maximum temperature (in degree Celsius) 
+
+* `xwdsp`: wind speed (knots), 
+
+* `xrh`: relative humidity 
+
+Of the 1,736 possible observations, i.e., n=28 locations times T=62 daily `o8hrmax` measurements, 24 are missing. 
+
+
+We use `o8hrmax` concentrations as outcome and `xmaxtemp`, `xwdsp`, and `xrh` as predictors. For computational reasons in this lab we will work with a subset of the data.
+
+The following packages are required:
+```{r, class.source='klippy'}
+library(tidyverse)
+library(bmstdr)
+library(mapview) 
+library(lubridate)
+library(mvtsplot)
+library(INLA)
+library(inlabru)
+library(viridis)
+library(sp)
+```
+
+## 2. The New York dataset: explore the data
+
+The data are obtained from 28 monitoring sites, between July 1 and August 31 in 2006. 
+
+* Load the data into `R` 
+```{r eval=TRUE, echo=TRUE, message=FALSE}
+data(nysptime)
+head(nysptime)
+```
+
+
+* Now, print the first rows of the data 
+```{r eval=TRUE, echo=TRUE, message=FALSE}
+head(nysptime)
+```
+
+* We create a map of the monitoring station using `mapview` package.  Here we plot the longitude and latitude using the World Geographic System 1984 (WGS84) projection, which is referenced as European Petroleum Survey Group (EPSG) 4326.
+
+```{r eval=TRUE, echo=TRUE, message=FALSE, fig.cap = "Map of the monitoring stations in New York State"}
+stations = cbind(unique(nysptime[,1]), unique(nysptime[,2:3]))
+
+# set the map projection to a common projection standard such as WGS84 via the argument crs = 4326
+mapview(stations, xcol = "Longitude", ycol = "Latitude", crs = 4326, grid = FALSE)
+```
+
+* We create a variable `date` using the package `lubridate` joining together the information about the year, the month and the day. 
+We also use the function `glimpse()` from the R package `dplyr` to see every column in a data frame. It's a little like `str()` applied to a data frame but it tries to show you as much data as possible
+
+```{r eval=TRUE, echo=TRUE, message=FALSE}
+nysptime = nysptime %>%
+  mutate(date = make_date(Year, Month, Day))
+glimpse(nysptime)
+```
+
+
+* We now plot the concentrations of ozone for each monitoring station using the package `mvtsplot`, which allows the visualization of Multivariate time Series (Link: http://www.biostat.jhsph.edu/~rpeng/RR/mvtsplot/). To be able to use it, we need to convert the data from long to wide format.
+
+```{r eval=TRUE, echo=TRUE, message=FALSE}
+# select ozone data
+O3 = nysptime %>% select(s.index, y8hrmax, date)
+dim(O3) 
+
+O3_wide = O3 %>% spread(s.index, y8hrmax)
+dim(O3_wide) 
+
+O3_wide = O3_wide[,-1] # remove date
+O3_wide = data.matrix(O3_wide)
+dim(O3_wide)
+
+colnames(O3_wide) = unique(O3[,1])
+
+```
+
+And then plot the ozone concentrations for the 28 monitoring stations using the package `mvtsplot`
+
+```{r eval=TRUE, echo=TRUE, fig.cap = "Daily ozone levels for 28 monitoring stations, Jul 1– Aug 31, 2006"}
+
+# Daily ozone levels for 28 monitoring stations, Jul 1– Aug 31, 2006.
+mvtsplot(O3_wide, group = NULL, xtime = NULL, norm = c("global"),
+         levels = 3, smooth.df = NULL, margin = TRUE, sort =NULL,
+         main = "", palette = "PRGn", rowstat = "median", xlim,
+         bottom.ylim = NULL, right.xlim=NULL, gcol = 3)
+
+```
+In the plot we use as color `PRGn` (default) from the `RColorBrewer` palettes. Here green indicates high values and purple indicates low values. Missing data are denoted by the color white. The bottom panel shows the overall median.  Finally, on the right hand side panel, we can see the boxplots of the data in each time series.
+
+
+* Moreover, we can check the basic statistics for ozone concentrations and make the histogram:
+
+```{r eval=TRUE, echo=TRUE, message=FALSE, fig.cap = "Histgram of ozone concentrations"}
+summary(nysptime$y8hrmax)
+nysptime %>% 
+  ggplot()+
+  geom_histogram(aes(y8hrmax), col="orange")
+```
+
+
+* We can visualize the relationships between the data using `ggpairs()` in the  `GGally` package : 
+
+```{r eval=TRUE, echo=TRUE, message=FALSE, fig.cap = "Figure 4. Plot of the correlation between variables in analysis", fig.height=6, fig.width = 11}
+library(GGally)
+ggpairs(nysptime[,9:12]) # print correlations between variables
+```
+
+* We print the table of the correlations between ozone and the three predictors using the package `corrr`:
+
+```{r eval=TRUE, echo=TRUE, message=FALSE}
+library(corrr)
+tab_cor = nysptime %>%
+  select(y8hrmax, xmaxtemp, xwdsp, xrh) %>%
+  correlate() %>%
+  shave(upper = TRUE) %>%
+  fashion(decimals = 2, na_print = "—") 
+
+tab_cor
+```
+
+
+* We create now a variable named `time` which is an index for time 
+```{r}
+nysptime$time = rep(1:n_distinct(nysptime$date),
+                   n_distinct(nysptime$s.index))
+dim(nysptime) #1736 (28stations*62 days)  14
+```
+
+* We consider only the first 30 time points for reducing the computational costs
+```{r}
+nysptime = nysptime %>% filter(time <= 30)
+dim(nysptime) #840 (28stations*30 days)  14
+```
+
+* In order to approximately normally distributed data for the response variable,  compute the square root transformation of `y8hrmax` and create a new variable named `sqrty8hrmax`, then plot the histogram of data as we did before
+```{r}
+nysptime$sqrty8hrmax = sqrt(nysptime$y8hrmax)
+
+nysptime %>% 
+  ggplot()+
+  geom_histogram(aes(sqrty8hrmax), col="orange")
+```
+
+* In this lab, we want also study the predictive capability of the model. To do so, we prepare two different datasets: the first, containing data for 8 stations, will be used for model validation, the second, with the data referring to the remaining stations, will be used for model training:
+```{r}
+# validation sites
+s = c(8, 11, 12, 14, 18, 21, 24, 28) # 8 validation stations
+
+# Training data
+DataFit = nysptime %>% 
+  filter(!(s.index %in% s))
+dim(DataFit)
+# Dim = 600 (20stations*30days) * 15
+
+# Validation data
+DataValPred =  nysptime %>% 
+  filter(s.index %in% s)
+dim(DataValPred)
+# dim = 240 (8stations*30days) * 15
+```
+
+
+* We finally import and explore the grid that will be used for the predictions to obtain a continuous surface of ozone concentrations. To do so, we use the data in the `gridnysptime` object, which contains a total of 6200 rows for 62 days of observations for 10x10 = 100 grid points (see `?gridnysptime`). 
+
+```{r}
+# ?gridnysptime
+data(gridnysptime)
+dim(gridnysptime)
+class(gridnysptime)
+head(gridnysptime)
+```
+
+
+## 3. Geostatistical spatio-temporal model
+
+Now, we implement the spatio-temporal model for ozone concentrations: 
+
+* $\boldsymbol{Y}_t =(Y(\mathbf{s}_1,t), \dots, Y(\mathbf{s}_n,t))'$ be the observed data at location $\mathbf{s}$ in day $t$
+
+* $\boldsymbol{O}_t =(O(\mathbf{s}_1,t), \dots, O(\mathbf{s}_n,t))'$ be the true value corresponding to $\boldsymbol{Y}_t$.
+
+We use a hierarchical structure and we fit the following Bayesian model, with nugget effect model together with an independent Gaussian Process (GP) model at each time point:
+
+\begin{equation*}
+\begin{split}
+ \boldsymbol{Y}_t &= \boldsymbol{O}_t +\boldsymbol{\epsilon}_t\\
+  \boldsymbol{O}_t &= \boldsymbol{X}_t \boldsymbol{\beta} + \boldsymbol{\eta}_t
+\end{split}
+\end{equation*}
+
+where:
+
++ $\boldsymbol{X}_t$ are the predictor values and $\boldsymbol{\beta}$ are the regression coefficients (i.e. large-scale component)
+
++ $\boldsymbol{\eta}_t=(\eta(\mathbf{s}_1,t), \dots, \eta(\mathbf{s}_n,t))'$ are the spatio-temporal random effects, assumed to follow $N(\mathbf{0}, \Sigma_{\eta})$  independently in time, where $\Sigma_{\eta}=\sigma_{\eta}^{2} S_{\eta}$, here $\sigma_{\eta}^2$ is the site invariant spatial variance  and $S_{\eta}$ is the spatial correlation matrix. We assume that the latent spatio-temporal process changes in time with first order autoregressive (AR(1)) model.
+
++ $\boldsymbol{\epsilon}_t=(\epsilon(\mathbf{s}_1,t), \dots, \epsilon(\mathbf{s}_n,t))'$ is the nugget effect or the pure error term, independent in space and time.
+
+The model we are going to implement is a separable model similar to the one described in @cameletti2013. 
+
+Remember that a spatio-temporal model is said to be separable when the space-time covariance structure can be decomposed into a spatial and a temporal term, i.e., the spatio-temporal covariance can be expressed as a Kronecker product of a spatial and a temporal covariance.
+
+
+## 4. Prediction at the hold-out validation sites
+
+### 4.1. Create the mesh and the SPDE model
+
+* We start by creating a triangulation of our domain. First we establish the boundary of the domain with the function `inla.nonconvex.hull`, then we create the mesh with `inla.mesh.2d` function.
+A required parameter in the latter function is `max.edge`, which determines the largest allowed triangle length. If the value supplied to this argument is a scalar, it controls the triangle edge lengths in the inner domain; if a vector of two values is supplied, it controls the edge lengths in the inner domain and in the outer extension respectively. Notice that the value (or values) passed to the `max.edge` function must be on the same scale unit as the coordinates. For computational reason, we consider a slightly rough mesh. Here we work with the training data set, i.e. `DataFit`
+
+```{r}
+coords.cv = unique(DataFit[c("Longitude", "Latitude")]) # coordinates for each station
+boundary.cv = inla.nonconvex.hull(as.matrix(coords.cv[,1:2]))
+mesh.cv = inla.mesh.2d(boundary = boundary.cv, max.edge = c(0.8, 1.3), cutoff = 0.1)
+plot(mesh.cv)
+```
+
+* Now we plot the mesh with the station points included in the training dataset. To do so, we use the `gg()` function from the `inlabru` package
+```{r}
+ggplot() +
+  gg(mesh.cv) +
+  geom_point(data = coords.cv, aes(Longitude, Latitude)) 
+```
+
+
+* Given the mesh, it is now possible to create the SPDE model using the `inla.spde2.matern` function or `inla.spde2.pcmatern`. Here we use PC priors for the model.
+The range of the process is the distance such that the correlation between values is close to 0.1. In this study, we decide to use as a prior $p(range < 1) =0.01$.
+The parameter $\sigma$ denotes the variability of the data. We specify the prior for this parameter as  $p(\sigma > 2) =0.01$.
+These PC priors are specified in the arguments `prior.range` and `prior.sigma` of the `inla.spde2.pcmatern()` function as follows:
+
+```{r}
+spde.cv = inla.spde2.pcmatern(mesh = mesh.cv, alpha = 2, 
+                           prior.range = c(1, 0.01),   # p(range < 1) = 0.01
+                           prior.sigma = c(2, 0.01)) # p(sigma > 2) = 0.01
+
+spde.cv$n.spde #n. of mesh vertices
+```
+
+### 4.2 Create the index set and matrix A
+
+* Create the index sets for the training data
+```{r}
+n_days = length(unique(DataFit$time))
+n_spatial.cv = mesh.cv$n 
+
+s_index.cv = inla.spde.make.index(
+  name = "spatial.field",
+  n.spde = n_spatial.cv, # or n.spde = spde$n.spde 
+  n.group = n_days)
+```
+
+The s_index contains two important items: 
+(i) the `spatial.field` index, which runs from 1 to `n_spatial` for `n_days` times, 
+(ii) the `spatial.field.group`, which runs from 1 to `n_days`, with each element replicated `n_spatial` times.
+
+
+* Create the project matrix using the function `inla.spde.make.A` function. This function takes as arguments the mesh, the measurement locations `loc`, the measurement group (here day), the number of groups:
+
+```{r}
+coordinates.alldays.cv = DataFit[c("Longitude", "Latitude")] %>% as.matrix()
+
+Ae = inla.spde.make.A(mesh = mesh.cv,
+                         loc = coordinates.alldays.cv,
+                         group = DataFit$time,
+                         n.group = n_days)
+```
+
+* Check the dimension of the projector matrix, and describe it
+```{r}
+dim(Ae) 
+```
+Answer:
+The matrix A is equal in dimension to `number of observations` x `number of indices` of our basis functions in space and time. We can check this as follows:
+
+```{r}
+nrow(DataFit) 
+length(s_index.cv$spatial.field) 
+```
+
+### 4.3. Define the stacks for the estimation and the predictions at the hold-out validation sites
+
+* Define the stack for the estimation part
+
+```{r}
+stk_est = inla.stack(
+  data = list(y = DataFit$sqrty8hrmax),
+  A = list(Ae, 1),
+  effects=list(c(s_index.cv,
+        list(Intercept=1)),
+        list(DataFit[,10:12])),
+  tag="est")
+```
+
+
+* Define the stack for the prediction part
+
+(i) We now construct a stack for the prediction locations. To do so, we construct the matrix `Ap` from the prediction locations to the mesh nodes. We specify the prediction locations as `coords.val` 
+
+```{r}
+coords.val = DataValPred[c("Longitude", "Latitude")]
+
+groupp = DataValPred[, 14]
+
+# Create A matrix for grid prediction 
+Ap = inla.spde.make.A(
+  mesh =  mesh.cv,
+  loc = as.matrix(coords.val),
+ group = groupp, 
+  n.group = n_days)
+dim(Ap)
+```
+
+(ii) Finally, we create the stack for the point predictions and the joint stack
+```{r}
+stk_pred = inla.stack(
+  data = list(y = NA),
+  A = list(Ap, 1),
+  effects=list(c(s_index.cv, #Spatial field 
+          list(Intercept=1)),
+          list(DataValPred[,10:12])),
+          tag="pred")
+
+# Final stack containing the estimation and prediction stacks
+stk = inla.stack(stk_est, stk_pred)
+```
+
+### 4.4 Run INLA for the cross-validation excercise
+
+* Now, we are ready to fit the model. We specify a PC prior on the AR(1) coefficient $\rho$, such that $p(\rho>0=0.9)$
+
+```{r,eval=T}
+# prior for AR(1) coefficient
+rho_hyper = list(theta = list(prior = "pccor1", param = c(0, 0.9)))
+```
+
+* We define the formula, including the intercept, 3 linear effects of the meteorological covariates and the spatio-temporal field (with AR(1) temporal dynamics):
+
+```{r}
+# formula
+formula.cv = y ~ -1 + Intercept + xmaxtemp + xwdsp + xrh + 
+  f(spatial.field,
+    model = spde.cv,
+    group = spatial.field.group,
+    control.group = list(model = "ar1",
+                         hyper=rho_hyper))
+
+```
+
+* We fit the model
+```{r}
+# fit the model
+fit.cv = inla(
+  formula.cv,
+  data = inla.stack.data(stk, spde = spde.cv),
+  family = "gaussian",
+  control.predictor = list(A = inla.stack.A(stk), 
+                           compute = TRUE),
+  control.compute = list(return.marginals.predictor = TRUE))   
+  
+summary(fit.cv)
+```
+
+* We will explore the output and discuss the results in next sections 5-7, while here we complete the cross validation exercise by plotting together the observed (red) and predicted time series (posterior mean in black); the gray ribbon describes the posterior 95% interval to inspect the predictive capability of our model:
+
+```{r}
+index.pred.cv = inla.stack.index(stk, "pred")$data
+
+## add to modmat the prediction and their sd
+DataValPred$yPostMean = fit.cv$summary.fitted.values[index.pred.cv, "mean"]
+DataValPred$ySD <- fit.cv$summary.fitted.values[index.pred.cv, "sd"]
+
+## a plot with the original data
+as.data.frame(DataValPred) %>%
+  ggplot() + 
+  geom_line(aes(time, sqrty8hrmax, group = s.index), color = "red") +
+  geom_line(aes(time, yPostMean, group = s.index)) +
+  geom_ribbon(aes(time, ymin = (yPostMean - 2 * ySD), ymax = (yPostMean + 2 * ySD), group = s.index), alpha = 0.5) +
+  facet_wrap(~ s.index)
+```
+
+
+## 5. Prediction on the grid
+
+We now repeat all the same process to implement the model, but using the entire data set, i.e. `nysptime` and obtaining predictions on the entire domain.
+
+### 5.1. Create the mesh and the SPDE model
+
+* Now we create a triangulation of our domain. First we establish the boundary of the domain with the function `inla.nonconvex.hull`, then we create the mesh with `inla.mesh.2d` function, as we did before, but using all the data from the New York stations (i.e. `nysptime`)
+
+```{r}
+coords = unique(nysptime[c("Longitude", "Latitude")]) # coordinates for each station
+boundary = inla.nonconvex.hull(as.matrix(coords[,1:2]))
+mesh = inla.mesh.2d(boundary = boundary, max.edge = c(0.8, 1.3), cutoff = 0.1)
+```
+
+* Now we plot the mesh with the 28 station points. To do so, we use the `gg()` function from the `inlabru` package
+```{r}
+ggplot() +
+  gg(mesh) +
+  geom_point(data = coords, aes(Longitude, Latitude)) 
+```
+
+
+* Given the mesh, it is now possible to create the SPDE model using the `inla.spde2.matern` function or `inla.spde2.pcmatern`. Here we use PC priors for the model. Create the SPDE model as we did before
+
+```{r}
+spde = inla.spde2.pcmatern(mesh = mesh, alpha = 2, 
+                           prior.range = c(1, 0.01),   # p(range < 1) = 0.01
+                           prior.sigma = c(2, 0.01)) # p(sigma > 2) = 0.01
+
+spde$n.spde #n. of mesh vertices
+```
+
+### 5.2 Create the index set and matrix A
+
+* Create the index sets
+```{r}
+n_days = length(unique(nysptime$time))
+n_spatial = mesh$n 
+
+s_index = inla.spde.make.index(
+  name = "spatial.field",
+  n.spde = n_spatial, # or n.spde = spde$n.spde 
+  n.group = n_days)
+```
+
+The s_index contains two important items: 
+(i) the `spatial.field` index, which runs from 1 to `n_spatial` for `n_days` times, 
+(ii) the `spatial.field.group`, which runs from 1 to `n_days`, with each element replicated `n_spatial` times.
+
+
+* Create the project matrix using the function `inla.spde.make.A` function. Remember from the previous section that this function takes as arguments the mesh, the measurement locations `loc`, the measurement group (here day), the number of groups
+```{r}
+coordinates.alldays = nysptime[c("Longitude", "Latitude")] %>% as.matrix()
+
+A_est = inla.spde.make.A(mesh = mesh,
+                         loc = coordinates.alldays,
+                         group = nysptime$time,
+                         n.group = n_days)
+```
+
+* Check the dimension of the projector matrix
+```{r}
+dim(A_est) 
+
+nrow(nysptime) 
+length(s_index$spatial.field) 
+```
+Answer:
+We see that the matrix A is equal in dimension to `number of observations` x `number of indices` of our basis functions in space and time. 
+
+
+### 5.3. Define the stacks for estimation and prediction
+
+* Define the stack for the estimation part
+
+```{r}
+stack_est = inla.stack(
+  data = list(y = nysptime$sqrty8hrmax),
+  A = list(A_est, 1),
+  effects=list(c(s_index,
+        list(Intercept=1)),
+        list(nysptime[,10:12])),
+  tag="est")
+```
+
+
+* Define the stack for the prediction part
+
+(i) Firstly we displays the grid points together with the mesh:
+```{r}
+gridnysptime %>% 
+  distinct(Longitude, Latitude) %>% 
+  ggplot()+
+  geom_point(aes(Longitude, Latitude)) +
+  gg(mesh)
+
+```
+
+(ii) Then, we create also for `gridnysptime` the variable containing the date information and then a variable which is an index for time:
+```{r}
+gridnysptime = gridnysptime %>%
+  mutate(date = make_date(Year, Month, Day))
+
+gridnysptime$time = rep(1:n_distinct(gridnysptime$date),
+                   n_distinct(gridnysptime$s.index))
+
+glimpse(gridnysptime)
+
+```
+
+(iii) For the sake of simplicity we consider only the first time point:
+```{r}
+gridnysptime = gridnysptime %>% filter(time == 1)
+```
+
+(iv) We construct a stack containing the matrices and vector defining the model at the prediction locations. To do so, we construct the matrix `A_pred` that projects the spatially continuous Gaussian random field from the prediction locations to the mesh nodes. We specify the prediction locations as `coords_grid`. We will make predictions at day 1:
+
+```{r}
+coords_grid = gridnysptime[c("Longitude", "Latitude")]
+
+# define prediction day
+i_day = 1
+which_date = unique(nysptime$date)[i_day]
+print(paste("* You will get a prediction for ", which_date, "*"))
+
+#groupp = gridnysptime[, 13]
+
+# Create A matrix for grid prediction 
+A_pred = inla.spde.make.A(
+  mesh =  mesh,
+  loc = as.matrix(coords_grid),
+ #group = groupp, 
+ group = i_day,
+  n.group = n_days)
+dim(A_pred)
+```
+
+(v) Finally, we create the stack for the predictions and the joint stack as we did before 
+```{r}
+stack_pred = inla.stack(
+  data = list(y = NA),
+  A = list(A_pred, 1),
+  effects=list(c(s_index, #Spatial field 
+          list(Intercept=1)),
+          list(gridnysptime[,9:11])),
+          tag="pred")
+
+# Final stack containing the estimation and prediction stacks
+stack = inla.stack(stack_est, stack_pred)
+```
+
+### 5.4 Run INLA
+
+* Now, we are ready to fit complete the model. We specify a PC prior on the AR(1) coefficient $\rho$, such that $p(\rho>0=0.9)$ as we did for the cross-validation task
+
+```{r,eval=T}
+# prior for AR(1) coefficient
+rho_hyper = list(theta = list(prior = "pccor1", param = c(0, 0.9)))
+```
+
+* We define the formula, including the intercept, 3 linear effects of the meteorological covariates and the spatio-temporal field (with AR(1) temporal dynamics):
+
+```{r}
+# formula
+formula = y ~ -1 + Intercept + xmaxtemp + xwdsp + xrh + 
+  f(spatial.field,
+    model = spde,
+    group = spatial.field.group,
+    control.group = list(model = "ar1",
+                         hyper=rho_hyper))
+
+```
+
+* We fit the model
+```{r}
+# fit the model
+fit = inla(
+  formula,
+  data = inla.stack.data(stack, spde = spde),
+  family = "gaussian",
+  control.predictor = list(A = inla.stack.A(stack), 
+                           compute = TRUE),
+  control.compute = list(return.marginals.predictor = TRUE))   
+  
+summary(fit)
+```
+
+
+## 6.  Extract and analyse the posterior summaries 
+
+* We start by exploring the output names 
+```{r}
+names(fit$marginals.fixed)
+names(fit$marginals.random)
+names(fit$marginals.hyperpar)
+```
+
+* Extract the posterior summaries (mean and 95%CI credible intervals) for the fixed effects. Comment the results
+```{r}
+# Fixed effects
+round(fit$summary.fixed[,c("mean","0.025quant","0.975quant")],3)
+```
+
+Comment:
+Using a subset of the New York data (only first 30 days are included), we see that the parameter estimates show that the max temperature has an impact on ozone concentrations, since the 95% credible intervals of the regression coefficients doesn't contain zero.  
+
+
+* Now we plot the posterior densities for the fixed effects
+```{r}
+modfix = fit$summary.fixed
+modfix
+
+par(mgp=c(2.2,0.45,0), tcl=-0.4, mar=c(3.3,4,2,2))
+par(mfrow=c(2,2))
+
+plot(fit$marginals.fix[[1]],type ='l',xlab=expression(beta[0]),ylab="density")
+abline(v = modfix[1, c(3, 5)], lty=2)
+
+plot(fit$marginals.fix[[2]],type ='l',xlab=expression(beta[max.temp]),ylab="density")
+abline(v = modfix[2, c(3, 5)], lty=2)
+
+plot(fit$marginals.fix[[3]],type ='l',xlab=expression(beta[w.speed]),ylab="density")
+abline(v = modfix[3, c(3, 5)], lty=2)
+
+plot(fit$marginals.fix[[4]],type ='l',xlab=expression(beta[rh]),ylab="density")
+abline(v = modfix[4, c(3, 5)], lty=2)
+
+```
+
+* Now we check the posterior estimates of the hyperparameters. Obtain their posterior summaries, and call the object as `modhy`
+```{r}
+# Hyperparameters 
+modhy = fit$summary.hyperpar
+modhy
+```
+
+* We extract field, parameter values and distributions for the spatial field using the `inla.spde2.result` function (https://rdrr.io/github/INBO-BMK/INLA/man/inla.spde.result.html). Here, the `do.tranf = TRUE` makes sure that marginals are calculated in the same scale as the data
+```{r}
+output.field = inla.spde2.result(inla = fit,
+                                  name = "spatial.field",
+                                  spde = spde,
+                                  do.transf = TRUE)
+```
+
+* Now we plot the posterior estimates for the parameter of the AR(1) model (coefficient $\rho$), the range that provides the distance value (in the unit of the point coordinates) above which spatial dependencies become negligible and the variance
+```{r}
+out.range = exp(output.field$summary.log.range.nominal)
+out.var = exp(output.field$summary.log.variance.nominal)
+
+par(mgp=c(2.2,0.45,0), tcl=-0.4, mar=c(3.3,4,2,2))
+par(mfrow=c(2,2))
+
+# AR1 parameter    
+plot(fit$marginals.hyperpar$`GroupRho for spatial.field`,type = 'l',xlab = expression(rho),ylab = "density", xlim=c(0.6,1))
+
+# range
+plot(output.field$marginals.variance.nominal[[1]],type = 'l',xlab = expression(sigma^2),ylab = "density")
+
+# variance
+plot(output.field$marginals.range.nominal[[1]],type = 'l',xlab = "spatial range",ylab = "density")
+```
+
+* We check the correlation between the data response and the posterior mean of the predicted values 
+```{r}
+# index for the random field at the data locations:
+idat = inla.stack.index(stack_est, 'est')$data
+
+# correlation between the data response and the posterior mean of the predicted values 
+cor(nysptime$sqrty8hrmax, fit$summary.linear.predictor$mean[idat], use="complete.obs")
+
+# plot
+plot(nysptime$sqrty8hrmax, fit$summary.linear.predictor$mean[idat])
+```
+
+
+## 7. Map of the predictions at grid level
+
+* We extract the indices to the prediction nodes and then extract the posterior mean of the response at day 1. To do so, we use `inla.stack.index()` function to get the indices of stack that correspond to `tag = "pred"`
+
+```{r}
+# Get the posterior mean values
+index.pred = inla.stack.index(stack, "pred")$data
+
+post.mean.pred = fit$summary.linear.predictor[index.pred,"mean"]
+post.sd.pred = fit$summary.linear.predictor[index.pred,"sd"]
+#lp_marginals = fit$marginals.linear.predictor[index.pred]
+
+# grid for the prediction
+grid_locs = expand.grid(
+  lon = seq(
+  min(gridnysptime$Longitude),
+  max(gridnysptime$Longitude),
+  length.out = 10),
+  lat = seq(
+  min(gridnysptime$Latitude),
+  max(gridnysptime$Latitude),
+  length.out = 10))
+
+# prepare posteriors for mapping  
+post.mean.df = SpatialPixelsDataFrame(SpatialPoints(grid_locs),
+data = data.frame(post.mean.pred))
+
+postsd.df = SpatialPixelsDataFrame(SpatialPoints(grid_locs),
+data = data.frame(post.sd.pred))
+```
+
+* Finally we present the map of the smooth ozone concentration posterior mean (on the square root scale) and of the prediction standard error:
+```{r}
+# posterior mean
+ggplot() + 
+  gg(post.mean.df, aes(lon, lat, fill = post.mean.pred))  +
+  ggtitle("Posterior mean at 2006-07-01") +
+  scale_fill_viridis() +
+  coord_equal()+
+  geom_point(data = coords, aes(Longitude, Latitude))
+
+# posterior standard deviation
+ggplot() + 
+  gg(post.mean.df, aes(lon, lat, fill = post.sd.pred))  +
+  ggtitle("Posterior sd at 2006-07-01") +
+  scale_fill_viridis() +
+  coord_equal()+
+  geom_point(data = coords, aes(Longitude, Latitude))
+```
