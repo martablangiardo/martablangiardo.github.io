@@ -1,0 +1,1002 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>Spatio-temporal Bayesian models for environmental epidemiology</title>
+    <meta charset="utf-8" />
+    <meta name="author" content="Marta Blangiardo and Garyfallos Konstantinoudis" />
+    <script src="libs/header-attrs/header-attrs.js"></script>
+    <link href="libs/panelset/panelset.css" rel="stylesheet" />
+    <script src="libs/panelset/panelset.js"></script>
+    <script src="libs/kePrint/kePrint.js"></script>
+    <link href="libs/lightable/lightable.css" rel="stylesheet" />
+    <!-- (Re)Defines a bunch of LaTeX commands that can then be used directly in the .Rmd file as '\command{...}' -->
+    <script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+      TeX: {
+        /* This enables color macros */
+        extensions: ["color.js"],
+        Macros: {
+          /* Probability & mathematical symbols */
+          Pr: "{\\style{font-family:inherit; font-size: 110%;}{\\text{Pr}}}",
+          exp: "{\\style{font-family:inherit; font-size: 105%;}{\\text{exp}}}",
+          log: "{\\style{font-family:inherit; font-size: 105%;}{\\text{log}}}",
+          ln: "{\\style{font-family:inherit; font-size: 105%;}{\\text{ln}}}",
+          logit: "{\\style{font-family:inherit; font-size: 100%;}{\\text{logit}}}",
+          HR: "{\\style{font-family:inherit; font-size: 105%;}{\\text{HR}}}",
+          OR: "{\\style{font-family:inherit; font-size: 105%;}{\\text{OR}}}",
+          E: "{\\style{font-family:inherit; font-size: 105%;}{\\text{E}}}",
+          Var: "{\\style{font-family:inherit; font-size: 105%;}{\\text{Var}}}",
+          Cov: "{\\style{font-family:inherit; font-size: 105%;}{\\text{Cov}}}",
+          Corr: "{\\style{font-family:inherit; font-size: 105%;}{\\text{Corr}}}",
+          DIC: "{\\style{font-family:inherit; font-size: 105%;}{\\text{DIC}}}",
+          se: "{\\style{font-family:inherit; font-size: 100%;}{\\text{se}}}",
+          sd: "{\\style{font-family:inherit; font-size: 100%;}{\\text{sd}}}",
+          kld: "{\\style{font-family:inherit; font-size: 100%;}{\\text{kld}}}",
+          /* Distributions */
+          dnorm: "{\\style{font-family:inherit;}{\\text{Normal}}}",
+          dt: "{\\style{font-family:inherit;}{\\text{t}}}",
+          ddirch: "{\\style{font-family:inherit;}{\\text{Dirichlet}}}",
+          dmulti: "{\\style{font-family:inherit;}{\\text{Multinomial}}}",
+          dbeta: "{\\style{font-family:inherit;}{\\text{Beta}}}",
+          dgamma: "{\\style{font-family:inherit;}{\\text{Gamma}}}",
+          dbern: "{\\style{font-family:inherit;}{\\text{Bernoulli}}}",
+          dbin: "{\\style{font-family:inherit;}{\\text{Binomial}}}",
+          dpois: "{\\style{font-family:inherit;}{\\text{Poisson}}}",
+          dweib: "{\\style{font-family:inherit;}{\\text{Weibull}}}",
+          dexp: "{\\style{font-family:inherit;}{\\text{Exponential}}}",
+          dlnorm: "{\\style{font-family:inherit;}{\\text{logNormal}}}",
+          dunif: "{\\style{font-family:inherit;}{\\text{Uniform}}}",
+          /* LaTeX formatting */
+          bm: ["{\\boldsymbol #1}",1],
+          /* These create macros to typeset numbers in maths with the basic font */
+          0: "{\\style{font-family:inherit; font-size: 105%;}{\\text{0}}}",
+          1: "{\\style{font-family:inherit; font-size: 105%;}{\\text{1}}}",
+          2: "{\\style{font-family:inherit; font-size: 105%;}{\\text{2}}}",
+          3: "{\\style{font-family:inherit; font-size: 105%;}{\\text{3}}}",
+          4: "{\\style{font-family:inherit; font-size: 105%;}{\\text{4}}}",
+          5: "{\\style{font-family:inherit; font-size: 105%;}{\\text{5}}}",
+          6: "{\\style{font-family:inherit; font-size: 105%;}{\\text{6}}}",
+          7: "{\\style{font-family:inherit; font-size: 105%;}{\\text{7}}}",
+          8: "{\\style{font-family:inherit; font-size: 105%;}{\\text{8}}}",
+          9: "{\\style{font-family:inherit; font-size: 105%;}{\\text{9}}}",
+          /* Health economics quantities */
+          icer: "{\\style{font-family:inherit; font-size: 100%;}{\\text{ICER}}}",
+          nb: "{\\style{font-family:inherit; font-size: 100%;}{\\text{NB}}}",
+          ol: "{\\style{font-family:inherit; font-size: 100%;}{\\text{OL}}}",
+          ceac: "{\\style{font-family:inherit; font-size: 100%;}{\\text{CEAC}}}",
+          evpi: "{\\style{font-family:inherit; font-size: 100%;}{\\text{EVPI}}}",
+          evppi: "{\\style{font-family:inherit; font-size: 100%;}{\\text{EVPPI}}}",
+          evsi: "{\\style{font-family:inherit; font-size: 100%;}{\\text{EVSI}}}"
+        }
+      }
+    });
+    </script>
+    <link rel="stylesheet" href="assets/beamer.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+
+
+
+
+
+class: title-slide
+
+# Spatio-temporal Bayesian models for environmental epidemiology&lt;span style="display:block; margin-top: 10px ;"&gt;&lt;/span&gt; 
+
+## Marta Blangiardo and Garyfallos Konstantinoudis
+
+### [Environment and Health Statistics group](https://www.envstats.org/) | Imperial College London    
+
+### MRC Health Collaboration with Helmholtz Centres, London 
+
+&lt;!-- Can also separate the various components of the extra argument 'params', eg as in 
+### MRC Health Collaboration with Helmholtz Centres, London, 16 May 2024, Spatio-temporal Bayesian models for environmental epidemiology
+--&gt;
+
+16 May 2024
+
+&lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
+
+&lt;center&gt;&lt;img src=./img/MRC-Centre-Logo.png width='30%' title='INCLUDE TEXT HERE'&gt;&lt;/center&gt;
+
+---
+
+layout: true  
+
+.my-footer[ 
+.alignleft[ 
+&amp;nbsp; &amp;copy; Blangiardo &amp; Konstantinoudis
+]
+.aligncenter[
+Spatio-temporal Bayesian models for environmental epidemiology 
+]
+.alignright[
+MRC Health Collaboration with Helmholtz Centres, 16 May 2024 
+]
+] 
+
+
+&lt;style&gt;
+pre {
+  overflow-x: auto;
+}
+pre code {
+  word-wrap: normal;
+  white-space: pre;
+}
+&lt;/style&gt;
+
+
+---
+
+# Data/modelling/challenges in environmental epidemiology
+
+&lt;center&gt;&lt;img src=./img/Areas.png width='80%' title='INCLUDE TEXT HERE'&gt;&lt;/center&gt;
+
+---
+
+# Accounting for spatial and temporal dependencies
+
+.center[.content-box-blue[
+**First law of geography** (W. Tobler, 1970): everything is related to everything else, but near things are more related than distant things
+]
+]
+
+&lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
+
+When are we interested in the spatial and temporal components?
+
+--
+
+&lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
+
+- Hypothesis generating perspective 
+
+`\(\rightarrow\)` Are we explicitly interested in the spatial pattern of disease risk?
+
+`\(\rightarrow\)` Do we want to evaluate temporal trends for each area?
+
+--
+
+&lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
+
+- Is the spatial clustering and/or temporal trend a nuisance quantity that we wish to take into account but are not explicitly interested in?
+
+`\(\rightarrow\)` Spatial / time series regression.
+
+
+--
+
+&lt;span style="display:block; margin-top: 40px ;"&gt;&lt;/span&gt;
+
+In this talk we are going to focus on
+
+&lt;span style="display:block; margin-top: 10px ;"&gt;&lt;/span&gt;
+  - Wastewater modelling and COVID-19 prevalence
+&lt;span style="display:block; margin-top: 10px ;"&gt;&lt;/span&gt;
+  - Temperature and COPD hospitalisations
+
+---
+
+name: WBE
+
+&lt;span style="display:block; margin-top: 250px ;"&gt;&lt;/span&gt;
+
+.myblue[.center[.huge[
+**Space-time modelling: wastewater based epidemiology**]]]
+
+---
+
+#Wastewater-based epidemiology
+
+&lt;span style="display:block; margin-top: 50px ;"&gt;&lt;/span&gt;
+&lt;center&gt;
+.content-box-green[.center[.large[A collection of tools
+and methods for surveillance and monitoring disease outbreaks using bio-
+chemical analysis of wastewater samples as the primary outcome measure]]]
+&lt;/center&gt;
+
+--
+
+&lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
+
+- Wastewater has been used over the years as an epidemiological tool
+  - no selection bias
+  - cheap
+
+- Methods to detect the presence of SARS-CoV-2 RNA in wastewater have
+been developed in a number of countries 
+
+- Scientific contributions to date have focused on the level of the sewage treatment works (STWs) where the
+measurements of SARS-CoV-2 RNA from wastewater are obtained.
+
+- No attempt has previously been made to develop a
+spatially resolved model to estimate wastewater viral
+concentration over a spatially continuous domain.
+
+---
+
+# How does it work 
+
+&lt;span style="display:block; margin-top: 10px ;"&gt;&lt;/span&gt;
+&lt;center&gt;&lt;img src=./img/WW.png width='80%' title=''&gt;&lt;/center&gt;
+
+### Aim
+
+- Develop a statistical model to estimate viral concentration in wastewater at fine spatio-temporal resolution covering the whole of England
+&lt;span style="display:block; margin-top: 10px ;"&gt;&lt;/span&gt;
+- Use the spatial dependence to **predict** values of the spatial surface (together with associated uncertainty) at locations where there are no observations.
+
+
+---
+
+# Data
+
+- SARS-CoV-2 viral concentrations obtained from the 303 Sewage Treatment Works (STWs) for which the data were publicly available from the Environmental Monitoring for Health Protection (EMHP) wastewater surveillance programme.
+
+.pull-left[
+&lt;center&gt;&lt;img src=./img/STW.png width='70%' title='Location of STWs and their catchment areas'&gt;&lt;/center&gt;
+.center[Location of STWs and their catchment areas]
+]
+
+.pull-right[
+- Socio-demographic, land use covariates and wastewater genomic data:
+  1. Index of Multiple Deprivation (2019)
+  2. Black, Asian and Minority Ethnic (BAME) proportion (Census, 2011)
+  3. Land cover (Copernicus, 2018)
+  4. Population density (ONS, 2019)
+  5. Age structure (ONS, 2019)
+  6. Percentage coverage of the SARS-CoV-2 genome in the sample
+  7. Single-Nucleotide Polymorphism (SNP) data in the sample
+]
+
+---
+
+# Statistical model
+
+The log-transformed number of gene copies per liter at catchment area `\(i=1, \ldots, 303\)` and week `\(t=1,\ldots, 44\)` is modelled as:
+
+`$$y_{it} \sim \text{Normal}(\mu_{it}, \sigma^2_y)$$`
+
+### Geospatial model on the latent mean concentration at monitoring site as a function of:
+1. covariates
+2. regional effect
+3. temporal trend
+4. spatio-temporal random effect
+
+--
+
+&lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
+
+### Spatial prediction
+
+1. at the population-weighted centroids of all the 32,844 Lower Super Output Areas (LSOAs) in England 
+2. Aggregated at the Lower Tier Local Authority level 
+3. The posterior predictive distribution is used to detect increases in viral concentration over two consecutive weeks
+
+--
+
+&lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
+
+### Bayesian approach implemented in R-INLA 
+
+---
+
+
+#Interactive dashboard
+To visualise these rich model outputs, we have created a dynamic and interactive dashboard
+
+&lt;span style="display:block; margin-top: -50px ;"&gt;&lt;/span&gt;
+
+&lt;iframe src="https://b-rowlingson.gitlab.io/wwatlas/" width="140%" height="100%" data-external="1" style="transform: scale(.8);border:none"&gt;&lt;/iframe&gt;
+
+---
+
+# Combining wastewater viral concentration and COVID-19 prevalence
+
+We consider the use of wastewater data under the following
+setting:
+&lt;center&gt;&lt;img src=./img/WWCovid.png width='70%' title='INCLUDE TEXT HERE'&gt;&lt;/center&gt;
+
+&lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
+
+###Aim 
+
+To **integrate** the spatially granular wastewater data with prevalence
+estimates in order to downscale prevalence estimates from
+the national to a local level when only the national prevalence is
+available.
+
+
+---
+
+# Modelling framework
+
+- Coarse (national) and local (LTLA) models jointly fitted
+
+- Wastewater predictions available from the geostatistical model
+
+- Posterior distribution of COVID-19 prevalence obtained through Nicholson et al. (2022) 
+
+--
+
+.pull-left[
+### Coarse (national)
+`\begin{align*}
+\mbox{logit}({P}_{t}) &amp;\sim \mbox{N}(\mu_{t},\sigma^2_{t})\\
+\mu_{t} &amp;= \alpha + b_t + \delta_t \tilde{y}^{\prime}_{t}
+\end{align*}`
+
+to learn about
+1. the time pattern of prevalence: `\(b_{1:T}\)`
+2. the national level WW - prevalence relationship: `\(\delta_t \tilde{y}^{\prime}_{t}\)` 
+
+Both are modelled using autoregressive structures
+]
+
+.pull-right[
+### Local
+`\begin{align*}
+\mbox{logit}(p_{lt}) &amp;\sim \mbox{N}(\mu_{lt},\sigma^2_{lt})\\
+\mu_{lt} &amp;= (\alpha + u_l) + (b_t + v_{lt}) + (d_t + m_l)y^{\prime}_{lt}\\
+\end{align*}`
+
+to learn about
+1. the local departure from the national trend of prevalence `\(v_{lt}\sim N(0,\sigma^2_v)\)`
+2. the local departure from the  WW-prevalence relationship `\(m_l \sim N(0,\sigma^2_m)\)`
+ ]
+
+&lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
+
+.small[Nicholson, G, et al. "Improving local prevalence estimates of SARS-CoV-2 infections using a causal debiasing framework." Nature Microbiology 7.1 (2022): 97-107.]
+
+---
+
+# Added values of WW: more accurate, less uncertain nowcasts
+
+.pull-left[&lt;center&gt;&lt;img src=./img/Nowcast.jpg width='80%' title='INCLUDE TEXT HERE'&gt;&lt;/center&gt;
+]
+
+.pull-right[
+- Using wastewater data helps to improve the quality of the disaggregated LTLA prevalence (lower RMSE and better coverage).
+
+&lt;span style="display:block; margin-top: 30px ;"&gt;&lt;/span&gt;
+&lt;center&gt;&lt;img src=./img/RMSE.jpg width='120%' title='INCLUDE TEXT HERE'&gt;&lt;/center&gt;
+]
+
+---
+
+# Take home message
+
+- The proposed framework for disaggregation demonstrates the added-value of wastewater data to inform local prevalence of COVID
+
+&lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
+
+- Example of .red[modular] integration of environmental and disease data  
+
+
+
+.pull-left[
+&lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
+
+- Currently being extended to include other data sources, such as syndromic and secondary care data, to enable quantitatively accurate monitoring of disease evolution across a population.
+]
+
+.pull-right[
+&lt;center&gt;&lt;img src=./img/Surveillance_representation.jpg width='80%' title='INCLUDE TEXT HERE'&gt;&lt;/center&gt;
+]
+
+
+---
+
+name: COPD
+
+&lt;span style="display:block; margin-top: 250px ;"&gt;&lt;/span&gt;
+
+.myblue[.center[.huge[
+**Space-time modelling: Temperature and Health**]]]
+
+
+
+---
+
+# COPD and temperature
+.pull-left[
+- 3rd cause of death, 3.17 million deaths in 2015 globally
+&lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
+- In England, 115,000 emergency admissions and 24,000 deaths per year.
+&lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
+- COPD exacerbations: Bacteria, viruses and air-pollution.
+&lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
+- The role of temperature is unclear. 
+]
+
+.pull-right[
+
+&lt;center&gt;&lt;img src=./img/COPD_HES.jpg width='80%' title='INCLUDE TEXT HERE'&gt;&lt;/center&gt;
+]
+
+---
+
+# Temperature and Health
+.pull-left[
+- Typically U-shaped relationship between temperature and mortality.
+&lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
+- Cold, dry air or hot air can trigger a flare-up.
+&lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
+- Different confounding, different lags across different temperatures.
+
+&lt;span style="display:block; margin-top: 30px ;"&gt;&lt;/span&gt;
+
+.center[.content-box-green[Aim: To evaluate the effect of warm temperatures and COPD hospitalizations.
+]
+]
+
+&lt;span style="display:block; margin-top: 30px ;"&gt;&lt;/span&gt;
+
+Secondary objectives:
+&lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
+- Examine effect modification by age, sex and space.
+&lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
+- Assess how contextual characteristics, such as green space, average temperature, deprivation and urbanicity affect population vulnerability. 
+&lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
+- Calculate the number of COPD cases attributable to temperature.
+]
+
+.pull-right[
+
+&lt;center&gt;&lt;img src=./img/TemperatureHealth.png width='100%' title='INCLUDE TEXT HERE'&gt;&lt;/center&gt;
+]
+
+
+
+---
+
+&lt;!--
+# Previous studies
+
+&lt;table class=" lightable-material lightable-striped lightable-hover" style='font-family: "Source Sans Pro", helvetica, sans-serif; margin-left: auto; margin-right: auto;'&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;"&gt; Authors &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; Aggregation &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; Country &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; Pollutants &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; Effect &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Michelozzi et al 2009 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; city and daily &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; EU &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; NO2, O3 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 2.1 (0.6 to 3.6) per 1oC &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Anderson et al 2013 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; county and daily &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; US &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; O3, PM10, PM2.5 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 2.0 (0.4 to 4.5) per 10oF &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Zhapo et al 2019 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; individual &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Brazil &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; no adjustment &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 5.0 (4.0 to 6.0) per 5oC &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+
+
+- Spatial and temporal aggregation
+  - Exposure varies on high resolution
+  - Insufficient adjustment for confounding
+  - Ecological bias.
+&lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
+- One study individual data, but did not account for air-pollution
+--&gt;
+
+# Outcome and exposure
+
+.pull-left[
+### Outcome
+- COPD hospitalization (ICD10 J40-44) 2007-2018 (NHS digital).
+- Individual data/ 100m grid spatial resolution.
+- Summer months.
+
+### Exposure
+- Daily maximum temperature 2007-2018 at 1km grid from MetOffice.
+- lag0-2.
+]
+
+.pull-right[
+&lt;center&gt;&lt;img src=./img/temperatureLTLA.png width='80%' title='INCLUDE TEXT HERE'&gt;&lt;/center&gt;
+]
+
+---
+
+# Case-crossover design
+
+- Epidemiological study design for transient environmental exposures
+&lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;    
+- Sample from same month and days
+&lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;    
+- Exposure period 0-2 days before the hospital episode (mean temperature)
+
+&lt;center&gt;&lt;img src=./img/FigCaseCrossOver.png width='70%' title='INCLUDE TEXT HERE'&gt;&lt;/center&gt;
+
+- Account for air-pollution, national holidays and relative humidity
+&lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt; 
+
+---
+
+&lt;!--
+# Confouders and spatial effect modifiers
+
+.panelset[
+.panel[.panel-name[Confounders]
+
+&lt;table class=" lightable-material lightable-striped lightable-hover" style='font-family: "Source Sans Pro", helvetica, sans-serif; margin-left: auto; margin-right: auto;'&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;"&gt; Confounder &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; Source &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; Space &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; Time &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; Year &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; PM2.5 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; MetOffice &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 1Km &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; daily &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 2007-2018 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; O3 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; MetOffice &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 1Km &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; daily &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 2007-2018 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Relative Humidity &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; MetOffice &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 10Km &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; daily &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 2007-2018 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Holidays &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; ONS &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; nationwide &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; daily &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 2007-2018 &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+]
+
+.panel[.panel-name[Effect modifiers]
+
+&lt;center&gt;&lt;img src=./img/SpatEffMod.png width='70%' title='INCLUDE TEXT HERE'&gt;&lt;/center&gt;
+]
+]
+
+
+
+# Step 1: Find the linear threshold
+
+Let `\(Y_{tj}\)` be the case-control identifier for the COPD hospitalisation for the event (case or control) at time `\(t\)`, in the `\(j-th\)` case-control group:
+  
+`\begin{align}
+Y_{tj} &amp;\sim \mbox{Poisson}(\mu_{tj})\\
+\log(\mu_{tj}) &amp;= \alpha_1 I(X_{1t} &lt; c) X_{1t} + \alpha_2 I(X_{1t} \geq c) X_{1t} + \sum_{m=1}^4\beta_mZ_{mt} + u_{j}\\
+u_j &amp;\sim N(0, 100)\\
+\alpha_1, \alpha_2, \beta_1, \dots \beta_4 &amp; \sim N(0, 1)\\
+\end{align}`
+
+`\(c\)` is the temperature threshold,  `\(50-\)`th, `\(55-\)`th, ...,  `\(90-\)`th,  `\(95-\)`th percentile. 
+
+
+
+&lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
+
+We ran the above model for the different temperature thresholds and chose the one which minimises the WAIC.
+
+
+
+# Step 2a: Effect modification by age and sex
+  
+Similarly we fitted the previous model for the different sex-age groups (male/female and `\(&lt;65\)`, `\(65-85\)`, `\(&gt;85\)` ). Consider `\(g\)` the index for the age-sex groups:
+
+`\begin{align*}
+Y_{tjg} &amp;\sim \text{Poisson}(\mu_{tjg})\\
+\log(\mu_{tjg}) &amp;= \alpha_1 I(X_{1tg} &lt; c^{\star}) X_{1tg} + \alpha_2 I(X_{1tg}\geq c^{\star})X_{1tg} + \sum_{m=1}^4\beta_mZ_{mtg} + u_{j}\\
+u_j &amp;\sim N(0, 100)\\
+\alpha_1, \alpha_2, \beta_1, \dots \beta_4 &amp; \sim N(0, 1)\\
+\end{align*}`
+
+
+# Step 2b. Spatial Effect modification
+.pull-left[    
+`\begin{align*}
+Y_{tj} &amp; \sim \text{Poisson}(\mu_{tj})\\
+\log(\mu_{tj}) &amp; = \alpha_1 I(X_{1t}&lt; c^{\star})X_{1t} + \alpha_{2s_j} I(X_{1t}\geq c^{\star})X_{1t} +\\ 
+&amp; \sum_{m=1}^4\beta_mZ_{mt} + u_{j}\\
+\alpha_{2s} &amp;= \alpha_2 + \sum_{m=1}^8 \gamma_q H_{sq} + v_s + b_s\\
+v_s &amp;\sim N(0, \sigma_2)\\
+b_s|b_{-s} &amp;\sim N\left(\frac{\sum_{s \sim r} w_{rs} b_s}{\sum_{s \sim r} w_{rs}},        \frac{\sigma^2}{\sum_{s \sim r} w_{rs}}\right)\\
+\end{align*}`
+
+where `\(\bm{H}_s\)` is a vector of the following covariates at the Lower Tier Local Authority level (LTLA):
+
+1\. Quintiles of deprivation
+2\. Proportion of green space
+3\. Urbanicity index
+4\. Average temperature
+]
+
+.pull-right[
+  &lt;center&gt;&lt;img src=./img/London.jpg width='100%' title='INCLUDE TEXT HERE'&gt;&lt;/center&gt;
+]
+
+&lt;span style="display:block; margin-top: 30px ;"&gt;&lt;/span&gt;
+.small[
+Konstantinoudis et al., Asthma hospitalisations and heat exposure in England: a case–crossover study during 2002–2019, Thorax (2023), in press.
+]
+--&gt;
+
+# Statistical analysis
+
+.pull-left[
+- Step 1: Linear threshold model
+&lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;    
+- Step 2: Age and sex effect modification
+&lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;    
+- Step 3: Spatial effect modification
+
+&lt;center&gt;&lt;img src=./img/SpatEffMod_mod.png width='100%' title='INCLUDE TEXT HERE'&gt;&lt;/center&gt;
+]
+
+
+.pull-right[
+
+&lt;center&gt;&lt;img src=./img/TemperatureHealth_0.png width='80%' title='INCLUDE TEXT HERE'&gt;&lt;/center&gt;
+]
+
+--
+- Average temperature
+- Urbanicity
+- Deprivation
+- Green space
+
+---
+
+
+# Results
+
+- In the adjusted model, the 80th percentile of the temperature (23.2C) was the threshold minimising the WAIC
+&lt;span style="display:block; margin-top: 30px ;"&gt;&lt;/span&gt;
+- The increase in the COPD hospitalisation risk for every 1°C increase in temperatures above 23.2C was 0.47% (95% CrI 0.16% to 0.75%) 
+
+
+&lt;center&gt;&lt;img src=./img/ConfoundersRR.jpg width='80%' title='INCLUDE TEXT HERE'&gt;&lt;/center&gt;
+
+---
+
+# Spatial effect modifiers
+
+- Evidence of spatial variation
+&lt;span style="display:block; margin-top: 30px ;"&gt;&lt;/span&gt;
+
+&lt;!--
+&lt;table class=" lightable-material lightable-striped lightable-hover" style='font-family: "Source Sans Pro", helvetica, sans-serif; margin-left: auto; margin-right: auto;'&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;"&gt; Modifier &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; PercentChange &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Probability &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Urban &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; −1.57 (−4.16 to 0.96) &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.12 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Avg Temp &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; −0.41 (−1.49 to 0.71) &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.22 &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+--&gt;
+
+&lt;center&gt;&lt;img src=./img/SVC.png width='80%' title='INCLUDE TEXT HERE'&gt;&lt;/center&gt;
+
+--
+
+- Not enough evidence of effects of the covariates in explaining the spatial variation
+---
+
+# Population Attributable Fraction (PAF)
+
+.pull-left[
+- Overall 7.8% (95% CrI 6.7% to 8.8%) of the total COPD hospitalisations in summer (2007-2019) are due to temperature above 23.2C
+&lt;span style="display:block; margin-top: 30px ;"&gt;&lt;/span&gt;
+- Clear spatial structure (more than 8% in East Midlands, East of England, London and South East, while it is below 5% in the South West).
+]
+
+.pull-right[
+
+&lt;center&gt;&lt;img src=./img/PAF.jpg width='100%' title='INCLUDE TEXT HERE'&gt;&lt;/center&gt;
+
+]
+
+---
+
+# Summary of the results
+
+- 1.46% (1.19%, 1.71%) for every 1oC increase in warm temperatures.
+
+
+&lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
+
+- Adjusting for air-pollution weakens evidence of an effect.
+
+
+&lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
+
+- Weak evidence of an effect modification by sex and age, whereas strong spatial component.
+
+&lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
+
+.center[.large[Evidence that COPD hospitalisations increase with warmer temperatures and as temperatures consistently increase, public health systems should be alerted and prepared to challenge the increased COPD hospitalisation burden. ]]
+
+
+---
+# General remarks
+
+- Spatial and temporal dependencies are crucial to account for in environmental epidemiology
+
+&lt;span style="display:block; margin-top: 10px ;"&gt;&lt;/span&gt;
+
+`\(\rightarrow\)` they add a level of understanding on the phenomenon under study and help reduce biases
+
+&lt;span style="display:block; margin-top: 10px ;"&gt;&lt;/span&gt;
+
+`\(\rightarrow\)` using the spatio-temporal structure (and potentially covariates) the model can predict at any location in the study region
+
+&lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
+
+- Increased flexibility, but also additional statistical challenges
+
+&lt;span style="display:block; margin-top: 10px ;"&gt;&lt;/span&gt;
+
+`\(\rightarrow\)` parameter structure
+
+&lt;span style="display:block; margin-top: 10px ;"&gt;&lt;/span&gt;
+
+`\(\rightarrow\)` computationally intensive
+
+&lt;span style="display:block; margin-top: 10px ;"&gt;&lt;/span&gt;
+
+`\(\rightarrow\)` transferability
+
+&lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
+
+- Reporting is challenging, particularly when dealing with stakeholders
+
+---
+
+# Other areas of work
+
+&lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
+
+- Evaluating the impact of short and long term aircraft noise on cardiovascular hospitalisation and mortality
+
+&lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
+
+- Modelling excess mortality at subnational level across different countries, to estimate the impact of extreme events (e.g. heat, COVID, policies)
+
+&lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
+
+- Examine heat related vulnerabilities in people living with diabetes (ICRF grant)
+
+&lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
+
+- Apportioning particulate matter into sources using Bayesian parametric and non parametric models to evaluate the effects on cardio-respiratory healths in children and elderly
+
+---
+# Acknowledgments
+
+.red[Wastewater based epidemiology:]
+
+**Guangquan Li** (Northumbria University)
+
+**Radka Jersakova**, **Callum Mole**, **Camila Rangel Smith**  (Alan Turing Institute)
+
+**Barry Rowlingson**, **Peter Diggle** (Lancaster University)
+
+**Sylvia Richardson** (MRC Biostatistics Unit, Cambridge)
+
+**George Nicholson**, **Chris Holmes** (Oxford University)
+
+**Fatemeh Torabi** (Swansea University)
+
+**Matt Wade**, **Hubert Denise**, **William Rowe**, **Daniel James**, **Jasmine Grimsley** (UKHSA)
+
+&lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
+
+.red[Temperature and COPD:]
+
+**Cosetta Minelli** (ICL)
+
+**Antonio Gasparrini** (LSHTM)
+
+**Ana Maria Vicedo Cabrera** (University of Bern)
+
+**Joan Ballester** (ISGlobal)
+
+---
+
+# Links to papers and code
+
+- Li G., Diggle P., Blangiardo M. **Integrating wastewater and randomised prevalence survey data for national COVID surveillance**, *Scientific Reports*, 14(5124), 2024; code:[https://github.com/gqlNU/wwprev](https://github.com/gqlNU/wwprev)
+&lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
+
+- Li G. et al, **A spatio-temporal framework for modelling wastewater concentration during the COVID-19 pandemic**, *Environment International*, 172(107765), 2023; code:[https://github.com/gqlNU/publicWW/](https://github.com/gqlNU/publicWW/)
+&lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
+
+- Konstantinoudis G. et al, **Asthma hospitalisations and heat exposure in England: a case–crossover study during 2002–2019**, *Thorax*, 78(9), 2023; code:[https://github.com/gkonstantinoudis/asthma_temperature](https://github.com/gkonstantinoudis/asthma_temperature)
+&lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
+
+- Konstantinoudis G. et al, **Ambient heat exposure and COPD hospitalisations in England: a nationwide case-crossover study during 2007-2018**, *Thorax*, 77(11), 2022; code:[https://github.com/gkonstantinoudis/COPDTempSVC](https://github.com/gkonstantinoudis/COPDTempSVC)
+
+
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script src="https://platform.twitter.com/widgets.js"></script>
+<script>var slideshow = remark.create({
+"highlightStyle": "github",
+"highlightLines": true,
+"countIncrementalSlides": false,
+"ratio": "16:9"
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+// add `data-at-shortcutkeys` attribute to <body> to resolve conflicts with JAWS
+// screen reader (see PR #262)
+(function(d) {
+  let res = {};
+  d.querySelectorAll('.remark-help-content table tr').forEach(tr => {
+    const t = tr.querySelector('td:nth-child(2)').innerText;
+    tr.querySelectorAll('td:first-child .key').forEach(key => {
+      const k = key.innerText;
+      if (/^[a-z]$/.test(k)) res[k] = t;  // must be a single letter (key)
+    });
+  });
+  d.body.setAttribute('data-at-shortcutkeys', JSON.stringify(res));
+})(document);
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+// adds .remark-code-has-line-highlighted class to <pre> parent elements
+// of code chunks containing highlighted lines with class .remark-code-line-highlighted
+(function(d) {
+  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
+  const preParents = [];
+  const findPreParent = function(line, p = 0) {
+    if (p > 1) return null; // traverse up no further than grandparent
+    const el = line.parentElement;
+    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
+  };
+
+  for (let line of hlines) {
+    let pre = findPreParent(line);
+    if (pre && !preParents.includes(pre)) preParents.push(pre);
+  }
+  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
+})(document);</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>
