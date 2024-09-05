@@ -238,7 +238,7 @@ count:false
 
 --
 
-.image-6[ <img src="img/COVID_Policy.png" alt="" style="width:450px;"/> ]
+.image-6[ <img src="img/COVIDPolicy.jpg" alt="" style="width:450px;"/> ]
 
 --
 
