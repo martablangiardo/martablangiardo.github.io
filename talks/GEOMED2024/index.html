@@ -524,7 +524,7 @@ The generalised linear predictor for the average of the outcome `\(\mu_{it}\)`:
 
 On the linear predictor
 
-`$$h(\mu_{it}) = {\color{red}{\alpha_0 + \alpha_1 w_{i}}} +
+`$$h(\mu_{itj}) = {\color{red}{\alpha_0 + \alpha_1 w_{i}}} +
   \psi_0 t + \psi_1 w_{i} t  + \delta_0 z_{tj_i}(t-t_{0j_i}) + \delta_1 w_{i} z_{tj_i}(t-t_{0j_i}) + \sum_{k=1}^K \beta_k X_{ik} + \gamma_i$$`
   
 &lt;span style="display:block; margin-top: 30px ;"&gt;&lt;/span&gt;
@@ -911,19 +911,15 @@ included ethnic group, the exposure period, all aforementioned confounders, a li
 
 &lt;span style="display:block; margin-top: 30px ;"&gt;&lt;/span&gt;
 
-- it naturally allows the construction of additional quantities of interest with their associated uncertainty
-
+- It naturally allows the construction of additional quantities of interest with their associated uncertainty
 
 `\(\rightarrow\)` Immediate and sustained effect can be obtained 
 
 &lt;span style="display:block; margin-top: 30px ;"&gt;&lt;/span&gt;
 
-- Caveat: it cannot be framed in a traditional causality perspective entirely, but it allows to evaluate the effect of intervention in a regression-type model
+- Caveat: it cannot always be framed in a traditional causality perspective, but it allows to evaluate the effect of intervention in a regression-type model
 
 &lt;span style="display:block; margin-top: 30px ;"&gt;&lt;/span&gt;
-
-
-- Still some assumptions are needed
 
 ---
 
@@ -946,7 +942,11 @@ A positive or a negative impact experienced in one place due to an independent e
 
 - Model framework can be extended so that the intervention effects are are specific
 
+&lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
+
 - Specified as function of space and/or covariates
+
+&lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
 
 - Synthetic controls can be added
 
