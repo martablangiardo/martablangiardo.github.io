@@ -248,7 +248,7 @@ count:false
 
 &lt;/style&gt;
   
-.center[Evaluating the effects of policy interventions is of crucial importance.]
+.center[Evaluating the effects of policy interventions is of crucial importance]
 
 --
 
@@ -265,7 +265,7 @@ count:false
 --
 
 &lt;span style="display:block; margin-top: 500px ;"&gt;&lt;/span&gt;
-.center[.red[Robust statistical methods needed.]]
+.center[.red[Robust statistical methods needed]]
 
 ---
 # Can we infer causality?
@@ -715,8 +715,7 @@ On the linear predictor
 - **Policy definition** contextual awareness using monthly statistics (Department of Work and Pensions) of UC - when it reaches 25% we assume the Local Authority has switched to UC. 
 &lt;span style="display:block; margin-top: 10px ;"&gt;&lt;/span&gt;
 
-- **Confounders**  (individuals) age, education level, ethnicity, relationship sta-
-tus, and sex; (area level) social deprivation and ethnic diversity  
+- **Confounders**  (individuals) age, education level, ethnicity, relationship status, and sex; (area level) social deprivation and ethnic diversity  
 ]
 
 .pull-right[
@@ -863,9 +862,9 @@ E(Y_{ijt})= h(\mu_{ijt}) &amp;= \\
 &amp; \alpha_{0} + \alpha_{j} w_{j_i} + \\
 &amp;\psi_{0} t + \psi_{j} w_{j_i} t + \\
 &amp;{\color{red}{\phi_{0}^{\star} z_{t}^{1} + \phi_{j}^{\star} z_{t}^{1} w_{j_i}}} + \\
-&amp;\phi_{0} z_{t}^{1} (t - t_{0}^{1}) + \phi_{j} z_{t}^{1} (t - t_{0}^{1}) w_{j_i} + \\
+&amp;{\color{red}{\phi_{0} z_{t}^{1} (t - t_{0}^{1})}} + {\color{red}{\phi_{j} z_{t}^{1} (t - t_{0}^{1}) w_{j_i}}} + \\
 &amp;{\color{red}{\delta_{0}^{\star} z_{t}^{2} + \delta_{j}^{\star} z_{t}^{2} w_{j_i}}} + \\
-&amp;\delta_{0} z_{t}^{2} (t - t_{0}^{2}) + \delta_{j} z_{t}^{2} (t - t_{0}^{2}) w_{j_i} + \\
+&amp;{\color{red}{\delta_{0} z_{t}^{2} (t - t_{0}^{2})}} + {\color{red}{\delta_{j} z_{t}^{2} (t - t_{0}^{2}) w_{j_i}}} + \\
 &amp; \sum_{k=1}^K \beta_k X_{itk} + \gamma_i + \lambda_t
 \end{align*}`
 ]
