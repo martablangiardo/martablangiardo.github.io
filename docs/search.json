@@ -1,0 +1,100 @@
+[
+  {
+    "objectID": "index.html",
+    "href": "index.html",
+    "title": "Marta Blangiardo",
+    "section": "",
+    "text": "I am a professor of Biostatistics at Imperial College, in the Department of Epidemiology and Biostatistics and I lead the Biostatistics and Data Science theme of the MRC Centre for Environment and Health. I am part-time seconded at the Turing Institute, working with the RSS-TURING lab to provide accurate estimates of COVID-19 incidence and prevalence at Local Authority level. Since 2017 I hold an honorary academic appointment with PHE (now UKHSA).\nMy main interests are related on the methodological aspects of environmental exposure estimation and on spatial and spatio-temporal models for disease mapping and for risk assessment.\nI have co-authored a book on the Integrated Nested Laplace approximation (INLA) for spatial and spatio-temporal applications: Spatial and Spatio-Temporal Bayesian Models with R-INLA\nCheck out my research group page at http://www.envstats.org\n\n\n\nUniversity of Florence | Italy\nPhD in Applied Statistics | Jan 2002 - Jan 2005\nUniversity of Milan-Bicocca | Italy\nMSci in Statistics, Demography and Social Sciences | Sept 1997 - July 2001\n\n\n\n\n\nBayesian statistics\nSpatio-temporal modelling\nEnvironmental epidemiology\nClimate change"
+  },
+  {
+    "objectID": "index.html#education",
+    "href": "index.html#education",
+    "title": "Marta Blangiardo",
+    "section": "",
+    "text": "University of Florence | Italy\nPhD in Applied Statistics | Jan 2002 - Jan 2005\nUniversity of Milan-Bicocca | Italy\nMSci in Statistics, Demography and Social Sciences | Sept 1997 - July 2001"
+  },
+  {
+    "objectID": "index.html#interests",
+    "href": "index.html#interests",
+    "title": "Marta Blangiardo",
+    "section": "",
+    "text": "Bayesian statistics\nSpatio-temporal modelling\nEnvironmental epidemiology\nClimate change"
+  },
+  {
+    "objectID": "talks.html",
+    "href": "talks.html",
+    "title": "Talks",
+    "section": "",
+    "text": "Some recording of talks and seminars I gave recently:"
+  },
+  {
+    "objectID": "talks.html#seminar-at-southampton-university-06022020",
+    "href": "talks.html#seminar-at-southampton-university-06022020",
+    "title": "Talks",
+    "section": "Seminar at Southampton University (06/02/2020)",
+    "text": "Seminar at Southampton University (06/02/2020)\nA data integration approach to adjust for residual confounding in area-referenced environmental health studies"
+  },
+  {
+    "objectID": "talks.html#talk-at-the-uk-ai-conference-23-24-march-2022",
+    "href": "talks.html#talk-at-the-uk-ai-conference-23-24-march-2022",
+    "title": "Talks",
+    "section": "Talk at the UK AI conference, 23-24 March 2022",
+    "text": "Talk at the UK AI conference, 23-24 March 2022"
+  },
+  {
+    "objectID": "talks.html#ties-virtual-conference-17-18-november-2022",
+    "href": "talks.html#ties-virtual-conference-17-18-november-2022",
+    "title": "Talks",
+    "section": "TIES virtual conference, 17-18 November 2022",
+    "text": "TIES virtual conference, 17-18 November 2022\nA dependent Bayesian Dirichlet process model for source apportionment of particle number size distribution"
+  },
+  {
+    "objectID": "talks.html#seminar-at-the-gaussian-processes-study-group-28-march-2022",
+    "href": "talks.html#seminar-at-the-gaussian-processes-study-group-28-march-2022",
+    "title": "Talks",
+    "section": "Seminar at the Gaussian processes study group (28 March 2022)",
+    "text": "Seminar at the Gaussian processes study group (28 March 2022)\nSpatial & spatiotemporal models in the time of COVID-19"
+  },
+  {
+    "objectID": "projects.html",
+    "href": "projects.html",
+    "title": "Projects",
+    "section": "",
+    "text": "My research aims at developing statistical methodology and innovative data analytics, anchored in the Bayesian hierarchical modelling paradigm and machine learning, to improve statistical inference in environment and health studies. I lead the environmental and health statistics group at Imperial College. The main projects I work on are described below."
+  },
+  {
+    "objectID": "projects.html#epidemiological-surveillance",
+    "href": "projects.html#epidemiological-surveillance",
+    "title": "Projects",
+    "section": "Epidemiological Surveillance",
+    "text": "Epidemiological Surveillance\nI have been developing and applying spatio-temporal disease mapping and surveillance models for chronic disease epidemiology, focusing on the detection of areas characterised by unusual trends.\n\n\nFor instance, during the COVID-19 pandemic I worked on hierarchical spatio-temporal models for estimating excess mortality and hospital admissions (Konstantinoudis, Cameletti, et al. 2022; Blangiardo et al. 2020)\nAs part of the project we built a dashboard to disseminate the results, available here\n\n\n\n\n\n\nSpatial excess mortality estimates in 5 countries, from Konstantinoudis, Cameletti, et al. (2022)"
+  },
+  {
+    "objectID": "projects.html#spatio-temporal-models",
+    "href": "projects.html#spatio-temporal-models",
+    "title": "Projects",
+    "section": "Spatio-temporal models",
+    "text": "Spatio-temporal models\nMy research employs flexible, spatio-temporal semi- and nonparametric models for large complex data from environmental and epidemiological studies.\n\n\n\nRecently I have started exploring how wastewater-based epidemiology can be used to predict disease processes which are changing in space and time. We specified a geostatistical model using the network of sites across England and predicted the value at Lower Tier Local Authority level.\nWe also had a webapp to disseminate the results of this project available here\n\n\n\n\n\n\n\nPredicted wastewater SARS-CoV2 concentration Li et al. (2023)\n\n\n\n\n\nI am working on Bayesian non-parametric models and functional data analysis to estimate the air pollution sources from compositional data or particle sizes for particulate matter and linking these to health data.\n\n\n\n\n\n\nConcentration of particle sizes, 2016-2019, Baerenbold et al. (2023)\n\n\n\n\n\n\n\n\nSource profiles around Gatwick airport, 2016-2019 Martinez-Hernndez et al. (2025)\n\n\n\n\n\nI have also developed a framework to integrate individual and aggregated data from multiple sources to better provide confounder adjustment at the area level for environmental epidemiology studies (Wang et al. 2019; Pirani et al. 2020)\n\n\n\n\nDAG of the integrative model"
+  },
+  {
+    "objectID": "projects.html#rss-turing-data-lab",
+    "href": "projects.html#rss-turing-data-lab",
+    "title": "Projects",
+    "section": "RSS-Turing Data Lab",
+    "text": "RSS-Turing Data Lab\nThe work of the Turing-RSS Lab I have been involved with has focused on (i) spatio-temporal modelling of health inequalities during the COVID pandemic (Padellini et al. 2022), (ii) data integration to de-bias prevalence data (Nicholson, Lehmann, et al. 2022)and on (iii) an interoperable concept which proposes a modular way to approach modelling (Nicholson, Blangiardo, et al. 2022)\n\n\n\nTime varying effect of ethnicity and deprivation on COVID-19 test positivity and prevalence"
+  },
+  {
+    "objectID": "projects.html#climate-change",
+    "href": "projects.html#climate-change",
+    "title": "Projects",
+    "section": "Climate Change",
+    "text": "Climate Change\nI have been involved in several projects related to climate change; in particular\n\n\n\nto evaluate the effect of hot temperature on respiratory diseases, using case-crossover designs couple with spatially varying coefficients (Konstantinoudis, Minelli, et al. 2022; Konstantinoudis et al. 2023)\n\n\n\n\n\n\n\nPercentage asthma hospitalisation risk for every 1°C increase in the daily mean summer temperature by sex and region\n\n\n\n\n\n\n\nto assess the impact of changing environmental factors on scorpionism using disease mapping and ecological regression models (Chiaravalloti-Neto et al. 2023)\n\n\n\n\n\n\n\nPosterior means of the predicted relative risks in natural scale obtained from the ecological regression model, for the four seasons of 2008 and 2021, municipalities of the state of São Paulo Chiaravalloti-Neto et al. (2023)"
+  },
+  {
+    "objectID": "projects.html#natural-experiments-for-policy-evaluation",
+    "href": "projects.html#natural-experiments-for-policy-evaluation",
+    "title": "Projects",
+    "section": "Natural experiments for policy evaluation",
+    "text": "Natural experiments for policy evaluation\nThis research programme aims to provide a methodological framework to draw causal inference for longitudinal data, accounting for their hierarchical nature, the existence of time series components and the use of negative outcome controls. We account for the hierarchical nature of the data (in space, such as for electoral wards and/or across organisational units such as schools/universities), which is a key characteristic in many social and epidemiological applications. The flexibility of the approach allow to incorporate trends deviating from linearity (for instance polynomial or splines) and, in line with existing literature, use variable selection techniques such as spike-and-slabs to build a parsimonious regression model for the outcome (Gascoigne et al. 2024; Jeffery et al. 2024).\n\n\n\n\n\nNational average GHQ-12 score for exposed (red) and control (blue) populations. The solid line represents the median value of the posterior distribution, and the shaded region is the 95% Credible Interval Gascoigne et al. (2024)\n\n\n\n\n\n\n\n\nEffects of the hostile environment policy on mental ill health across different ethnic groups compared with people of White ethnicity Jeffery et al. (2024)"
+  }
+]
