@@ -1,0 +1,36 @@
+---
+title: "Talks"
+date: ""
+date-modified: ""
+---
+
+```{r, echo=FALSE, eval=TRUE, include=FALSE}
+library(vembedr)
+```
+
+Some recording of talks and seminars I gave recently:
+
+## Seminar at Southampton University (06/02/2020)
+
+[A data integration approach to adjust for residual confounding in area-referenced environmental health studies](https://southampton.cloud.panopto.eu/Panopto/Pages/Viewer.aspx?id=6498f6bd-d352-40bb-b639-ab5200e14a9d)
+
+## Talk at the UK AI conference, 23-24 March 2022
+
+{{< video https://www.youtube.com/watch?v=WFAy7EStc_k&t=1782s >}}
+
+## TIES virtual conference, 17-18 November 2022
+
+**A dependent Bayesian Dirichlet process model for source apportionment of particle number size distribution**
+
+{{< video https://www.youtube.com/embed/tZDDQfloAAA >}}
+
+## Seminar at the Gaussian processes study group (28 March 2022)
+
+[Spatial & spatiotemporal models in the time of COVID-19](https://www.youtube.com/watch?v=qtiMMV2cSZ8)
+
+## New Horizons in Public Health - The use of AI in public health in the UK
+
+**A focus on ehalth surveillance: wastewater - (from minute 1:03:29)**
+
+{{< video https://www.youtube.com/watch?v=_Y20bmpp8EE >}}
+

@@ -1,0 +1,90 @@
+---
+title: "List of publications"
+page-layout: full
+# bibliography: citations.bib
+# nocite: |
+#    @*
+# csl: harvard-imperial.csl
+---
+
+<!-- This removes the header "References" from the page -->
+
+::: {#refs}
+:::
+
+```{r eval=TRUE}
+#| echo: false
+#| results: asis
+#| message: false
+#| warning: false
+library(tidyverse)
+# Imports biblios from bib into tibble
+bibs=bib2df::bib2df("citations.bib") # or come si chiama il tuo file
+bibs=bibs |> 
+  # Puts the authors' list into a single string, separated by commas
+  rowwise() |> mutate(AUTHOR=paste(unlist(AUTHOR), collapse=", ")) |> ungroup() |>
+  mutate(
+    # Makes your name in bold
+    AUTHOR=stringr::str_replace(AUTHOR,"Blangiardo, Marta","<b>Blangiardo, Marta</b>"),
+    # Formats the pages in a nicer way
+    PAGES=stringr::str_replace(PAGES,"--","-"),
+    PAGES=replace_na(PAGES,"")
+  ) |> 
+  # Creates a single string with the text to be included in the reference list
+   mutate(
+     string=case_when(
+       # If the pages are not present in the bib file, then exclude them
+       PAGES==""~paste0(AUTHOR,
+                   " (",YEAR,"). ",
+                   TITLE,
+                   # This formats the journal in italics
+                   ". <i>",JOURNAL, "</i>. ",
+                   # This makes the URL a hyperlink
+                   "<a href='",URL,"'>",URL,"</a>"),
+       # If they are given, then just include them
+       TRUE~paste0(AUTHOR,
+                   " (",YEAR,"). ",
+                   TITLE,
+                   # This formats the journal in italics
+                   ". <i>",JOURNAL, "</i>. ",
+                   PAGES,". ",
+                   # This makes the URL a hyperlink
+                   "<a href='",URL,"'>",URL,"</a>")
+     )
+   )
+
+# Now use DT::datatable to format they references by date and with searchable fields
+bibs %>% dplyr::select(string,YEAR,CATEGORY) %>% as.data.frame() %>% arrange(desc(YEAR)) %>% 
+  DT::datatable(
+    class = list(stripe = FALSE),
+    escape = FALSE, rownames = FALSE,
+    extensions = c("RowGroup",'Select', 'SearchPanes'),
+    # This allows for regex search
+    selection = 'none',
+    colnames = rep("", ncol(.)),
+    options = list(
+      info = FALSE,
+      paging = FALSE,
+      dom = 'Pfrtip',
+      search = list(regex=TRUE, caseInsensitive=TRUE),
+      searchPanes = list(initCollapsed=TRUE),
+      language = list(lengthMenu = "_MENU_"),
+      rowGroup=list(dataSrc=c(1)),
+      pageLength = 200,
+      columnDefs = list(
+        list(
+          visible=FALSE,targets=c(1,2)
+        ),
+        list(
+          searchPanes = list(show = FALSE), targets = 0
+        ),
+        list(
+          searchPanes = list(show=TRUE,header=c("Select Year")),targets=1
+        ),
+        list(
+          searchPanes = list(show=TRUE,header=c("Select type")),targets=2
+        )
+      )
+    )
+  ) 
+```

@@ -1,0 +1,28 @@
+project:
+  type: website
+  output-dir: docs
+
+website:
+  title: "Marta Blangiardo"
+  page-navigation: true
+  navbar: 
+    logo: "banner.png"
+    title: false
+    left:
+      # - href: index.qmd
+      #   text: Home
+      - projects.qmd
+      - talks.qmd
+      - href: publications.qmd
+        text: "Publications"
+      - href: teaching.qmd
+        text: "Teaching - MSc Epidemiology"
+      
+format:
+  html:
+    theme: cosmo
+    css: styles.css
+    toc: true
+
+editor: visual
+

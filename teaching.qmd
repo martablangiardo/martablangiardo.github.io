@@ -1,0 +1,70 @@
+---
+title: "Teaching - MSc Epidemiology"
+image: "cover.png"
+date: ""
+date-modified: ""
+---
+
+Welcome to the Bayesian Reasoning and Methods for spatio-temporal data module.
+
+Spatial and spatio-temporal analysis represent an increasingly important tool in public health research as well as in geographic and environmental epidemiology due to the emerging availability of spatial/temporal health data and the development of novel computational techniques, allowing for the analysis of large database.  
+
+The module provides a comprehensive introduction to the concepts of Bayesian modelling and inference, and the statistical methods used in analysing spatial and spatio-temporal data.  In the first part of the course, students will learn about the main theoretical concepts of the Bayesian approach to probability and inference, before moving on to statistical modelling and interpretation. Successively, they will acquire concepts, methodologies and practical skills to manipulate, effectively visualize and model spatially- and temporally-related data. At the end of this module, students will be able to handle with confidence spatial and/or temporal data, identify patterns of dependence and level of noise in the data, describe and quantify risk of diseases as well as critically interpret and discuss the results from their analyses.  
+
+Data analysis will be carried out using the statistical software R and model complexity will be handled within a Bayesian framework, while reproducible reporting will be ensured with R-Markdown. 
+
+The module will be delivered by lectures and live computer-based tutorials and practicals, along with quizzes/practical sessions, which will include real-life examples (from environmental science as well as chronic and infectious disease epidemiology), simulative examples and hands-on project.  
+
+**Download and Install R, RStudio and RTools**
+
+We recommend installing the latest version of R, Rtools and Rstudio IDE (Integrated Development Environment). To do so, visit the links below:
+
+- R: https://www.r-project.org/
+- RStudio: https://posit.co/download/rstudio-desktop/
+- RTools: https://cran.r-project.org/bin/windows/Rtools/
+
+If you are installing R and RStudio for the first time, useful suggestions can be found here https://rstudio-education.github.io/hopr/starting.html
+
+**R packages**
+
+1. Install the **stable version of INLA**, following carefully the instructions at the package webpage: https://www.r-inla.org/download-install
+
+2. Run the code below in R to install the main required R packages.
+Note that, during the module's labs, we will work with additional R packages that will be installed at the occurrence.
+
+```r
+install.packages("remotes")
+
+pkg_list = c("sf", "spData", "terra", "stars", "sp", "spdep", "geoR", "fields", "gstat", "tmap", "ggplot2", "RColorBrewer","tidyverse", "mapview", "leaflet", "cowplot", "viridis", "patchwork", "knitr", "kableExtra", "mvtsplot", "GGally", "corrr", "SpatialEpi", "spTimer", "units", "stringr", "inlabru", "fmesher")
+
+remotes::install_cran(pkg_list)
+```
+
+The html version of the slides will be posted here, while the pdf version, the practicals and any other materials will be available on blackboard.
+
+### Week 1
+
+- [Session 1.1 (html)](sessions/Session1.1/index.html): Introduction to Bayesian thinking 
+- [Session 1.2 (html)](sessions/Session1.2/index.html): Introduction to Bayes Theorem
+
+
+### Week 2
+
+- [Session 2.1 (html)](sessions/Session2.1/index.html): Bayes Theorem for random variables and for general Bayesian inference; conjugate families
+- [Session 2.2 (html)](sessions/Session2.2/index.html): Posterior Predictive Distribution and Monte Carlo computation 
+
+
+### Week 3
+
+- [Session 3.1 (html)](sessions/Session3.1/index.html): Introduction to INLA and R-INLA 
+
+### Week 4
+
+- [Session 4.1](sessions/Session4.1/index.html): Introduction to hierarchical models, choice of prior and model checking 
+
+### Week 5
+
+- [Session 5.1](sessions/Session5.1/index.html): Hierarchical models for longitudinal data 
+- [Session 5.2](sessions/Session5.2/index.html): Missing data imputation
+
+

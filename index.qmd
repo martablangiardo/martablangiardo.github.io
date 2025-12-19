@@ -1,0 +1,46 @@
+---
+title: ""
+image: MartaPic.jpg
+image-width: 100px
+image-height: 150px
+about:
+  template: trestles
+  links:
+    - icon: twitter
+      text: twitter
+      href: https://twitter.com/martablangiardo
+    - icon: github
+      text: Github
+      href: https://github.com/martablangiardo
+    - icon: envelope
+      text: email
+      href: "mailto:m.blangiardo@imperial.ac.uk"
+page-layout: full
+---
+
+# Marta Blangiardo
+
+I am a professor of Biostatistics at Imperial College, in the Department of Epidemiology and Biostatistics and I lead the Biostatistics and Data Science theme of the [MRC Centre for Environment and Health](https://environment-health.ac.uk/). I am part-time seconded at the Turing Institute, working with the RSS-TURING lab to provide accurate estimates of COVID-19 incidence and prevalence at Local Authority level. Since 2017 I hold an honorary academic appointment with PHE (now UKHSA).
+
+My main interests are related on the methodological aspects of environmental exposure estimation and on spatial and spatio-temporal models for disease mapping and for risk assessment.
+
+I have co-authored a book on the Integrated Nested Laplace approximation (INLA) for spatial and spatio-temporal applications: [Spatial and Spatio-Temporal Bayesian Models with R-INLA](https://www.google.co.uk/books/edition/Spatial_and_Spatio_temporal_Bayesian_Mod/kaYKCAAAQBAJ?hl=en&gbpv=1&printsec=frontcover)
+
+Check out my research group page at <http://www.envstats.org>
+
+## Education
+
+-   University of Florence \| Italy
+
+    **PhD in Applied Statistics** \| Jan 2002 - Jan 2005
+
+-   University of Milan-Bicocca \| Italy
+
+    **MSci in Statistics, Demography and Social Sciences** \| Sept 1997 - July 2001
+
+## Interests
+
+-   Bayesian statistics
+-   Spatio-temporal modelling
+-   Environmental epidemiology
+-   Climate change
