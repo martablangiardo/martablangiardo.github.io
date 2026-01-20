@@ -21,17 +21,17 @@
   --header-font-is-google: 1;
   --code-font-family: 'Inconsolata';
   --code-font-is-google: 1;
-  --base-font-size: 22px;
+  --base-font-size: 20px;
   --text-font-size: 1rem;
   --code-font-size: 1rem; /*0.9rem;*/
   --code-inline-font-size: 1em;
-  --header-h1-font-size: 1.60rem;
-  --header-h2-font-size: 1.30rem;
-  --header-h3-font-size: 1.05rem;
+  --header-h1-font-size: 2.00rem;
+  --header-h2-font-size: 1.50rem;
+  --header-h3-font-size: 1.10rem;
 
   /* Colors */
   --text-color: #000000;
-  --header-color: #3434ad; /* #24568c; */
+  --header-color: #002c53; /* rgb(0,44,83) */
   --background-color: #FFFFFF;
   --link-color: #C5283D;
   --text-bold-color: #035AA6;
@@ -41,7 +41,7 @@
   --inverse-header-color: #000000;
   --title-slide-background-color: #FFFFFF; /* #035AA6; */
   --title-slide-text-color: #FFFFFF;
-  --header-background-color: #3434ad;
+  --header-background-color: #002c53;
   --header-background-text-color: #FFFFFF;
   --primary: #035AA6;
   --secondary: #03A696;
@@ -67,7 +67,7 @@ body {
 
 /* Headers */
 h1 {
-  color: #fcd000; /* #FFFFFF; */
+  color: #647d97; /* rgb(100,125,151) */
   font-weight: 300;
   font-family: var(--header-font-family);
   background-color: var(--header-background-color);
@@ -116,11 +116,27 @@ h2, h3 {
 .remark-slide-number {
   color: #FFFFFF;
   opacity: 1;
-  font-size: 0.65em;
+  font-size: 0.75em;
   /* Customise position of numbering */
-  margin-bottom: -11.0px;
+  margin-bottom: -9.0px;
   margin-right: 5.0px;
 }
+
+.logo-stats {
+  position: absolute;
+  top: 86.0%;
+  left: 92.0%;
+  text-decoration:none;
+  display: block;
+  height: 3.5em;
+  width: 3.5em;
+  padding: .5em;
+  box-shadow: 5px 5px 7px rgba(33,33,33,.7);
+  background-image: url("ucl-stats/UCL_Stats_logo.jpeg");
+  background-size: contain;
+  border-radius: 6px 6px 6px 6px;
+}
+
 
 /* This defines the format for bold text */
 strong {
@@ -134,7 +150,10 @@ a, a > code {
 }
 a:hover {
   border-bottom: 10px;
-  background-color: #fcd000;
+  background-color: #647d97;
+  color: #002c53;
+  border-radius: 4px 4px 4px 4px;
+  padding: 0 2px 0 2px; 
 }
 
 .footnote {
@@ -160,14 +179,14 @@ a:hover {
 /* Customised title page */
 /* Title slide with box around the title */
 .title-slide h1 {
-  color: #fcd000; /* #FFFFFF; */
+  color: #647d97; /* #FFFFFF; */
   font-family: 'Ubuntu';
   font-size: 40px!important;
   font-weight: 400;
   box-sizing: border-box;
   box-shadow: 10px 10px 5px  rgba(0,0,0,0.6);
   border-radius: 15px;
-  background-color: #3434ad;
+  background-color: #002c53;
   padding: 35px 30px 35px 30px;
   margin-left: 3%;
   margin-right: 3%;
@@ -208,7 +227,7 @@ a:hover {
   /*display: none;*/
   color: #FFFFFF;
   opacity: 1;
-  font-size: 0.75em;
+  font-size: 0em; /* 0.75em; */
   /* Customise position of numbering */
   margin-bottom: -10.0px;
   margin-right: 5.0px;
@@ -352,6 +371,14 @@ table.dataTable.hover tbody tr:hover, table.dataTable.display tbody tr:hover {
     left: 0 !important;
   }
 }
+/* This allows incremental slides to be printed to pdf using
+ * see: https://stackoverflow.com/questions/56373198/get-xaringan-incremental-animations-to-print-to-pdf
+*/
+@media print {
+  .has-continuation {
+    display: block!important;
+  }
+}
 
 /* This defines the basic slides page - including the background image */
 .primary {
@@ -395,8 +422,7 @@ table.dataTable.hover tbody tr:hover, table.dataTable.display tbody tr:hover {
  ****************/
 .large { font-size: 130% }
 .small { font-size: 70% }
-.tiny{font-size: 50%}
-.huge {font-size: 200%}
+.tiny{font-size: 40%}
 
 .center-left {
   position:          relative;
@@ -457,7 +483,7 @@ table.dataTable.hover tbody tr:hover, table.dataTable.display tbody tr:hover {
   color: #ff8811;
 }
 .olive {
-  color: #808000;
+  color: #334f17;
 }
 .ubuntublue {
   color: #035AA6;
@@ -506,24 +532,23 @@ table.dataTable.hover tbody tr:hover, table.dataTable.display tbody tr:hover {
     width: 100%;
     color: #D5D5D5;
     font-size: 70%;
-    background-image: linear-gradient(to right, rgb(0, 34, 102), rgb(164, 148, 215));
+    background-image: linear-gradient(to right, rgb(0, 44, 83), rgb(100, 125, 151));
 }
 .my-footer .alignleft {
   float: left;
   text-align: left;
-  width: 28%;
+  width: 20%;
 }
 .my-footer .aligncenter {
   float: left;
   text-align: center;
-  width: 50%;
-  margin-left: 6%;
+  width: 55%;
 }
 .my-footer .alignright {
   float: left;
   text-align: right;
   width: 25%;
-  margin-left: -6%;
+  margin-left: -8%;
 }
 
 /* A footer to be on the bottom-left corner of the page */
@@ -538,7 +563,7 @@ table.dataTable.hover tbody tr:hover, table.dataTable.display tbody tr:hover {
   width: 100%;
   font-size: 70%;
   color: white;
-  background-image: linear-gradient(to right, rgb(0, 34, 102), rgb(164, 148, 215));
+  background-image: linear-gradient(to right, rgb(0, 44, 83), rgb(100, 125, 151));
   height: 22px;
 }
 
@@ -628,9 +653,9 @@ table.dataTable.hover tbody tr:hover, table.dataTable.display tbody tr:hover {
 */
 .content-box-beamer {
   color: #FFFFF;
-  font-size: 90%;
+  font-size: 80%;
   box-sizing: border-box;
-  border-radius: 5px;
+  border-radius: 15px;
   background-color: #dae4f5;
   padding: 0px 10px 5px 10px;
   box-shadow: 10px 10px 5px  rgba(0,0,0,0.6);
@@ -640,7 +665,7 @@ table.dataTable.hover tbody tr:hover, table.dataTable.display tbody tr:hover {
 */
 .content-box-beamer h3 {
   background-color: #abb3d6;
-  border-radius: 15px 5px 0px 0px;
+  border-radius: 15px 15px 0px 0px;
   margin-left: -10px;
   margin-right: -10px;
   margin-bottom: 5px;
@@ -769,7 +794,7 @@ ol > li {
 */
 ol > li::before {
   content: counter(my-counter);
-  color: #fcd000;
+  color: #002c53;
   font-size: 1.5rem;
   font-weight: normal;
   font-family: "Nanum Pen Script";
@@ -781,7 +806,7 @@ ol > li::before {
   height: var(--size);
   top: 0;
   transform: rotate(-0deg);
-  background: #3434ad; /*black;*/
+  background: #647d97; /*black;*/
   border-radius: 50%;
   text-align: center;
   box-shadow: 1px 4px 0 #999;
@@ -813,4 +838,3 @@ ol > li::before {
   display: inline-block;
   box-shadow: 8px 5px 5px  rgba(0,0,0,0.6);
 }
-
