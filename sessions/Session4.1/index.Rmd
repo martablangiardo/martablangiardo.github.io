@@ -333,7 +333,7 @@ $$\hbox{SIR}_A=\frac{118}{126.38}=0.93$$
 
 - Fewer incident cases of lung cancer for males in ward A than expected in EW after adjusting for differences in age.
 
-- In R we can perform indirect standardization using the package `SpatialEpi` (we will see it in the Practical in week 6).
+- In R we can perform indirect standardization using the package `SpatialEpi` (You will do it in this week homework).
 
 ---
 
@@ -430,15 +430,12 @@ where $a$ and $b$ are unknown parameters and need to be estimated.
 
 # A more flexible hierarchical prior for the relative risks
 - A gamma random effect prior for the $\rho_i$ is mathematically convenient, but might be restrictive:
-
   - Covariate adjustment is difficult
-  
   - Not possible to allow for spatial correlation between risks in nearby areas
 
 --
 
-  - A Normal random effect prior on the $\log \rho_i$ is more flexible:
- 
+- A Normal random effect prior on the $\log \rho_i$ is more flexible:
 \begin{align*}
 y_i &\sim \text{Poisson}(\lambda_i = \rho_i E_i)\\
 \eta_i &= \log \rho_i = b_0 + v_i\\
