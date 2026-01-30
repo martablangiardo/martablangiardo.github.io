@@ -444,6 +444,8 @@ v_i &\sim \text{Normal}(0, \sigma^2_v)
 
 --
 
+`r vspace("-20px")`
+
 - Need to specify hyperprior distributions for:
 
 - $\sigma^2_v$ (between-area variance), e.g. $1/\sigma^2_v \sim \text{Gamma}(1,0.001)$
@@ -457,9 +459,12 @@ Posterior for each $v_i$
 
 - *borrows strength* from the likelihood contributions of **all** the areas, via their joint influence on the estimate of the unknown population (prior) parameter $\sigma^2_v$ 
 
+`r vspace("-10px")`
+
 &rarr; *global smoothing* of the area RR 
 
 &rarr; reflects our *full uncertainty* about the true values of $\sigma^2_v$
+
 
 .content-blue-box[
 Such models are called .red[*Hierarchical*] or .red[*Random effects*] or .red[*Multilevel*] models
@@ -933,7 +938,7 @@ We can answer the first question using .red[methods based on the trade-off betwe
 set.seed(1234)
 air_poll <- rnorm(500,10,2)
 dow<- sample(c(0,1),500,replace=TRUE)
-Pop=1000
+#Pop=1000
 E_asthma <- exp(0.1*air_poll + 0.5*dow)
 y<-c()
 for(i in 1:500){
@@ -946,7 +951,7 @@ data<-data.frame(y=y,x=air_poll,ID=seq(1,500))
 We propose the following model (y=number of asthma attacks, x=level of $PM_{10}$ in the previous 3 days $i=1,\ldots,500$):
 
 \begin{align}
-y_i &\sim \text{Poisson}(Pop \rho_i)\\
+y_i &\sim \text{Poisson}(\rho_i)\\
 \text{log}(\rho_i) &= b_0 + \beta x_i + v_i\\
 b_0, \beta &\sim N(0,0.001)\\
 v_i &\sim N(0,\sigma^2_{v})\\

@@ -458,6 +458,8 @@ v_i &amp;\sim \text{Normal}(0, \sigma^2_v)
 
 --
 
+&lt;span style="display:block; margin-top: -20px ;"&gt;&lt;/span&gt;
+
 - Need to specify hyperprior distributions for:
 
 - `\(\sigma^2_v\)` (between-area variance), e.g. `\(1/\sigma^2_v \sim \text{Gamma}(1,0.001)\)`
@@ -471,9 +473,12 @@ Posterior for each `\(v_i\)`
 
 - *borrows strength* from the likelihood contributions of **all** the areas, via their joint influence on the estimate of the unknown population (prior) parameter `\(\sigma^2_v\)` 
 
+&lt;span style="display:block; margin-top: -10px ;"&gt;&lt;/span&gt;
+
 &amp;rarr; *global smoothing* of the area RR 
 
 &amp;rarr; reflects our *full uncertainty* about the true values of `\(\sigma^2_v\)`
+
 
 .content-blue-box[
 Such models are called .red[*Hierarchical*] or .red[*Random effects*] or .red[*Multilevel*] models
@@ -635,7 +640,7 @@ To obtain the quantile ratio we need to follow these steps:
 
 ```
 Predictor:1 Predictor:2 Predictor:3 
-   1.281979    1.058823    0.700640 
+   1.231411    1.434035    1.297542 
 ```
 &lt;span style="display:block; margin-top: -10px ;"&gt;&lt;/span&gt;
 Note that:
@@ -670,7 +675,7 @@ Note that:
 ```
 
 ```
-[1] 10.75457
+[1] 10.86615
 ```
 
 - The `\(QR90\)` points towards a large spatial variability. 
@@ -755,9 +760,9 @@ where `\(x_{i}\)` is the exposure to sun in each area. Note that `\(b_0\)` , `\(
 ```
 
 ```
-                   mean         sd 0.025quant    0.5quant  0.975quant        mode          kld
-(Intercept) -0.49119663 0.15719392 -0.8050305 -0.48970373 -0.18591772 -0.48973949 4.376006e-08
-x            0.06841513 0.01402741  0.0408243  0.06840119  0.09608742  0.06840194 3.293171e-08
+                   mean         sd  0.025quant    0.5quant  0.975quant        mode          kld
+(Intercept) -0.49119667 0.15719397 -0.80503063 -0.48970377 -0.18591767 -0.48973953 4.376008e-08
+x            0.06841513 0.01402742  0.04082429  0.06840119  0.09608743  0.06840194 3.293173e-08
 ```
 ]
 
@@ -917,7 +922,7 @@ We can answer the first question using .red[methods based on the trade-off betwe
 We propose the following model (y=number of asthma attacks, x=level of `\(PM_{10}\)` in the previous 3 days `\(i=1,\ldots,500\)`):
 
 `\begin{align}
-y_i &amp;\sim \text{Poisson}(Pop \rho_i)\\
+y_i &amp;\sim \text{Poisson}(\rho_i)\\
 \text{log}(\rho_i) &amp;= b_0 + \beta x_i + v_i\\
 b_0, \beta &amp;\sim N(0,0.001)\\
 v_i &amp;\sim N(0,\sigma^2_{v})\\
@@ -962,7 +967,7 @@ Then to get the `\(y_i\)` values we need to incorporate an additional step getti
 
 ```
 Predictor:1 Predictor:2 Predictor:3 
-  1.0313326   0.7011092   1.7418546 
+   1.228366    1.067761    1.736668 
 ```
 ]
 
@@ -1002,9 +1007,9 @@ Then we sample from a Poisson where the mean is the output of the joint posterio
 
 ```
   V1 V2 V3 V4 V5 V6 V7 V8 V9 V10
-1  3  6  4  3  2  1  6  1  3   2
-2  4  0  1  5  6  1  2  2  2   3
-3  3  6  6  9  4  1  7  3  4   6
+1  3  4  4  3  1  5  2  5  1   1
+2  5  0  1  3  2  4  2  5  2   4
+3  3  6  6  9 11  2  6  3  8   7
 ```
 ]
 
