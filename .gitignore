@@ -44,3 +44,5 @@ po/*~
 *.rdb
 
 /.quarto/
+
+**/*.quarto_ipynb
