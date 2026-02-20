@@ -67,4 +67,16 @@ The html version of the slides will be posted here, while the pdf version, the p
 - [Session 5.1](sessions/Session5.1/index.html): Hierarchical models for longitudinal data 
 - [Session 5.2](sessions/Session5.2/index.html): Missing data imputation
 
+### Week 6
+
+- [Session 6](sessions/Session6/index.html): Introduction to spatial data
+
+### Week 7
+
+- [Session 7](sessions/Session7/index.html): Models for areal data - disease mapping and ecological regression
+
+### Week 8
+
+- [Session 8.1](sessions/Session8.1/index.html): Introduction to temporal modelling
+- [Session 8.2](sessions/Session8.2/index.html): Spatio-temporal modelling for area data 
 

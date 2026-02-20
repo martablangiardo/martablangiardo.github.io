@@ -1,0 +1,1366 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>Evaluating policy impact on health inequalities</title>
+    <meta charset="utf-8" />
+    <meta name="author" content="Marta Blangiardo" />
+    <script src="libs/header-attrs/header-attrs.js"></script>
+    <link href="libs/panelset/panelset.css" rel="stylesheet" />
+    <script src="libs/panelset/panelset.js"></script>
+    <!-- (Re)Defines a bunch of LaTeX commands that can then be used directly in the .Rmd file as '\command{...}' -->
+    <script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+      TeX: {
+        /* This enables color macros */
+        extensions: ["color.js"],
+        Macros: {
+          /* Probability & mathematical symbols */
+          Pr: "{\\style{font-family:inherit; font-size: 110%;}{\\text{Pr}}}",
+          exp: "{\\style{font-family:inherit; font-size: 105%;}{\\text{exp}}}",
+          log: "{\\style{font-family:inherit; font-size: 105%;}{\\text{log}}}",
+          ln: "{\\style{font-family:inherit; font-size: 105%;}{\\text{ln}}}",
+          logit: "{\\style{font-family:inherit; font-size: 100%;}{\\text{logit}}}",
+          HR: "{\\style{font-family:inherit; font-size: 105%;}{\\text{HR}}}",
+          OR: "{\\style{font-family:inherit; font-size: 105%;}{\\text{OR}}}",
+          E: "{\\style{font-family:inherit; font-size: 105%;}{\\text{E}}}",
+          Var: "{\\style{font-family:inherit; font-size: 105%;}{\\text{Var}}}",
+          Cov: "{\\style{font-family:inherit; font-size: 105%;}{\\text{Cov}}}",
+          Corr: "{\\style{font-family:inherit; font-size: 105%;}{\\text{Corr}}}",
+          DIC: "{\\style{font-family:inherit; font-size: 105%;}{\\text{DIC}}}",
+          se: "{\\style{font-family:inherit; font-size: 100%;}{\\text{se}}}",
+          sd: "{\\style{font-family:inherit; font-size: 100%;}{\\text{sd}}}",
+          kld: "{\\style{font-family:inherit; font-size: 100%;}{\\text{kld}}}",
+          /* Distributions */
+          dnorm: "{\\style{font-family:inherit;}{\\text{Normal}}}",
+          dt: "{\\style{font-family:inherit;}{\\text{t}}}",
+          ddirch: "{\\style{font-family:inherit;}{\\text{Dirichlet}}}",
+          dmulti: "{\\style{font-family:inherit;}{\\text{Multinomial}}}",
+          dbeta: "{\\style{font-family:inherit;}{\\text{Beta}}}",
+          dgamma: "{\\style{font-family:inherit;}{\\text{Gamma}}}",
+          dbern: "{\\style{font-family:inherit;}{\\text{Bernoulli}}}",
+          dbin: "{\\style{font-family:inherit;}{\\text{Binomial}}}",
+          dpois: "{\\style{font-family:inherit;}{\\text{Poisson}}}",
+          dweib: "{\\style{font-family:inherit;}{\\text{Weibull}}}",
+          dexp: "{\\style{font-family:inherit;}{\\text{Exponential}}}",
+          dlnorm: "{\\style{font-family:inherit;}{\\text{logNormal}}}",
+          dunif: "{\\style{font-family:inherit;}{\\text{Uniform}}}",
+          /* LaTeX formatting */
+          bm: ["{\\boldsymbol #1}",1],
+          /* These create macros to typeset numbers in maths with the basic font */
+          0: "{\\style{font-family:inherit; font-size: 105%;}{\\text{0}}}",
+          1: "{\\style{font-family:inherit; font-size: 105%;}{\\text{1}}}",
+          2: "{\\style{font-family:inherit; font-size: 105%;}{\\text{2}}}",
+          3: "{\\style{font-family:inherit; font-size: 105%;}{\\text{3}}}",
+          4: "{\\style{font-family:inherit; font-size: 105%;}{\\text{4}}}",
+          5: "{\\style{font-family:inherit; font-size: 105%;}{\\text{5}}}",
+          6: "{\\style{font-family:inherit; font-size: 105%;}{\\text{6}}}",
+          7: "{\\style{font-family:inherit; font-size: 105%;}{\\text{7}}}",
+          8: "{\\style{font-family:inherit; font-size: 105%;}{\\text{8}}}",
+          9: "{\\style{font-family:inherit; font-size: 105%;}{\\text{9}}}",
+          /* Health economics quantities */
+          icer: "{\\style{font-family:inherit; font-size: 100%;}{\\text{ICER}}}",
+          nb: "{\\style{font-family:inherit; font-size: 100%;}{\\text{NB}}}",
+          ol: "{\\style{font-family:inherit; font-size: 100%;}{\\text{OL}}}",
+          ceac: "{\\style{font-family:inherit; font-size: 100%;}{\\text{CEAC}}}",
+          evpi: "{\\style{font-family:inherit; font-size: 100%;}{\\text{EVPI}}}",
+          evppi: "{\\style{font-family:inherit; font-size: 100%;}{\\text{EVPPI}}}",
+          evsi: "{\\style{font-family:inherit; font-size: 100%;}{\\text{EVSI}}}"
+        }
+      }
+    });
+    </script>
+    <link rel="stylesheet" href="assets/beamer.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+
+
+
+
+class: title-slide
+
+# Evaluating policy impact on health inequalities&lt;span style="display:block; margin-top: 10px ;"&gt;&lt;/span&gt; 
+
+## Marta Blangiardo
+
+### [Environment and Health Statistics group](https://www.envstats.org/) | [Imperial College London](www.imperial.ac.uk)    
+
+### Explaining and Promoting Health Equity workshop, Trondheim University 
+
+&lt;!-- Can also separate the various components of the extra argument 'params', eg as in 
+### Explaining and Promoting Health Equity workshop, Trondheim University, 24-25 February 2026, Methods and Examples
+--&gt;
+
+24-25 February 2026
+
+&lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
+
+&lt;center&gt;&lt;img src=./img/MRC-Centre-Logo.png width='30%' title='INCLUDE TEXT HERE'&gt;&lt;/center&gt;
+
+---
+
+layout: true  
+
+.my-footer[ 
+.alignleft[ 
+&amp;nbsp; &amp;copy; Marta Blangiardo 
+]
+.aligncenter[
+Methods and Examples 
+]
+.alignright[
+Explaining and Promoting Health Equity workshop, NA 
+]
+] 
+
+
+&lt;style&gt;
+pre {
+  overflow-x: auto;
+}
+pre code {
+  word-wrap: normal;
+  white-space: pre;
+}
+&lt;/style&gt;
+
+
+---
+
+#Policies shape health – and who benefits
+
+&lt;style&gt;
+.image-1 {
+  position: absolute;
+  top: 20%;
+  left: 30%;
+}
+&lt;/style&gt;
+
+- Policies on welfare, housing, health, environment, migration and transport shape people’s living conditions.
+
+- These conditions are not equally distributed `\(\rightarrow\)` they generate health inequalities.
+
+.image-1[ &lt;img src="img/Brexit.png" alt="" style="width:400px;"/&gt; ]
+
+
+---
+
+count:false
+
+#Policies shape health – and who benefits
+
+&lt;style&gt;
+.image-3 {
+  position: absolute;
+  top: 30%;
+  left: 10%;
+}
+&lt;/style&gt;
+
+- Policies on welfare, housing, health, environment, migration and transport shape people’s living conditions.
+
+- These conditions are not equally distributed `\(\rightarrow\)` they generate health inequalities.
+
+.image-1[ &lt;img src="img/Brexit.png" alt="" style="width:400px;"/&gt; ]
+
+
+.image-3[ &lt;img src="img/Sugar.jpg" alt="" style="width:400px;"/&gt; ]
+
+---
+
+count:false
+
+#Policies shape health – and who benefits
+
+&lt;style&gt;
+.image-4 {
+  position: absolute;
+  top: 40%;
+  left: 50%;
+}
+&lt;/style&gt;
+
+- Policies on welfare, housing, health, environment, migration and transport shape people’s living conditions.
+
+- These conditions are not equally distributed `\(\rightarrow\)` they generate health inequalities.
+
+.image-1[ &lt;img src="img/Brexit.png" alt="" style="width:400px;"/&gt; ]
+
+.image-3[ &lt;img src="img/Sugar.jpg" alt="" style="width:400px;"/&gt; ]
+
+.image-4[ &lt;img src="img/SmokingBan.jpg" alt="" style="width:400px;"/&gt; ]
+
+&lt;span style="display:block; margin-top: 450px ;"&gt;&lt;/span&gt;
+
+--
+
+&lt;div style="padding: 0 3em; text-align: center;"&gt;
+.red[*Do policies reduce or widen health gaps between social and ethnic groups, and between areas?*]
+&lt;/div&gt;
+---
+
+# What do we mean by health inequalities?
+
+Differences in health outcomes between social groups, not just between individuals.
+
+.pull-left[
+
+Common axes:
+
+- Area deprivation (most vs least deprived neighbourhoods)
+
+ex. Life expectancy differences of several years between most and least deprived areas.
+
+.white[&lt;span style="display:block; margin-top: 50px ;"&gt;&lt;/span&gt;
+
+- Ethnicity and migration background
+
+ex. Higher mortality following COVID-19 lockdown in minoritised ethnic groups.
+
+&lt;span style="display:block; margin-top: 50px ;"&gt;&lt;/span&gt;
+
+- Employment and welfare status
+
+ex. Higher prevalence of mental distress among people in insecure work or on benefits.
+]
+
+]
+
+.pull-right[
+
+&lt;center&gt;&lt;img src=./img/life_exp.jpg width='80%' title='INCLUDE TEXT HERE'&gt;&lt;/center&gt;
+&lt;div style="padding: 0 3em; text-align: center;"&gt;
+  .small[source: Bennett et al, 2015, Lancet, Volume 386, Issue 9989p163-170 ]
+&lt;/div&gt;
+]
+
+---
+
+count: false
+
+# What do we mean by health inequalities?
+
+Differences in health outcomes between social groups, not just between individuals.
+
+.pull-left[
+
+Common axes:
+
+.white[- Area deprivation (most vs least deprived neighbourhoods)
+
+ex. Life expectancy differences of several years between most and least deprived areas.
+
+&lt;span style="display:block; margin-top: 50px ;"&gt;&lt;/span&gt;
+
+]
+
+- Ethnicity and migration background
+
+ex. Higher mortality following COVID-19 lockdown in minoritised ethnic groups.
+
+.white[
+&lt;span style="display:block; margin-top: 50px ;"&gt;&lt;/span&gt;
+
+- Employment and welfare status
+
+ ex. Higher prevalence of mental distress among people in insecure work or on benefits.
+]
+]
+
+.pull-right[
+&lt;span style="display:block; margin-top: 80px ;"&gt;&lt;/span&gt;
+&lt;center&gt;&lt;img src=./img/covid-ethnicity.jpg width='100%' title='INCLUDE TEXT HERE'&gt;&lt;/center&gt;
+&lt;div style="padding: 0 3em; text-align: center;"&gt;
+  .small[source: Ayoubkhani et al, 2020, Int J Epidemiol. 49(6): 1951–1962]
+&lt;/div&gt;
+]
+
+---
+
+count:false
+
+# What do we mean by health inequalities?
+
+Differences in health outcomes between social groups, not just between individuals.
+
+.pull-left[
+
+Common axes:
+
+.white[
+- Area deprivation (most vs least deprived neighbourhoods)
+
+ex. Life expectancy differences of several years between most and least deprived areas.
+
+&lt;span style="display:block; margin-top: 50px ;"&gt;&lt;/span&gt;
+
+- Ethnicity and migration background
+
+ex. Higher mortality following COVID-19 lockdown in minoritised ethnic groups.
+
+&lt;span style="display:block; margin-top: 50px ;"&gt;&lt;/span&gt;
+]
+
+- Employment and welfare status
+
+ex. Higher prevalence of mental distress among people in insecure work or on benefits.
+
+]
+
+.pull-right[
+&lt;span style="display:block; margin-top: 150px ;"&gt;&lt;/span&gt;
+&lt;center&gt;&lt;img src=./img/employment.jpg width='100%' title='INCLUDE TEXT HERE'&gt;&lt;/center&gt;
+&lt;div style="padding: 0 3em; text-align: center;"&gt;
+  .small[source: Barr et al, 2015, Social Science &amp; Medicine, 147: 324-331]
+&lt;/div&gt;
+
+]
+
+---
+
+# More policies = less evidence?
+
+&lt;style&gt;
+.image-7 {
+  position: absolute;
+  top: 20%;
+  left: 10%;
+}
+
+.image-8 {
+  position: absolute;
+  top: 20%;
+  left: 30%;
+}
+
+.image-9 {
+  position: absolute;
+  top: 20%;
+  left: 40%;
+}
+
+.image-10 {
+  position: absolute;
+  top: 20%;
+  left: 55%;
+}
+
+&lt;/style&gt;
+  
+.center[Evaluating the effects of policy interventions is of crucial importance]
+
+--
+
+.image-7[ &lt;img src="img/COVIDpolicy.jpg" alt="" style="width:450px;"/&gt; ]
+
+--
+
+.image-8[ &lt;img src="img/SmokingBan2.png" alt="" style="width:450px;"/&gt; ]
+
+--
+
+.image-9[ &lt;img src="img/Speed_limit2.png" alt="" style="width:550px;"/&gt; ]
+
+
+--
+
+&lt;span style="display:block; margin-top: 500px ;"&gt;&lt;/span&gt;
+.center[.red[Robust statistical methods needed]]
+
+---
+
+# Also, what about inequalities?
+
+Debate often focuses on average effects in the whole population.
+
+Policymakers also need to know:
+
+- Who benefits?
+
+- Who is harmed?
+
+
+Evaluating the distributional impact of policies is essential to tackle health inequalities.
+
+&lt;span style="display:block; margin-top: 20pt ;"&gt;&lt;/span&gt;
+
+&lt;center&gt;&lt;img src=./img/Vaccine_depr.jpg width='40%' title='INCLUDE TEXT HERE'&gt;&lt;/center&gt;
+
+&lt;div style="padding: 0 3em; text-align: center;"&gt;
+.small[source: Flatt et al. BMJ 2024, https://www.bmj.com/content/387/bmj-2024-079550]
+&lt;/div&gt;
+
+---
+
+
+# Can we infer causality?
+
+- Randomised trials of policies are rarely feasible.
+
+&lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
+
+- We rely on observational longitudinal data.
+
+&lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
+
+- We want effects by social group or area (e.g. deprivation quintile, ethnic group).
+
+&lt;span style="display:block; margin-top: 50px ;"&gt;&lt;/span&gt;
+
+Need:
+- Designs that approximate a trial (quasi‑experimental).
+
+&lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
+
+- Models that handle time, space, dependence and effect heterogeneity.
+
+&lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
+
+- Comparable control groups to deal with residual confounding.
+
+---
+
+# Outline
+
+&lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
+
+1\. Methods: 
+
+- Quasi-experimental design for policy evaluation.
+
+&lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
+
+- Why using Bayesian hierarchical models can be useful.
+
+&lt;span style="display:block; margin-top: 40px ;"&gt;&lt;/span&gt;
+
+
+2\. Examples: 
+
+- Environmental policy – incinerators and infant health
+
+&lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
+
+- Welfare reforms and mental health inequalities
+
+
+&lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
+
+- Immigration policy and ethnic inequalities in mental health
+
+&lt;span style="display:block; margin-top: 40px ;"&gt;&lt;/span&gt;
+
+3\. Discussion
+
+---
+
+# Quasi-experimental designs
+
+.content-box-green[Definition: 
+Research designs that estimate the causal impact of an intervention without randomisation.]
+
+--
+
+Most common designs:
+
+- Interrupted Time Series (ITS): follow one group over time, compare before/after a policy.
+
+- Difference‑in‑Differences (DiD): compare trends in a policy group vs control group.
+
+- To evaluate inequalities:
+
+  - Let groups be defined by deprivation, ethnicity, immigration status, welfare exposure.
+  - Ask whether the before/after changes differ between groups.
+
+--
+
+What we need:
+
+1. Outcome `\(y_{it}\)` : health measure for group or area `\(i\)` at time `\(t\)`
+2. Policy indicator `\(z_{it}\)`: 0 before, 1 after policy.
+3. Group indicator `\(w_i\)` : 1 for disadvantaged group (e.g. most deprived, minoritised ethnicity), 0 for reference group.
+4. Interaction `\(w_i z_t\)`: gives the extra policy effect in the disadvantaged group.
+
+---
+
+# Longitudinal setting: ITS
+
+.content-box-green[**Interrupted Time Series (ITS)**
+                     
+A time series of a particular outcome of interest is "interrupted" by an intervention at a known point in time.
+                   
+Particularly useful for "natural experiments" in real world settings.
+]
+
+.pull-left[
+&lt;center&gt;&lt;img src=./img/ITS.jpg width='80%' title='INCLUDE TEXT HERE'&gt;&lt;/center&gt;
+  
+.small[Kontopantelis et al., BMJ 2015; 350: h2750]
+]
+
+.pull-right[
+In its general formulation:
+    
+- Linear effect of intervention.
+&lt;span style="display:block; margin-top: 10px ;"&gt;&lt;/span&gt;
+- Do not account for external time varying effects or autocorrelation.
+&lt;span style="display:block; margin-top: 10px ;"&gt;&lt;/span&gt;
+- Do not include controls.
+&lt;span style="display:block; margin-top: 10px ;"&gt;&lt;/span&gt;
+- Causal effects: step and slope change.
+]
+
+We can fit separate ITS models by strata (e.g. deprivation quintiles) or allow group‑specific level/slope changes.
+
+---
+  
+# Difference in difference
+
+&lt;!--
+https://www.publichealth.columbia.edu/research/population-health-methods/difference-difference-estimation
+
+--&gt;
+
+If controls are available the difference-in-difference approach (DID) is a popular choice:
+  
+.pull-left[
+&lt;center&gt;&lt;img src=./img/d-i-d.png width='60%' title='INCLUDE TEXT HERE'&gt;&lt;/center&gt;
+    
+.small[Polsky and Baiocchi, in Encyclopedia of Health Economics, 2014]
+]
+
+.pull-right[
+&lt;span style="display:block; margin-top: 10px ;"&gt;&lt;/span&gt;
+- Do not account for external time varying effects or autocorrelation
+&lt;span style="display:block; margin-top: 10px ;"&gt;&lt;/span&gt;
+- Before-after approach
+&lt;span style="display:block; margin-top: 10px ;"&gt;&lt;/span&gt;
+- Causal effects: step change
+&lt;span style="display:block; margin-top: 10px ;"&gt;&lt;/span&gt;
+- To evaluate inequalities the analysis can be stratified by ethnicity / deprivation, etc.; The DiD estimate captures the change in the gap between groups after the policy.
+]
+
+
+&lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt; 
+
+
+Other methods under this umbrella: segmented regression, regression discontinuity...
+
+---
+
+# Longitudinal data for policy evaluation
+
+We observe repeated measures of health over time:
+
+&lt;span style="display:block; margin-top: 10px ;"&gt;&lt;/span&gt;
+
+- by area (e.g. local authorities), or
+
+&lt;span style="display:block; margin-top: 10px ;"&gt;&lt;/span&gt;
+
+- by individuals in panel surveys.
+
+&lt;span style="display:block; margin-top: 30px ;"&gt;&lt;/span&gt;
+
+Data exhibit autocorrelation (today depends on yesterday) and often spatial correlation (neighbouring areas similar).
+
+&lt;span style="display:block; margin-top: 10px ;"&gt;&lt;/span&gt;
+
+Ignoring these can bias estimates of policy effects and their uncertainty.
+
+&lt;span style="display:block; margin-top: 30px ;"&gt;&lt;/span&gt;
+
+Hierarchical models give a natural way to incorporate this structure.
+
+---
+
+# A general framework
+  
+These methods have been developed to perform causal inference on longitudinal data dealing with specific data availability
+
+- They are similar! 
+  
+  
+.content-box-green[**AIM**
+                       
+- Build a general framework for quasi-experimental designs in a longitudinal setting that works with multiple groups and areas.
+
+- Deal with a common limitation: lack of additional dependence (e.g. in space) &amp; generally simplified assumptions on trends (computational reasons / to make life easy)
+
+- Can explicitly models differences between social and ethnic groups.
+
+- Provides policy‑relevant contrasts, such as changes in deprivation or ethnicity gaps.                     
+
+`\(\Rightarrow\)` Bayesian Hierarchical Modelling Framework
+]
+
+---
+  
+# Can we re-frame this?
+
+We can write many ITS and DiD setups as a single regression‐type model where policy, time and group indicators, and their interactions, describe how policies change overall levels and inequalities.
+
+.panelset[
+.panel[.panel-name[Bayesian Hierarchical Framework]
+           
+For each unit `\(i=1,\ldots,I\)` (areas or individuals) and time `\(t=1,\ldots, T\geq \text{2}\)`, the data comprise: 
+             
+&lt;span style="display:block; margin-top: 10px ;"&gt;&lt;/span&gt;
+           
+- the outcome `\(y_{it}\)`; 
+&lt;span style="display:block; margin-top: 10px ;"&gt;&lt;/span&gt;
+           
+- a vector of `\(K\)` covariates (confounders) `\(\bm{X}_{it}=(X_{it1},\ldots,X_{itK})\)`; 
+           
+&lt;span style="display:block; margin-top: 10px ;"&gt;&lt;/span&gt;
+           
+- an indicator variable `\(z_{t}=1\)` if the intervention is being applied at time `\(t\)` and 0 otherwise; 
+           
+&lt;span style="display:block; margin-top: 10px ;"&gt;&lt;/span&gt;
+           
+- an indicator variable `\(w_{i}=1\)` if unit `\(i\)` is exposed and 0 if it is a control.
+           
+&lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
+           
+The generalised linear predictor for the average of the outcome `\(\mu_{it}\)`:
+             
+`$$E[y_{it}] = h(\mu_{it}) = \alpha_0 + \alpha_1 w_i + \delta_0 z_{t} + \delta_1 w_i z_t+ \sum_{k=1}^K \beta_k X_{itk} + \gamma_i + \boldsymbol{\lambda}_t$$`
+]
+    
+.panel[.panel-name[Why hierarchical]
+           
+- Flexible structure - adapt to data availability:
+             
+`\(\Rightarrow\)` Can include controls and non linearity in time trends.
+
+- Allows partial pooling of effects across areas/groups - more stable estimates of inequality impacts where data are sparse.
+           
+- Account for dependencies in space / across units: 
+             
+`\(\Rightarrow\)` `\(\bm{\gamma}\)` captures unexplained differences between areas or groups. It can be modelled as exchangeable or spatially structured (neighborhood or distance based); 
+           
+- `\(\delta_1\)` `\((\delta_0)\)` identifies the causal effect of the intervention. Additional time dependent causal effects can be obtained through `\(\lambda_t\)` if appropriate.
+           
+`$$E[y_{it}] = h(\mu_{it}) = \alpha_0 + \alpha_1 w_i + \delta_0 z_{t} + \delta_1 w_i z_t+ \sum_{k=1}^K \beta_k X_{itk} + \gamma_i + \boldsymbol{\lambda}_t$$`
+]
+    
+.panel[.panel-name[Why Bayesian]
+           
+- Can include relatively vague information in the priors, which can still help regularise the inference
+           
+`\(\rightarrow\)` Avoid inconsistent estimates because of small numbers/separation
+           
+`\(\rightarrow\)` Use Penalised Complexity (PC) priors
+
+&lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
+
+- Direct characterisation of full uncertainty in all model parameters
+
+`\(\rightarrow\)` posterior distributions for policy effects within each group and for differences between groups, directly quantifying uncertainty about changes in inequalities.
+           
+`\(\rightarrow\)` Can then rescale (e.g. from regression coefficients to original scores etc) and still obtain samples from the full posterior distributions
+           
+`\(\rightarrow\)` Particularly helpful for generalised linear models and for obtaining functions of original parameters
+           
+`\(\rightarrow\)` Can aggregate at any space-time resolution
+
+           
+]
+]
+---
+
+# Example: incinerators effects on health
+  
+- Recent increase in incineration of municipal waste in response to European Union (EU) legislation to divert waste from landfills.
+&lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
+
+- Few studies available, despite public concern about potential for adverse effects from this and other waste management processes on birth and other health outcomes.
+
+&lt;!-- - EU Waste Incinerator Directive aims  at reducing and preventing negative effects on the environment produced from incineration. --&gt; 
+  
+--
+  
+.pull-left[
+&lt;center&gt;&lt;img src=./img/NOincinerator.png width='65%' title='INCLUDE TEXT HERE'&gt;&lt;/center&gt;
+]
+
+.pull-right[
+&lt;center&gt;&lt;img src=./img/Incinerators_reuters.png width='85%' title='INCLUDE TEXT HERE'&gt;&lt;/center&gt;
+]
+
+---
+  
+# The project
+  
+&lt;center&gt;&lt;img src=./img/Project_inc.png width='100%' title='INCLUDE TEXT HERE'&gt;&lt;/center&gt;
+
+---
+  
+# Data
+  
+.pull-left[
+- Eight Municipal Waste Incinerators (MWIs) opening within 2003-10; study period  1998-2012.
+&lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
+- Exposed areas as middle super output areas whose centroids lay within a 10km radius buffer of each of the eight MWIs.
+&lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
+- Matched 10km buffers as controls,  based on  live births, mean percentage of low social class, lack of car ownership, overcrowding,  male unemployment, population density and non-white percentage ethnicity. 
+    
+&lt;center&gt;&lt;img src=./img/Controls_inc.png width='100%' title='INCLUDE TEXT HERE'&gt;&lt;/center&gt;
+    
+]
+
+.pull-right[
+&lt;span style="display:block; margin-top: 50px ;"&gt;&lt;/span&gt;
+  
+&lt;center&gt;&lt;img src=./img/incloc1.png width='100%' title='INCLUDE TEXT HERE'&gt;&lt;/center&gt;
+]
+
+---
+  
+#The model 
+  
+`\(y_{itj} \sim Bin(\mu_{itj},n_{itj} )\)` for  infant mortality;
+
+`\(y_{itj} \sim \mathcal{N}(\mu_{itj}, \sigma^2)\)` for sex ratio.  
+
+
+On the linear predictor
+
+`$$h(\mu_{itj}) = {\color{red}{\alpha_0 + \alpha_1 w_{i}}} +
+  \psi_0 t + \psi_1 w_{i} t  + \delta_0 z_{tj_i}(t-t_{0j_i}) + \delta_1 w_{i} z_{tj_i}(t-t_{0j_i}) + \sum_{k=1}^K \beta_k X_{ik} + \gamma_i$$`
+  
+&lt;span style="display:block; margin-top: 30px ;"&gt;&lt;/span&gt;
+
+.pull-left[
+&lt;center&gt;&lt;img src=./img/InfMort.png width='75%' title='INCLUDE TEXT HERE'&gt;&lt;/center&gt;
+]
+
+&lt;!-- CG: above uses lambda*t and psi*t whereas below there is lambda_t and psi_t. Are these parameters (i.e., betas) of linear trend in time or a function of time? --&gt;
+  
+&lt;!-- CG: t_0 is the start of the intervention? or the start of time? Figure its the former --&gt;
+  
+.pull-right[
+- Linear trends on time
+- On `\(\gamma_i\)`  we assume a combination of spatial and unstructured random effects
+
+]
+
+---
+
+count:false
+
+#The model 
+  
+`\(y_{itj} \sim Bin(\mu_{itj},n_{itj} )\)` for  infant mortality;
+
+`\(y_{itj} \sim \mathcal{N}(\mu_{itj}, \sigma^2)\)` for sex ratio.  
+
+
+On the linear predictor
+
+`$$h(\mu_{itj}) = \alpha_0 + \alpha_1 w_{i} +
+  {\color{red}{\psi_0 t + \psi_1 w_i t}}  + \delta_0 z_{tj_i}(t-t_{0j_i}) + \delta_1 w_i z_{tj_i}(t-t_{0j_i}) + \sum_{k=1}^K \beta_k X_{ik} + \gamma_i$$`
+  
+&lt;span style="display:block; margin-top: 30px ;"&gt;&lt;/span&gt;
+
+.pull-left[
+&lt;center&gt;&lt;img src=./img/InfMort.png width='75%' title='INCLUDE TEXT HERE'&gt;&lt;/center&gt;
+]
+
+&lt;!-- CG: above uses lambda*t and psi*t whereas below there is lambda_t and psi_t. Are these parameters (i.e., betas) of linear trend in time or a function of time? --&gt;
+  
+&lt;!-- CG: t_0 is the start of the intervention? or the start of time? Figure its the former --&gt;
+  
+.pull-right[
+- Linear trends on time
+- On `\(\gamma_i\)`  we assume a combination of spatial and unstructured random effects
+
+]
+
+&lt;!-- 5 years before and after the policy --&gt;
+
+&lt;!-- Excess in females in exposure areas reported before, but not here --&gt;
+
+---
+
+count:false
+
+#The model 
+  
+`\(y_{itj} \sim Bin(\mu_{itj},n_{itj} )\)` for  infant mortality;
+
+`\(y_{itj} \sim \mathcal{N}(\mu_{itj}, \sigma^2)\)` for sex ratio.  
+
+
+On the linear predictor
+
+`$$h(\mu_{itj}) = \alpha_0 + \alpha_1 w_{i} +
+ \psi_0 t + \psi_1 w_i t  +  {\color{red}{\delta_0 z_{tj_i}(t-t_{0j_i}) + \delta_1 w_i z_{tj_i}(t-t_{0j_i})}} + \sum_{k=1}^K \beta_k X_{ik} + \gamma_i$$`
+  
+&lt;span style="display:block; margin-top: 30px ;"&gt;&lt;/span&gt;
+
+.pull-left[
+&lt;center&gt;&lt;img src=./img/InfMort.png width='75%' title='INCLUDE TEXT HERE'&gt;&lt;/center&gt;
+]
+
+&lt;!-- CG: above uses lambda*t and psi*t whereas below there is lambda_t and psi_t. Are these parameters (i.e., betas) of linear trend in time or a function of time? --&gt;
+  
+&lt;!-- CG: t_0 is the start of the intervention? or the start of time? Figure its the former --&gt;
+  
+.pull-right[
+- Linear trends on time
+- On `\(\gamma_i\)`  we assume a combination of spatial and unstructured random effects
+
+]
+
+---
+
+# Interpretation
+  
+&lt;span style="display:block; margin-top: 50px ;"&gt;&lt;/span&gt;
+
+&lt;center&gt;&lt;img src=./img/Effects_inc.png width='100%' title='INCLUDE TEXT HERE'&gt;&lt;/center&gt;
+
+- `\(\delta_0\)`: potential discontinuity in controls before-after intervention.
+
+&lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
+
+- `\(\delta_1\)`: difference of differences before - after intervention between exposed and controls (at intervention time).
+
+--
+  
+&lt;span style="display:block; margin-top: 50px ;"&gt;&lt;/span&gt;
+
+- Rich output means that we can easily look at differences for specific times before-after.
+
+&lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
+
+- Potential flexibility of the model traded-off with the difficulty in interpretation if a more flexible time trend is considered.
+
+
+---
+  
+# Incinerators and area inequalities
+  
+&lt;center&gt;&lt;img src=./img/Incinerator_results.jpg width='50%' title='INCLUDE TEXT HERE'&gt;&lt;/center&gt;
+
+- Compare changes in infant mortality between areas with new incinerators and matched areas with similar social profiles.
+
+- Matching on deprivation, overcrowding, car ownership, etc. helps isolate the environmental policy from underlying social inequalities.
+
+- Results show no strong evidence that the policy to open new incineration facilities changed infant mortality.
+
+---
+
+
+# Example: Welfare policies and mental health
+  
+.pull-left[
+&lt;span style="display:block; margin-top: 50px ;"&gt;&lt;/span&gt;
+
+- As a modern welfare state, one of the core functions of Government is to promote equitable social and economic wellbeing for its citizens. 
+    
+&lt;span style="display:block; margin-top: 10px ;"&gt;&lt;/span&gt;
+    
+- Broad set of policy levers, ranging from taxation, welfare reform, migration policy to the provision of public health care
+    
+&lt;span style="display:block; margin-top: 10px ;"&gt;&lt;/span&gt;
+    
+- Ineffective implementation of policy may result in negative consequences for population mental health, especially when intentionally or unintentionally generates or perpetuates social and economic inequities in society
+    
+]
+
+.pull-right[
+&lt;center&gt;&lt;img src=./img/EPITOME.png width='200%' title='INCLUDE TEXT HERE'&gt;&lt;/center&gt;
+]
+
+---
+
+
+# Universal credit
+
+.pull-left[
+- UC was introduced in the UK in the early 2010s by the coalition government led by the Conservatives
+
+&lt;span style="display:block; margin-top: 10px ;"&gt;&lt;/span&gt;
+
+- Theoretical aim was to simplify and facilitate access and receipt of welfare according to need. 
+
+&lt;span style="display:block; margin-top: 10px ;"&gt;&lt;/span&gt;
+
+- In practice lengthy delay in payment and increased sanction with individuals receiving reduced amounts or no amount of welfare support at all for long periods
+
+&lt;span style="display:block; margin-top: 30px ;"&gt;&lt;/span&gt;
+
+- UC may have different impacts for people in secure vs insecure work and across deprivation levels.
+
+- We ask:
+  1. Did UC change overall mental distress?
+  2. Did it widen or narrow the mental health gap between employed vs unemployed, more vs less deprived local authorities?
+
+
+]
+
+.pull-right[
+&lt;center&gt;&lt;img src=./img/UC_MH.png width='80%' title='INCLUDE TEXT HERE'&gt;&lt;/center&gt;
+
+&lt;center&gt;&lt;img src=./img/TrussellTrust.jpg width='40%' title='INCLUDE TEXT HERE'&gt;&lt;/center&gt;
+]
+
+---
+
+#Data &amp; Model
+
+- [UK Household Longitudinal Survey](https://www.understandingsociety.ac.uk/) ("*Understanding Society*")
+
+&lt;span style="display:block; margin-top: 10px ;"&gt;&lt;/span&gt;
+
+- Age 16-64 with 
+  - (i) employment status, 
+  - (ii) Lower Layer Super Output Area (LSOA) of residence, 
+  - (iii) responded at least once to mental health questionnaire - score from 0 - 36 derived from the GHQ-12 questionnarie where higher scores indicating more severe impairment
+
+- Period: 2009-2020
+
+&lt;span style="display:block; margin-top: 10px ;"&gt;&lt;/span&gt;
+
+.pull-left[
+- **Exposure variable** was defined as unemployment status
+
+&lt;span style="display:block; margin-top: 10px ;"&gt;&lt;/span&gt;
+
+- **Policy definition** contextual awareness using monthly statistics (Department of Work and Pensions) of UC - when it reaches 25% we assume the Local Authority has switched to UC. 
+&lt;span style="display:block; margin-top: 10px ;"&gt;&lt;/span&gt;
+
+- **Confounders**  (individuals) age, education level, ethnicity, relationship status, and sex; (area level) social deprivation and ethnic diversity  
+]
+
+.pull-right[
+&lt;span style="display:block; margin-top: -20px ;"&gt;&lt;/span&gt;
+`\begin{align*}
+E(Y_{it})=h(\mu_{it})= &amp; \alpha_{0} + \alpha_{1} w_{it} + \psi_{0} {t} +  \psi_{1} {t} w_{it}  +\\
+&amp;{\color{red}{\delta_{0}^{\star} z_{it} + \delta_{1}^{\star} z_{it} w_{it}}}  + \\
+&amp;\delta_{0} z_{it}(t - {t_{0i}}) + \delta_{1} z_{it} (t - {t_{0i}}) w_{it} +\\
+&amp; \sum_{k=1}^K \beta_k X_{itk} + 
+\lambda_t + \boldsymbol{\gamma}_i 
+\end{align*}`
+
+- `\(\boldsymbol{\gamma}_i\)` includes individual, spatial random effect and strata/clusters coming from the survey design
+
+- Immediate and sustained effects estimated  
+
+]
+
+---
+
+# National average effect on mental distress 
+
+&lt;center&gt;&lt;img src=./img/Fixed_effects.png width='100%' title='INCLUDE TEXT HERE'&gt;&lt;/center&gt;
+
+---
+
+# Standardised change
+
+.content-box-green[**Standardised change**
+
+It estimates the change in the score in the exposed population before and after the intervention, while adjusting for what happens in the controls during the same period.
+]
+
+- E=exposed; 
+- C=non exposed; 
+- A= time points after the introduction of the policy; 
+- B=time points before the introduction of the policy 
+
+1. `\(p^\text{EA} = \mu^{^\text{EA}}\)`
+posterior distribution of the average linear predictor for all exposed individuals after the intervention only
+
+2. `\(\tilde{p}^\text{EB} = \mu^\text{EB} \frac{\mu^\text{CA}}{\mu^\text{CB}}\)`
+posterior distribution of the average linear predictor for all exposed individuals before the intervention only 
+`\(\rightarrow\)` rescaling using the controls
+
+3. `\(\rho = ({p^\text{EA} - \tilde{p}^\text{EB}}) / {\tilde{p}^\text{EB}}\)`
+
+is a **standarsised change of the impact of UC on mental distress**
+
+`\(\rightarrow\)` Full posterior distribution
+
+`\(\rightarrow\)` Useful to provide group-specific results (e.g. by deprivation)
+
+---
+
+# Results: standardised change
+
+&lt;center&gt;&lt;img src=./img/universal-credit.jpg width='65%' title='INCLUDE TEXT HERE'&gt;&lt;/center&gt;
+
+- UC impact on mental health showed large geographical variability
+
+- UC was associated with a greater worsening of mental health in more deprived areas, suggesting a regressive impact on inequalities.
+---
+
+  
+# The Windrush generation
+  
+.pull-left[
+&lt;center&gt;&lt;img src=./img/windrush.png width='100%' title='INCLUDE TEXT HERE'&gt;&lt;/center&gt;
+  ]
+
+.pull-right[
+- After the Second World War, the UK faced severe labour shortages. To make up for this they encouraged people from British Colonies to move to the UK, with the promise of jobs, a better standard of living, and British Citizenship 
+    
+- Between 1948 and 1970, nearly half a million people moved from the Caribbean to Britain. These individuals became known as the **Windrush Generation**, after the ship which carried some of the first migrants
+    
+- The Immigration Act of 1971 meant that only commonwealth citizens who arrived before 1971 were allowed the right to stay in the UK
+    
+- However, in 2010 the British Home Office destroyed all migration records from the 1950s and 1960s
+  
+- This meant that many people who came to Britain as part of the Windrush Generation, and many of their children, no longer had evidence of their right-to-stay
+]
+
+---
+  
+# Hostile environment and the Windrush scandal
+  
+.pull-left[
+- The UK government (under pressure from nationalist/populist parties pushing for brexit), started a series of immigration reforms, collectively known as the *hostile environment policy*, in **2012** followed by the Immigration Act in **2014**
+      
+
+      
+- These policies deliberately aimed to make life difficult for migrants and operated on a "deport first, ask questions later" basis
+    
+
+      
+- In **2017** the "[Windrush scandal](https://en.wikipedia.org/wiki/Windrush_scandal)" hits the mainstream media headlines and cost her job to the new Home Secretary, Amber Rudd, but not to the one who actually enacted the policy...
+    
+]
+
+.pull-right[
+  
+&lt;center&gt;&lt;img src=./img/media-coverage.png width='100%' title='INCLUDE TEXT HERE'&gt;&lt;/center&gt;
+]
+
+&lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
+
+.center[.red[Did immigration policy changes disproportionately affect mental health of specific ethnic groups?]]
+---
+  
+# Data and timeline
+  
+We use data from The [UK Household Longitudinal Survey](https://www.understandingsociety.ac.uk/) ("*Understanding Society*")
+
+### Participants
+- Age 16+, responded at least once to mental health questionnaire
+
+### Timing
+- 12x 24 month “waves”, January 2009 to March 2020
+- Avoid "Covid" confounding...
+
+### Outcome &amp; exposure
+- Outcome: Mental ill health using the GHQ score
+
+- Exposures: 
+  - Immigration Act 2014
+  - Windrush media coverage 2017
+  - Exposed ethnicities: Black African, Black Caribbean, Indian, Pakistani, Bangladeshi vs White
+
+- Main confounders:  age, sex, urban/rural, IMD, children, UK born, education, working condition
+
+---
+  
+# Study design 
+
+&lt;!--Question: the  starred one is not the average effect rather than the immediate? --&gt;
+
+.pull-left[
+
+&lt;center&gt;&lt;img src=./img/timeline.png width='150%' title='INCLUDE TEXT HERE'&gt;&lt;/center&gt;
+]
+
+.pull-right[ 
+For individual `\(i\)`, ethnical group `\(j\)`, month `\(t\)` 
+&lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
+`\begin{align*}
+E(Y_{ijt})= h(\mu_{ijt}) &amp;= \alpha_{0} + \alpha_{j} w_{j_i} + \psi_{0} t + \psi_{j} w_{j_i} t + \\
+&amp;{\color{red}{\phi_{0}^{\star} z_{t}^{1} + \phi_{j}^{\star} z_{t}^{1} w_{j_i}}} + \\
+&amp;{\color{red}{\phi_{0} z_{t}^{1} (t - t_{0}^{1})}} + {\color{red}{\phi_{j} z_{t}^{1} (t - t_{0}^{1}) w_{j_i}}} + \\
+&amp;{\color{red}{\delta_{0}^{\star} z_{t}^{2} + \delta_{j}^{\star} z_{t}^{2} w_{j_i}}} + \\
+&amp;{\color{red}{\delta_{0} z_{t}^{2} (t - t_{0}^{2})}} + {\color{red}{\delta_{j} z_{t}^{2} (t - t_{0}^{2}) w_{j_i}}} + \\
+&amp; \sum_{k=1}^K \beta_k X_{itk} + \gamma_i + \lambda_t
+\end{align*}`
+]
+
+.pull-left[
+- More than one **policy**
+- More than one **exposed groups**
+]
+
+.pull-right[
+&lt;span style="display:block; margin-top: -100px ;"&gt;&lt;/span&gt;
+
+- `\(\phi_{0}^{\star}\)`, `\(\phi_{j}^{\star}\)`, `\(\delta_{0}^{\star}\)` and `\(\delta_{j}^{\star}\)` immediate effect of first and second policies for control and `\(j\)` exposure groups
+- `\(\phi_{0}\)` and `\(\phi_{j}\)`, `\(\delta_{0}\)` and `\(\delta_{j}\)` sustained effect of first and second policies for control and `\(j\)` exposure groups
+]
+
+--
+
+
+.red[Interactions between policy indicators and ethnic group indicators capture changes in ethnic inequalities in mental health]
+
+---
+
+# Results
+
+
+
+&lt;img src="./img/unnamed-chunk-3-1.png" &gt;
+- Evidence of increased psychological distress among some minoritised groups following immigration policy changes.
+
+- Estimates suggest a widening of ethnic inequalities in mental health, particularly after high‑profile media coverage.
+
+
+&lt;!-- we found evidence of greater psychological distress in people from Black Caribbean backgrounds than White participants after implementation of the Immigration Act 2014 (MD 0·67, 95% CrI 0·06 to 1·28). This effect persisted for several years, shown by the absence of difference over time since implementation of the Immigration Act 2014. We also found evidence that the Black Caribbean group had a further increase in psychological distress relative to White participants after the Windrush scandal media coverage commenced in 2017 (MD 1·28, 95% CrI 0·34 to 2·21).
+
+Apart from Black Caribbean (where the immediate effect of the policy is strong), there's an increase in mental distress between the two periods and post media seems to have a bigger effect across all ethnic groups
+
+included ethnic group, the exposure period, all aforementioned confounders, a linear fixed effect for time (by year), a linear fixed effect for time since the start of each exposure period (by year), random effects to model residual temporal confounding (by year), and residual spatial confounding (by local authority area). These random effects accounted for variation not captured by our measured fixed effects. We specified weakly informative priors for all model parameters; these allow one to stabilise the inference while not imposing overbearing restrictions on the parameters’ values. We fitted the interrupted time series model using integrated nested Laplace approximations (INLA) through the R-INLA package --&gt;
+
+
+---
+
+# Discussion - implications for health inequalities
+
+- Flexible Bayesian hierarchical quasi‑experimental framework to evaluate policy effects on health and health inequalities.
+
+&lt;span style="display:block; margin-top: 10px ;"&gt;&lt;/span&gt;
+
+- Handles dependencies over time and space, and allows heterogeneous effects across social, ethnic or area groups.
+
+&lt;span style="display:block; margin-top: 10px ;"&gt;&lt;/span&gt;
+
+- Can produce policy‑relevant contrasts: changes in deprivation gradients, ethnic gaps, or area‑level inequalities.
+
+&lt;span style="display:block; margin-top: 10px ;"&gt;&lt;/span&gt;
+
+- It naturally allows the construction of additional quantities of interest with their associated uncertainty
+
+
+&lt;span style="display:block; margin-top: 30px ;"&gt;&lt;/span&gt;
+
+- Caveat: it cannot always be framed in a traditional causality perspective, but it allows to evaluate the effect of intervention in a regression-type model
+
+&lt;span style="display:block; margin-top: 10px ;"&gt;&lt;/span&gt;
+
+- Still relies on assumptions (e.g. parallel trends, correct specification of time trends and confounders).
+
+&lt;span style="display:block; margin-top: 30px ;"&gt;&lt;/span&gt;
+
+---
+
+# Acknowledgments
+
+.pull-left[
+
+&lt;span style="display:block; margin-top: 50px ;"&gt;&lt;/span&gt;
+
+.pull-left[
+&lt;center&gt;&lt;img src=./img/PHE.png width='100%' title='INCLUDE TEXT HERE'&gt;&lt;/center&gt;]
+.pull-right[
+&lt;center&gt;&lt;img src=./img/ScottishGov.png width='60%' title='INCLUDE TEXT HERE'&gt;&lt;/center&gt;
+]
+
+.center[
+Anna Freni Sterrantino (ATI),
+
+Rebecca Ghosh (UKHSA), 
+
+Daniela Fecht (ICL), 
+
+Mireille Toledano (ICL), 
+
+Paul Elliott (ICL), 
+
+Anna Hansell (Leicester)
+]
+]
+
+.pull-right[
+&lt;span style="display:block; margin-top: 50px ;"&gt;&lt;/span&gt;
+
+&lt;center&gt;&lt;img src=./img/Wellcome.png width='30%' title='INCLUDE TEXT HERE'&gt;&lt;/center&gt;
+
+.center[
+Connor Gascoigne (ICL)
+
+Annie Jeffrey (UCL)
+
+Gianluca Baio (UCL)
+
+James Kirkbride (UCL)
+
+Sara Geneletti (LSE)
+
+Jennifer Dykxhoorn (UCL)
+
+Zejing Shao (UCL)
+]
+]
+
+---
+
+# References
+
+- Freni-Sterrantino et al. Bayesian spatial modelling for quasi-experimental designs: An interrupted time series study of the opening of Municipal Waste Incinerators in relation to infant mortality and sex ratio, *Environment International*, 2019 Jul:128:109-115. .url[](https://doi:10.1016/j.envint.2019.04.009)
+
+
+- Gascoigne et al. A Bayesian Interrupted Time Series framework for evaluating policy change on mental well-being: An application to England’s welfare reform, *Spatial and Spatio-Temporal Epidemiology* 50, August 2024, 100662, .url[](https://doi.org/10.1016/j.sste.2024.100662)
+
+
+- Jeffrey et al. The effect of immigration policy reform on mental health in people from minoritised ethnic groups in England: an interrupted time series analysis of longitudinal data from the UK Household Longitudinal Study cohort, *Lancet Psychiatry* 11(3), 183-192, .url[](https://doi.org/10.1016/S2215-0366(23)00412-1)
+
+
+- 
+.center[&lt;center&gt;&lt;img src=./img/thankyou.png width='40%' title='INCLUDE TEXT HERE'&gt;&lt;/center&gt;]
+
+
+setwd("C:\\Users\\magb\\Dropbox\\Conferences-Talks\\GEOMEDs\\GEOMED2024")
+
+to_pdf(from = "indexCG.html", partial_slides = TRUE)
+
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script src="https://platform.twitter.com/widgets.js"></script>
+<script>var slideshow = remark.create({
+  "highlightStyle": "github",
+  "highlightLines": true,
+  "countIncrementalSlides": false,
+  "ratio": "16:9"
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+// add `data-at-shortcutkeys` attribute to <body> to resolve conflicts with JAWS
+// screen reader (see PR #262)
+(function(d) {
+  let res = {};
+  d.querySelectorAll('.remark-help-content table tr').forEach(tr => {
+    const t = tr.querySelector('td:nth-child(2)').innerText;
+    tr.querySelectorAll('td:first-child .key').forEach(key => {
+      const k = key.innerText;
+      if (/^[a-z]$/.test(k)) res[k] = t;  // must be a single letter (key)
+    });
+  });
+  d.body.setAttribute('data-at-shortcutkeys', JSON.stringify(res));
+})(document);
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+// adds .remark-code-has-line-highlighted class to <pre> parent elements
+// of code chunks containing highlighted lines with class .remark-code-line-highlighted
+(function(d) {
+  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
+  const preParents = [];
+  const findPreParent = function(line, p = 0) {
+    if (p > 1) return null; // traverse up no further than grandparent
+    const el = line.parentElement;
+    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
+  };
+
+  for (let line of hlines) {
+    let pre = findPreParent(line);
+    if (pre && !preParents.includes(pre)) preParents.push(pre);
+  }
+  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
+})(document);</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>
