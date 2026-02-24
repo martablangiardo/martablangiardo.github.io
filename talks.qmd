@@ -30,7 +30,7 @@ Some recording of talks and seminars I gave recently:
 
 ## New Horizons in Public Health - The use of AI in public health in the UK
 
-**A focus on ehalth surveillance: wastewater - (from minute 1:03:29)**
+**A focus on health surveillance: wastewater - (from minute 1:03:29)**
 
 {{< video https://www.youtube.com/watch?v=_Y20bmpp8EE >}}
 
