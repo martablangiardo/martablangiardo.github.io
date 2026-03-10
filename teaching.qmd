@@ -80,3 +80,12 @@ The html version of the slides will be posted here, while the pdf version, the p
 - [Session 8.1](sessions/Session8.1/index.html): Introduction to temporal modelling
 - [Session 8.2](sessions/Session8.2/index.html): Spatio-temporal modelling for area data 
 
+### Week 9
+
+- [Session 9.1](sessions/Session9.1/index.html): Introduction to geostatistics
+- [Session 9.2](sessions/Session9.2/index.html): Introduction to SPDE 
+
+### Week 10
+
+- [Session 10](sessions/Session10/index.html): Spatio-temporal models with SPDE
+
