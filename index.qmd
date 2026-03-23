@@ -6,9 +6,6 @@ image-height: 150px
 about:
   template: trestles
   links:
-    - icon: twitter
-      text: twitter
-      href: https://twitter.com/martablangiardo
     - icon: github
       text: Github
       href: https://github.com/martablangiardo
@@ -20,7 +17,7 @@ page-layout: full
 
 # Marta Blangiardo
 
-I am a professor of Biostatistics at Imperial College, in the Department of Epidemiology and Biostatistics and I lead the Biostatistics and Data Science theme of the [MRC Centre for Environment and Health](https://environment-health.ac.uk/). I am part-time seconded at the Turing Institute, working with the RSS-TURING lab to provide accurate estimates of COVID-19 incidence and prevalence at Local Authority level. Since 2017 I hold an honorary academic appointment with PHE (now UKHSA).
+I am a professor of Biostatistics at Imperial College, in the Department of Epidemiology and Biostatistics and I lead the Biostatistics and Data Science theme of the [MRC Centre for Environment and Health](https://environment-health.ac.uk/). I was part-time seconded at the Turing Institute in 2020-2022, working with the RSS-TURING lab to provide accurate estimates of COVID-19 incidence and prevalence at Local Authority level. Since 2017 I hold an honorary academic appointment with PHE (now UKHSA).
 
 My main interests are related on the methodological aspects of environmental exposure estimation and on spatial and spatio-temporal models for disease mapping and for risk assessment.
 
