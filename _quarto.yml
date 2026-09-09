@@ -15,9 +15,7 @@ website:
       - talks.qmd
       - href: publications.qmd
         text: "Publications"
-      - href: teaching.qmd
-        text: "Teaching - MSc Epidemiology"
-      
+       
 format:
   html:
     theme: cosmo
