@@ -2,4 +2,4 @@
 
 git add *
 git commit -m "list of publication updated"
-git push -u origin main
+git push -u origin master
