@@ -402,26 +402,6 @@ $\Rightarrow$ $\bm{\gamma}$ can be modelled as exchangeable or spatially structu
            
 $$E[y_{it}] = h(\mu_{it}) = \alpha_0 + \alpha_1 w_i + \delta_0 z_{t} + \delta_1 w_i z_t+ \sum_{k=1}^K \beta_k X_{itk} + \gamma_i + \boldsymbol{\lambda}_t$$
 ]
-    
-.panel[.panel-name[Why Bayesian]
-           
-- Can include relatively vague information in the priors, which can still help regularise the inference
-           
-$\rightarrow$ Avoid inconsistent estimates because of small numbers/separation
-           
-$\rightarrow$ Use Penalised Complexity (PC) priors
-
-`r vspace("20px")`
-
-- Direct characterisation of full uncertainty in all model parameters
-           
-$\rightarrow$ Can then rescale (e.g. from regression coefficients to original scores etc) and still obtain samples from the full posterior distributions
-           
-$\rightarrow$ Particularly helpful for generalised linear models and for obtaining functions of original parameters
-           
-$\rightarrow$ Can aggregate at any space-time resolution
-           
-]
 ]
 ---
 
@@ -778,9 +758,9 @@ Using the alternative scenario of no ULEZ we calculate the attributable fraction
 
 # Results: attributable numbers
 
-`r include_fig("Barplot_new.png",width="40%")`
+`r include_fig("Barplot_new.png",width="60%")`
 
-Spatial map (LSOA) and table for the different implementation periods
+
 ---
 
 # Discussion
