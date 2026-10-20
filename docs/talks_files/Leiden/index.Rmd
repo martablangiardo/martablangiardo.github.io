@@ -271,9 +271,9 @@ count:false
 We usually will be facing one of these two questions:
 
 
-<span>1.</span> Did the policy change the outcome?
+<span>1.</span> Did the policy change the health outcome?
   
-  $\rightarrow$ direct intervention  effect
+  $\rightarrow$ direct intervention  effect on health
 
 `r vspace("20px")`
 
@@ -358,56 +358,7 @@ In its general formulation:
 ]
 
 ---
-  
-# Difference in difference
 
-<!--
-https://www.publichealth.columbia.edu/research/population-health-methods/difference-difference-estimation
-
--->
-
-If controls are available the difference-in-difference approach (DID) is a popular choice:
-  
-.pull-left[
-`r include_fig("d-i-d.png", width="60%")`
-    
-.small[D. Polsky, M. Baiocchi, in Encyclopedia of Health Economics, 2014]
-]
-
-.pull-right[
-`r vspace("10px")`
-- Do not account for external time varying effects or autocorrelation
-`r vspace("10px")`
-- Before-after approach
-`r vspace("10px")`
-- Causal effects: step change
-]
-
-
-`r vspace("20px")` 
-
-Other methods under this umbrella: segmented regression, regression discontinuity...
-
----
-  
-# A general framework
-  
-These methods have been developed to perform causal inference on longitudinal data dealing with specific data availability
-
-- They are similar! 
-  
-  
-.content-box-green[**AIM**
-                       
-- Build a general framework for quasi-experimental designs in a longitudinal setting
-                     
-- Deal with a common limitation: lack of additional dependence (e.g. in space) & generally simplified assumptions on trends (computational reasons / to make life easy)
-                     
-$\Rightarrow$ Bayesian Hierarchical Modelling Framework
-]
-
----
-  
 # Can we re-frame this?
   
 .panelset[
@@ -795,7 +746,7 @@ $$y_{ijk} \sim \text{Poisson}(\lambda_{ijk})$$
 --
 
 The two scenarios are obtained through a chemical transport model (CMAQ) which includes input as:
-- pollutant ewissions
+- pollutant emissions
 - metereology
 - atmospheric boundary conditions;
 - land use and terrain.
@@ -827,7 +778,7 @@ Using the alternative scenario of no ULEZ we calculate the attributable fraction
 
 # Results: attributable numbers
 
-`r include_fig("AN_trend.png",width="60%")`
+`r include_fig("Barplot_new.png",width="40%")`
 
 Spatial map (LSOA) and table for the different implementation periods
 ---

@@ -34,9 +34,7 @@ Some recording of talks and seminars I gave recently:
 
 {{< video https://www.youtube.com/watch?v=_Y20bmpp8EE >}}
 
-## Workshop on Health inequalities - Trondheim University
+## Bayesian Biostatistics slides 
 
-**Evaluating policy impact on health inequalities**
-
-[Slides](talks_files/Trondheim/index.html)
+[Slides](talks_files/Leiden/index.html)
 
