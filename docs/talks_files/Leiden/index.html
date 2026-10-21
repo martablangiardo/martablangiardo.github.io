@@ -589,16 +589,17 @@ Typical marginal variance `\(s_i^{(\tau)}\)` defined as the `\(i^{th}\)` entry o
 
 - `\(\delta_1\)`: difference of differences before - after intervention between exposed and controls (at intervention time).
 
---
+
   
 &lt;span style="display:block; margin-top: 50px ;"&gt;&lt;/span&gt;
 
-- Rich output means that we can easily look at differences for specific times before-after.
+&lt;!-- - Rich output means that we can easily look at differences for specific times before-after.
 
 &lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
 
 - Potential flexibility of the model traded-off with the difficulty in interpretation if a more flexible time trend is considered.
 
+--&gt;
 
 ---
   
@@ -612,13 +613,16 @@ Typical marginal variance `\(s_i^{(\tau)}\)` defined as the `\(i^{th}\)` entry o
 
 # Discussion
 
-- Flexible robust framework which can be adapted to a range of questions at individual and aggregated level
+- Flexible framework which can be adapted to a range of questions at individual and aggregated level
 
 &lt;span style="display:block; margin-top: 50px ;"&gt;&lt;/span&gt;
 
-- It naturally allows the construction of additional quantities of interest with their associated uncertainty
 
-`\(\rightarrow\)` Immediate and sustained effect can be obtained 
+- Linear predictor can be specified to estimate immediate and sustained effect of the intervention
+
+&lt;span style="display:block; margin-top: 50px ;"&gt;&lt;/span&gt;
+
+- Rich output means that contrasts can be estimated for specific space and time combinations
 
 &lt;span style="display:block; margin-top: 50px ;"&gt;&lt;/span&gt;
 
@@ -640,11 +644,11 @@ Case-crossover plus counterfactual attribution
 
 Did the policy influence a variable (e.g. exposure) whose change prevent some type of events?
 
-&lt;span style="display:block; margin-top: q0px ;"&gt;&lt;/span&gt;
+&lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
 
 Three steps:
 
-&lt;span style="display:block; margin-top: q0px ;"&gt;&lt;/span&gt;
+&lt;span style="display:block; margin-top: 10px ;"&gt;&lt;/span&gt;
 
 &lt;span&gt;1.&lt;/span&gt; Decide on the most appropriate design to estimate the effect of the variable (e.g. exposure) on the outcome (e.g. short or long-term effect? Individual or aggregated level?)
 
@@ -713,9 +717,9 @@ Three steps:
 
 # Results: impact changing in time
 
-- The `\(\beta\)` changing in time represents changes such as vulnerability/resilience in the population, changes in healthcare-seeking or admission practice, changes in the pollutant mixture,...
+- The `\(\bf{\beta}\)` changing in time represents changes such as vulnerability/resilience in the population, changes in healthcare-seeking or admission practice, changes in the pollutant mixture,...
 
-&lt;center&gt;&lt;img src=./img/Year_month_beta.png width='60%' title='INCLUDE TEXT HERE'&gt;&lt;/center&gt;
+&lt;center&gt;&lt;img src=./img/Year_month_beta.png width='55%' title='INCLUDE TEXT HERE'&gt;&lt;/center&gt;
 
 &lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
 
@@ -781,11 +785,11 @@ Using the alternative scenario of no ULEZ we calculate the attributable fraction
 
 - Hard to disentangle policy specific as happened at the same time as COVID 
 
-`\(\rightarrow\)` ITS design would not be appropriate
+`\(\qquad\qquad\rightarrow\)` ITS design would not be appropriate
 
 &lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
 
-- Counterfactuals help focusing on the ULEZ changes, dynamic coefficients help accounting for anything else happening
+- Counterfactuals make the focus on the ULEZ-driven changes in air pollution, dynamic coefficients help accounting for anything else happening during the study period
 
 &lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
 
@@ -793,38 +797,44 @@ Using the alternative scenario of no ULEZ we calculate the attributable fraction
 
 &lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
 
-- Relies on the modelled counterfactuals
+- It relies on the modelled counterfactuals
 
 ---
 
 # Comparison and synthesis
 
 
+.pull-left[
+
 **Spatial ITS**
 
-- Unit of analysis: area (or individual) and time  
+- Unit of analysis: Individual/area and time  
 
 - Exposure: Intervention status
 
-- Outcome: Population (or individual)-level health measure
+- Outcome: Individual/area-level health outcome
 
 - Main comparison: Observed versus no-intervention outcome trajectory
 
 - Main output: Intervention effect
 
---
+]
+
+.pull-right[
 
 **Case-crossover plus attribution**
 
-- Unit of analysis: Individual and time  
+- Unit of analysis: Individual/area and time  
 
-- Exposure: Daily exposure measurement
+- Exposure: Risk factor measurement
 
-- Outcome: Individual-level health outcome
+- Outcome: Individual/area-level health outcome
 
 - Main comparison: Observed versus no-intervention exposure
 
 - Main output: Number/fraction of outcomes potentially prevented
+
+]
 
 --
 
@@ -836,7 +846,7 @@ Using the alternative scenario of no ULEZ we calculate the attributable fraction
 
 --
 
-.red[The choice of design should follow the intervention, outcome, exposure pathway, and counterfactual of interest, not simply the availability of longitudinal data.]
+.red[The choice of strategy should follow the intervention, outcome, exposure pathway, and counterfactual of interest, not simply the availability of longitudinal data.]
 
 ---
 

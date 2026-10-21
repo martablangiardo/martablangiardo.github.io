@@ -575,16 +575,17 @@ $\Rightarrow$ Issues with disconnected graphs as the typical marginal variances 
 
 - $\delta_1$: difference of differences before - after intervention between exposed and controls (at intervention time).
 
---
+
   
 `r vspace("50px")`
 
-- Rich output means that we can easily look at differences for specific times before-after.
+<!-- - Rich output means that we can easily look at differences for specific times before-after.
 
 `r vspace("20px")`
 
 - Potential flexibility of the model traded-off with the difficulty in interpretation if a more flexible time trend is considered.
 
+-->
 
 ---
   
@@ -598,13 +599,16 @@ $\Rightarrow$ Issues with disconnected graphs as the typical marginal variances 
 
 # Discussion
 
-- Flexible robust framework which can be adapted to a range of questions at individual and aggregated level
+- Flexible framework which can be adapted to a range of questions at individual and aggregated level
 
 `r vspace("50px")`
 
-- It naturally allows the construction of additional quantities of interest with their associated uncertainty
 
-$\rightarrow$ Immediate and sustained effect can be obtained 
+- Linear predictor can be specified to estimate immediate and sustained effect of the intervention
+
+`r vspace("50px")`
+
+- Rich output means that contrasts can be estimated for specific space and time combinations
 
 `r vspace("50px")`
 
@@ -626,11 +630,11 @@ Case-crossover plus counterfactual attribution
 
 Did the policy influence a variable (e.g. exposure) whose change prevent some type of events?
 
-`r vspace("q0px")`
+`r vspace("20px")`
 
 Three steps:
 
-`r vspace("q0px")`
+`r vspace("10px")`
 
 <span>1.</span> Decide on the most appropriate design to estimate the effect of the variable (e.g. exposure) on the outcome (e.g. short or long-term effect? Individual or aggregated level?)
 
@@ -699,9 +703,9 @@ $$y_{ijk} \sim \text{Poisson}(\lambda_{ijk})$$
 
 # Results: impact changing in time
 
-- The $\beta$ changing in time represents changes such as vulnerability/resilience in the population, changes in healthcare-seeking or admission practice, changes in the pollutant mixture,...
+- The $\bf{\beta}$ changing in time represents changes such as vulnerability/resilience in the population, changes in healthcare-seeking or admission practice, changes in the pollutant mixture,...
 
-`r include_fig("Year_month_beta.png",width="60%")`
+`r include_fig("Year_month_beta.png",width="55%")`
 
 `r vspace("20px")`
 
@@ -767,11 +771,11 @@ Using the alternative scenario of no ULEZ we calculate the attributable fraction
 
 - Hard to disentangle policy specific as happened at the same time as COVID 
 
-$\rightarrow$ ITS design would not be appropriate
+$\qquad\qquad\rightarrow$ ITS design would not be appropriate
 
 `r vspace("20px")`
 
-- Counterfactuals help focusing on the ULEZ changes, dynamic coefficients help accounting for anything else happening
+- Counterfactuals make the focus on the ULEZ-driven changes in air pollution, dynamic coefficients help accounting for anything else happening during the study period
 
 `r vspace("20px")`
 
@@ -779,38 +783,44 @@ $\rightarrow$ ITS design would not be appropriate
 
 `r vspace("20px")`
 
-- Relies on the modelled counterfactuals
+- It relies on the modelled counterfactuals
 
 ---
 
 # Comparison and synthesis
 
 
+.pull-left[
+
 **Spatial ITS**
 
-- Unit of analysis: area (or individual) and time  
+- Unit of analysis: Individual/area and time  
 
 - Exposure: Intervention status
 
-- Outcome: Population (or individual)-level health measure
+- Outcome: Individual/area-level health outcome
 
 - Main comparison: Observed versus no-intervention outcome trajectory
 
 - Main output: Intervention effect
 
---
+]
+
+.pull-right[
 
 **Case-crossover plus attribution**
 
-- Unit of analysis: Individual and time  
+- Unit of analysis: Individual/area and time  
 
-- Exposure: Daily exposure measurement
+- Exposure: Risk factor measurement
 
-- Outcome: Individual-level health outcome
+- Outcome: Individual/area-level health outcome
 
 - Main comparison: Observed versus no-intervention exposure
 
 - Main output: Number/fraction of outcomes potentially prevented
+
+]
 
 --
 
@@ -822,7 +832,7 @@ $\rightarrow$ ITS design would not be appropriate
 
 --
 
-.red[The choice of design should follow the intervention, outcome, exposure pathway, and counterfactual of interest, not simply the availability of longitudinal data.]
+.red[The choice of strategy should follow the intervention, outcome, exposure pathway, and counterfactual of interest, not simply the availability of longitudinal data.]
 
 ---
 
