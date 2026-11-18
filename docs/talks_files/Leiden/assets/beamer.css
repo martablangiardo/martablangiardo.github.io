@@ -31,17 +31,17 @@
 
   /* Colors */
   --text-color: #000000;
-  --header-color: #003E74; /* #24568c; */
+  --header-color: #0000CD; /* #24568c; */
   --background-color: #FFFFFF;
   --link-color: #C5283D;
-  --text-bold-color: #035AA6;
+  --text-bold-color: #0000CD;
   --code-highlight-color: rgba(255,255,0,0.5);
   --inverse-text-color: #000000;
   --inverse-background-color: #03A696;
   --inverse-header-color: #000000;
   --title-slide-background-color: #FFFFFF; /* #035AA6; */
   --title-slide-text-color: #FFFFFF;
-  --header-background-color: #003E74;
+  --header-background-color: #0000CD;
   --header-background-text-color: #FFFFFF;
   --primary: #035AA6;
   --secondary: #03A696;
@@ -142,6 +142,7 @@ a:hover {
   bottom: 60px;
   padding-right: 4em;
   font-size: 0.9em;
+  color: #0000CD;
 }
 .remark-code-line-highlighted {
   background-color: var(--code-highlight-color);
@@ -167,7 +168,7 @@ a:hover {
   box-sizing: border-box;
   box-shadow: 10px 10px 5px  rgba(0,0,0,0.6);
   border-radius: 15px;
-  background-color: #003E74;
+  background-color: #0000CD;
   padding: 35px 30px 35px 30px;
   margin-left: 3%;
   margin-right: 3%;
@@ -506,7 +507,7 @@ table.dataTable.hover tbody tr:hover, table.dataTable.display tbody tr:hover {
     width: 100%;
     color: #D5D5D5;
     font-size: 70%;
-    background-image: linear-gradient(to right, rgb(0, 62, 116), rgb(0, 62, 116));
+    background-image: linear-gradient(to right, rgb(0, 0, 205), rgb(0, 0, 205));
 }
 .my-footer .alignleft {
   float: left;
